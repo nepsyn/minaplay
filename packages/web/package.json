@@ -1,0 +1,22 @@
+{
+  "name": "@minaplay/web",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "@mdi/js": "^7.2.96",
+    "@vitejs/plugin-vue": "^4.1.0",
+    "pinia": "^2.0.34",
+    "prettier": "^2.8.7",
+    "sass": "^1.62.0",
+    "typescript": "^4.9.3",
+    "vite": "^4.2.0",
+    "vite-plugin-vuetify": "^1.0.2",
+    "vue-tsc": "^1.2.0",
+    "vuetify": "^3.1.14",
+    "vue": "^3.2.47",
+    "vue-router": "^4.1.6"
+  }
+}

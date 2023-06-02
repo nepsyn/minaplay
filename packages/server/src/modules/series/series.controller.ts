@@ -104,7 +104,7 @@ export class SeriesController {
     }
 
     return await this.seriesService.save({
-      ...series,
+      id,
       ...data,
       poster: { id: data.posterFileId },
       tags: data.tagIds?.map((id) => ({ id })),

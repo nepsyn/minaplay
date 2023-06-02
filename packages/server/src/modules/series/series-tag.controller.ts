@@ -56,7 +56,7 @@ export class SeriesTagController {
     }
 
     return await this.seriesTagService.save({
-      ...seriesTag,
+      id,
       ...data,
     });
   }

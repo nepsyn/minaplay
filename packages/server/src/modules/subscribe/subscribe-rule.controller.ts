@@ -126,7 +126,7 @@ export class SubscribeRuleController {
     }
 
     return this.subscribeRuleService.save({
-      ...rule,
+      id,
       ...data,
       series: { id: data.seriesId },
     });

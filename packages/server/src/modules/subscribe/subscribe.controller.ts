@@ -84,7 +84,7 @@ export class SubscribeController {
 
     await this.subscribeSourceService.deleteFetchSubscribeDataJob(id);
     source = await this.subscribeSourceService.save({
-      ...source,
+      id,
       ...data,
     });
     if (source.enabled) {

@@ -22,6 +22,11 @@ export enum PermissionEnum {
   /** 获取订阅 */
   FETCH_SUBSCRIBE = 'FETCH:SUBSCRIBE',
 
+  /** 管理直播间 */
+  MANAGE_LIVE = 'MANAGE:LIVE',
+  /** 获取直播间 */
+  FETCH_LIVE = 'FETCH:LIVE',
+
   /** 操作 Aria2 */
   MANAGE_ARIA2 = 'MANAGE:ARIA2',
 }

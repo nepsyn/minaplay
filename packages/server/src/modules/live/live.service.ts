@@ -14,4 +14,9 @@ export class LiveService {
   async findOneBy(where: FindOptionsWhere<Live>) {
     return await this.liveRepository.findOneBy(where);
   }
+
+  async delete(where: FindOptionsWhere<Live>) {
+    const result = await this.liveRepository.delete(where);
+    return result.affected > 0;
+  }
 }

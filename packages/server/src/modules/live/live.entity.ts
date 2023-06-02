@@ -55,6 +55,7 @@ export class Live {
   updateAt: Date;
 
   /** 删除时间 */
+  @Exclude()
   @DeleteDateColumn()
   deleteAt: Date;
 

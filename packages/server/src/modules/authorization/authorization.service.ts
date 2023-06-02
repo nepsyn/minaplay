@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Permission } from './permission.entity';
-import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
+import { DeepPartial, Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/user.entity';
 import { instanceToPlain } from 'class-transformer';
@@ -25,7 +25,7 @@ export class AuthorizationService {
     };
     const token = await this.signToken(payload);
 
-    await this.updateTicket({ id: user.id }, ticket);
+    await this.updateTicket(user.id, ticket);
 
     return {
       ...instanceToPlain(user),
@@ -33,12 +33,18 @@ export class AuthorizationService {
     };
   }
 
-  async updateTicket(where: FindOptionsWhere<User>, ticket: string) {
-    return await this.userService.update(where, { ticket });
+  async updateTicket(id: number, ticket: string) {
+    return await this.userService.save({
+      id,
+      ticket,
+    });
   }
 
-  async revokeTicket(where: FindOptionsWhere<User>) {
-    return await this.userService.update(where, { ticket: null });
+  async revokeTicket(id: number) {
+    return await this.userService.save({
+      id,
+      ticket: null,
+    });
   }
 
   async signToken(data: object) {

@@ -14,9 +14,4 @@ export class UserService {
   async findOneBy(where: FindOptionsWhere<User>) {
     return this.userRepository.findOneBy(where);
   }
-
-  async update(where: FindOptionsWhere<User>, data: DeepPartial<User>) {
-    const result = await this.userRepository.update(where, data);
-    return result.affected > 0;
-  }
 }

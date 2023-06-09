@@ -6,10 +6,11 @@ import { LiveService } from './live.service';
 import { LiveConfigurableModule } from './live.module-definition';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import { UserModule } from '../user/user.module';
+import { LiveGateway } from './live.gateway';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Live]), AuthorizationModule, UserModule],
-  providers: [LiveService],
+  providers: [LiveService, LiveGateway],
   controllers: [LiveController],
   exports: [LiveService],
 })

@@ -44,7 +44,7 @@ export class SubscribeRuleController {
   @ApiOperation({
     description: '添加订阅源规则',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SUBSCRIBE)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createSubscribeRule(
     @RequestUser() user: User,
     @Param('sourceId') sourceId: number,
@@ -86,7 +86,7 @@ export class SubscribeRuleController {
   @ApiOperation({
     description: '获取订阅源规则列表',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SUBSCRIBE)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async getSubscribeRulesBySourceId(@Param('sourceId') sourceId: number) {
     const source = await this.subscribeSourceService.findOneBy({ id: sourceId });
     if (!source) {
@@ -106,7 +106,7 @@ export class SubscribeRuleController {
   @ApiOperation({
     description: '修改订阅源规则',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SUBSCRIBE)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async updateSubscribeRule(@Param('id') id: number, @Body() data: SubscribeRuleDto) {
     const rule = await this.subscribeRuleService.findOneBy({ id });
     if (!rule) {
@@ -136,7 +136,7 @@ export class SubscribeRuleController {
   @ApiOperation({
     description: '删除订阅规则',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SUBSCRIBE)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async deleteSubscribeRule(@Param('id') id: number) {
     await this.subscribeRuleService.delete({ id });
     return {};

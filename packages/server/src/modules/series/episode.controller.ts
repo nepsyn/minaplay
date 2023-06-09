@@ -31,7 +31,7 @@ export class EpisodeController {
   @ApiOperation({
     description: '查看单集',
   })
-  @RequirePermissions(PermissionEnum.FETCH_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
   async getEpisodeById(@Param('id') id: number) {
     const episode = await this.episodeService.findOneBy({ id });
     if (!episode) {
@@ -45,7 +45,7 @@ export class EpisodeController {
   @ApiOperation({
     description: '创建单集',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async createEpisode(@Body() data: EpisodeDto) {
     if (!data.seriesId) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
@@ -62,7 +62,7 @@ export class EpisodeController {
   @ApiOperation({
     description: '修改单集信息',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async updateEpisode(@Param('id') id: number, @Body() data: EpisodeDto) {
     const episode = await this.episodeService.findOneBy({ id });
     if (!episode) {
@@ -85,7 +85,7 @@ export class EpisodeController {
   @ApiOperation({
     description: '删除单集',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async deleteEpisode(@Param('id') id: number) {
     await this.episodeService.delete({ id });
     return {};

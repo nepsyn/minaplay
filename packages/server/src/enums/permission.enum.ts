@@ -1,32 +1,29 @@
 export enum PermissionEnum {
-  /** 授权权限 */
-  GRANT_PERMISSION = 'GRANT:PERMISSION',
+  /** 最高权限 */
+  ROOT_OP = '*:*',
 
-  /** 用户操作 */
-  MANAGE_USER = 'MANAGE:USER',
+  /** 用户管理 */
+  USER_OP = 'USER:*',
 
-  /** 文件操作 */
-  MANAGE_FILE = 'MANAGE:FILE',
+  /** 文件管理 */
+  FILE_OP = 'FILE:*',
   /** 上传图片 */
-  UPLOAD_IMAGE = 'UPLOAD:IMAGE',
+  FILE_UPLOAD_IMAGE = 'FILE:UPLOAD:IMAGE',
   /** 上传视频 */
-  UPLOAD_VIDEO = 'UPLOAD:VIDEO',
+  FILE_UPLOAD_VIDEO = 'FILE_UPLOAD:VIDEO',
 
-  /** 操作剧集 */
-  MANAGE_SERIES = 'MANAGE:SERIES',
-  /** 获取剧集 */
-  FETCH_SERIES = 'FETCH:SERIES',
+  /** 剧集管理 */
+  SERIES_OP = 'SERIES:*',
+  /** 剧集查看 */
+  SERIES_VIEW = 'SERIES:VIEW',
 
-  /** 操作订阅 */
-  MANAGE_SUBSCRIBE = 'MANAGE:SUBSCRIBE',
-  /** 获取订阅 */
-  FETCH_SUBSCRIBE = 'FETCH:SUBSCRIBE',
+  /** 订阅管理 */
+  SUBSCRIBE_OP = 'SUBSCRIBE:*',
+  /** 订阅查看 */
+  SUBSCRIBE_VIEW = 'SUBSCRIBE:VIEW',
 
-  /** 管理直播间 */
-  MANAGE_LIVE = 'MANAGE:LIVE',
-  /** 获取直播间 */
-  FETCH_LIVE = 'FETCH:LIVE',
-
-  /** 操作 Aria2 */
-  MANAGE_ARIA2 = 'MANAGE:ARIA2',
+  /** 直播管理 */
+  LIVE_OP = 'LIVE:*',
+  /** 直播查看 */
+  LIVE_VIEW = 'LIVE:VIEW',
 }

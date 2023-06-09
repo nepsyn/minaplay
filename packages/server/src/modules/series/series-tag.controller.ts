@@ -29,7 +29,7 @@ export class SeriesTagController {
   @ApiOperation({
     description: '新增剧集标签',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async createSeriesTag(@Body() data: SeriesTagDto) {
     const sameNameSeriesTag = await this.seriesTagService.findOneBy({ name: data.name });
     if (sameNameSeriesTag) {
@@ -43,7 +43,7 @@ export class SeriesTagController {
   @ApiOperation({
     description: '修改剧集标签',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async updateSeriesTag(@Param('id') id: number, @Body() data: SeriesTagDto) {
     const seriesTag = await this.seriesTagService.findOneBy({ id });
     if (!seriesTag) {
@@ -65,7 +65,7 @@ export class SeriesTagController {
   @ApiOperation({
     description: '删除剧集标签',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async deleteSeriesTag(@Param('id') id: number) {
     await this.seriesTagService.delete({ id });
     return {};

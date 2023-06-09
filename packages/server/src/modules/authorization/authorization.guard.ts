@@ -32,7 +32,7 @@ export class AuthorizationGuard extends AuthGuard('jwt') implements CanActivate 
         throw buildException(UnauthorizedException, ErrorCodeEnum.USER_NOT_LOGGED_IN);
       }
 
-      if (permissions.some((p) => !user.permissionNames.includes(p))) {
+      if (!permissions.some((p) => user.permissionNames.includes(p))) {
         throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
       }
     }

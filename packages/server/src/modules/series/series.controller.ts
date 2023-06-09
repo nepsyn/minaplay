@@ -37,7 +37,7 @@ export class SeriesController {
   @ApiOperation({
     description: '查看剧集',
   })
-  @RequirePermissions(PermissionEnum.FETCH_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
   async getSeriesById(@Param('id') id: number) {
     const series = await this.seriesService.findOneBy({ id });
     if (!series) {
@@ -51,7 +51,7 @@ export class SeriesController {
   @ApiOperation({
     description: '创建剧集',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async createSeries(@RequestUser() user: User, @Body() data: SeriesDto) {
     const sameNameSeries = await this.seriesService.findOneBy({ name: data.name });
     if (sameNameSeries) {
@@ -70,7 +70,7 @@ export class SeriesController {
   @ApiOperation({
     description: '查询剧集',
   })
-  @RequirePermissions(PermissionEnum.FETCH_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async querySeries(@Query() query: SeriesQueryDto) {
     const { keyword, id, name } = query;
     const [result, total] = await this.seriesService.findAndCount({
@@ -91,7 +91,7 @@ export class SeriesController {
   @ApiOperation({
     description: '修改剧集信息',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async updateSeries(@Param('id') id: number, @Body() data: SeriesDto) {
     const series = await this.seriesService.findOneBy({ id });
     if (!series) {
@@ -115,7 +115,7 @@ export class SeriesController {
   @ApiOperation({
     description: '删除剧集',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SERIES)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async deleteSeries(@Param('id') id: number) {
     await this.seriesService.delete({ id });
     return {};

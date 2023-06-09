@@ -32,7 +32,7 @@ export class SubscribeController {
   @ApiOperation({
     description: '添加新订阅',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SUBSCRIBE)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createSubscribeSource(@RequestUser() user: User, @Body() data: SubscribeSourceDto) {
     const feed = await this.subscribeSourceService.readSource(data.url);
     if (!feed.title) {
@@ -54,7 +54,7 @@ export class SubscribeController {
   @ApiOperation({
     description: '获取订阅源信息',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SUBSCRIBE)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async getSubscribeSourceById(@Param('id') id: number) {
     const source = await this.subscribeSourceService.findOneBy({ id });
     if (!source) {
@@ -68,7 +68,7 @@ export class SubscribeController {
   @ApiOperation({
     description: '修改订阅源信息',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SUBSCRIBE)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async updateSubscribeSource(@Param('id') id: number, @Body() data: SubscribeSourceDto) {
     let source = await this.subscribeSourceService.findOneBy({ id });
     if (!source) {
@@ -98,7 +98,7 @@ export class SubscribeController {
   @ApiOperation({
     description: '删除订阅源',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SUBSCRIBE)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async deleteSubscribeSource(@Param('id') id: number) {
     await this.subscribeSourceService.deleteFetchSubscribeDataJob(id);
     await this.subscribeSourceService.delete({ id });
@@ -109,7 +109,7 @@ export class SubscribeController {
   @ApiOperation({
     description: '获取订阅源原始数据',
   })
-  @RequirePermissions(PermissionEnum.MANAGE_SUBSCRIBE)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async fetchSourceRawData(@Param('id') id: number) {
     const source = await this.subscribeSourceService.findOneBy({ id });
     if (!source) {

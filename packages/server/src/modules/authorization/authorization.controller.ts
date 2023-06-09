@@ -58,7 +58,7 @@ export class AuthorizationController {
   @HttpCode(200)
   @UseGuards(AuthorizationGuard)
   async logout(@RequestUser() user: User) {
-    await this.authService.revokeTicket({ id: user.id });
+    await this.authService.revokeTicket(user.id);
     return {};
   }
 
@@ -68,9 +68,9 @@ export class AuthorizationController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthorizationGuard)
-  @RequirePermissions(PermissionEnum.MANAGE_USER)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.USER_OP)
   async logoutUser(@Param('userId') userId: number) {
-    await this.authService.revokeTicket({ id: userId });
+    await this.authService.revokeTicket(userId);
     return {};
   }
 
@@ -80,9 +80,9 @@ export class AuthorizationController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthorizationGuard)
-  @RequirePermissions(PermissionEnum.GRANT_PERMISSION)
+  @RequirePermissions(PermissionEnum.ROOT_OP)
   async grantPermissions(@RequestUser() operator: User, @Param('userId') userId: number, @Body() data: PermissionDto) {
-    if (operator.id === userId || data.permissionNames.includes(PermissionEnum.GRANT_PERMISSION)) {
+    if (operator.id === userId || data.permissionNames.includes(PermissionEnum.ROOT_OP)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -100,7 +100,7 @@ export class AuthorizationController {
   })
   @ApiBearerAuth()
   @UseGuards(AuthorizationGuard)
-  @RequirePermissions(PermissionEnum.GRANT_PERMISSION)
+  @RequirePermissions(PermissionEnum.ROOT_OP)
   async fetchAllPermissions() {
     return await this.authService.findAllPermissions();
   }

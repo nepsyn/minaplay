@@ -6,10 +6,7 @@ import { PermissionEnum } from '../../enums/permission.enum';
 @Entity()
 export class Permission {
   /** 名称 */
-  @PrimaryColumn({
-    type: 'enum',
-    enum: PermissionEnum,
-  })
+  @PrimaryColumn()
   name: PermissionEnum;
 
   /** 用户 */

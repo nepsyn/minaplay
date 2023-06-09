@@ -65,7 +65,7 @@ export class FileController {
   @ApiOperation({
     description: '上传图片资源文件',
   })
-  @RequirePermissions(PermissionEnum.UPLOAD_IMAGE)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP, PermissionEnum.FILE_UPLOAD_IMAGE)
   @ApiFile('file', '图片文件')
   async uploadImageFile(@RequestUser() user: User, @UploadedFile() file: Express.Multer.File) {
     if (file) {
@@ -113,7 +113,7 @@ export class FileController {
     description: '上传视频资源',
   })
   @ApiFile('file', '视频资源文件')
-  @RequirePermissions(PermissionEnum.UPLOAD_VIDEO)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP, PermissionEnum.FILE_UPLOAD_VIDEO)
   async uploadMediaFile(@RequestUser() user: User, @UploadedFile() file: Express.Multer.File) {
     if (file) {
       try {

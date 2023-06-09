@@ -9,13 +9,13 @@ export class AddRootUser1685282226999 implements MigrationInterface {
     for (const key in PermissionEnum) {
       const permission = PermissionEnum[key];
       await queryRunner.query(`INSERT INTO \`permission\` VALUES ('${permission}','${permission}')`);
-      await queryRunner.query(`INSERT INTO \`user_permissions_permission\` VALUES (1,'${permission}')`);
     }
+    await queryRunner.query(`INSERT INTO \`user_permissions_permission\` VALUES (1,'${PermissionEnum.ROOT_OP}')`);
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.clearTable('user_permissions_permission');
-    await queryRunner.clearTable('permission');
-    await queryRunner.clearTable('user');
+    await queryRunner.query(`DELETE FROM \`user_permissions_permission\``);
+    await queryRunner.query(`DELETE FROM \`permission\``);
+    await queryRunner.query(`DELETE FROM \`user\``);
   }
 }

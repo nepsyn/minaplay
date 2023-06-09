@@ -46,7 +46,7 @@ export class AuthorizationWsGuard implements CanActivate {
     // 所需要权限
     const permissions = this.reflector.get<PermissionEnum[]>(PERMISSIONS_SYMBOL, context.getHandler());
     if (permissions && permissions.length > 0) {
-      if (permissions.some((p) => !socket.data.user.permissions.includes(p))) {
+      if (!permissions.some((p) => socket.data.user.permissions.includes(p))) {
         throw buildException(WsException, ErrorCodeEnum.INVALID_TOKEN);
       }
     }

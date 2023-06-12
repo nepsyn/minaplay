@@ -1,7 +1,6 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { WsException } from '@nestjs/websockets';
-import { instanceToPlain } from 'class-transformer';
 import { Socket } from 'socket.io';
 import { UserService } from '../user/user.service';
 import { AuthorizationService } from './authorization.service';
@@ -40,13 +39,13 @@ export class AuthorizationWsGuard implements CanActivate {
         throw buildException(WsException, ErrorCodeEnum.INVALID_TOKEN);
       }
 
-      socket.data.user = instanceToPlain(user);
+      socket.data.user = user;
     }
 
     // 所需要权限
     const permissions = this.reflector.get<PermissionEnum[]>(PERMISSIONS_SYMBOL, context.getHandler());
     if (permissions && permissions.length > 0) {
-      if (!permissions.some((p) => socket.data.user.permissions.includes(p))) {
+      if (!permissions.some((p) => socket.data.user.permissionNames.includes(p))) {
         throw buildException(WsException, ErrorCodeEnum.INVALID_TOKEN);
       }
     }

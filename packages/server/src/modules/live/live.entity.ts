@@ -27,6 +27,7 @@ export class Live {
   title?: string;
 
   /** 密码 */
+  @Exclude()
   @Column({
     nullable: true,
   })

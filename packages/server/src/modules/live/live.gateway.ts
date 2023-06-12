@@ -26,6 +26,7 @@ import { LiveChatService } from './live-chat.service';
 import { Between } from 'typeorm';
 import { RequireAdmin } from './require-admin.ws.decorator';
 import { instanceToPlain } from 'class-transformer';
+import { User } from '../user/user.entity';
 
 @WebSocketGateway()
 @UseGuards(AuthorizationWsGuard)
@@ -53,7 +54,11 @@ export class LiveGateway implements OnGatewayDisconnect {
       user: instanceToPlain(socket.data.user),
     });
 
-    return await this.liveService.createLiveState(live.id);
+    const state = await this.liveService.createLiveState(live.id);
+    state.users.push(instanceToPlain(socket.data.user) as User);
+    await this.liveService.updateLiveState(state);
+
+    return state;
   }
 
   @SubscribeMessage('state')
@@ -199,7 +204,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     const client = sockets.find((client) => client.data.user.id === id);
     if (client) {
       this.server.to(socket.data.roomId).emit('member-kick', {
-        user: client.data.user,
+        user: instanceToPlain(client.data.user),
       });
       await this.makeClientLeaveCurrentRoom(client);
 

@@ -24,16 +24,22 @@ import { LiveState } from './live.state';
 import { MinaplayMessage, parseMessage } from '../../utils/message-type';
 import { LiveChatService } from './live-chat.service';
 import { Between } from 'typeorm';
-import { RequireAdmin } from './require-admin.ws.decorator';
+import { CreatorOnly } from './creator-only.ws.decorator';
 import { instanceToPlain } from 'class-transformer';
 import { User } from '../user/user.entity';
+import { LiveVoiceService } from './live-voice.service';
+import { types as MediasoupTypes } from 'mediasoup';
 
 @WebSocketGateway()
 @UseGuards(AuthorizationWsGuard)
 @UseFilters(BaseWsExceptionFilter)
 @UseInterceptors(ApplicationGatewayInterceptor, ClassSerializerInterceptor, LiveStateWsInterceptor)
 export class LiveGateway implements OnGatewayDisconnect {
-  constructor(private liveService: LiveService, private liveChatService: LiveChatService) {}
+  constructor(
+    private liveService: LiveService,
+    private liveVoiceService: LiveVoiceService,
+    private liveChatService: LiveChatService,
+  ) {}
 
   @WebSocketServer()
   private readonly server: Server;
@@ -52,6 +58,13 @@ export class LiveGateway implements OnGatewayDisconnect {
 
     this.server.to(live.id).emit('member-join', {
       user: instanceToPlain(socket.data.user),
+    });
+
+    const group = await this.liveVoiceService.getVoiceGroup(id);
+    group.peers.set(socket.data.user.id, {
+      transports: new Map(),
+      producers: new Map(),
+      consumers: new Map(),
     });
 
     const state = await this.liveService.createLiveState(live.id);
@@ -133,7 +146,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('revoke')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
-  @RequireAdmin()
+  @CreatorOnly()
   async handleRevoke(@ConnectedSocket() socket: Socket, @MessageBody('id') id: string) {
     if (!id) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
@@ -146,7 +159,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('mute-chat')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
-  @RequireAdmin()
+  @CreatorOnly()
   async handleMute(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState, @MessageBody('id') id: number) {
     if (!id) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
@@ -163,7 +176,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('unmute-chat')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
-  @RequireAdmin()
+  @CreatorOnly()
   async handleUnmute(
     @ConnectedSocket() socket: Socket,
     @WsLiveState() state: LiveState,
@@ -193,7 +206,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('kick')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
-  @RequireAdmin()
+  @CreatorOnly()
   async handleKick(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState, @MessageBody('id') id: number) {
     if (!id || id === socket.data.user.id) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
@@ -207,6 +220,140 @@ export class LiveGateway implements OnGatewayDisconnect {
       });
       await this.makeClientLeaveCurrentRoom(client);
     }
+  }
+
+  @SubscribeMessage('dispose')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
+  @UseGuards(LiveAudienceWsGuard)
+  async handleDispose(@ConnectedSocket() socket: Socket) {
+    await this.dispose(socket.data.live.id);
+  }
+
+  @SubscribeMessage('voice-rtp-capabilities')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
+  @UseGuards(LiveAudienceWsGuard)
+  async handleVoiceRtpCapabilities(@ConnectedSocket() socket: Socket) {
+    const group = await this.liveVoiceService.getVoiceGroup(socket.data.live.id);
+    return group.router.rtpCapabilities;
+  }
+
+  @SubscribeMessage('voice-get-producers')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
+  @UseGuards(LiveAudienceWsGuard)
+  async handleVoiceGetProducers(@ConnectedSocket() socket: Socket) {
+    const group = await this.liveVoiceService.getVoiceGroup(socket.data.live.id);
+    const maps: { userId: number; producerId: string }[] = [];
+    for (const [peerId, peer] of group.peers) {
+      for (const producer of peer.producers.values()) {
+        maps.push({
+          userId: peerId,
+          producerId: producer.id,
+        });
+      }
+    }
+    return maps;
+  }
+
+  @SubscribeMessage('voice-create-webrtc-transport')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
+  @UseGuards(LiveAudienceWsGuard)
+  async handleVoiceCreateWebrtcTransport(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('transportId') transportId: string,
+    @MessageBody('dtlsParameters') dtlsParameters: MediasoupTypes.DtlsParameters,
+  ) {
+    await this.liveVoiceService.connectTransport(socket.data.roomId, socket.data.user.id, transportId, dtlsParameters);
+  }
+
+  @SubscribeMessage('voice-create-producer')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
+  @UseGuards(LiveAudienceWsGuard)
+  async handleVoiceCreateProducer(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('transportId') transportId: string,
+    @MessageBody('rtpParameters') rtpParameters: MediasoupTypes.RtpParameters,
+  ) {
+    const producer = await this.liveVoiceService.createProducer(
+      socket.data.roomId,
+      socket.data.user.id,
+      transportId,
+      rtpParameters,
+    );
+
+    if (!producer) {
+      throw buildException(WsException, ErrorCodeEnum.VOICE_SERVICE_ESTABLISH_FAILED);
+    }
+
+    producer.on('transportclose', () => {
+      this.server.to(socket.data.roomId).emit('voice-closed-producer', {
+        userId: socket.data.user.id,
+        producerId: producer.id,
+      });
+    });
+
+    // 通知
+    this.server.to(socket.data.roomId).emit('voice-new-producer', {
+      userId: socket.data.user.id,
+      producerId: producer.id,
+    });
+
+    return {
+      producerId: producer.id,
+    };
+  }
+
+  @SubscribeMessage('voice-create-consumer')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
+  @UseGuards(LiveAudienceWsGuard)
+  async handleVoiceCreateConsumer(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('transportId') transportId: string,
+    @MessageBody('producerId') producerId: string,
+    @MessageBody('rtpCapabilities') rtpCapabilities: MediasoupTypes.RtpCapabilities,
+  ) {
+    const consumer = await this.liveVoiceService.createConsumer(
+      socket.data.roomId,
+      socket.data.user.id,
+      transportId,
+      producerId,
+      rtpCapabilities,
+    );
+
+    if (!consumer) {
+      throw buildException(WsException, ErrorCodeEnum.VOICE_SERVICE_ESTABLISH_FAILED);
+    }
+
+    consumer.on('transportclose', () => {
+      this.server.to(socket.data.roomId).emit('voice-closed-consumer', {
+        userId: socket.data.user.id,
+        consumer: consumer.id,
+      });
+    });
+
+    return {
+      consumerId: consumer.id,
+      producerId: consumer.producerId,
+      kind: consumer.kind,
+      rtpParameters: consumer.rtpParameters,
+      type: consumer.type,
+      producerPaused: consumer.producerPaused,
+    };
+  }
+
+  async dispose(liveId: string) {
+    // 发送关闭广播
+    this.server.to(liveId).emit('live-dispose');
+    // 清除数据
+    for (const socket of await this.server.to(liveId).fetchSockets()) {
+      socket.data.live = undefined;
+      socket.data.state = undefined;
+    }
+    // 使用户退出房间
+    this.server.to(liveId).socketsLeave(liveId);
+    // 关闭房间语音服务
+    await this.liveVoiceService.removeGroup(liveId);
+    // 删除房间缓存
+    await this.liveService.deleteLiveState(liveId);
   }
 
   private async makeClientLeaveCurrentRoom(socket: Socket | RemoteSocket<any, any>) {
@@ -228,7 +375,7 @@ export class LiveGateway implements OnGatewayDisconnect {
         user: instanceToPlain(socket.data.user),
       });
     }
-    
+
     await this.makeClientLeaveCurrentRoom(socket);
   }
 }

@@ -43,4 +43,6 @@ export enum ErrorCodeEnum {
   USER_CHAT_MUTED = 0x0601,
   /** 用户被禁止语音 */
   USER_VOICE_MUTED = 0x0602,
+  /** 直播语音连接建立失败 */
+  VOICE_SERVICE_ESTABLISH_FAILED = 0x0603,
 }

@@ -9,13 +9,14 @@ import { LiveDto } from './live.dto';
 import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
+import { LiveGateway } from './live.gateway';
 
 @Controller('live')
 @UseGuards(AuthorizationGuard)
 @ApiTags('live')
 @ApiBearerAuth()
 export class LiveController {
-  constructor(private liveService: LiveService) {}
+  constructor(private liveService: LiveService, private liveGateway: LiveGateway) {}
 
   @Get(':id')
   @ApiOperation({
@@ -74,7 +75,7 @@ export class LiveController {
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   async deleteLive(@Param('id') id: string) {
     await this.liveService.delete({ id });
-    await this.liveService.deleteLiveState(id);
+    await this.liveGateway.dispose(id);
     return {};
   }
 }

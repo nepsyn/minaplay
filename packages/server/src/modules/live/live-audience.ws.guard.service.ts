@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { Reflector } from '@nestjs/core';
-import { REQUIRE_ADMIN_SYMBOL } from './require-admin.ws.decorator';
+import { CREATOR_ONLY_SYMBOL } from './creator-only.ws.decorator';
 
 @Injectable()
 export class LiveAudienceWsGuard implements CanActivate {
@@ -10,8 +10,8 @@ export class LiveAudienceWsGuard implements CanActivate {
   async canActivate(context: ExecutionContext) {
     const socket: Socket = context.switchToWs().getClient();
 
-    const requireAdmin = this.reflector.get<boolean>(REQUIRE_ADMIN_SYMBOL, context.getHandler());
-    if (requireAdmin) {
+    const creatorOnly = this.reflector.get<boolean>(CREATOR_ONLY_SYMBOL, context.getHandler());
+    if (creatorOnly) {
       return socket.data.user && socket.data.live && socket.data.user.id === socket.data.live.user.id;
     }
 

@@ -16,6 +16,7 @@ import { buildException } from './utils/build-exception.util';
 import { ErrorCodeEnum } from './enums/error-code.enum';
 import { Aria2Module } from './modules/aria2/aria2.module';
 import { LiveModule } from './modules/live/live.module';
+import { cpus } from 'os';
 
 @Module({
   imports: [
@@ -29,8 +30,8 @@ import { LiveModule } from './modules/live/live.module';
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
         store: redisStore as any,
-        url: `redis://${configService.get('REDIS_HOST')}:${configService.get('REDIS_PORT')}`,
-        database: Number(configService.get('REDIS_DB')),
+        url: `redis://${configService.get('REDIS_HOST', '127.0.0.1')}:${configService.get('REDIS_PORT', 6379)}`,
+        database: Number(configService.get('REDIS_DB', 0)),
         password: configService.get('REDIS_PASSWORD'),
         ttl: 24 * 60 * 60 * 1000,
       }),
@@ -39,8 +40,8 @@ import { LiveModule } from './modules/live/live.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         redis: {
-          host: configService.get('REDIS_HOST'),
-          port: configService.get('REDIS_PORT'),
+          host: configService.get('REDIS_HOST', '127.0.0.1'),
+          port: configService.get('REDIS_PORT', 6379),
           password: configService.get('REDIS_PASSWORD'),
         },
       }),
@@ -49,11 +50,11 @@ import { LiveModule } from './modules/live/live.module';
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'mysql',
-        host: configService.get('DB_HOST'),
-        port: Number(configService.get('DB_PORT')),
+        host: configService.get('DB_HOST', '127.0.0.1'),
+        port: Number(configService.get('DB_PORT', 3306)),
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE'),
+        database: configService.get('DB_DATABASE', 'minaplay'),
         timezone: 'Z',
         entities: ['dist/**/*.entity{.ts,.js}'],
         migrations: ['dist/migrations/*{.ts,.js}'],
@@ -68,21 +69,21 @@ import { LiveModule } from './modules/live/live.module';
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
-        rpcUrl: configService.get('ARIA2_RPC_URL'),
+        rpcUrl: configService.get('ARIA2_RPC_URL', '127.0.0.1:6800/jsonrpc'),
         rpcSecret: configService.get('ARIA2_RPC_SECRET'),
-        autoUpdateTracker: Number(configService.get('ARIA2_AUTO_UPDATE_TRACKER')) === 1,
+        autoUpdateTracker: Number(configService.get('ARIA2_AUTO_UPDATE_TRACKER', 0)) === 1,
         trackerListUrl: configService.get('ARIA2_TRACKER_LIST_URL'),
-        expireHours: Number(configService.get('ARIA2_EXPIRE_HOURS')) || 0,
+        expireHours: Number(configService.get('ARIA2_EXPIRE_HOURS', 0)) || 0,
       }),
     }),
     LiveModule.registerAsync({
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
-        mediasoupWorkerNum: Number(configService.get('MS_WORKERS_NUM')),
-        mediasoupAudioClockRate: Number(configService.get('MS_AUDIO_CLOCK_RATE')),
-        mediasoupAudioChannel: Number(configService.get('MS_AUDIO_CHANNELS')),
-        mediasoupMaxIncomeBitrate: Number(configService.get('MS_AUDIO_MAX_INCOME_BITRATE')),
+        mediasoupWorkerNum: Number(configService.get('MS_WORKERS_NUM', cpus().length)),
+        mediasoupAudioClockRate: Number(configService.get('MS_AUDIO_CLOCK_RATE', 48000)),
+        mediasoupAudioChannel: Number(configService.get('MS_AUDIO_CHANNELS', 2)),
+        mediasoupMaxIncomeBitrate: Number(configService.get('MS_AUDIO_MAX_INCOME_BITRATE', 1500000)),
       }),
     }),
     FileModule,

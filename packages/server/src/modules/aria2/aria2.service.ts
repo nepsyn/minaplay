@@ -3,7 +3,6 @@ import { Aria2DownloadTask } from './aria2-download-task';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
-import { ConfigService } from '@nestjs/config';
 import { ARIA2_MODULE_OPTIONS_TOKEN } from './aria2.module-definition';
 import { Aria2ModuleOptions } from './aria2.module.interface';
 import { type _AsyncVersionOf } from 'async-call-rpc/src/types';
@@ -32,7 +31,6 @@ export class Aria2Service implements OnModuleInit {
   constructor(
     @Inject(ARIA2_MODULE_OPTIONS_TOKEN) private options: Aria2ModuleOptions,
     @Inject(CACHE_MANAGER) private cacheStore: CacheStore,
-    private configService: ConfigService,
     private scheduleRegistry: SchedulerRegistry,
     private fileService: FileService,
   ) {}

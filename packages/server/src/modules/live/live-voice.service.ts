@@ -1,7 +1,7 @@
 import { ConsoleLogger, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { LIVE_MODULE_OPTIONS_TOKEN } from './live.module-definition';
 import { LiveModuleOptions } from './live.module.interface';
-import { createWorker, types as MediasoupTypes } from 'mediasoup';
+import { createWorker, types as MediasoupTypes, version as MEDIASOUP_VERSION } from 'mediasoup';
 import { Interval } from '@nestjs/schedule';
 
 interface Peer {
@@ -38,6 +38,8 @@ export class LiveVoiceService implements OnModuleInit {
       });
       this.workers.push(worker);
     }
+
+    this.logger.log(`LiveVoice service is running, mediasoup version=${MEDIASOUP_VERSION}`);
   }
 
   @Interval('mediasoup-workers-status', /* 30 min */ 1800000)

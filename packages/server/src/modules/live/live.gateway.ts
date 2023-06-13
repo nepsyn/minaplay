@@ -154,7 +154,7 @@ export class LiveGateway implements OnGatewayDisconnect {
 
     if (!state.muted.chat.includes(id)) {
       state.muted.chat.push(id);
-      this.server.to(socket.data.live.id).emit('member-muted', {
+      this.server.to(socket.data.live.id).emit('member-mute-chat', {
         id,
       });
     }
@@ -174,7 +174,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     }
 
     state.muted.chat = state.muted.chat.filter((userId) => userId !== id);
-    this.server.to(socket.data.live.id).emit('member-unmuted', {
+    this.server.to(socket.data.live.id).emit('member-unmute-chat', {
       id,
     });
   }
@@ -188,7 +188,6 @@ export class LiveGateway implements OnGatewayDisconnect {
     });
 
     await this.makeClientLeaveCurrentRoom(socket);
-    state.users = state.users.filter((user) => user.id !== socket.data.user.id);
   }
 
   @SubscribeMessage('kick')
@@ -207,16 +206,16 @@ export class LiveGateway implements OnGatewayDisconnect {
         user: instanceToPlain(client.data.user),
       });
       await this.makeClientLeaveCurrentRoom(client);
-
-      state.users = state.users.filter((user) => user.id !== id);
     }
   }
 
   private async makeClientLeaveCurrentRoom(socket: Socket | RemoteSocket<any, any>) {
-    const id = socket.data.live?.id;
-    if (id) {
+    if (socket.data.live) {
       // 退出房间
-      socket.leave(id);
+      socket.leave(socket.data.live.id);
+      // 更新房间用户
+      socket.data.state.users = socket.data.state.users.filter((user) => user.id !== socket.data.user.id);
+      await this.liveService.updateLiveState(socket.data.state);
       // 清除数据
       socket.data.live = undefined;
       socket.data.state = undefined;
@@ -228,14 +227,8 @@ export class LiveGateway implements OnGatewayDisconnect {
       this.server.to(socket.data.live.id).emit('member-quit', {
         user: instanceToPlain(socket.data.user),
       });
-
-      const state: LiveState = socket.data.state;
-      if (state) {
-        state.users = state.users.filter((user) => user.id !== socket.data.user.id);
-        await this.liveService.updateLiveState(state);
-      }
-
-      await this.makeClientLeaveCurrentRoom(socket);
     }
+    
+    await this.makeClientLeaveCurrentRoom(socket);
   }
 }

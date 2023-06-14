@@ -29,6 +29,9 @@ import { instanceToPlain } from 'class-transformer';
 import { User } from '../user/user.entity';
 import { LiveVoiceService } from './live-voice.service';
 import { types as MediasoupTypes } from 'mediasoup';
+import { LiveStreamService } from './live-stream.service';
+import { FileService } from '../file/file.service';
+import { VALID_VIDEO_MIME } from '../../constants';
 
 @WebSocketGateway()
 @UseGuards(AuthorizationWsGuard)
@@ -39,6 +42,8 @@ export class LiveGateway implements OnGatewayDisconnect {
     private liveService: LiveService,
     private liveVoiceService: LiveVoiceService,
     private liveChatService: LiveChatService,
+    private liveStreamService: LiveStreamService,
+    private fileService: FileService,
   ) {}
 
   @WebSocketServer()
@@ -227,6 +232,51 @@ export class LiveGateway implements OnGatewayDisconnect {
   @UseGuards(LiveAudienceWsGuard)
   async handleDispose(@ConnectedSocket() socket: Socket) {
     await this.dispose(socket.data.live.id);
+  }
+
+  @SubscribeMessage('stream-file')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
+  @UseGuards(LiveAudienceWsGuard)
+  @CreatorOnly()
+  async handleStreamFile(
+    @ConnectedSocket() socket: Socket,
+    @WsLiveState() state: LiveState,
+    @MessageBody('id') id: string,
+  ) {
+    const file = await this.fileService.findOneBy({ id });
+    if (!(file && file.isExist)) {
+      throw buildException(WsException, ErrorCodeEnum.NOT_FOUND);
+    }
+    if (!VALID_VIDEO_MIME.includes(file.mimetype)) {
+      throw buildException(WsException, ErrorCodeEnum.INVALID_VIDEO_FILE_TYPE);
+    }
+
+    const url = await this.liveStreamService.publishVideoFile(socket.data.live.id, file.path);
+    state.stream = {
+      type: 'server-push',
+      media: {
+        title: file.name,
+        url,
+      },
+      updateAt: new Date(),
+    };
+
+    this.server.to(socket.data.live.id).emit('stream', {
+      stream: state.stream,
+    });
+  }
+
+  @SubscribeMessage('stop-stream-file')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
+  @UseGuards(LiveAudienceWsGuard)
+  @CreatorOnly()
+  async handleStopStreamFile(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState) {
+    await this.liveStreamService.stopPublish(socket.data.live.id);
+    state.stream = undefined;
+
+    this.server.to(socket.data.live.id).emit('stream', {
+      stream: state.stream,
+    });
   }
 
   @SubscribeMessage('voice-rtp-capabilities')

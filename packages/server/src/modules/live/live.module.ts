@@ -10,12 +10,14 @@ import { LiveGateway } from './live.gateway';
 import { LiveChatService } from './live-chat.service';
 import { LiveChat } from './live-chat.entity';
 import { LiveVoiceService } from './live-voice.service';
+import { LiveStreamService } from './live-stream.service';
+import { FileModule } from '../file/file.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Live, LiveChat]), AuthorizationModule, UserModule],
-  providers: [LiveService, LiveVoiceService, LiveChatService, LiveGateway],
+  imports: [TypeOrmModule.forFeature([Live, LiveChat]), AuthorizationModule, UserModule, FileModule],
+  providers: [LiveService, LiveVoiceService, LiveStreamService, LiveChatService, LiveGateway],
   controllers: [LiveController],
-  exports: [LiveService, LiveVoiceService, LiveChatService],
+  exports: [LiveService, LiveVoiceService, LiveStreamService, LiveChatService],
 })
 export class LiveModule extends LiveConfigurableModule {
   declare static register: typeof LiveConfigurableModule.register;

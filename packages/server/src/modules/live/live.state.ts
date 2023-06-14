@@ -7,12 +7,21 @@ export interface ServerPushMediaStream {
     title: string;
     url: string;
   };
-  status: 'playing' | 'paused' | 'stopped';
+  updateAt: Date;
+}
+
+export interface ClientSyncMediaStream {
+  type: 'client-sync';
+  media: {
+    title: string;
+    url: string;
+  };
+  status: 'playing' | 'paused';
   position: number;
   updateAt: Date;
 }
 
-export type LiveStream = ServerPushMediaStream;
+export type LiveStream = ServerPushMediaStream | ClientSyncMediaStream;
 
 export interface LiveState {
   live: Live;

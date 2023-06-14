@@ -3,4 +3,11 @@ export interface LiveModuleOptions {
   mediasoupAudioClockRate: number;
   mediasoupAudioChannel: number;
   mediasoupMaxIncomeBitrate: number;
+
+  streamRtmpPort: number;
+  streamChunkSize: number;
+  streamFfmpegPath: string;
+  streamPublishKey: string;
+
+  appHost: string;
 }

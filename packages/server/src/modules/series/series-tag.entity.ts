@@ -17,7 +17,7 @@ export class SeriesTag {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  /** 剧集名称 */
+  /** 剧集标签名称 */
   @Column({
     unique: true,
   })

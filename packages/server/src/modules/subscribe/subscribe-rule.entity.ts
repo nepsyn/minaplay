@@ -19,6 +19,7 @@ export class SubscribeRule {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
+  /** 备注 */
   @Column({
     nullable: true,
   })

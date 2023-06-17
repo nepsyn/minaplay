@@ -4,6 +4,7 @@ import {
   AfterLoad,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -15,7 +16,7 @@ import { FileSourceEnum } from '../../enums/file-source.enum';
 /** 文件实体 */
 @Entity()
 export class File {
-  /** 媒体id */
+  /** 文件id */
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -64,8 +65,11 @@ export class File {
 
   /** 上传用户 */
   @Exclude()
-  @ManyToOne(() => User)
-  user: User;
+  @ManyToOne(() => User, {
+    nullable: true,
+    eager: true,
+  })
+  user?: User;
 
   /** 创建时间 */
   @CreateDateColumn()
@@ -74,6 +78,11 @@ export class File {
   /** 修改时间 */
   @UpdateDateColumn()
   updateAt: Date;
+
+  /** 删除时间 */
+  @Exclude()
+  @DeleteDateColumn()
+  deleteAt: Date;
 
   /** 本地文件是否存在 */
   @Exclude()

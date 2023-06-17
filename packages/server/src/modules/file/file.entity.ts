@@ -57,7 +57,6 @@ export class File {
   path: string;
 
   /** 过期时间 */
-  @Exclude()
   @Column({
     nullable: true,
   })

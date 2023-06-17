@@ -1,7 +1,7 @@
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { Series } from './series.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsInt, IsOptional, IsString } from 'class-validator';
 
 export class SeriesQueryDto extends ApiQueryDto<Series> {
   @ApiProperty({
@@ -17,7 +17,7 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
     required: false,
   })
   @IsOptional()
-  @IsString()
+  @IsInt()
   id?: number;
 
   @ApiProperty({

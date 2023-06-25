@@ -66,7 +66,6 @@ export class File {
   @Exclude()
   @ManyToOne(() => User, {
     nullable: true,
-    eager: true,
   })
   user?: User;
 

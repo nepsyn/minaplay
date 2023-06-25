@@ -1,9 +1,14 @@
 import {
   BadRequestException,
   Controller,
+  Delete,
+  Get,
   HttpCode,
   Logger,
+  NotFoundException,
+  Param,
   Post,
+  Query,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -26,6 +31,11 @@ import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { PermissionEnum } from '../../enums/permission.enum';
 import { FileSourceEnum } from '../../enums/file-source.enum';
 import { USER_UPLOAD_IMAGE_DIR, USER_UPLOAD_VIDEO_DIR, VALID_IMAGE_MIME, VALID_VIDEO_MIME } from '../../constants';
+import { FileQueryDto } from './file-query.dto';
+import { buildQueryOptions } from '../../utils/build-query-options.util';
+import { File } from './file.entity';
+import { MoreThanOrEqual } from 'typeorm';
+import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 
 @Controller('file')
 @UseGuards(AuthorizationGuard)
@@ -137,5 +147,50 @@ export class FileController {
     } else {
       throw buildException(BadRequestException, ErrorCodeEnum.INVALID_FILE);
     }
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    description: '查看文件',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
+  async getFileById(@Param('id') id: string) {
+    const file = await this.fileService.findOneBy({ id });
+    if (!file) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    return file;
+  }
+
+  @Get()
+  @ApiOperation({
+    description: '查询文件',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
+  async queryFile(@Query() query: FileQueryDto) {
+    const { keyword, id, md5, expired, userId } = query;
+    const [result, total] = await this.fileService.findAndCount({
+      where: buildQueryOptions<File>({
+        keyword,
+        keywordProperties: (entity) => [entity.name, entity.mimetype],
+        exact: { id, md5, expireAt: expired ? MoreThanOrEqual(new Date()) : undefined, user: { id: userId } },
+      }),
+      skip: query.page * query.size,
+      take: query.size,
+      order: { [query.sort]: query.order },
+    });
+
+    return new ApiPaginationResultDto(result, total, query.page, query.size);
+  }
+
+  @Delete(':id')
+  @ApiOperation({
+    description: '删除文件',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
+  async deleteFile(@Param('id') id: string) {
+    await this.fileService.delete({ id });
+    return {};
   }
 }

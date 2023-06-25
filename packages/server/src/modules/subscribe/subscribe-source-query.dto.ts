@@ -1,9 +1,9 @@
-import { ApiQueryDto } from '../../utils/api.query.dto';
-import { Series } from './series.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
+import { ApiQueryDto } from '../../utils/api.query.dto';
+import { SubscribeSource } from './subscribe-source.entity';
 
-export class SeriesQueryDto extends ApiQueryDto<Series> {
+export class SubscribeSourceQueryDto extends ApiQueryDto<SubscribeSource> {
   @ApiProperty({
     description: '查询关键字',
     required: false,
@@ -13,7 +13,7 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   keyword?: string;
 
   @ApiProperty({
-    description: '剧集id',
+    description: '订阅源id',
     required: false,
   })
   @IsOptional()
@@ -21,10 +21,18 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   id?: number;
 
   @ApiProperty({
-    description: '剧集名称',
+    description: '订阅源url',
     required: false,
   })
   @IsOptional()
   @IsString()
-  name?: string;
+  url?: string;
+
+  @ApiProperty({
+    description: '创建用户id',
+    required: false,
+  })
+  @IsOptional()
+  @IsInt()
+  userId?: number;
 }

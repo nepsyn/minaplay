@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { SubscribeSourceService } from './subscribe-source.service';
@@ -20,6 +21,10 @@ import { buildException } from '../../utils/build-exception.util';
 import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
+import { SubscribeSourceQueryDto } from './subscribe-source-query.dto';
+import { buildQueryOptions } from '../../utils/build-query-options.util';
+import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
+import { SubscribeSource } from './subscribe-source.entity';
 
 @Controller('subscribe')
 @UseGuards(AuthorizationGuard)
@@ -62,6 +67,27 @@ export class SubscribeController {
     }
 
     return source;
+  }
+
+  @Get()
+  @ApiOperation({
+    description: '查询订阅源',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  async querySubscribeSource(@Query() query: SubscribeSourceQueryDto) {
+    const { keyword, id, url, userId } = query;
+    const [result, total] = await this.subscribeSourceService.findAndCount({
+      where: buildQueryOptions<SubscribeSource>({
+        keyword,
+        keywordProperties: (entity) => [entity.title, entity.url, entity.remark],
+        exact: { id, url, user: { id: userId } },
+      }),
+      skip: query.page * query.size,
+      take: query.size,
+      order: { [query.sort]: query.order },
+    });
+
+    return new ApiPaginationResultDto(result, total, query.page, query.size);
   }
 
   @Put(':id')

@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
@@ -28,6 +29,10 @@ import { generateMD5 } from '../../utils/generate-md5.util';
 import { FileSourceEnum } from '../../enums/file-source.enum';
 import { FileService } from '../file/file.service';
 import { SubscribeSourceService } from './subscribe-source.service';
+import { SubscribeRuleQueryDto } from './subscribe-rule-query.dto';
+import { buildQueryOptions } from '../../utils/build-query-options.util';
+import { SubscribeRule } from './subscribe-rule.entity';
+import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 
 @Controller('subscribe')
 @UseGuards(AuthorizationGuard)
@@ -100,6 +105,27 @@ export class SubscribeRuleController {
     });
 
     return rules;
+  }
+
+  @Get('rule')
+  @ApiOperation({
+    description: '查询订阅规则',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  async querySubscribeRule(@Query() query: SubscribeRuleQueryDto) {
+    const { keyword, id, sourceId, seriesId } = query;
+    const [result, total] = await this.subscribeRuleService.findAndCount({
+      where: buildQueryOptions<SubscribeRule>({
+        keyword,
+        keywordProperties: (entity) => [entity.remark],
+        exact: { id, source: { id: sourceId }, series: { id: seriesId } },
+      }),
+      skip: query.page * query.size,
+      take: query.size,
+      order: { [query.sort]: query.order },
+    });
+
+    return new ApiPaginationResultDto(result, total, query.page, query.size);
   }
 
   @Put('rule/:id')

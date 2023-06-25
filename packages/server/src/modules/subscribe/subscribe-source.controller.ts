@@ -30,7 +30,7 @@ import { SubscribeSource } from './subscribe-source.entity';
 @UseGuards(AuthorizationGuard)
 @ApiTags('subscribe')
 @ApiBearerAuth()
-export class SubscribeController {
+export class SubscribeSourceController {
   constructor(private subscribeSourceService: SubscribeSourceService) {}
 
   @Post()

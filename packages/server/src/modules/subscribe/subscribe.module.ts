@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { SubscribeController } from './subscribe.controller';
+import { SubscribeSourceController } from './subscribe-source.controller';
 import { SubscribeSourceService } from './subscribe-source.service';
 import { SubscribeSource } from './subscribe-source.entity';
 import { SubscribeRule } from './subscribe-rule.entity';
@@ -29,7 +29,7 @@ import { SubscribeRuleController } from './subscribe-rule.controller';
     SubscribeDownloadItemService,
     FetchSubscribeSourceConsumer,
   ],
-  controllers: [SubscribeController, SubscribeRuleController],
+  controllers: [SubscribeSourceController, SubscribeRuleController],
   exports: [SubscribeSourceService, SubscribeRuleService, SubscribeFetchErrorService, SubscribeDownloadItemService],
 })
 export class SubscribeModule {}

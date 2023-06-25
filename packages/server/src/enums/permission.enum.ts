@@ -4,6 +4,8 @@ export enum PermissionEnum {
 
   /** 用户管理 */
   USER_OP = 'USER:*',
+  /* 用户查看 */
+  USER_VIEW = 'USER:VIEW',
 
   /** 文件管理 */
   FILE_OP = 'FILE:*',

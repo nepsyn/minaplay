@@ -4,9 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
 import { BullModule } from '@nestjs/bull';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { SubscribeModule } from './modules/subscribe/subscribe.module';
 import { AuthorizationModule } from './modules/authorization/authorization.module';
-import { SeriesModule } from './modules/series/series.module';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ApplicationExceptionFilter } from './utils/application.exception.filter';
 import { FileModule } from './modules/file/file.module';
@@ -17,6 +15,9 @@ import { ErrorCodeEnum } from './enums/error-code.enum';
 import { Aria2Module } from './modules/aria2/aria2.module';
 import { LiveModule } from './modules/live/live.module';
 import { cpus } from 'os';
+import { UserModule } from './modules/user/user.module';
+import { SeriesModule } from './modules/series/series.module';
+import { SubscribeModule } from './modules/subscribe/subscribe.module';
 
 @Module({
   imports: [
@@ -95,6 +96,7 @@ import { cpus } from 'os';
     SubscribeModule,
     AuthorizationModule,
     SeriesModule,
+    UserModule,
   ],
   providers: [
     {

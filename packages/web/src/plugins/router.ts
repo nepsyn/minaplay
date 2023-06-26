@@ -1,10 +1,25 @@
-import { createRouter, createWebHashHistory, RouteRecordRaw } from 'vue-router';
-import Home from '../views/Home.vue';
-import Media from '../views/Media.vue';
-import Live from '../views/Live.vue';
-import Subscribe from '../views/Subscribe.vue';
-import Admin from '../views/Admin.vue';
-import Setting from '../views/Setting.vue';
+import { createRouter, createWebHashHistory, NavigationGuard, RouteRecordRaw } from 'vue-router';
+import Home from '@/views/Home.vue';
+import Media from '@/views/home/Media.vue';
+import Live from '@/views/home/Live.vue';
+import Subscribe from '@/views/home/Subscribe.vue';
+import Admin from '@/views/home/Admin.vue';
+import Setting from '@/views/home/Setting.vue';
+import { Api } from '@/api/api';
+import Login from '@/views/Login.vue';
+
+const LoginGuard: NavigationGuard = (to, from, next) => {
+  if (!Api.isLogin) {
+    next({
+      path: '/login',
+      query: {
+        redirect_url: to.fullPath,
+      },
+    });
+  } else {
+    next();
+  }
+};
 
 const routes: RouteRecordRaw[] = [
   {
@@ -33,6 +48,11 @@ const routes: RouteRecordRaw[] = [
         component: Setting,
       },
     ],
+    beforeEnter: LoginGuard,
+  },
+  {
+    path: '/login',
+    component: Login,
   },
 ];
 

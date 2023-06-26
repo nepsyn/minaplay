@@ -24,6 +24,14 @@ export interface SubscribeSourceEntity {
   updateAt: Date;
 }
 
+export interface SubscribeSourceDto {
+  url?: string;
+  title?: string;
+  remark?: string;
+  cron?: string;
+  enabled?: boolean;
+}
+
 export interface SubscribeRuleEntity {
   /** id */
   id: number;
@@ -37,4 +45,10 @@ export interface SubscribeRuleEntity {
   createAt: Date;
   /** 更新时间 */
   updateAt: Date;
+}
+
+export interface SubscribeRuleDto {
+  code?: string;
+  remark?: string;
+  seriesId?: number;
 }

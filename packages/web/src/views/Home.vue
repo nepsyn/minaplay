@@ -11,7 +11,7 @@ import {
 } from '@mdi/js';
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
-import { vuetify } from '../main';
+import { vuetify } from '@/main';
 
 const drawerWidth = ref(108);
 const drawer = ref(vuetify.display.mdAndUp.value);
@@ -58,22 +58,22 @@ const navs = [
 
 <template>
   <v-layout class="overflow-hidden">
-    <v-app-bar flat border="b" color="background">
+    <v-app-bar border="b" color="background" flat>
       <v-app-bar-nav-icon class="d-flex d-md-none" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>MinaPlay</v-toolbar-title>
       <template v-slot:append>
         <div class="d-none d-md-flex flex-row align-center">
-          <v-tooltip :text="darkMode ? '白天模式' : '夜间模式'" open-delay="500" location="bottom">
+          <v-tooltip :text="darkMode ? '白天模式' : '夜间模式'" location="bottom" open-delay="500">
             <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" icon @click="toggleDarkMode">
+              <v-btn icon v-bind="props" @click="toggleDarkMode">
                 <v-icon :icon="darkMode ? mdiWeatherSunny : mdiWeatherNight" size="large"></v-icon>
               </v-btn>
             </template>
           </v-tooltip>
-          <v-divider vertical inset class="mx-2"></v-divider>
-          <v-tooltip text="GitHub仓库" open-delay="500" location="bottom">
+          <v-divider class="mx-2" inset vertical></v-divider>
+          <v-tooltip location="bottom" open-delay="500" text="GitHub仓库">
             <template v-slot:activator="{ props }">
-              <v-btn v-bind="props" @click="openGitHubLink" icon>
+              <v-btn icon v-bind="props" @click="openGitHubLink">
                 <v-icon :icon="mdiGithub" size="large"></v-icon>
               </v-btn>
             </template>
@@ -82,7 +82,7 @@ const navs = [
       </template>
     </v-app-bar>
 
-    <v-navigation-drawer elevation="0" :width="drawerWidth" v-model="drawer">
+    <v-navigation-drawer v-model="drawer" :width="drawerWidth" elevation="0">
       <v-list class="py-0" density="compact">
         <template v-for="({ icon, name, route }, index) in navs" :key="index">
           <v-list-item
@@ -110,7 +110,7 @@ const navs = [
   </v-layout>
 </template>
 
-<style scoped lang="sass">
+<style lang="sass" scoped>
 .ban
   position: absolute
   top: 0

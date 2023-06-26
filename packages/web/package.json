@@ -1,12 +1,14 @@
 {
   "name": "@minaplay/web",
   "version": "1.0.0",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build"
   },
   "devDependencies": {
     "@mdi/js": "^7.2.96",
+    "@types/node": "^20.3.1",
     "@vitejs/plugin-vue": "^4.1.0",
     "pinia": "^2.0.34",
     "prettier": "^2.8.7",

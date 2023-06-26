@@ -12,7 +12,12 @@
       "ESNext",
       "DOM"
     ],
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@/*": [
+        "src/*"
+      ]
+    }
   },
   "include": [
     "**/*.ts",

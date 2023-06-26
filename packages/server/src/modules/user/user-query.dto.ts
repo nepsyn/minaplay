@@ -2,6 +2,7 @@ import { ApiQueryDto } from '../../utils/api.query.dto';
 import { User } from './user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class UserQueryDto extends ApiQueryDto<User> {
   @ApiProperty({
@@ -16,6 +17,7 @@ export class UserQueryDto extends ApiQueryDto<User> {
     description: '用户',
     required: false,
   })
+  @Transform(({ value }) => Number(value))
   @IsOptional()
   @IsInt()
   id?: number;

@@ -8,19 +8,28 @@ interface QueryOptions<T> {
   exact?: FindOptionsWhere<T>;
 }
 
+function removeUndefinedProperties(obj: any): any {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj;
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(removeUndefinedProperties);
+  }
+
+  const cleanedObj: any = {};
+  Object.entries(obj).forEach(([key, value]) => {
+    const cleanedValue = removeUndefinedProperties(value);
+    if ((typeof cleanedValue === 'object' && Object.keys(cleanedValue).length > 0) || cleanedValue !== undefined) {
+      cleanedObj[key] = cleanedValue;
+    }
+  });
+
+  return cleanedObj;
+}
+
 export function buildQueryOptions<T>(options: QueryOptions<T>): FindOptionsWhere<T>[] {
   const conditions: FindOptionsWhere<T>[] = [];
-
-  if (options.exact) {
-    Object.keys(options.exact).forEach((key) => {
-      if (options.exact[key] === undefined) {
-        delete options.exact[key];
-      }
-    });
-    if (Object.keys(options.exact).length === 0) {
-      options.exact = undefined;
-    }
-  }
 
   if (options.keyword && options.keywordProperties) {
     const keywordProperties =
@@ -44,7 +53,10 @@ export function buildQueryOptions<T>(options: QueryOptions<T>): FindOptionsWhere
       });
     }
   } else if (options.exact) {
-    conditions.push(options.exact);
+    const cleaned = removeUndefinedProperties(options.exact);
+    if (Object.keys(cleaned).length > 0) {
+      conditions.push(cleaned);
+    }
   }
 
   return conditions;

@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { SubscribeSource } from './subscribe-source.entity';
+import { Transform } from 'class-transformer';
 
 export class SubscribeSourceQueryDto extends ApiQueryDto<SubscribeSource> {
   @ApiProperty({
@@ -16,6 +17,7 @@ export class SubscribeSourceQueryDto extends ApiQueryDto<SubscribeSource> {
     description: '订阅源id',
     required: false,
   })
+  @Transform(({ value }) => Number(value))
   @IsOptional()
   @IsInt()
   id?: number;
@@ -32,6 +34,7 @@ export class SubscribeSourceQueryDto extends ApiQueryDto<SubscribeSource> {
     description: '创建用户id',
     required: false,
   })
+  @Transform(({ value }) => Number(value))
   @IsOptional()
   @IsInt()
   userId?: number;

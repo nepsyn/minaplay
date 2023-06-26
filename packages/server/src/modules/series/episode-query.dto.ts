@@ -1,10 +1,10 @@
 import { ApiQueryDto } from '../../utils/api.query.dto';
-import { Series } from './series.entity';
+import { Episode } from './episode.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
-export class SeriesQueryDto extends ApiQueryDto<Series> {
+export class EpisodeQueryDto extends ApiQueryDto<Episode> {
   @ApiProperty({
     description: '查询关键字',
     required: false,
@@ -20,13 +20,14 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   @Transform(({ value }) => Number(value))
   @IsOptional()
   @IsInt()
-  id?: number;
+  seriesId?: number;
 
   @ApiProperty({
-    description: '剧集名称',
+    description: '单集id',
     required: false,
   })
+  @Transform(({ value }) => Number(value))
   @IsOptional()
-  @IsString()
-  name?: string;
+  @IsInt()
+  id?: number;
 }

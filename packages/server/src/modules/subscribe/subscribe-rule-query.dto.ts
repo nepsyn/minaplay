@@ -2,6 +2,7 @@ import { ApiQueryDto } from '../../utils/api.query.dto';
 import { SubscribeRule } from './subscribe-rule.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class SubscribeRuleQueryDto extends ApiQueryDto<SubscribeRule> {
   @ApiProperty({
@@ -16,14 +17,16 @@ export class SubscribeRuleQueryDto extends ApiQueryDto<SubscribeRule> {
     description: '订阅规则id',
     required: false,
   })
+  @Transform(({ value }) => Number(value))
   @IsOptional()
   @IsInt()
   id?: number;
 
   @ApiProperty({
-    description: '订阅源',
+    description: '订阅源id',
     required: false,
   })
+  @Transform(({ value }) => Number(value))
   @IsOptional()
   @IsInt()
   sourceId?: number;
@@ -32,6 +35,7 @@ export class SubscribeRuleQueryDto extends ApiQueryDto<SubscribeRule> {
     description: '剧集',
     required: false,
   })
+  @Transform(({ value }) => Number(value))
   @IsOptional()
   @IsInt()
   seriesId?: number;

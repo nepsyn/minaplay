@@ -21,7 +21,15 @@ export class SubscribeRuleDto {
   remark?: string;
 
   @ApiProperty({
-    description: '剧集 id',
+    description: '订阅源id',
+    required: false,
+  })
+  @IsOptional()
+  @IsInt()
+  sourceId?: number;
+
+  @ApiProperty({
+    description: '剧集id',
     required: false,
   })
   @IsOptional()

@@ -25,13 +25,17 @@ import { SubscribeSourceQueryDto } from './subscribe-source-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { SubscribeSource } from './subscribe-source.entity';
+import { SubscribeRuleService } from './subscribe-rule.service';
 
 @Controller('subscribe')
 @UseGuards(AuthorizationGuard)
 @ApiTags('subscribe')
 @ApiBearerAuth()
 export class SubscribeSourceController {
-  constructor(private subscribeSourceService: SubscribeSourceService) {}
+  constructor(
+    private subscribeSourceService: SubscribeSourceService,
+    private subscribeRuleService: SubscribeRuleService,
+  ) {}
 
   @Post()
   @ApiOperation({
@@ -143,5 +147,25 @@ export class SubscribeSourceController {
     }
 
     return this.subscribeSourceService.readSource(source.url);
+  }
+
+  @Get(':id/rule')
+  @ApiOperation({
+    description: '获取订阅源规则列表',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  async getSubscribeRulesBySourceId(@Param('id') id: number) {
+    const source = await this.subscribeSourceService.findOneBy({ id });
+    if (!source) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    const [rules] = await this.subscribeRuleService.findAndCount({
+      where: {
+        source: { id },
+      },
+    });
+
+    return rules;
   }
 }

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Episode } from './episode.entity';
-import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
 export class EpisodeService {
@@ -13,6 +13,10 @@ export class EpisodeService {
 
   async findOneBy(where: FindOptionsWhere<Episode>) {
     return await this.episodeRepository.findOneBy(where);
+  }
+
+  async findAndCount(options?: FindManyOptions<Episode>) {
+    return await this.episodeRepository.findAndCount(options);
   }
 
   async delete(where: FindOptionsWhere<Episode>) {

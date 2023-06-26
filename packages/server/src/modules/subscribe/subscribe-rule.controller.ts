@@ -34,7 +34,7 @@ import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { SubscribeRule } from './subscribe-rule.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 
-@Controller('subscribe')
+@Controller('rule')
 @UseGuards(AuthorizationGuard)
 @ApiTags('subscribe')
 @ApiBearerAuth()
@@ -45,17 +45,17 @@ export class SubscribeRuleController {
     private fileService: FileService,
   ) {}
 
-  @Post(':sourceId/rule')
+  @Post()
   @ApiOperation({
     description: '添加订阅源规则',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async createSubscribeRule(
-    @RequestUser() user: User,
-    @Param('sourceId') sourceId: number,
-    @Body() data: SubscribeRuleDto,
-  ) {
-    const source = await this.subscribeSourceService.findOneBy({ id: sourceId });
+  async createSubscribeRule(@RequestUser() user: User, @Body() data: SubscribeRuleDto) {
+    if (!data.sourceId) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
+    const source = await this.subscribeSourceService.findOneBy({ id: data.sourceId });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
@@ -81,33 +81,13 @@ export class SubscribeRuleController {
 
     return this.subscribeRuleService.save({
       ...data,
-      source: { id: sourceId },
+      source: { id: data.sourceId },
       series: { id: data.seriesId },
       codeFile: file,
     });
   }
 
-  @Get(':sourceId/rule')
-  @ApiOperation({
-    description: '获取订阅源规则列表',
-  })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async getSubscribeRulesBySourceId(@Param('sourceId') sourceId: number) {
-    const source = await this.subscribeSourceService.findOneBy({ id: sourceId });
-    if (!source) {
-      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-    }
-
-    const [rules] = await this.subscribeRuleService.findAndCount({
-      where: {
-        source: { id: sourceId },
-      },
-    });
-
-    return rules;
-  }
-
-  @Get('rule')
+  @Get()
   @ApiOperation({
     description: '查询订阅规则',
   })
@@ -128,7 +108,7 @@ export class SubscribeRuleController {
     return new ApiPaginationResultDto(result, total, query.page, query.size);
   }
 
-  @Put('rule/:id')
+  @Put(':id')
   @ApiOperation({
     description: '修改订阅源规则',
   })
@@ -154,11 +134,12 @@ export class SubscribeRuleController {
     return this.subscribeRuleService.save({
       id,
       ...data,
+      source: { id: data.sourceId },
       series: { id: data.seriesId },
     });
   }
 
-  @Delete('rule/:id')
+  @Delete(':id')
   @ApiOperation({
     description: '删除订阅规则',
   })

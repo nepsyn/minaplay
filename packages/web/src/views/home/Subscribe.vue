@@ -10,8 +10,8 @@ const app = useAppStore();
 const sources: Ref<SubscribeSourceEntity[]> = ref([]);
 const fetchSources = async function (query?: ApiQueryDto<SubscribeSourceEntity>) {
   try {
-    const response = await Api.Subscribe.querySource(query);
-    sources.value.push(...response.data);
+    const response = await Api.SubscribeSource.query(query);
+    sources.value.push(...response.data.items);
   } catch (e) {
     app.toast('获取订阅源数据失败！', 'error');
   }

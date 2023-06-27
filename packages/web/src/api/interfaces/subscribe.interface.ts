@@ -50,5 +50,6 @@ export interface SubscribeRuleEntity {
 export interface SubscribeRuleDto {
   code?: string;
   remark?: string;
+  sourceId?: number;
   seriesId?: number;
 }

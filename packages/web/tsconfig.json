@@ -13,6 +13,7 @@
       "DOM"
     ],
     "noEmit": true,
+    "baseUrl": ".",
     "paths": {
       "@/*": [
         "src/*"

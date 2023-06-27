@@ -7,31 +7,9 @@ import {
   SubscribeSourceDto,
   SubscribeSourceEntity,
 } from './interfaces/subscribe.interface';
-import { ApiQueryDto } from './interfaces/common.interface';
+import { ApiQueryDto, ApiQueryResult } from './interfaces/common.interface';
 
 class ApiHelper {
-  Auth = {
-    login: this.apiPost<AuthData, LoginDto>('/auth/login/'),
-    logout: this.apiPost('/auth/logout/'),
-  };
-  File = {
-    uploadImage: this.apiUpload<FileEntity>('/file/image/upload/'),
-    uploadVideo: this.apiUpload<FileEntity>('/file/video/upload/'),
-  };
-  Subscribe = {
-    createSource: this.apiPost<SubscribeSourceEntity, SubscribeSourceDto>('/subscribe'),
-    getSourceById: (id: number) => this.apiGet(`/subscribe/${id}`),
-    querySource: this.apiGet<SubscribeSourceEntity[], ApiQueryDto<SubscribeSourceEntity>>('/subscribe'),
-    updateSource: (id: number) => this.apiPut<SubscribeSourceEntity, SubscribeSourceDto>(`/subscribe/${id}`),
-    deleteSource: (id: number) => this.apiDelete(`/subscribe/${id}`),
-    fetchRawData: (id: number) => this.apiPost<object>(`/subscribe/${id}/raw`),
-    createRule: (sourceId: number) =>
-      this.apiPost<SubscribeRuleEntity, SubscribeRuleDto>(`/subscribe/${sourceId}/rule`),
-    getRuleBySourceId: (sourceId: number) => this.apiGet<SubscribeRuleEntity[]>(`/subscribe/${sourceId}/rule`),
-    queryRule: this.apiGet<SubscribeRuleEntity[], ApiQueryDto<SubscribeRuleEntity>>('/subscribe/rule'),
-    updateRule: (id: number) => this.apiPut(`/subscribe/rule/${id}`),
-    deleteRule: (id: number) => this.apiDelete(`/subscribe/rule/${id}`),
-  };
   private token: string | null = null;
 
   constructor(private baseUrl: string) {
@@ -86,6 +64,33 @@ class ApiHelper {
       });
     };
   }
+
+  Auth = {
+    login: this.apiPost<AuthData, LoginDto>('/auth/login/'),
+    logout: this.apiPost('/auth/logout/'),
+  };
+
+  File = {
+    uploadImage: this.apiUpload<FileEntity>('/file/image/upload/'),
+    uploadVideo: this.apiUpload<FileEntity>('/file/video/upload/'),
+  };
+
+  SubscribeSource = {
+    create: this.apiPost<SubscribeSourceEntity, SubscribeSourceDto>('/subscribe'),
+    getById: (id: number) => this.apiGet(`/subscribe/${id}`),
+    query: this.apiGet<ApiQueryResult<SubscribeSourceEntity>, ApiQueryDto<SubscribeSourceEntity>>('/subscribe'),
+    update: (id: number) => this.apiPut<SubscribeSourceEntity, SubscribeSourceDto>(`/subscribe/${id}`),
+    delete: (id: number) => this.apiDelete(`/subscribe/${id}`),
+    fetchRawData: (id: number) => this.apiPost<object>(`/subscribe/${id}/raw`),
+    getRulesById: (id: number) => this.apiGet(`/subscribe/${id}/rule`),
+  };
+
+  SubscribeRule = {
+    create: (sourceId: number) => this.apiPost<SubscribeRuleEntity, SubscribeRuleDto>(`rule`),
+    query: this.apiGet<ApiQueryResult<SubscribeRuleEntity>, ApiQueryDto<SubscribeRuleEntity>>('rule'),
+    update: (id: number) => this.apiPut(`rule/${id}`),
+    delete: (id: number) => this.apiDelete(`rule/${id}`),
+  };
 }
 
 export const Api = new ApiHelper(import.meta.env.VITE_BASE_URL);

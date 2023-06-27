@@ -52,7 +52,7 @@ const register = async () => {};
   <v-container class="d-flex justify-center align-center login-page overflow-y-auto" fluid>
     <v-card width="640">
       <v-img :src="LogoLandscape"></v-img>
-      <v-card-title class="d-flex flex-row justify-space-between">
+      <v-card-title class="d-flex flex-row justify-space-between align-center">
         <span class="py-2" v-if="action === 'login'">登录到 Minaplay</span>
         <span class="py-2" v-else>加入 Minaplay 发现精彩世界！</span>
         <v-btn color="primary" variant="text" @click="toggleAction">

@@ -7,6 +7,7 @@ import Admin from '@/views/home/Admin.vue';
 import Setting from '@/views/home/Setting.vue';
 import { Api } from '@/api/api';
 import Login from '@/views/Login.vue';
+import SubscribeDetail from '@/views/home/subscribe/SubscribeDetail.vue';
 
 const LoginGuard: NavigationGuard = (to, from, next) => {
   if (!Api.isLogin) {
@@ -38,6 +39,12 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/subscribe',
         component: Subscribe,
+        children: [
+          {
+            path: '/subscribe/:id',
+            component: SubscribeDetail,
+          },
+        ],
       },
       {
         path: '/admin',

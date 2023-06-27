@@ -7,7 +7,7 @@ export type ApiQueryDto<T> = {
   page?: number;
   size?: number;
   sort?: keyof T;
-  order: 'ASC' | 'DESC';
+  order?: 'ASC' | 'DESC';
 };
 
 export type ApiQueryResult<T> = {

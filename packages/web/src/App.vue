@@ -1,7 +1,16 @@
 <script lang="ts" setup>
 import { useAppStore } from '@/store/app';
+import { onBeforeMount } from 'vue';
+import { Api } from '@/api/api';
 
 const app = useAppStore();
+
+onBeforeMount(async () => {
+  const authToken = localStorage.getItem('token');
+  if (authToken) {
+    Api.setToken(authToken);
+  }
+});
 </script>
 
 <template>

@@ -4,7 +4,7 @@ import Router from './plugins/router';
 import Vuetify from './plugins/vuetify';
 import Pinia from './plugins/pinia';
 
-import './main.sass';
+import '@/scss/main.scss';
 
 export const app = createApp(App);
 export const router = Router();

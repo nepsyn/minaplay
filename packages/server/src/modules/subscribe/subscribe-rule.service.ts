@@ -8,7 +8,7 @@ export class SubscribeRuleService {
   constructor(@InjectRepository(SubscribeRule) private subscribeRuleRepository: Repository<SubscribeRule>) {}
 
   async save(rule: DeepPartial<SubscribeRule>) {
-    return this.subscribeRuleRepository.create(await this.subscribeRuleRepository.save(rule));
+    return await this.subscribeRuleRepository.save(rule);
   }
 
   async findOneBy(where: FindOptionsWhere<SubscribeRule>) {

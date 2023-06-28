@@ -38,13 +38,14 @@ export class LiveController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   async createLive(@Body() data: LiveDto, @RequestUser() user: User) {
-    const live = await this.liveService.save({
+    const { id } = await this.liveService.save({
       ...data,
       poster: { id: data.posterFileId },
       user: { id: user.id },
     });
-    await this.liveService.createLiveState(live.id);
-    return live;
+    await this.liveService.createLiveState(id);
+
+    return await this.liveService.findOneBy({ id });
   }
 
   @Put(':id')
@@ -53,19 +54,19 @@ export class LiveController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   async updateLive(@Param('id') id: string, @Body() data: LiveDto) {
-    let live = await this.liveService.findOneBy({ id });
+    const live = await this.liveService.findOneBy({ id });
     if (!live) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    live = await this.liveService.save({
+    await this.liveService.save({
       id,
       ...data,
       poster: { id: data.posterFileId },
     });
     await this.liveService.createLiveState(id, true);
 
-    return live;
+    return await this.liveService.findOneBy({ id });
   }
 
   @Delete(':id')

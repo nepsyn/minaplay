@@ -8,7 +8,7 @@ export class EpisodeService {
   constructor(@InjectRepository(Episode) private episodeRepository: Repository<Episode>) {}
 
   async save(episode: DeepPartial<Episode>) {
-    return this.episodeRepository.create(await this.episodeRepository.save(episode));
+    return await this.episodeRepository.save(episode);
   }
 
   async findOneBy(where: FindOptionsWhere<Episode>) {

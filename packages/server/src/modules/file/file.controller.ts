@@ -79,7 +79,7 @@ export class FileController {
   @ApiFile('file', '图片文件')
   async uploadImageFile(@RequestUser() user: User, @UploadedFile() file: Express.Multer.File) {
     if (file) {
-      return await this.fileService.save({
+      const { id } = await this.fileService.save({
         user: { id: user.id },
         filename: file.filename,
         name: file.originalname,
@@ -89,6 +89,8 @@ export class FileController {
         source: FileSourceEnum.USER_UPLOAD,
         path: file.path,
       });
+
+      return await this.fileService.findOneBy({ id });
     } else {
       throw buildException(BadRequestException, ErrorCodeEnum.INVALID_FILE);
     }
@@ -129,8 +131,7 @@ export class FileController {
       try {
         // 计算视频文件 md5
         const md5 = await generateMD5(createReadStream(file.path));
-        // 检查是否已上传过
-        return await this.fileService.save({
+        const { id } = await this.fileService.save({
           user: { id: user.id },
           filename: file.filename,
           name: file.originalname,
@@ -140,6 +141,8 @@ export class FileController {
           source: FileSourceEnum.USER_UPLOAD,
           path: file.path,
         });
+
+        return await this.fileService.findOneBy({ id });
       } catch (error) {
         this.logger.error(error);
         throw buildException(BadRequestException, ErrorCodeEnum.INVALID_FILE);

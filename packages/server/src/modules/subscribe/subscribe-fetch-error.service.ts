@@ -10,7 +10,7 @@ export class SubscribeFetchErrorService {
   ) {}
 
   async save(log: DeepPartial<SubscribeFetchError>) {
-    return this.subscribeParseLogRepository.create(await this.subscribeParseLogRepository.save(log));
+    return await this.subscribeParseLogRepository.save(log);
   }
 
   async findOneBy(where: FindOptionsWhere<SubscribeFetchError>) {

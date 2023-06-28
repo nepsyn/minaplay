@@ -28,7 +28,7 @@ export class SubscribeSourceService implements OnModuleInit {
   }
 
   async save(source: DeepPartial<SubscribeSource>) {
-    return this.subscribeSourceRepository.create(await this.subscribeSourceRepository.save(source));
+    return await this.subscribeSourceRepository.save(source);
   }
 
   async findOneBy(where: FindOptionsWhere<SubscribeSource>) {

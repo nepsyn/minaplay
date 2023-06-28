@@ -10,7 +10,7 @@ export class SubscribeDownloadItemService {
   ) {}
 
   async save(item: DeepPartial<SubscribeDownloadItem>) {
-    return this.subscribeDownloadItemRepository.create(await this.subscribeDownloadItemRepository.save(item));
+    return await this.subscribeDownloadItemRepository.save(item);
   }
 
   async findOneBy(where: FindOptionsWhere<SubscribeDownloadItem>) {

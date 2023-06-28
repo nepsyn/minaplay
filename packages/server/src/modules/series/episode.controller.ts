@@ -78,11 +78,13 @@ export class EpisodeController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    return await this.episodeService.save({
+    const { id } = await this.episodeService.save({
       ...data,
       series: { id: data.seriesId },
       file: { id: data.fileId },
     });
+
+    return await this.episodeService.findOneBy({ id });
   }
 
   @Put(':id')
@@ -96,16 +98,20 @@ export class EpisodeController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    const series = await this.seriesService.findOneBy({ id: data.seriesId });
-    if (!series) {
-      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    if (data.seriesId !== undefined) {
+      const series = await this.seriesService.findOneBy({ id: data.seriesId });
+      if (!series) {
+        throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+      }
     }
 
-    return await this.episodeService.save({
+    await this.episodeService.save({
       id,
       ...data,
       file: { id: data.fileId },
     });
+
+    return await this.episodeService.findOneBy({ id });
   }
 
   @Delete(':id')

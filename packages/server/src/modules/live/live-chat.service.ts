@@ -9,7 +9,7 @@ export class LiveChatService {
   constructor(@InjectRepository(LiveChat) private chatRepository: Repository<LiveChat>) {}
 
   async save(chat: DeepPartial<LiveChat>) {
-    return this.chatRepository.create(await this.chatRepository.save(chat));
+    return await this.chatRepository.save(chat);
   }
 
   async findAndCount(options: FindManyOptions<LiveChat>) {

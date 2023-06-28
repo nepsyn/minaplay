@@ -44,15 +44,20 @@ export class SubscribeSourceController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createSubscribeSource(@RequestUser() user: User, @Body() data: SubscribeSourceDto) {
+    if (!data.url || !data.enabled) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const feed = await this.subscribeSourceService.readSource(data.url);
     if (!feed.title) {
       throw buildException(BadRequestException, ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT);
     }
 
-    const source = await this.subscribeSourceService.save({
+    const { id } = await this.subscribeSourceService.save({
       ...data,
       user: { id: user.id },
     });
+    const source = await this.subscribeSourceService.findOneBy({ id });
     if (source.enabled) {
       await this.subscribeSourceService.addFetchSubscribeDataJob(source);
     }
@@ -101,7 +106,7 @@ export class SubscribeSourceController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async updateSubscribeSource(@Param('id', ParseIntPipe) id: number, @Body() data: SubscribeSourceDto) {
-    let source = await this.subscribeSourceService.findOneBy({ id });
+    const source = await this.subscribeSourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
@@ -113,16 +118,19 @@ export class SubscribeSourceController {
       }
     }
 
-    await this.subscribeSourceService.deleteFetchSubscribeDataJob(id);
-    source = await this.subscribeSourceService.save({
+    await this.subscribeSourceService.save({
       id,
       ...data,
     });
-    if (source.enabled) {
-      await this.subscribeSourceService.addFetchSubscribeDataJob(source);
+
+    if (data.enabled !== undefined) {
+      await this.subscribeSourceService.deleteFetchSubscribeDataJob(id);
+      if (data.enabled === true) {
+        await this.subscribeSourceService.addFetchSubscribeDataJob(source);
+      }
     }
 
-    return source;
+    return await this.subscribeSourceService.findOneBy({ id });
   }
 
   @Delete(':id')

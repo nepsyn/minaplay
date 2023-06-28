@@ -14,7 +14,7 @@ export class LiveService {
   ) {}
 
   async save(live: DeepPartial<Live>) {
-    return this.liveRepository.create(await this.liveRepository.save(live));
+    return await this.liveRepository.save(live);
   }
 
   async findOneBy(where: FindOptionsWhere<Live>) {

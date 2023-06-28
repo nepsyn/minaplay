@@ -52,17 +52,13 @@ export class SubscribeRuleController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createSubscribeRule(@RequestUser() user: User, @Body() data: SubscribeRuleDto) {
-    if (!data.sourceId) {
+    if (!data.sourceId || !data.code) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
     const source = await this.subscribeSourceService.findOneBy({ id: data.sourceId });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-    }
-
-    if (!data.code) {
-      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
     const filename = randomUUID().replace(/-/g, '') + '.js';
@@ -80,12 +76,13 @@ export class SubscribeRuleController {
       path: filepath,
     });
 
-    return this.subscribeRuleService.save({
+    const { id } = await this.subscribeRuleService.save({
       ...data,
       source: { id: data.sourceId },
       series: { id: data.seriesId },
       codeFile: file,
     });
+    return await this.subscribeRuleService.findOneBy({ id });
   }
 
   @Get()
@@ -132,12 +129,14 @@ export class SubscribeRuleController {
       });
     }
 
-    return this.subscribeRuleService.save({
+    await this.subscribeRuleService.save({
       id,
       ...data,
       source: { id: data.sourceId },
       series: { id: data.seriesId },
     });
+
+    return await this.subscribeRuleService.findOneBy({ id });
   }
 
   @Delete(':id')

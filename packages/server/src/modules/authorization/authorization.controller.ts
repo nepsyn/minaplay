@@ -91,7 +91,9 @@ export class AuthorizationController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    return await this.authService.grantPermissions(user, data.permissionNames);
+    await this.authService.grantPermissions(user, data.permissionNames);
+
+    return await this.userService.findOneBy({ id: userId });
   }
 
   @Get('permission')

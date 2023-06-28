@@ -8,7 +8,7 @@ export class UserService {
   constructor(@InjectRepository(User) private userRepository: Repository<User>) {}
 
   async save(user: DeepPartial<User>) {
-    return this.userRepository.create(await this.userRepository.save(user));
+    return await this.userRepository.save(user);
   }
 
   async findOneBy(where: FindOptionsWhere<User>) {

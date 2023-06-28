@@ -59,12 +59,14 @@ export class SeriesController {
       throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATE_SERIES_NAME);
     }
 
-    return await this.seriesService.save({
+    const { id } = await this.seriesService.save({
       ...data,
       user: { id: user.id },
       poster: { id: data.posterFileId },
       tags: data.tagIds?.map((id) => ({ id })),
     });
+
+    return await this.seriesService.findOneBy({ id });
   }
 
   @Get()
@@ -104,12 +106,14 @@ export class SeriesController {
       throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATE_SERIES_NAME);
     }
 
-    return await this.seriesService.save({
+    await this.seriesService.save({
       id,
       ...data,
       poster: { id: data.posterFileId },
       tags: data.tagIds?.map((id) => ({ id })),
     });
+
+    return await this.seriesService.findOneBy({ id });
   }
 
   @Delete(':id')

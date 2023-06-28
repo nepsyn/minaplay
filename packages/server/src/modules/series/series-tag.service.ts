@@ -8,7 +8,7 @@ export class SeriesTagService {
   constructor(@InjectRepository(SeriesTag) private seriesTagRepository: Repository<SeriesTag>) {}
 
   async save(tag: DeepPartial<SeriesTag>) {
-    return this.seriesTagRepository.create(await this.seriesTagRepository.save(tag));
+    return await this.seriesTagRepository.save(tag);
   }
 
   async findOneBy(where: FindOptionsWhere<SeriesTag>) {

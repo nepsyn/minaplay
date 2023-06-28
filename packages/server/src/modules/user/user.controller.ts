@@ -65,10 +65,12 @@ export class UserController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    return this.userService.save({
+    await this.userService.save({
       id,
       ...data,
       avatar: { id: data.avatarFileId },
     });
+
+    return await this.userService.findOneBy({ id });
   }
 }

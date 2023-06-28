@@ -16,7 +16,7 @@ export class FileService {
   ) {}
 
   async save(file: DeepPartial<File>) {
-    const record = this.fileRepository.create(await this.fileRepository.save(file));
+    const record = await this.fileRepository.save(file);
     if (record.expireAt && !record.isExpired) {
       const name = `delete-file-${record.id}`;
       this.scheduleRegistry.deleteCronJob(name);

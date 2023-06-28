@@ -37,7 +37,9 @@ export class SeriesTagController {
       return sameNameSeriesTag;
     }
 
-    return await this.seriesTagService.save(data);
+    const { id } = await this.seriesTagService.save(data);
+
+    return await this.seriesTagService.findOneBy({ id });
   }
 
   @Put(':id')
@@ -56,10 +58,12 @@ export class SeriesTagController {
       throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATE_SERIES_TAG_NAME);
     }
 
-    return await this.seriesTagService.save({
+    await this.seriesTagService.save({
       id,
       ...data,
     });
+
+    return await this.seriesTagService.findOneBy({ id });
   }
 
   @Delete(':id')

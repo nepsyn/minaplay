@@ -75,6 +75,9 @@ export class SubscribeSourceService implements OnModuleInit {
   }
 
   async deleteFetchSubscribeDataJob(id: number) {
-    this.scheduleRegistry.deleteCronJob(SubscribeSourceService.buildFetchJobName(id));
+    const name = SubscribeSourceService.buildFetchJobName(id);
+    if (this.scheduleRegistry.doesExist('cron', name)) {
+      this.scheduleRegistry.deleteCronJob(name);
+    }
   }
 }

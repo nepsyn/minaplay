@@ -6,6 +6,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -64,7 +65,7 @@ export class SubscribeSourceController {
     description: '获取订阅源信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async getSubscribeSourceById(@Param('id') id: number) {
+  async getSubscribeSourceById(@Param('id', ParseIntPipe) id: number) {
     const source = await this.subscribeSourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -99,7 +100,7 @@ export class SubscribeSourceController {
     description: '修改订阅源信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async updateSubscribeSource(@Param('id') id: number, @Body() data: SubscribeSourceDto) {
+  async updateSubscribeSource(@Param('id', ParseIntPipe) id: number, @Body() data: SubscribeSourceDto) {
     let source = await this.subscribeSourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -129,7 +130,7 @@ export class SubscribeSourceController {
     description: '删除订阅源',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async deleteSubscribeSource(@Param('id') id: number) {
+  async deleteSubscribeSource(@Param('id', ParseIntPipe) id: number) {
     await this.subscribeSourceService.deleteFetchSubscribeDataJob(id);
     await this.subscribeSourceService.delete({ id });
     return {};
@@ -140,7 +141,7 @@ export class SubscribeSourceController {
     description: '获取订阅源原始数据',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async fetchSourceRawData(@Param('id') id: number) {
+  async fetchSourceRawData(@Param('id', ParseIntPipe) id: number) {
     const source = await this.subscribeSourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -154,7 +155,7 @@ export class SubscribeSourceController {
     description: '获取订阅源规则列表',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async getSubscribeRulesBySourceId(@Param('id') id: number) {
+  async getSubscribeRulesBySourceId(@Param('id', ParseIntPipe) id: number) {
     const source = await this.subscribeSourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);

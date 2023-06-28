@@ -6,6 +6,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -37,7 +38,7 @@ export class EpisodeController {
     description: '查看单集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
-  async getEpisodeById(@Param('id') id: number) {
+  async getEpisodeById(@Param('id', ParseIntPipe) id: number) {
     const episode = await this.episodeService.findOneBy({ id });
     if (!episode) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -89,7 +90,7 @@ export class EpisodeController {
     description: '修改单集信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
-  async updateEpisode(@Param('id') id: number, @Body() data: EpisodeDto) {
+  async updateEpisode(@Param('id', ParseIntPipe) id: number, @Body() data: EpisodeDto) {
     const episode = await this.episodeService.findOneBy({ id });
     if (!episode) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -112,7 +113,7 @@ export class EpisodeController {
     description: '删除单集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
-  async deleteEpisode(@Param('id') id: number) {
+  async deleteEpisode(@Param('id', ParseIntPipe) id: number) {
     await this.episodeService.delete({ id });
     return {};
   }

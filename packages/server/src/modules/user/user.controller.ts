@@ -1,4 +1,4 @@
-import { Body, Controller, Get, NotFoundException, Param, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Put, Query, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
@@ -24,7 +24,7 @@ export class UserController {
     description: '查看用户信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.USER_OP, PermissionEnum.USER_VIEW)
-  async getUserById(@Param('id') id: number) {
+  async getUserById(@Param('id', ParseIntPipe) id: number) {
     const user = await this.userService.findOneBy({ id });
     if (!user) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -59,7 +59,7 @@ export class UserController {
     description: '修改用户信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.USER_OP)
-  async updateUser(@Param('id') id: number, @Body() data: UserDto) {
+  async updateUser(@Param('id', ParseIntPipe) id: number, @Body() data: UserDto) {
     const user = await this.userService.findOneBy({ id });
     if (!user) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);

@@ -6,6 +6,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -113,7 +114,7 @@ export class SubscribeRuleController {
     description: '修改订阅源规则',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async updateSubscribeRule(@Param('id') id: number, @Body() data: SubscribeRuleDto) {
+  async updateSubscribeRule(@Param('id', ParseIntPipe) id: number, @Body() data: SubscribeRuleDto) {
     const rule = await this.subscribeRuleService.findOneBy({ id });
     if (!rule) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -144,7 +145,7 @@ export class SubscribeRuleController {
     description: '删除订阅规则',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async deleteSubscribeRule(@Param('id') id: number) {
+  async deleteSubscribeRule(@Param('id', ParseIntPipe) id: number) {
     await this.subscribeRuleService.delete({ id });
     return {};
   }

@@ -5,6 +5,7 @@ import {
   Delete,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   UseGuards,
@@ -44,7 +45,7 @@ export class SeriesTagController {
     description: '修改剧集标签',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
-  async updateSeriesTag(@Param('id') id: number, @Body() data: SeriesTagDto) {
+  async updateSeriesTag(@Param('id', ParseIntPipe) id: number, @Body() data: SeriesTagDto) {
     const seriesTag = await this.seriesTagService.findOneBy({ id });
     if (!seriesTag) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -66,7 +67,7 @@ export class SeriesTagController {
     description: '删除剧集标签',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
-  async deleteSeriesTag(@Param('id') id: number) {
+  async deleteSeriesTag(@Param('id', ParseIntPipe) id: number) {
     await this.seriesTagService.delete({ id });
     return {};
   }

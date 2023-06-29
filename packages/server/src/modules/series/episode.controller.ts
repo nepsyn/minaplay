@@ -74,7 +74,7 @@ export class EpisodeController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async createEpisode(@Body() data: EpisodeDto) {
-    if (!data.seriesId) {
+    if (data.seriesId == null) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 

@@ -67,11 +67,14 @@ export class SubscribeSourceService implements OnModuleInit {
     const name = SubscribeSourceService.buildFetchJobName(source.id);
     const job = new CronJob({
       cronTime: source.cron,
-      onTick: async () => this.fetchSubscribeSourceQueue.add(source),
-      runOnInit: true,
+      onTick: async () => await this.fetchSubscribeSourceQueue.add(source),
     });
 
     this.scheduleRegistry.addCronJob(name, job);
+  }
+
+  async runFetchSubscribeDataJob(source: SubscribeSource) {
+    await this.fetchSubscribeSourceQueue.add(source);
   }
 
   async deleteFetchSubscribeDataJob(id: number) {

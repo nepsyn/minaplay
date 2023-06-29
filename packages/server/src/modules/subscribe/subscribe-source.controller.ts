@@ -44,13 +44,8 @@ export class SubscribeSourceController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createSubscribeSource(@RequestUser() user: User, @Body() data: SubscribeSourceDto) {
-    if (!data.url || !data.enabled) {
+    if (data.url == null || data.enabled == null) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
-    }
-
-    const feed = await this.subscribeSourceService.readSource(data.url);
-    if (!feed.title) {
-      throw buildException(BadRequestException, ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT);
     }
 
     const { id } = await this.subscribeSourceService.save({
@@ -111,13 +106,6 @@ export class SubscribeSourceController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    if (data.url) {
-      const feed = await this.subscribeSourceService.readSource(data.url);
-      if (!feed.title) {
-        throw buildException(BadRequestException, ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT);
-      }
-    }
-
     await this.subscribeSourceService.save({
       id,
       ...data,
@@ -155,7 +143,25 @@ export class SubscribeSourceController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    return this.subscribeSourceService.readSource(source.url);
+    try {
+      return this.subscribeSourceService.readSource(source.url);
+    } catch {
+      throw buildException(BadRequestException, ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT);
+    }
+  }
+
+  @Post(':id/run')
+  @ApiOperation({
+    description: '立即执行更新订阅源操作',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  async runFetchJob(@Param('id', ParseIntPipe) id: number) {
+    const source = await this.subscribeSourceService.findOneBy({ id });
+    if (!source) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    await this.subscribeSourceService.runFetchSubscribeDataJob(source);
   }
 
   @Get(':id/rule')

@@ -10,7 +10,7 @@ export class ApplicationGatewayInterceptor implements NestInterceptor {
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
     const socket: Socket = context.switchToWs().getClient();
     const syncId: number = context.switchToWs().getData().sync;
-    if (!syncId) {
+    if (syncId == null) {
       throw buildException(WsException, ErrorCodeEnum.NO_SYNC_FIELD);
     }
 

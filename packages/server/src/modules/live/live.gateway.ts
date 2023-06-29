@@ -133,7 +133,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     @MessageBody('start') startTime: Date,
     @MessageBody('end') endTime?: Date,
   ) {
-    if (!startTime) {
+    if (startTime == null) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -153,7 +153,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @UseGuards(LiveAudienceWsGuard)
   @CreatorOnly()
   async handleRevoke(@ConnectedSocket() socket: Socket, @MessageBody('id') id: string) {
-    if (!id) {
+    if (id == null) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -166,7 +166,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @UseGuards(LiveAudienceWsGuard)
   @CreatorOnly()
   async handleMute(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState, @MessageBody('id') id: number) {
-    if (!id) {
+    if (id == null) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -187,7 +187,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     @WsLiveState() state: LiveState,
     @MessageBody('id') id: number,
   ) {
-    if (!id) {
+    if (id == null) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -213,7 +213,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @UseGuards(LiveAudienceWsGuard)
   @CreatorOnly()
   async handleKick(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState, @MessageBody('id') id: number) {
-    if (!id || id === socket.data.user.id) {
+    if (id == null || id === socket.data.user.id) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 

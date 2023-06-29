@@ -52,7 +52,7 @@ export class SubscribeRuleController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createSubscribeRule(@RequestUser() user: User, @Body() data: SubscribeRuleDto) {
-    if (!data.sourceId || !data.code) {
+    if (data.sourceId == null || data.code == null) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 

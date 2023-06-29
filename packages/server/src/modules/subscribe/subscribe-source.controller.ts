@@ -162,6 +162,7 @@ export class SubscribeSourceController {
     }
 
     await this.subscribeSourceService.runFetchSubscribeDataJob(source);
+    return source;
   }
 
   @Get(':id/rule')

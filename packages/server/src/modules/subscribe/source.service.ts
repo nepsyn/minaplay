@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SubscribeSource } from './subscribe-source.entity';
+import { Source } from './source.entity';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { extract } from '@extractus/feed-extractor';
 import { SchedulerRegistry } from '@nestjs/schedule';
@@ -9,9 +9,9 @@ import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 
 @Injectable()
-export class SubscribeSourceService implements OnModuleInit {
+export class SourceService implements OnModuleInit {
   constructor(
-    @InjectRepository(SubscribeSource) private subscribeSourceRepository: Repository<SubscribeSource>,
+    @InjectRepository(Source) private sourceRepository: Repository<Source>,
     private scheduleRegistry: SchedulerRegistry,
     @InjectQueue('fetch-subscribe-source') private fetchSubscribeSourceQueue: Queue,
   ) {}
@@ -27,20 +27,20 @@ export class SubscribeSourceService implements OnModuleInit {
     }
   }
 
-  async save(source: DeepPartial<SubscribeSource>) {
-    return await this.subscribeSourceRepository.save(source);
+  async save(source: DeepPartial<Source>) {
+    return await this.sourceRepository.save(source);
   }
 
-  async findOneBy(where: FindOptionsWhere<SubscribeSource>) {
-    return this.subscribeSourceRepository.findOneBy(where);
+  async findOneBy(where: FindOptionsWhere<Source>) {
+    return this.sourceRepository.findOneBy(where);
   }
 
-  async findAndCount(options?: FindManyOptions<SubscribeSource>) {
-    return await this.subscribeSourceRepository.findAndCount(options);
+  async findAndCount(options?: FindManyOptions<Source>) {
+    return await this.sourceRepository.findAndCount(options);
   }
 
-  async delete(where: FindOptionsWhere<SubscribeSource>) {
-    const result = await this.subscribeSourceRepository.delete(where);
+  async delete(where: FindOptionsWhere<Source>) {
+    const result = await this.sourceRepository.delete(where);
     return result.affected > 0;
   }
 
@@ -63,8 +63,8 @@ export class SubscribeSourceService implements OnModuleInit {
     });
   }
 
-  async addFetchSubscribeDataJob(source: SubscribeSource) {
-    const name = SubscribeSourceService.buildFetchJobName(source.id);
+  async addFetchSubscribeDataJob(source: Source) {
+    const name = SourceService.buildFetchJobName(source.id);
     const job = new CronJob({
       cronTime: source.cron,
       onTick: async () => await this.fetchSubscribeSourceQueue.add(source),
@@ -73,12 +73,12 @@ export class SubscribeSourceService implements OnModuleInit {
     this.scheduleRegistry.addCronJob(name, job);
   }
 
-  async runFetchSubscribeDataJob(source: SubscribeSource) {
+  async runFetchSubscribeDataJob(source: Source) {
     await this.fetchSubscribeSourceQueue.add(source);
   }
 
   async deleteFetchSubscribeDataJob(id: number) {
-    const name = SubscribeSourceService.buildFetchJobName(id);
+    const name = SourceService.buildFetchJobName(id);
     if (this.scheduleRegistry.doesExist('cron', name)) {
       this.scheduleRegistry.deleteCronJob(name);
     }

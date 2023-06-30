@@ -1,10 +1,10 @@
 import { ApiQueryDto } from '../../utils/api.query.dto';
-import { SubscribeRule } from './subscribe-rule.entity';
+import { Rule } from './rule.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
-export class SubscribeRuleQueryDto extends ApiQueryDto<SubscribeRule> {
+export class RuleQueryDto extends ApiQueryDto<Rule> {
   @ApiProperty({
     description: '查询关键字',
     required: false,

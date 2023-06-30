@@ -17,7 +17,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { hash } from 'bcrypt';
 import { File } from '../file/file.entity';
 import { Series } from '../series/series.entity';
-import { SubscribeSource } from '../subscribe/subscribe-source.entity';
+import { Source } from '../subscribe/source.entity';
 
 /** 用户 */
 @Entity()
@@ -62,8 +62,8 @@ export class User {
 
   /** 创建的订阅源 */
   @Exclude()
-  @OneToMany(() => SubscribeSource, (source) => source.user)
-  sources: SubscribeSource[];
+  @OneToMany(() => Source, (source) => source.user)
+  sources: Source[];
 
   /** 头像文件 */
   @Exclude()

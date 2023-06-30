@@ -1,10 +1,10 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 import { ApiQueryDto } from '../../utils/api.query.dto';
-import { SubscribeSource } from './subscribe-source.entity';
+import { Source } from './source.entity';
 import { Transform } from 'class-transformer';
 
-export class SubscribeSourceQueryDto extends ApiQueryDto<SubscribeSource> {
+export class SourceQueryDto extends ApiQueryDto<Source> {
   @ApiProperty({
     description: '查询关键字',
     required: false,

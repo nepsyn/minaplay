@@ -11,7 +11,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
-import { SubscribeRule } from '../subscribe/subscribe-rule.entity';
+import { Rule } from '../subscribe/rule.entity';
 import { SeriesTag } from './series-tag.entity';
 import { File } from '../file/file.entity';
 import { User } from '../user/user.entity';
@@ -62,8 +62,8 @@ export class Series {
   description: string;
 
   /** 订阅规则 */
-  @OneToMany(() => SubscribeRule, (rule) => rule.series)
-  rules: SubscribeRule[];
+  @OneToMany(() => Rule, (rule) => rule.series)
+  rules: Rule[];
 
   /** 创建时间 */
   @CreateDateColumn()

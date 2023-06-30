@@ -1,10 +1,11 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { SubscribeRule } from './subscribe-rule.entity';
+import { Rule } from './rule.entity';
 import { SubscribeDownloadItemStatusEnum } from '../../enums/subscribe-download-item-status.enum';
+import { Source } from './source.entity';
 
 /** 订阅解析元素 */
 @Entity()
-export class SubscribeDownloadItem {
+export class DownloadItem {
   /** id */
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -19,13 +20,21 @@ export class SubscribeDownloadItem {
   @Column()
   url: string;
 
-  /** 命中规则 */
-  @ManyToOne(() => SubscribeRule, {
+  /** 所属订阅源 */
+  @ManyToOne(() => Source, {
     onDelete: 'SET NULL',
     nullable: true,
     eager: true,
   })
-  rule: SubscribeRule;
+  source: Source;
+
+  /** 命中规则 */
+  @ManyToOne(() => Rule, {
+    onDelete: 'SET NULL',
+    nullable: true,
+    eager: true,
+  })
+  rule: Rule;
 
   /** 下载状态 */
   @Column({

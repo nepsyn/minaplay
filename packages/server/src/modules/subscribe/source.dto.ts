@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class SubscribeSourceDto {
+export class SourceDto {
   @ApiProperty({
     description: '订阅源 url',
     required: false,

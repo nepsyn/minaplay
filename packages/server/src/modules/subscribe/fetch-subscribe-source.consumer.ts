@@ -1,12 +1,12 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
-import { SubscribeSourceService } from './subscribe-source.service';
+import { SourceService } from './source.service';
 import { Job } from 'bull';
-import { SubscribeSource } from './subscribe-source.entity';
+import { Source } from './source.entity';
 import { SubscribeDownloadItemStatusEnum } from '../../enums/subscribe-download-item-status.enum';
-import { SubscribeFetchErrorService } from './subscribe-fetch-error.service';
-import { SubscribeRuleService } from './subscribe-rule.service';
-import { SubscribeDownloadItemService } from './subscribe-download-item.service';
+import { FetchLogService } from './fetch-log.service';
+import { RuleService } from './rule.service';
+import { DownloadItemService } from './download-item.service';
 import { Aria2Service } from '../aria2/aria2.service';
 import { NodeVM } from 'vm2';
 import { VALID_VIDEO_MIME } from '../../constants';
@@ -16,23 +16,23 @@ import { EpisodeService } from '../series/episode.service';
 @Processor('fetch-subscribe-source')
 export class FetchSubscribeSourceConsumer {
   constructor(
-    private subscribeSourceService: SubscribeSourceService,
-    private subscribeParseLogService: SubscribeFetchErrorService,
-    private subscribeRuleService: SubscribeRuleService,
-    private subscribeDownloadItemService: SubscribeDownloadItemService,
+    private sourceService: SourceService,
+    private fetchLogService: FetchLogService,
+    private ruleService: RuleService,
+    private downloadItemService: DownloadItemService,
     private aria2Service: Aria2Service,
     private episodeService: EpisodeService,
   ) {}
 
   @Process()
-  async fetchSubscribeSource(job: Job<SubscribeSource>) {
+  async fetchSubscribeSource(job: Job<Source>) {
     const source = job.data;
 
     try {
-      const data = await this.subscribeSourceService.readSource(source.url);
+      const data = await this.sourceService.readSource(source.url);
 
       if (data.entries.length > 0) {
-        const [rules] = await this.subscribeRuleService.findAndCount({
+        const [rules] = await this.ruleService.findAndCount({
           where: {
             source: { id: source.id },
           },
@@ -50,12 +50,12 @@ export class FetchSubscribeSourceConsumer {
           for (const entry of validEntries) {
             const valid = validatorFunc(entry);
             if (valid) {
-              const sameNameItem = await this.subscribeDownloadItemService.findOneBy({ title: entry.title });
+              const sameNameItem = await this.downloadItemService.findOneBy({ title: entry.title });
               if (sameNameItem) {
                 continue;
               }
 
-              const item = await this.subscribeDownloadItemService.save({
+              const item = await this.downloadItemService.save({
                 title: entry.title,
                 url: entry.enclosure.url,
                 rule: { id: rule.id },
@@ -74,13 +74,13 @@ export class FetchSubscribeSourceConsumer {
                   }
                 }
 
-                await this.subscribeDownloadItemService.save({
+                await this.downloadItemService.save({
                   id: item.id,
                   status: SubscribeDownloadItemStatusEnum.DOWNLOADED,
                 });
               });
               task.on('error', async (status) => {
-                await this.subscribeDownloadItemService.save({
+                await this.downloadItemService.save({
                   id: item.id,
                   status: SubscribeDownloadItemStatusEnum.FAILED,
                   error: status.errorMessage,
@@ -90,9 +90,16 @@ export class FetchSubscribeSourceConsumer {
           }
         }
       }
-    } catch (error) {
-      await this.subscribeParseLogService.save({
+
+      await this.fetchLogService.save({
         source: { id: source.id },
+        success: true,
+        data: JSON.stringify(data),
+      });
+    } catch (error) {
+      await this.fetchLogService.save({
+        source: { id: source.id },
+        success: false,
         error: error?.stack,
       });
     }

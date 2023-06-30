@@ -8,13 +8,13 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { SubscribeSource } from './subscribe-source.entity';
+import { Source } from './source.entity';
 import { Series } from '../series/series.entity';
 import { File } from '../file/file.entity';
 
 /** 订阅规则 */
 @Entity()
-export class SubscribeRule {
+export class Rule {
   /** id */
   @PrimaryGeneratedColumn('increment')
   id: number;
@@ -33,10 +33,10 @@ export class SubscribeRule {
   codeFile: File;
 
   /** 订阅源 */
-  @ManyToOne(() => SubscribeSource, (source) => source.rules, {
+  @ManyToOne(() => Source, (source) => source.rules, {
     eager: true,
   })
-  source: SubscribeSource;
+  source: Source;
 
   /** 剧集 */
   @ManyToOne(() => Series, (series) => series.rules, {

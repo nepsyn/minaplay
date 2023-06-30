@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class SubscribeRuleDto {
+export class RuleDto {
   @ApiProperty({
     description: '代码规则',
     required: false,

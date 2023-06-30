@@ -9,12 +9,12 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { SubscribeRule } from './subscribe-rule.entity';
+import { Rule } from './rule.entity';
 import { User } from '../user/user.entity';
 
 /** 订阅源 */
 @Entity()
-export class SubscribeSource {
+export class Source {
   /** id */
   @PrimaryGeneratedColumn('increment')
   id: number;
@@ -48,8 +48,8 @@ export class SubscribeSource {
   enabled: boolean;
 
   /** 订阅规则 */
-  @OneToMany(() => SubscribeRule, (rule) => rule.source)
-  rules: SubscribeRule[];
+  @OneToMany(() => Rule, (rule) => rule.source)
+  rules: Rule[];
 
   /** 创建用户 */
   @ManyToOne(() => User, (user) => user.sources, {

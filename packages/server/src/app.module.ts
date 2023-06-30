@@ -56,7 +56,6 @@ import { SubscribeModule } from './modules/subscribe/subscribe.module';
         username: configService.get('DB_USERNAME'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE', 'minaplay'),
-        timezone: 'Z',
         entities: ['dist/**/*.entity{.ts,.js}'],
         migrations: ['dist/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations_minaplay',

@@ -144,7 +144,7 @@ export class SubscribeSourceController {
     }
 
     try {
-      return this.subscribeSourceService.readSource(source.url);
+      return await this.subscribeSourceService.readSource(source.url);
     } catch {
       throw buildException(BadRequestException, ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT);
     }

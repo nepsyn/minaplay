@@ -8,6 +8,19 @@ html {
   height: calc(100vh - 64px);
 }
 
+.scrollable-container {
+  flex-grow: 1;
+  height: 0;
+  overflow-y: auto;
+}
+
 .fill-width {
   width: 100%;
+}
+
+.section-block::before {
+  content: "";
+  margin-right: 8px;
+  border: 3px solid rgb(var(--v-theme-primary-lighten-1));
+  border-radius: 1px;
 }

@@ -1,13 +1,22 @@
-import axios, { AxiosProgressEvent } from 'axios';
+import axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 import { AuthData, LoginDto } from './interfaces/auth.interface';
 import { FileEntity } from './interfaces/file.interface';
 import {
-  SubscribeRuleDto,
-  SubscribeRuleEntity,
-  SubscribeSourceDto,
-  SubscribeSourceEntity,
+  DownloadItemEntity,
+  DownloadItemQueryDto,
+  FeedData,
+  FetchLogEntity,
+  FetchLogQueryDto,
+  RuleDto,
+  RuleEntity,
+  RuleQueryDto,
+  SourceDto,
+  SourceEntity,
+  SourceQueryDto,
 } from './interfaces/subscribe.interface';
-import { ApiQueryDto, ApiQueryResult } from './interfaces/common.interface';
+import { ApiQueryResult } from './interfaces/common.interface';
+import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
+import { useRouter } from 'vue-router';
 
 class ApiHelper {
   private token: string | null = null;
@@ -25,6 +34,20 @@ class ApiHelper {
         return Promise.reject(error);
       },
     );
+
+    axios.interceptors.response.use(
+      (response) => {
+        return response;
+      },
+      (error) => {
+        if (error.response?.data?.code === ErrorCodeEnum.INVALID_TOKEN) {
+          localStorage.removeItem('token');
+          const router = useRouter();
+          router.replace({ name: 'login' });
+        }
+        return Promise.reject(error);
+      },
+    );
   }
 
   get isLogin() {
@@ -35,20 +58,20 @@ class ApiHelper {
     this.token = token;
   }
 
-  private apiGet<T = any, Params = any>(url: string) {
-    return (params?: Params) => axios.get<T>(this.baseUrl + url, { params });
+  private apiGet<T = any, Params = any>(url: string, config: AxiosRequestConfig = {}) {
+    return (params?: Params) => axios.get<T>(this.baseUrl + url, { params, ...config });
   }
 
-  private apiPost<T = any, Data = any>(url: string) {
-    return (data?: Data) => axios.post<T>(this.baseUrl + url, data);
+  private apiPost<T = any, Data = any>(url: string, config: AxiosRequestConfig = {}) {
+    return (data?: Data) => axios.post<T>(this.baseUrl + url, data, config);
   }
 
-  private apiPut<T = any, Data = any>(url: string) {
-    return (data?: Data) => axios.put<T>(this.baseUrl + url, data);
+  private apiPut<T = any, Data = any>(url: string, config: AxiosRequestConfig = {}) {
+    return (data?: Data) => axios.put<T>(this.baseUrl + url, data, config);
   }
 
-  private apiDelete<T = any, Params = any>(url: string) {
-    return (params?: Params) => axios.delete<T>(this.baseUrl + url, { params });
+  private apiDelete<T = any, Params = any>(url: string, config: AxiosRequestConfig = {}) {
+    return (params?: Params) => axios.delete<T>(this.baseUrl + url, { params, ...config });
   }
 
   private apiUpload<T = any>(url: string) {
@@ -76,18 +99,23 @@ class ApiHelper {
   };
 
   SubscribeSource = {
-    create: this.apiPost<SubscribeSourceEntity, SubscribeSourceDto>('/subscribe'),
+    create: this.apiPost<SourceEntity, SourceDto>('/subscribe'),
     getById: (id: number) => this.apiGet(`/subscribe/${id}`),
-    query: this.apiGet<ApiQueryResult<SubscribeSourceEntity>, ApiQueryDto<SubscribeSourceEntity>>('/subscribe'),
-    update: (id: number) => this.apiPut<SubscribeSourceEntity, SubscribeSourceDto>(`/subscribe/${id}`),
+    query: this.apiGet<ApiQueryResult<SourceEntity>, SourceQueryDto>('/subscribe'),
+    update: (id: number) => this.apiPut<SourceEntity, SourceDto>(`/subscribe/${id}`),
     delete: (id: number) => this.apiDelete(`/subscribe/${id}`),
-    fetchRawData: (id: number) => this.apiPost<object>(`/subscribe/${id}/raw`),
-    getRulesById: (id: number) => this.apiGet(`/subscribe/${id}/rule`),
+    fetchRawData: (id: number) => this.apiGet<FeedData>(`/subscribe/${id}/raw`),
+    invokeFetchJobById: (id: number) => this.apiPost(`/subscribe/${id}/run`),
+    getRulesById: (id: number) => this.apiGet<RuleEntity[]>(`/subscribe/${id}/rule`),
+    getFetchLogsById: (id: number) =>
+      this.apiGet<ApiQueryResult<FetchLogEntity>, FetchLogQueryDto>(`/subscribe/${id}/log`),
+    getDownloadItemsById: (id: number) =>
+      this.apiGet<ApiQueryResult<DownloadItemEntity>, DownloadItemQueryDto>(`/subscribe/${id}/log`),
   };
 
   SubscribeRule = {
-    create: (sourceId: number) => this.apiPost<SubscribeRuleEntity, SubscribeRuleDto>(`rule`),
-    query: this.apiGet<ApiQueryResult<SubscribeRuleEntity>, ApiQueryDto<SubscribeRuleEntity>>('rule'),
+    create: this.apiPost<RuleEntity, RuleDto>(`rule`),
+    query: this.apiGet<ApiQueryResult<RuleEntity>, RuleQueryDto>('rule'),
     update: (id: number) => this.apiPut(`rule/${id}`),
     delete: (id: number) => this.apiDelete(`rule/${id}`),
   };

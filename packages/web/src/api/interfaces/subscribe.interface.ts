@@ -1,7 +1,8 @@
 import { UserEntity } from './user.interface';
 import { SeriesEntity } from './series.interface';
+import { ApiQueryDto } from '@/api/interfaces/common.interface';
 
-export interface SubscribeSourceEntity {
+export interface SourceEntity {
   /** id */
   id: number;
   /** url */
@@ -14,8 +15,6 @@ export interface SubscribeSourceEntity {
   cron: string;
   /** 是否启用 */
   enabled: boolean;
-  /** 订阅规则 */
-  rules: SubscribeRuleEntity[];
   /** 创建用户 */
   user: UserEntity;
   /** 创建时间 */
@@ -24,7 +23,7 @@ export interface SubscribeSourceEntity {
   updateAt: Date;
 }
 
-export interface SubscribeSourceDto {
+export interface SourceDto {
   url?: string;
   title?: string;
   remark?: string;
@@ -32,13 +31,20 @@ export interface SubscribeSourceDto {
   enabled?: boolean;
 }
 
-export interface SubscribeRuleEntity {
+export interface SourceQueryDto {
+  keyword?: string;
+  id?: number;
+  url?: string;
+  userId?: number;
+}
+
+export interface RuleEntity {
   /** id */
   id: number;
   /** 备注 */
   remark?: string;
   /** 订阅源 */
-  source: SubscribeSourceEntity;
+  source: SourceEntity;
   /** 剧集 */
   series: SeriesEntity;
   /** 创建时间 */
@@ -47,9 +53,70 @@ export interface SubscribeRuleEntity {
   updateAt: Date;
 }
 
-export interface SubscribeRuleDto {
+export interface RuleDto {
   code?: string;
   remark?: string;
   sourceId?: number;
   seriesId?: number;
+}
+
+export interface RuleQueryDto extends ApiQueryDto<RuleEntity> {
+  keyword?: string;
+  id?: number;
+  sourceId?: number;
+  seriesId?: number;
+}
+
+export interface FetchLogEntity {
+  id: string;
+  source: SourceEntity;
+  success: boolean;
+  data?: string;
+  error?: string;
+  createAt: Date;
+}
+
+export interface FetchLogQueryDto extends ApiQueryDto<FetchLogEntity> {
+  start?: Date;
+  end?: Date;
+}
+
+export interface DownloadItemEntity {
+  id: string;
+  title: string;
+  url: string;
+  source: SourceEntity;
+  rule: RuleEntity;
+  status: 'DOWNLOADED' | 'DOWNLOADING' | 'FAILED';
+  error?: string;
+  createAt: Date;
+}
+
+export interface DownloadItemQueryDto extends ApiQueryDto<DownloadItemEntity> {
+  keyword?: string;
+  start?: Date;
+  end?: Date;
+  status?: 'DOWNLOADED' | 'DOWNLOADING' | 'FAILED';
+}
+
+export interface FeedEntry {
+  id: string;
+  link?: string;
+  title?: string;
+  description?: string;
+  published?: Date;
+  enclosure: {
+    url: string;
+    type?: string;
+  };
+}
+
+export interface FeedData {
+  link?: string;
+  title?: string;
+  description?: string;
+  generator?: string;
+  language?: string;
+  published?: Date;
+  entries?: Array<FeedEntry>;
 }

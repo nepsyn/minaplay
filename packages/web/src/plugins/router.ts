@@ -25,32 +25,39 @@ const LoginGuard: NavigationGuard = (to, from, next) => {
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
+    name: 'home',
     component: Home,
     redirect: '/media',
     children: [
       {
+        name: 'media',
         path: '/media',
         component: Media,
       },
       {
+        name: 'live',
         path: '/live',
         component: Live,
       },
       {
+        name: 'subscribe',
         path: '/subscribe',
         component: Subscribe,
         children: [
           {
+            name: 'subscribe-detail',
             path: '/subscribe/:id',
             component: SubscribeDetail,
           },
         ],
       },
       {
+        name: 'admin',
         path: '/admin',
         component: Admin,
       },
       {
+        name: 'setting',
         path: '/setting',
         component: Setting,
       },
@@ -58,6 +65,7 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: LoginGuard,
   },
   {
+    name: 'login',
     path: '/login',
     component: Login,
   },

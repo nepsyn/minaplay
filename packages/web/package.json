@@ -8,6 +8,7 @@
   },
   "devDependencies": {
     "@mdi/js": "^7.2.96",
+    "@types/lodash": "^4.14.195",
     "@types/node": "^20.3.1",
     "@vitejs/plugin-vue": "^4.1.0",
     "pinia": "^2.0.34",
@@ -22,7 +23,15 @@
     "vuetify": "^3.1.14"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.1.9",
+    "@codemirror/lang-json": "^6.0.1",
+    "@codemirror/lang-xml": "^6.0.2",
+    "@codemirror/state": "^6.2.1",
+    "@codemirror/theme-one-dark": "^6.1.2",
     "axios": "^1.4.0",
-    "socket.io-client": "^4.6.2"
+    "codemirror": "^6.0.1",
+    "lodash": "^4.17.21",
+    "socket.io-client": "^4.6.2",
+    "vue-codemirror": "^6.1.1"
   }
 }

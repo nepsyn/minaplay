@@ -4,6 +4,7 @@ import { useAppStore } from '@/store/app';
 import { Api } from '@/api/api';
 import LogoLandscape from '@/assets/logo_banner_landscape.jpeg';
 import { useRoute, useRouter } from 'vue-router';
+import { mdiAccountCircleOutline, mdiEye, mdiEyeOff, mdiLockOutline } from '@mdi/js';
 
 const app = useAppStore();
 const route = useRoute();
@@ -16,6 +17,7 @@ const toggleAction = function () {
 
 const username = ref('');
 const password = ref('');
+const passwordVisible = ref(false);
 const error: Ref<string | undefined> = ref(undefined);
 const loading = ref(false);
 
@@ -66,15 +68,19 @@ const register = async () => {};
           color="primary"
           autofocus
           label="用户名"
-          maxlength="20"
+          :prepend-inner-icon="mdiAccountCircleOutline"
+          maxlength="40"
         ></v-text-field>
         <v-text-field
           v-model.trim="password"
           variant="underlined"
           color="primary"
           label="密码"
+          :prepend-inner-icon="mdiLockOutline"
+          :append-inner-icon="passwordVisible ? mdiEyeOff : mdiEye"
+          @click:append-inner="passwordVisible = !passwordVisible"
           maxlength="20"
-          type="password"
+          :type="passwordVisible ? 'text' : 'password'"
           @keypress.enter="action === 'login' ? login() : register()"
         ></v-text-field>
         <v-alert v-if="error" class="mb-0" text tile type="error">{{ error }}</v-alert>

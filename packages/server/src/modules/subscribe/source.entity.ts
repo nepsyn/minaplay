@@ -11,6 +11,8 @@ import {
 import { Exclude } from 'class-transformer';
 import { Rule } from './rule.entity';
 import { User } from '../user/user.entity';
+import { FetchLog } from './fetch-log.entity';
+import { DownloadItem } from './download-item.entity';
 
 /** 订阅源 */
 @Entity()
@@ -48,8 +50,19 @@ export class Source {
   enabled: boolean;
 
   /** 订阅规则 */
+  @Exclude()
   @OneToMany(() => Rule, (rule) => rule.source)
   rules: Rule[];
+
+  /** 更新记录 */
+  @Exclude()
+  @OneToMany(() => FetchLog, (log) => log.source)
+  logs: FetchLog[];
+
+  /** 下载内容 */
+  @Exclude()
+  @OneToMany(() => DownloadItem, (download) => download.source)
+  downloads: DownloadItem[];
 
   /** 创建用户 */
   @ManyToOne(() => User, (user) => user.sources, {

@@ -10,7 +10,8 @@ export class FetchLog {
   id: string;
 
   /** 订阅源 */
-  @ManyToOne(() => Source, {
+  @ManyToOne(() => Source, (source) => source.logs, {
+    onDelete: 'CASCADE',
     eager: true,
   })
   source: Source;

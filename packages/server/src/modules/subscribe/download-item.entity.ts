@@ -21,7 +21,7 @@ export class DownloadItem {
   url: string;
 
   /** 所属订阅源 */
-  @ManyToOne(() => Source, {
+  @ManyToOne(() => Source, (source) => source.downloads, {
     onDelete: 'SET NULL',
     nullable: true,
     eager: true,
@@ -29,7 +29,7 @@ export class DownloadItem {
   source: Source;
 
   /** 命中规则 */
-  @ManyToOne(() => Rule, {
+  @ManyToOne(() => Rule, (rule) => rule.downloads, {
     onDelete: 'SET NULL',
     nullable: true,
     eager: true,

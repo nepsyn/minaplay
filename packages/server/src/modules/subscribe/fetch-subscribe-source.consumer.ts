@@ -58,6 +58,7 @@ export class FetchSubscribeSourceConsumer {
               const item = await this.downloadItemService.save({
                 title: entry.title,
                 url: entry.enclosure.url,
+                source: { id: source.id },
                 rule: { id: rule.id },
                 status: SubscribeDownloadItemStatusEnum.DOWNLOADING,
               });

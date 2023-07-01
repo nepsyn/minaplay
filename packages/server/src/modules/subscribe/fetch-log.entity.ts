@@ -1,5 +1,6 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Source } from './source.entity';
+import { Exclude } from 'class-transformer';
 
 /** 订阅解析日志 */
 @Entity()
@@ -19,6 +20,7 @@ export class FetchLog {
   success: boolean;
 
   /** 原始数据 */
+  @Exclude()
   @Column({
     nullable: true,
     type: 'text',

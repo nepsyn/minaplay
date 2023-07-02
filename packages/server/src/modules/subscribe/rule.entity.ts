@@ -8,11 +8,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { Source } from './source.entity';
 import { Series } from '../series/series.entity';
 import { File } from '../file/file.entity';
 import { DownloadItem } from './download-item.entity';
+import { readFileSync } from 'fs-extra';
 
 /** 订阅规则 */
 @Entity()
@@ -53,6 +54,11 @@ export class Rule {
     nullable: true,
   })
   series: Series;
+
+  @Expose()
+  get code() {
+    return this.codeFile.isExist ? readFileSync(this.codeFile.path).toString() : undefined;
+  }
 
   /** 创建时间 */
   @CreateDateColumn()

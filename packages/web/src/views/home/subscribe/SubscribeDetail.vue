@@ -28,6 +28,7 @@ import _ from 'lodash';
 import ItemsLoader from '@/components/ItemsLoader.vue';
 import { createItemsLoaderState, createSingleItemLoaderState } from '@/utils';
 import SingleItemLoader from '@/components/SingleItemLoader.vue';
+import ToTopContainer from '@/components/ToTopContainer.vue';
 
 const app = useApp();
 const sourceStore = useSourceStore();
@@ -194,7 +195,7 @@ watch(
         <v-tab :value="4" :prepend-icon="mdiDownloadCircleOutline">下载项目</v-tab>
       </v-tabs>
     </v-toolbar>
-    <v-container fluid class="pa-0 scrollable-container">
+    <to-top-container class="scrollable-container">
       <single-item-loader ref="sourceLoaderRef" v-model="sourceState" @error="app.toastError('获取订阅源数据失败！')">
         <template #default="{ load }">
           <v-window v-model="tab" class="pa-6">
@@ -459,7 +460,7 @@ watch(
           </v-window>
         </template>
       </single-item-loader>
-    </v-container>
+    </to-top-container>
   </v-container>
 </template>
 

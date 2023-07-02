@@ -1,0 +1,55 @@
+<script setup lang="ts">
+import { Ref, ref } from 'vue';
+import { mdiChevronUp } from '@mdi/js';
+
+const props = withDefaults(
+  defineProps<{
+    threshold?: string | number;
+    size?: string | number;
+  }>(),
+  {
+    threshold: 120,
+    size: 'default',
+  },
+);
+
+const showToTop = ref(false);
+
+const onScroll = (e: any) => {
+  showToTop.value = e.target.scrollTop >= Number(props.threshold);
+};
+
+const containerRef: Ref<any> = ref(null);
+const toTop = () => {
+  containerRef.value.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  });
+};
+</script>
+
+<template>
+  <div ref="containerRef" class="pa-0" @scroll="onScroll">
+    <slot></slot>
+    <slot name="activator" :to-top="toTop">
+      <v-layout-item :model-value="showToTop" position="bottom" class="text-end pointer-events-none" size="80">
+        <v-btn
+          class="mr-8 pointer-events-initial"
+          :size="size!"
+          color="primary"
+          elevation="8"
+          :icon="mdiChevronUp"
+          @click="toTop"
+        ></v-btn>
+      </v-layout-item>
+    </slot>
+  </div>
+</template>
+
+<style lang="sass" scoped>
+.pointer-events-none
+  pointer-events: none
+
+.pointer-events-initial
+  pointer-events: initial
+</style>

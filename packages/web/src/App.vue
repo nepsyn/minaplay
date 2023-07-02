@@ -32,7 +32,7 @@ onBeforeMount(async () => {
 
 <template>
   <router-view />
-  <v-snackbar v-model="app.snackbar.show" :color="app.snackbar.color" timeout="2000" location="bottom right">
+  <v-snackbar v-model="app.snackbar.show" :color="app.snackbar.color" timeout="2000" location="bottom">
     {{ app.snackbar.message }}
   </v-snackbar>
 </template>

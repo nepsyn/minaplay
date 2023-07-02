@@ -69,8 +69,8 @@ export class SourceService implements OnModuleInit {
       cronTime: source.cron,
       onTick: async () => await this.fetchSubscribeSourceQueue.add(source),
     });
-
     this.scheduleRegistry.addCronJob(name, job);
+    job.start();
   }
 
   async runFetchSubscribeDataJob(source: Source) {
@@ -80,6 +80,8 @@ export class SourceService implements OnModuleInit {
   async deleteFetchSubscribeDataJob(id: number) {
     const name = SourceService.buildFetchJobName(id);
     if (this.scheduleRegistry.doesExist('cron', name)) {
+      const job = this.scheduleRegistry.getCronJob(name);
+      job.stop();
       this.scheduleRegistry.deleteCronJob(name);
     }
   }

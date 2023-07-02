@@ -15,8 +15,6 @@ import {
   SourceQueryDto,
 } from './interfaces/subscribe.interface';
 import { ApiQueryResult } from './interfaces/common.interface';
-import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
-import { useRouter } from 'vue-router';
 
 class ApiHelper {
   private token: string | null = null;
@@ -31,20 +29,6 @@ class ApiHelper {
         return config;
       },
       (error) => {
-        return Promise.reject(error);
-      },
-    );
-
-    axios.interceptors.response.use(
-      (response) => {
-        return response;
-      },
-      (error) => {
-        if (error.response?.data?.code === ErrorCodeEnum.INVALID_TOKEN) {
-          localStorage.removeItem('token');
-          const router = useRouter();
-          router.replace({ name: 'login' });
-        }
         return Promise.reject(error);
       },
     );
@@ -110,7 +94,7 @@ class ApiHelper {
     getFetchLogsById: (id: number) =>
       this.apiGet<ApiQueryResult<FetchLogEntity>, FetchLogQueryDto>(`/subscribe/${id}/log`),
     getDownloadItemsById: (id: number) =>
-      this.apiGet<ApiQueryResult<DownloadItemEntity>, DownloadItemQueryDto>(`/subscribe/${id}/log`),
+      this.apiGet<ApiQueryResult<DownloadItemEntity>, DownloadItemQueryDto>(`/subscribe/${id}/download`),
   };
 
   SubscribeRule = {

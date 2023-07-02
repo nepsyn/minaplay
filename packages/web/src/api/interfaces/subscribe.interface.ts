@@ -31,7 +31,7 @@ export interface SourceDto {
   enabled?: boolean;
 }
 
-export interface SourceQueryDto {
+export interface SourceQueryDto extends ApiQueryDto<SourceEntity> {
   keyword?: string;
   id?: number;
   url?: string;

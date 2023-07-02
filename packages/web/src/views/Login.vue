@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { ref, Ref } from 'vue';
-import { useAppStore } from '@/store/app';
+import { useApp } from '@/store/app';
 import { Api } from '@/api/api';
 import LogoLandscape from '@/assets/logo_banner_landscape.jpeg';
 import { useRoute, useRouter } from 'vue-router';
 import { mdiAccountCircleOutline, mdiEye, mdiEyeOff, mdiLockOutline } from '@mdi/js';
 
-const app = useAppStore();
+const app = useApp();
 const route = useRoute();
 const router = useRouter();
 

@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { useSubscribeStore } from '@/store/subscribe';
+import { useSourceStore } from '@/store/source';
 import { computed, Ref, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { FetchLogEntity, RuleEntity, SourceEntity } from '@/api/interfaces/subscribe.interface';
-import { useAppStore } from '@/store/app';
+import { DownloadItemEntity, FetchLogEntity, RuleEntity, SourceEntity } from '@/api/interfaces/subscribe.interface';
+import { useApp } from '@/store/app';
 import {
   mdiAlertCircle,
   mdiCheck,
@@ -25,9 +25,12 @@ import { useTheme } from 'vuetify';
 import { javascript } from '@codemirror/lang-javascript';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import _ from 'lodash';
+import ItemsLoader from '@/components/ItemsLoader.vue';
+import { createItemsLoaderState, createSingleItemLoaderState } from '@/utils';
+import SingleItemLoader from '@/components/SingleItemLoader.vue';
 
-const app = useAppStore();
-const subscribe = useSubscribeStore();
+const app = useApp();
+const sourceStore = useSourceStore();
 const route = useRoute();
 const router = useRouter();
 const theme = useTheme();
@@ -35,21 +38,68 @@ const theme = useTheme();
 const routes = ['#info', '#rules', '#raw', '#log', '#download'];
 const tab = ref(routes.includes(String(route.hash)) ? routes.indexOf(String(route.hash)) : 0);
 
-const sourceLoading = ref(true);
-const source: Ref<SourceEntity> = ref(undefined as any);
-const loadSource = async (id: number) => {
-  sourceLoading.value = true;
-  try {
-    const response = await Api.SubscribeSource.getById(id)();
-    source.value = response.data;
-  } catch (error: any) {
-    if (error.response?.data?.code === ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT) {
-      app.toast('订阅源格式错误，请检查订阅源URL！', 'error');
-    } else {
-      app.toast('获取订阅源信息失败！', 'error');
+const sourceLoaderRef: Ref<any> = ref(null);
+const sourceState = createSingleItemLoaderState<SourceEntity>({
+  loadFn: async () => await Api.SubscribeSource.getById(Number(route.params.id))(),
+});
+const source = computed({
+  get() {
+    return sourceState.item as SourceEntity;
+  },
+  set(value) {
+    sourceState.item = value;
+  },
+});
+
+const runFetchJobLoading = ref(false);
+const runFetchJob = _.throttle(
+  async () => {
+    runFetchJobLoading.value = true;
+    try {
+      await Api.SubscribeSource.invokeFetchJobById(source.value.id)();
+      app.toast('请求更新成功', 'success');
+    } catch {
+      app.toast('请求更新失败！', 'error');
+    } finally {
+      runFetchJobLoading.value = false;
     }
+  },
+  4000,
+  { trailing: false },
+);
+
+const sourceSaving = ref(false);
+const saveSource = async () => {
+  sourceSaving.value = true;
+  try {
+    const { id, user, enabled, createAt, updateAt, ...data } = source.value;
+    const response = await Api.SubscribeSource.update(source.value.id)(data);
+    source.value = response.data;
+    sourceStore.update(source.value);
+    app.toast('订阅源信息已保存', 'success');
+  } catch {
+    app.toast('保存订阅源信息失败！', 'error');
   } finally {
-    sourceLoading.value = false;
+    sourceSaving.value = false;
+  }
+};
+
+const enabledToggling = ref(false);
+const toggleEnabled = async () => {
+  enabledToggling.value = true;
+  try {
+    const response = await Api.SubscribeSource.update(source.value.id)({
+      enabled: source.value.enabled,
+    });
+    source.value = {
+      ...source.value,
+      ...response.data,
+    };
+    sourceStore.update(source.value);
+  } catch {
+    app.toast('更改订阅源启用状态失败！', 'error');
+  } finally {
+    enabledToggling.value = false;
   }
 };
 
@@ -58,7 +108,7 @@ const deleteSource = async () => {
   sourceDeleting.value = true;
   try {
     await Api.SubscribeSource.delete(source.value.id)();
-    subscribe.deleteSource(source.value.id);
+    sourceStore.delete(source.value.id);
     await router.replace({ name: 'subscribe' });
     app.toast('订阅源已成功删除', 'success');
   } catch {
@@ -68,132 +118,65 @@ const deleteSource = async () => {
   }
 };
 
-const rulesLoading = ref(false);
-const rules: Ref<RuleEntity[]> = ref(undefined as any);
-const loadRules = async () => {
-  rulesLoading.value = true;
-  try {
-    rules.value = undefined as any;
-    const response = await Api.SubscribeSource.getRulesById(source.value.id)();
-    rules.value = response.data;
-  } catch {
-    app.toast('获取订阅规则列表失败！', 'error');
-  } finally {
-    rulesLoading.value = false;
-  }
-};
+const rulesState = createItemsLoaderState<RuleEntity>({
+  loadFn: async (option: { page: number; size: number }) =>
+    await Api.SubscribeSource.getRulesById(source.value.id)({
+      page: option.page,
+      size: option.size,
+    }),
+});
 
-const rawDataLoading = ref(false);
-const rawData: Ref<string> = ref(undefined as any);
+const rawDataState = createSingleItemLoaderState<object>({
+  loadFn: _.throttle(async () => await Api.SubscribeSource.fetchRawData(source.value.id)(), 4000, { trailing: false }),
+});
+const rawData = computed(() => JSON.stringify(rawDataState.item, null, 2));
 const rawDataEditorExtensions = computed(() => {
   return theme.global.name.value === 'dark' ? [json(), javascript(), oneDark] : [json(), javascript()];
 });
-const loadRawData = _.throttle(
-  async () => {
-    rawDataLoading.value = true;
-    try {
-      rawData.value = undefined as any;
-      const response = await Api.SubscribeSource.fetchRawData(Number(route.params.id))();
-      rawData.value = JSON.stringify(response.data, null, 2);
-    } catch (error: any) {
-      if (error.response?.data?.code === ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT) {
-        app.toast('订阅源格式错误，请检查订阅源URL！', 'error');
-      } else {
-        app.toast('获取订阅源数据失败！', 'error');
-      }
-    } finally {
-      rawDataLoading.value = false;
-    }
-  },
-  2000,
-  { leading: true, trailing: false },
-);
-
-const fetchLogLoading = ref(false);
-const fetchLogs: Ref<FetchLogEntity[]> = ref(undefined as any);
-const loadFetchLogs = async () => {
-  fetchLogLoading.value = true;
-  try {
-    fetchLogs.value = undefined as any;
-    const response = await Api.SubscribeSource.getFetchLogsById(source.value.id)({
-      size: 10,
-    });
-    fetchLogs.value = response.data.items;
-  } catch (error: any) {
-    if (error.response?.data?.code !== ErrorCodeEnum.NOT_FOUND) {
-      app.toast('查询日志失败！', 'error');
-    }
-  } finally {
-    fetchLogLoading.value = false;
+const onRawDataError = (error: any) => {
+  if (error.response?.data?.code === ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT) {
+    app.toast('订阅源格式错误，请检查订阅源URL！', 'error');
+  } else {
+    app.toast('获取订阅源数据失败！', 'error');
   }
 };
 
-const runFetchJobLoading = ref(false);
-const runFetchJob = _.throttle(async () => {
-  runFetchJobLoading.value = true;
-  try {
-    await Api.SubscribeSource.invokeFetchJobById(source.value.id)();
-    app.toast('请求更新成功', 'success');
-  } catch {
-    app.toast('请求更新失败！', 'error');
-  } finally {
-    runFetchJobLoading.value = false;
-  }
-}, 5000);
+const fetchLogsState = createItemsLoaderState<FetchLogEntity>({
+  size: 5,
+  loadFn: async (option: { page: number; size: number }) =>
+    await Api.SubscribeSource.getFetchLogsById(source.value.id)({
+      page: option.page,
+      size: option.size,
+    }),
+});
 
-const sourceSaving = ref(false);
-const saveSource = async () => {
-  sourceSaving.value = true;
-  try {
-    const { id, user, enabled, createAt, updateAt, ...data } = source.value;
-    const response = await Api.SubscribeSource.update(source.value.id)(data);
-    source.value = response.data;
-    subscribe.updateSource(source.value);
-    app.toast('订阅源信息已保存', 'success');
-  } catch {
-    app.toast('保存订阅源信息失败！', 'error');
-  } finally {
-    sourceSaving.value = false;
-  }
-};
-
-const enabledSwitching = ref(false);
-const toggleEnabled = async () => {
-  try {
-    const response = await Api.SubscribeSource.update(source.value.id)({
-      enabled: source.value.enabled,
-    });
-    source.value = {
-      ...source.value,
-      ...response.data,
-    };
-    subscribe.updateSource(source.value);
-  } catch {
-    app.toast('更改订阅源启用状态失败！', 'error');
-  } finally {
-    sourceSaving.value = false;
-  }
-};
+const downloadItemsState = createItemsLoaderState<DownloadItemEntity>({
+  loadFn: async (option: { page: number; size: number }) =>
+    await Api.SubscribeSource.getDownloadItemsById(source.value.id)({
+      page: option.page,
+      size: option.size,
+    }),
+});
 
 watch(
   () => route.params,
   async () => {
     const id = Number(route.params.id);
-    if (route.params.id != null && !isNaN(id)) {
-      rawData.value = '';
-      await loadSource(id);
-    }
+    if ((route.params.id as any) !== undefined && !isNaN(id)) {
+      // reset states
+      rulesState.reset();
+      rawDataState.reset();
+      fetchLogsState.reset();
+      sourceState.reset();
+      downloadItemsState.reset();
 
-    switch (tab.value) {
-      case 1:
-        await loadRules();
-        break;
-      case 2:
-        await loadRawData();
-        break;
-      case 3:
-        await loadFetchLogs();
-        break;
+      // cancel throttled
+      (rawDataState.loadFn as _.DebouncedFunc<any>).cancel();
+      runFetchJob.cancel();
+
+      if (sourceLoaderRef.value !== null) {
+        await sourceLoaderRef.value.load();
+      }
     }
   },
   { immediate: true },
@@ -212,258 +195,272 @@ watch(
       </v-tabs>
     </v-toolbar>
     <v-container fluid class="pa-0 scrollable-container">
-      <v-container class="d-flex flex-column align-center justify-center fill-height" v-if="sourceLoading">
-        <v-progress-circular indeterminate color="primary"></v-progress-circular>
-        <span class="text-body-2 mt-4">数据加载中~~~</span>
-      </v-container>
-      <v-window v-else v-model="tab" class="pa-6">
-        <v-window-item class="fill-height" :value="0">
-          <v-container>
-            <v-container class="pa-0 d-flex flex-row align-center">
-              <span class="text-h6">基本信息</span>
-              <v-spacer></v-spacer>
-              <v-btn variant="outlined" color="primary" :prepend-icon="mdiRefresh" @click="loadSource(source.id)"
-                >刷新
-              </v-btn>
-            </v-container>
-            <v-divider class="my-4"></v-divider>
-            <v-container v-if="source" class="my-4 pa-0">
-              <span class="text-body-1">ID</span>
-              <v-text-field
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                v-model="source.id"
-                readonly
-                :append-inner-icon="mdiPencilLock"
-              ></v-text-field>
-            </v-container>
-            <v-container class="my-4 pa-0">
-              <span class="text-body-1">订阅地址</span>
-              <v-text-field
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                v-model="source.url"
-                maxlength="256"
-              ></v-text-field>
-            </v-container>
-            <v-container class="my-4 pa-0">
-              <span class="text-subtitle-1">CRON表达式</span>
-              <v-text-field
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                v-model="source.cron"
-                maxlength="60"
-              ></v-text-field>
-            </v-container>
-            <v-container class="my-4 pa-0">
-              <span class="text-subtitle-1">标题</span>
-              <v-text-field
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                v-model="source.title"
-                maxlength="100"
-              ></v-text-field>
-            </v-container>
-            <v-container class="my-4 pa-0">
-              <span class="text-subtitle-1">备注</span>
-              <v-text-field
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                v-model="source.remark"
-                maxlength="40"
-              ></v-text-field>
-            </v-container>
-            <v-container class="my-4 pa-0">
-              <v-btn
-                block
-                variant="tonal"
-                color="info"
-                :prepend-icon="mdiCheck"
-                :loading="sourceSaving"
-                @click="saveSource"
-              >
-                保存修改
-              </v-btn>
-            </v-container>
-            <v-container class="pa-0 mt-12">
-              <span class="text-h6">其它操作</span>
-            </v-container>
-            <v-card class="my-4" variant="outlined">
-              <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
-                <v-container class="pa-0">
-                  <p class="text-subtitle-1">立即更新</p>
-                  <p class="text-caption">立即更新并解析当前订阅源的资源内容。</p>
+      <single-item-loader ref="sourceLoaderRef" v-model="sourceState" @error="app.toastError('获取订阅源数据失败！')">
+        <template #default="{ load }">
+          <v-window v-model="tab" class="pa-6">
+            <v-window-item class="fill-height" :value="0">
+              <v-container>
+                <v-container class="pa-0 d-flex flex-row align-center">
+                  <span class="text-h6">基本信息</span>
+                  <v-spacer></v-spacer>
+                  <v-btn variant="outlined" color="primary" :prepend-icon="mdiRefresh" @click="load">刷新</v-btn>
                 </v-container>
-                <v-btn class="ml-4" variant="tonal" color="warning" :loading="runFetchJobLoading" @click="runFetchJob">
-                  更新
-                </v-btn>
-              </v-container>
-              <v-divider></v-divider>
-              <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
-                <v-container class="pa-0">
-                  <p class="text-subtitle-1">是否启用</p>
-                  <p class="text-caption">
-                    当订阅源未启用时，Minaplay不会根据CRON表达式对该订阅源内容进行定时检索，该订阅源中的最新资料将不会同步到Minaplay中。
-                  </p>
+                <v-divider class="my-4"></v-divider>
+                <v-container v-if="source" class="my-4 pa-0">
+                  <span class="text-body-1">ID</span>
+                  <v-text-field
+                    class="mt-2"
+                    variant="outlined"
+                    hide-details
+                    color="primary"
+                    density="compact"
+                    v-model="source.id"
+                    readonly
+                    :append-inner-icon="mdiPencilLock"
+                  ></v-text-field>
                 </v-container>
-                <v-switch
-                  class="ml-4"
-                  v-model="source.enabled"
-                  color="secondary"
-                  hide-details
-                  density="compact"
-                  :loading="enabledSwitching"
-                  @change="toggleEnabled"
-                ></v-switch>
-              </v-container>
-              <v-divider></v-divider>
-              <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
-                <v-container class="pa-0">
-                  <p class="text-subtitle-1">删除订阅源</p>
-                  <p class="text-caption">一旦删除此订阅源，Minaplay将不再接收该订阅源中的任何更新，请谨慎操作。</p>
+                <v-container class="my-4 pa-0">
+                  <span class="text-body-1">订阅地址</span>
+                  <v-text-field
+                    class="mt-2"
+                    variant="outlined"
+                    hide-details
+                    color="primary"
+                    density="compact"
+                    v-model="source.url"
+                    maxlength="256"
+                  ></v-text-field>
                 </v-container>
-                <v-menu location="left">
-                  <template v-slot:activator="{ props }">
-                    <v-btn class="ml-4" variant="tonal" color="error" v-bind="props" :loading="sourceDeleting">
-                      删除订阅源
-                    </v-btn>
-                  </template>
-                  <v-card>
-                    <v-card-title>删除确认</v-card-title>
-                    <v-card-text>确定要删除订阅源吗？该操作不可撤销！</v-card-text>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn color="primary" variant="text">取消</v-btn>
-                      <v-btn color="error" variant="plain" @click="deleteSource">确认</v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </v-menu>
-              </v-container>
-            </v-card>
-          </v-container>
-        </v-window-item>
-        <v-window-item
-          class="fill-height"
-          :value="1"
-          @group:selected="(val) => val && !rules && !rulesLoading && loadRules()"
-        >
-          <v-container>
-            <v-container class="pa-0 d-flex flex-row align-center">
-              <span class="text-h6">订阅源规则</span>
-              <v-spacer></v-spacer>
-              <v-btn
-                variant="outlined"
-                color="primary"
-                :loading="rulesLoading"
-                :prepend-icon="mdiRefresh"
-                @click="loadRules"
-              >
-                刷新
-              </v-btn>
-              <v-btn class="ml-2" variant="outlined" color="warning" :prepend-icon="mdiPlus">添加</v-btn>
-            </v-container>
-            <v-divider class="my-4"></v-divider>
-          </v-container>
-        </v-window-item>
-        <v-window-item
-          class="fill-height"
-          :value="2"
-          @group:selected="(val) => val && !rawData && !rawDataLoading && loadRawData()"
-        >
-          <v-container>
-            <v-container class="pa-0 d-flex flex-row align-center">
-              <span class="text-h6">数据查看</span>
-              <v-spacer></v-spacer>
-              <v-btn
-                variant="outlined"
-                color="primary"
-                :prepend-icon="mdiRefresh"
-                :loading="rawDataLoading"
-                @click="loadRawData"
-              >
-                刷新
-              </v-btn>
-            </v-container>
-            <v-divider class="my-4"></v-divider>
-            <v-container v-if="!rawDataLoading" class="pa-0">
-              <codemirror v-if="rawData" v-model="rawData" disabled :extensions="rawDataEditorExtensions"></codemirror>
-            </v-container>
-          </v-container>
-        </v-window-item>
-        <v-window-item
-          class="fill-height"
-          :value="3"
-          @group:selected="(val) => val && !fetchLogs && !fetchLogLoading && loadFetchLogs()"
-        >
-          <v-container>
-            <v-container class="pa-0 d-flex flex-row align-center">
-              <span class="text-h6">解析日志</span>
-              <v-spacer></v-spacer>
-              <v-btn
-                variant="outlined"
-                color="primary"
-                :loading="fetchLogLoading"
-                :prepend-icon="mdiRefresh"
-                @click="loadFetchLogs"
-              >
-                刷新
-              </v-btn>
-            </v-container>
-            <v-divider class="my-4"></v-divider>
-            <v-container v-if="!fetchLogLoading" class="pa-0">
-              <v-timeline v-if="fetchLogs" side="end">
-                <v-timeline-item
-                  v-for="log in fetchLogs"
-                  :key="log.id"
-                  :dot-color="log.success ? 'success' : 'error'"
-                  size="small"
-                >
-                  <v-alert
+                <v-container class="my-4 pa-0">
+                  <span class="text-subtitle-1">CRON表达式</span>
+                  <v-text-field
+                    class="mt-2"
+                    variant="outlined"
+                    hide-details
+                    color="primary"
+                    density="compact"
+                    v-model="source.cron"
+                    maxlength="60"
+                  ></v-text-field>
+                </v-container>
+                <v-container class="my-4 pa-0">
+                  <span class="text-subtitle-1">标题</span>
+                  <v-text-field
+                    class="mt-2"
+                    variant="outlined"
+                    hide-details
+                    color="primary"
+                    density="compact"
+                    v-model="source.title"
+                    maxlength="100"
+                  ></v-text-field>
+                </v-container>
+                <v-container class="my-4 pa-0">
+                  <span class="text-subtitle-1">备注</span>
+                  <v-text-field
+                    class="mt-2"
+                    variant="outlined"
+                    hide-details
+                    color="primary"
+                    density="compact"
+                    v-model="source.remark"
+                    maxlength="40"
+                  ></v-text-field>
+                </v-container>
+                <v-container class="my-4 pa-0">
+                  <v-btn
+                    block
                     variant="tonal"
-                    :color="log.success ? 'success' : 'error'"
-                    :icon="log.success ? mdiCheckCircle : mdiAlertCircle"
+                    color="info"
+                    :prepend-icon="mdiCheck"
+                    :loading="sourceSaving"
+                    @click="saveSource"
                   >
-                    <v-container class="pa-0 d-flex flex-row align-center">
-                      <span class="text-subtitle-1">{{ log.success ? '解析成功' : '解析失败' }}</span>
-                      <v-spacer></v-spacer>
-                      <span class="text-subtitle-1">{{ new Date(log.createAt).toLocaleString() }}</span>
+                    保存修改
+                  </v-btn>
+                </v-container>
+                <v-container class="pa-0 mt-12">
+                  <span class="text-h6">其它操作</span>
+                </v-container>
+                <v-card class="my-4" variant="outlined">
+                  <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
+                    <v-container class="pa-0">
+                      <p class="text-subtitle-1">立即更新</p>
+                      <p class="text-caption">立即更新并解析当前订阅源的资源内容。</p>
                     </v-container>
-                    <pre v-if="!log.success" class="text-body-2 mt-2 overflow-x-auto">{{ log.error }}</pre>
-                  </v-alert>
-                </v-timeline-item>
-              </v-timeline>
-            </v-container>
-          </v-container>
-        </v-window-item>
-        <v-window-item class="fill-height" :value="4">
-          <v-container>
-            <v-container class="pa-0 d-flex flex-row align-center">
-              <span class="text-h6">下载项目</span>
-            </v-container>
-            <v-divider class="my-4"></v-divider>
-          </v-container>
-        </v-window-item>
-      </v-window>
+                    <v-btn
+                      class="ml-4"
+                      variant="tonal"
+                      color="warning"
+                      :loading="runFetchJobLoading"
+                      @click="runFetchJob"
+                    >
+                      立即更新
+                    </v-btn>
+                  </v-container>
+                  <v-divider></v-divider>
+                  <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
+                    <v-container class="pa-0">
+                      <p class="text-subtitle-1">是否启用</p>
+                      <p class="text-caption">
+                        当订阅源未启用时，Minaplay不会根据CRON表达式对该订阅源内容进行定时检索，该订阅源中的最新资料将不会同步到Minaplay中。
+                      </p>
+                    </v-container>
+                    <v-switch
+                      class="ml-4"
+                      v-model="source.enabled"
+                      color="secondary"
+                      hide-details
+                      density="compact"
+                      :loading="enabledToggling"
+                      @change="toggleEnabled"
+                    ></v-switch>
+                  </v-container>
+                  <v-divider></v-divider>
+                  <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
+                    <v-container class="pa-0">
+                      <p class="text-subtitle-1">删除订阅源</p>
+                      <p class="text-caption">一旦删除此订阅源，Minaplay将不再接收该订阅源中的任何更新，请谨慎操作。</p>
+                    </v-container>
+                    <v-menu location="left">
+                      <template #activator="{ props }">
+                        <v-btn class="ml-4" variant="tonal" color="error" v-bind="props" :loading="sourceDeleting">
+                          删除订阅源
+                        </v-btn>
+                      </template>
+                      <v-card>
+                        <v-card-title>删除确认</v-card-title>
+                        <v-card-text>确定要删除订阅源吗？该操作不可撤销！</v-card-text>
+                        <v-card-actions>
+                          <v-spacer></v-spacer>
+                          <v-btn color="primary" variant="text">取消</v-btn>
+                          <v-btn color="error" variant="plain" @click="deleteSource">确认</v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </v-menu>
+                  </v-container>
+                </v-card>
+              </v-container>
+            </v-window-item>
+            <v-window-item class="fill-height" :value="1">
+              <v-container>
+                <items-loader v-model="rulesState" @error="app.toastError('查询规则列表失败！')">
+                  <template #prepend="{ load }">
+                    <v-container class="pa-0 d-flex flex-row align-center">
+                      <span class="text-h6">订阅源规则 ({{ rulesState.total }})</span>
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        variant="outlined"
+                        color="primary"
+                        :loading="rulesState.loading"
+                        :prepend-icon="mdiRefresh"
+                        @click="rulesState.reset() & load()"
+                      >
+                        重新加载
+                      </v-btn>
+                      <v-btn class="ml-2" variant="outlined" color="warning" :prepend-icon="mdiPlus">添加</v-btn>
+                    </v-container>
+                    <v-divider class="my-4"></v-divider>
+                  </template>
+                </items-loader>
+              </v-container>
+            </v-window-item>
+            <v-window-item class="fill-height" :value="2">
+              <v-container>
+                <single-item-loader lazy v-model="rawDataState" @error="onRawDataError">
+                  <template #prepend="{ load }">
+                    <v-container class="pa-0 d-flex flex-row align-center">
+                      <span class="text-h6">数据查看</span>
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        variant="outlined"
+                        color="primary"
+                        :prepend-icon="mdiRefresh"
+                        :loading="rawDataState.loading"
+                        @click="load"
+                      >
+                        刷新
+                      </v-btn>
+                    </v-container>
+                    <v-divider class="my-4"></v-divider>
+                  </template>
+                  <v-container class="pa-0">
+                    <codemirror v-model="rawData" disabled :extensions="rawDataEditorExtensions"></codemirror>
+                  </v-container>
+                </single-item-loader>
+              </v-container>
+            </v-window-item>
+            <v-window-item class="fill-height" :value="3">
+              <v-container>
+                <items-loader v-model="fetchLogsState" @error="app.toastError('获取解析日志失败！')">
+                  <template #prepend="{ load }">
+                    <v-container class="pa-0 d-flex flex-row align-center">
+                      <span class="text-h6">解析日志 ({{ fetchLogsState.total }})</span>
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        variant="outlined"
+                        color="primary"
+                        :loading="fetchLogsState.loading"
+                        :prepend-icon="mdiRefresh"
+                        @click="fetchLogsState.reset() & load()"
+                      >
+                        重新加载
+                      </v-btn>
+                    </v-container>
+                    <v-divider class="my-4"></v-divider>
+                  </template>
+                  <v-timeline side="end">
+                    <v-timeline-item
+                      hide-opposite
+                      width="100%"
+                      v-for="log in fetchLogsState.items"
+                      :key="log.id"
+                      :dot-color="log.success ? 'success' : 'error'"
+                      size="small"
+                    >
+                      <v-alert
+                        variant="tonal"
+                        :color="log.success ? 'success' : 'error'"
+                        :icon="log.success ? mdiCheckCircle : mdiAlertCircle"
+                      >
+                        <v-container class="pa-0 d-flex flex-row align-center">
+                          <span class="text-subtitle-1">{{ log.success ? '解析成功' : '解析失败' }}</span>
+                          <v-spacer></v-spacer>
+                          <span class="text-subtitle-1">{{ new Date(log.createAt).toLocaleString() }}</span>
+                        </v-container>
+                        <pre v-if="!log.success" class="text-body-2 mt-2 overflow-x-auto">{{ log.error }}</pre>
+                      </v-alert>
+                    </v-timeline-item>
+                  </v-timeline>
+                </items-loader>
+              </v-container>
+            </v-window-item>
+            <v-window-item class="fill-height" :value="4">
+              <v-container>
+                <items-loader v-model="downloadItemsState" @error="app.toastError('查询下载任务失败！')">
+                  <template #prepend="{ load }">
+                    <v-container class="pa-0 d-flex flex-row justify-space-between align-center">
+                      <span class="text-h6">下载项目 ({{ downloadItemsState.total }})</span>
+                      <v-btn
+                        variant="outlined"
+                        color="primary"
+                        :loading="downloadItemsState.loading"
+                        :prepend-icon="mdiRefresh"
+                        @click="downloadItemsState.reset() & load()"
+                      >
+                        重新加载
+                      </v-btn>
+                    </v-container>
+                    <v-divider class="my-4"></v-divider>
+                  </template>
+                </items-loader>
+              </v-container>
+            </v-window-item>
+          </v-window>
+        </template>
+      </single-item-loader>
     </v-container>
   </v-container>
 </template>
 
-<style lang="sass" scoped>
-::v-deep(.v-timeline-item__body)
-  width: 100%
-</style>
+<style lang="sass" scoped></style>

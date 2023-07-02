@@ -11,11 +11,13 @@ const props = withDefaults(
     lazy?: boolean;
     noLoading?: boolean;
     noAppend?: boolean;
+    loadingText?: string;
   }>(),
   {
     lazy: false,
     noLoading: false,
     noAppend: false,
+    loadingText: '加载中，请稍候~~~',
   },
 );
 
@@ -60,7 +62,7 @@ onMounted(async () => {
   <slot v-else-if="state.loading && !noLoading" name="loading">
     <v-container class="fill-height d-flex flex-column justify-center align-center">
       <v-progress-circular color="primary" indeterminate></v-progress-circular>
-      <span class="text-caption mt-2">加载中，请稍候~~~</span>
+      <span class="text-caption mt-2" v-text="loadingText"></span>
     </v-container>
   </slot>
   <slot v-if="!noAppend" name="append" :load="load">

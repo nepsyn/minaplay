@@ -43,6 +43,8 @@ export interface RuleEntity {
   id: number;
   /** 备注 */
   remark?: string;
+  /** 代码 */
+  code?: string;
   /** 订阅源 */
   source: SourceEntity;
   /** 剧集 */

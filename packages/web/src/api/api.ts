@@ -98,10 +98,10 @@ class ApiHelper {
   };
 
   SubscribeRule = {
-    create: this.apiPost<RuleEntity, RuleDto>(`rule`),
-    query: this.apiGet<ApiQueryResult<RuleEntity>, RuleQueryDto>('rule'),
-    update: (id: number) => this.apiPut(`rule/${id}`),
-    delete: (id: number) => this.apiDelete(`rule/${id}`),
+    create: this.apiPost<RuleEntity, RuleDto>(`/rule`),
+    query: this.apiGet<ApiQueryResult<RuleEntity>, RuleQueryDto>('/rule'),
+    update: (id: number) => this.apiPut<RuleEntity, RuleDto>(`/rule/${id}`),
+    delete: (id: number) => this.apiDelete(`/rule/${id}`),
   };
 }
 

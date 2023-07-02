@@ -8,6 +8,7 @@ import {
   mdiAlertCircle,
   mdiCheck,
   mdiCheckCircle,
+  mdiDownloadCircle,
   mdiDownloadCircleOutline,
   mdiFileTreeOutline,
   mdiInformationOutline,
@@ -119,6 +120,13 @@ const deleteSource = async () => {
   }
 };
 
+const rulesExpanded: Ref<number[]> = ref([]);
+const onRulesLoaded = () => {
+  rulesExpanded.value = rulesState.items.map((v) => v.id);
+};
+const ruleCodeEditorExtensions = computed(() =>
+  theme.global.name.value === 'dark' ? [javascript(), oneDark] : [javascript()],
+);
 const rulesState = createItemsLoaderState<RuleEntity>({
   loadFn: async (option: { page: number; size: number }) =>
     await Api.SubscribeSource.getRulesById(source.value.id)({
@@ -126,14 +134,28 @@ const rulesState = createItemsLoaderState<RuleEntity>({
       size: option.size,
     }),
 });
+const editRuleId: Ref<number | undefined> = ref(undefined);
+const saveRuleCode = _.throttle(
+  async (id: number, code?: string) => {
+    editRuleId.value = id;
+    try {
+      await Api.SubscribeRule.update(id)({ code });
+      app.toastSuccess('保存规则代码成功');
+    } catch {
+      app.toastError('保存规则代码失败！');
+    } finally {
+      editRuleId.value = undefined;
+    }
+  },
+  3000,
+  { trailing: false },
+);
 
 const rawDataState = createSingleItemLoaderState<object>({
   loadFn: _.throttle(async () => await Api.SubscribeSource.fetchRawData(source.value.id)(), 4000, { trailing: false }),
 });
 const rawData = computed(() => JSON.stringify(rawDataState.item, null, 2));
-const rawDataEditorExtensions = computed(() => {
-  return theme.global.name.value === 'dark' ? [json(), javascript(), oneDark] : [json(), javascript()];
-});
+const rawDataViewerExtensions = computed(() => (theme.global.name.value === 'dark' ? [json(), oneDark] : [json()]));
 const onRawDataError = (error: any) => {
   if (error.response?.data?.code === ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT) {
     app.toast('订阅源格式错误，请检查订阅源URL！', 'error');
@@ -151,6 +173,19 @@ const fetchLogsState = createItemsLoaderState<FetchLogEntity>({
     }),
 });
 
+const getDownloadItemColor = (item: DownloadItemEntity) => {
+  return item.status === 'DOWNLOADED' ? 'success' : item.status === 'DOWNLOADING' ? 'secondary-lighten-1' : 'error';
+};
+const getDownloadItemIcon = (item: DownloadItemEntity) => {
+  return item.status === 'DOWNLOADED'
+    ? mdiCheckCircle
+    : item.status === 'DOWNLOADING'
+    ? mdiDownloadCircle
+    : mdiAlertCircle;
+};
+const getDownloadItemStatusText = (item: DownloadItemEntity) => {
+  return item.status === 'DOWNLOADED' ? '下载完成' : item.status === 'DOWNLOADING' ? '正在下载' : '下载失败';
+};
 const downloadItemsState = createItemsLoaderState<DownloadItemEntity>({
   loadFn: async (option: { page: number; size: number }) =>
     await Api.SubscribeSource.getDownloadItemsById(source.value.id)({
@@ -174,6 +209,7 @@ watch(
       // cancel throttled
       (rawDataState.loadFn as _.DebouncedFunc<any>).cancel();
       runFetchJob.cancel();
+      saveRuleCode.cancel();
 
       if (sourceLoaderRef.value !== null) {
         await sourceLoaderRef.value.load();
@@ -345,7 +381,11 @@ watch(
             </v-window-item>
             <v-window-item class="fill-height" :value="1">
               <v-container>
-                <items-loader v-model="rulesState" @error="app.toastError('查询规则列表失败！')">
+                <items-loader
+                  v-model="rulesState"
+                  @loaded="onRulesLoaded"
+                  @error="app.toastError('查询规则列表失败！')"
+                >
                   <template #prepend="{ load }">
                     <v-container class="pa-0 d-flex flex-row align-center">
                       <span class="text-h6">订阅源规则 ({{ rulesState.total }})</span>
@@ -363,6 +403,31 @@ watch(
                     </v-container>
                     <v-divider class="my-4"></v-divider>
                   </template>
+                  <v-card variant="outlined">
+                    <v-expansion-panels multiple variant="accordion" v-model="rulesExpanded">
+                      <v-expansion-panel elevation="0" v-for="rule in rulesState.items" :value="rule.id" :key="rule.id">
+                        <v-expansion-panel-title>
+                          <span class="text-subtitle-1 font-weight-bold">{{ rule.remark || '未命名规则' }}</span>
+                        </v-expansion-panel-title>
+                        <v-expansion-panel-text>
+                          <codemirror v-model="rule.code" :extensions="ruleCodeEditorExtensions"></codemirror>
+                          <v-divider class="my-2"></v-divider>
+                          <v-container fluid="" class="pa-0 d-flex flex-row justify-end">
+                            <v-btn
+                              variant="tonal"
+                              color="info"
+                              :prepend-icon="mdiCheck"
+                              @click="saveRuleCode(rule.id, rule.code)"
+                              :loading="editRuleId === rule.id"
+                              :disabled="editRuleId !== undefined && editRuleId !== rule.id"
+                            >
+                              保存代码
+                            </v-btn>
+                          </v-container>
+                        </v-expansion-panel-text>
+                      </v-expansion-panel>
+                    </v-expansion-panels>
+                  </v-card>
                 </items-loader>
               </v-container>
             </v-window-item>
@@ -385,9 +450,7 @@ watch(
                     </v-container>
                     <v-divider class="my-4"></v-divider>
                   </template>
-                  <v-container class="pa-0">
-                    <codemirror v-model="rawData" disabled :extensions="rawDataEditorExtensions"></codemirror>
-                  </v-container>
+                  <codemirror v-model="rawData" disabled :extensions="rawDataViewerExtensions"></codemirror>
                 </single-item-loader>
               </v-container>
             </v-window-item>
@@ -425,9 +488,15 @@ watch(
                         :icon="log.success ? mdiCheckCircle : mdiAlertCircle"
                       >
                         <v-container class="pa-0 d-flex flex-row align-center">
-                          <span class="text-subtitle-1">{{ log.success ? '解析成功' : '解析失败' }}</span>
+                          <span
+                            class="text-subtitle-1 font-weight-bold"
+                            v-text="log.success ? '解析成功' : '解析失败'"
+                          ></span>
                           <v-spacer></v-spacer>
-                          <span class="text-subtitle-1">{{ new Date(log.createAt).toLocaleString() }}</span>
+                          <span
+                            class="text-subtitle-1 font-weight-bold"
+                            v-text="new Date(log.createAt).toLocaleString()"
+                          ></span>
                         </v-container>
                         <pre v-if="!log.success" class="text-body-2 mt-2 overflow-x-auto">{{ log.error }}</pre>
                       </v-alert>
@@ -454,6 +523,20 @@ watch(
                     </v-container>
                     <v-divider class="my-4"></v-divider>
                   </template>
+                  <v-alert
+                    v-for="item in downloadItemsState.items"
+                    :key="item.id"
+                    class="my-2"
+                    variant="tonal"
+                    :color="getDownloadItemColor(item)"
+                    :icon="getDownloadItemIcon(item)"
+                  >
+                    <p class="text-subtitle-1 font-weight-bold" v-text="item.title"></p>
+                    <p class="text-caption" v-text="item.url"></p>
+                    <p class="text-caption">
+                      任务创建于 {{ new Date(item.createAt).toLocaleString() }} - {{ getDownloadItemStatusText(item) }}
+                    </p>
+                  </v-alert>
                 </items-loader>
               </v-container>
             </v-window-item>

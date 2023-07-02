@@ -86,7 +86,10 @@ const getFaviconUrl = (url: string) => {
                         </v-img>
                       </v-icon>
                     </template>
-                    <v-list-item-title class="py-1 text-wrap" v-text="source.title"></v-list-item-title>
+                    <v-list-item-title
+                      class="py-1 text-wrap font-weight-bold"
+                      v-text="source.title"
+                    ></v-list-item-title>
                     <v-list-item-subtitle class="py-1" v-text="source.url"></v-list-item-subtitle>
                   </v-list-item>
                   <v-divider class="py-0"></v-divider>

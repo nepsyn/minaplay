@@ -10,11 +10,17 @@ const props = withDefaults(
     lazy?: boolean;
     noLoading?: boolean;
     noAppend?: boolean;
+    loadingText?: string;
+    noItemText?: string;
+    noMoreText?: string;
   }>(),
   {
     lazy: false,
     noLoading: false,
     noAppend: false,
+    loadingText: '加载中，请稍候~~~',
+    noItemText: '没有找到任何数据~~~',
+    noMoreText: '已经到底了~~~',
   },
 );
 
@@ -63,14 +69,14 @@ onMounted(async () => {
   <slot v-else-if="state.loading && !noLoading" name="loading" :first="!state.all && state.page === 0">
     <v-container class="fill-height d-flex flex-column justify-center align-center">
       <v-progress-circular color="primary" indeterminate></v-progress-circular>
-      <span class="text-caption mt-2">加载中，请稍候~~~</span>
+      <span class="text-caption mt-2" v-text="loadingText"></span>
     </v-container>
   </slot>
   <slot v-if="!noAppend" name="append" :load="load">
-    <v-container class="d-flex flex-column justify-center align-center">
+    <v-container v-if="!state.loading" class="d-flex flex-column justify-center align-center">
       <template v-if="state.all">
-        <span class="text-caption" v-if="state.total == 0">没有找到任何数据~~~</span>
-        <span class="text-caption" v-else>已经到底了~~~</span>
+        <span class="text-caption" v-if="state.total == 0" v-text="noItemText"></span>
+        <span class="text-caption" v-else v-text="noMoreText"></span>
       </template>
       <template v-else>
         <v-btn variant="plain" color="primary" class="text-caption" @click="load" :loading="state.loading">

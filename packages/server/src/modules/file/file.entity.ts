@@ -1,5 +1,5 @@
 import { Exclude, Expose } from 'class-transformer';
-import { access, constants, pathExists, unlink } from 'fs-extra';
+import { access, constants, pathExistsSync, unlink } from 'fs-extra';
 import {
   AfterLoad,
   Column,
@@ -84,17 +84,18 @@ export class File {
 
   /** 本地文件是否存在 */
   @Exclude()
-  isExist: boolean;
+  get isExist() {
+    return pathExistsSync(this.path);
+  }
 
   /** 文件是否过期 */
   @Expose()
-  isExpired: boolean;
+  get isExpired() {
+    return this.expireAt && this.expireAt && this.expireAt.getTime() <= new Date().getTime();
+  }
 
   @AfterLoad()
   async afterLoad() {
-    this.isExist = await pathExists(this.path);
-    this.isExpired = this.expireAt && this.expireAt.getTime() <= new Date().getTime();
-
     if (this.isExpired && this.isExist) {
       try {
         await access(this.path, constants.W_OK);

@@ -19,12 +19,18 @@ export class FileService {
     const record = await this.fileRepository.save(file);
     if (record.expireAt && !record.isExpired) {
       const name = `delete-file-${record.id}`;
-      this.scheduleRegistry.deleteCronJob(name);
+      if (this.scheduleRegistry.doesExist('cron', name)) {
+        const job = this.scheduleRegistry.getCronJob(name);
+        job.stop();
+        this.scheduleRegistry.deleteCronJob(name);
+      }
 
       const job = new CronJob(file.expireAt as Date, async () => {
         try {
           await access(record.path, constants.W_OK);
           await unlink(record.path);
+          job.stop();
+          this.scheduleRegistry.addCronJob(name, job);
         } catch (error) {
           this.logger.error(`Delete local expired file failed with uuid: ${record.id}`);
           if (error.stack) {
@@ -32,6 +38,7 @@ export class FileService {
           }
         }
       });
+      job.start();
       this.scheduleRegistry.addCronJob(name, job);
     }
 

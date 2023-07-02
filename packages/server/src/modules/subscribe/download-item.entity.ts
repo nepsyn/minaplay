@@ -45,6 +45,7 @@ export class DownloadItem {
 
   /** 错误内容 */
   @Column({
+    type: 'text',
     nullable: true,
   })
   error?: string;

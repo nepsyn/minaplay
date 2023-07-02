@@ -66,7 +66,7 @@ export class FetchSubscribeSourceConsumer {
               const task = await this.aria2Service.addTask(entry.enclosure.url);
               task.on('complete', async (files) => {
                 for (const file of files) {
-                  if (VALID_VIDEO_MIME.includes(file.mimetype)) {
+                  if (VALID_VIDEO_MIME.includes(file.mimetype) && rule.series) {
                     await this.episodeService.save({
                       title: file.filename,
                       series: { id: rule.series.id },

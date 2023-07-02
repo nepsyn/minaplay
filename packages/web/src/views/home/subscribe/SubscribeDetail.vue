@@ -498,7 +498,7 @@ watch(
                             v-text="new Date(log.createAt).toLocaleString()"
                           ></span>
                         </v-container>
-                        <pre v-if="!log.success" class="text-body-2 mt-2 overflow-x-auto">{{ log.error }}</pre>
+                        <pre v-if="!log.success" class="text-body-2 mt-2 overflow-x-auto" v-text="log.error"></pre>
                       </v-alert>
                     </v-timeline-item>
                   </v-timeline>
@@ -536,6 +536,11 @@ watch(
                     <p class="text-caption">
                       任务创建于 {{ new Date(item.createAt).toLocaleString() }} - {{ getDownloadItemStatusText(item) }}
                     </p>
+                    <pre
+                      v-if="item.status === 'FAILED'"
+                      class="text-body-2 mt-2 overflow-x-auto"
+                      v-text="item.error"
+                    ></pre>
                   </v-alert>
                 </items-loader>
               </v-container>

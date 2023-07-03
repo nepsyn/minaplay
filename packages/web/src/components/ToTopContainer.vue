@@ -26,6 +26,10 @@ const toTop = () => {
     behavior: 'smooth',
   });
 };
+
+defineExpose({
+  toTop,
+});
 </script>
 
 <template>

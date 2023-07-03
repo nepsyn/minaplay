@@ -53,8 +53,7 @@ const getFaviconUrl = (url: string) => {
                   color="primary"
                   :loading="sourceStore.state.loading"
                   :prepend-icon="mdiRefresh"
-                >
-                  刷新
+                  >刷新
                 </v-btn>
                 <v-btn
                   class="ml-2"
@@ -63,8 +62,7 @@ const getFaviconUrl = (url: string) => {
                   :prepend-icon="mdiPlus"
                   :loading="sourceCreating"
                   @click="createSource"
-                >
-                  添加
+                  >添加
                 </v-btn>
               </v-toolbar>
             </template>

@@ -8,6 +8,7 @@ import {
   mdiAlertCircle,
   mdiCheck,
   mdiCheckCircle,
+  mdiClose,
   mdiDownloadCircle,
   mdiDownloadCircleOutline,
   mdiFileTreeOutline,
@@ -30,6 +31,7 @@ import ItemsLoader from '@/components/ItemsLoader.vue';
 import { createItemsLoaderState, createSingleItemLoaderState } from '@/utils';
 import SingleItemLoader from '@/components/SingleItemLoader.vue';
 import ToTopContainer from '@/components/ToTopContainer.vue';
+import EditableContent from '@/components/EditableContent.vue';
 
 const app = useApp();
 const sourceStore = useSourceStore();
@@ -120,10 +122,6 @@ const deleteSource = async () => {
   }
 };
 
-const rulesExpanded: Ref<number[]> = ref([]);
-const onRulesLoaded = () => {
-  rulesExpanded.value = rulesState.items.map((v) => v.id);
-};
 const ruleCodeEditorExtensions = computed(() =>
   theme.global.name.value === 'dark' ? [javascript(), oneDark] : [javascript()],
 );
@@ -139,10 +137,14 @@ const saveRuleCode = _.throttle(
   async (id: number, code?: string) => {
     editRuleId.value = id;
     try {
-      await Api.SubscribeRule.update(id)({ code });
-      app.toastSuccess('保存规则代码成功');
+      const response = await Api.SubscribeRule.update(id)({ code });
+      const index = rulesState.items.findIndex((v) => v.id === id);
+      if (index > -1) {
+        rulesState.items[index] = response.data;
+      }
+      app.toastSuccess('代码保存成功');
     } catch {
-      app.toastError('保存规则代码失败！');
+      app.toastError('代码保存失败！');
     } finally {
       editRuleId.value = undefined;
     }
@@ -150,6 +152,53 @@ const saveRuleCode = _.throttle(
   3000,
   { trailing: false },
 );
+const deleteRuleId: Ref<number | undefined> = ref(undefined);
+const deleteRule = async (id: number) => {
+  deleteRuleId.value = id;
+  try {
+    await Api.SubscribeRule.delete(id)();
+    rulesState.items = rulesState.items.filter((v) => v.id !== id);
+    app.toastSuccess('规则删除成功');
+  } catch {
+    app.toastError('规则删除失败！');
+  } finally {
+    deleteRuleId.value = undefined;
+  }
+};
+const newRuleCodeSample = `
+/**
+ * Validator used to determine if the resource item is to be downloaded
+ * @param {Object} entry - The entire feed entry
+ * @param {String} entry.id - Entry guid
+ * @param {String} entry.link - Entry link
+ * @param {String} entry.title - Entry title
+ * @param {String} entry.description - Entry description
+ * @param {Date} entry.published - Entry publish time
+ * @param {Object} entry.enclosure - Entry enclosure resource item
+ * @param {String} entry.enclosure.url - Entry enclosure url
+ * @param {String?} entry.enclosure.type - Entry enclosure type
+ * @returns {Boolean} Boolean value used to determine if the resource item is to be downloaded
+ */
+module.exports = function(entry) {
+  return false;
+}
+`.trim();
+const ruleCreating = ref(false);
+const createRule = async () => {
+  ruleCreating.value = true;
+  try {
+    const response = await Api.SubscribeRule.create({
+      remark: '新订阅规则',
+      sourceId: source.value.id,
+      code: newRuleCodeSample,
+    });
+    rulesState.items.unshift(response.data);
+  } catch {
+    app.toastError('创建规则失败！');
+  } finally {
+    ruleCreating.value = false;
+  }
+};
 
 const rawDataState = createSingleItemLoaderState<object>({
   loadFn: _.throttle(async () => await Api.SubscribeSource.fetchRawData(source.value.id)(), 4000, { trailing: false }),
@@ -231,7 +280,7 @@ watch(
         <v-tab :value="4" :prepend-icon="mdiDownloadCircleOutline">下载项目</v-tab>
       </v-tabs>
     </v-toolbar>
-    <to-top-container class="scrollable-container">
+    <to-top-container ref="scrollableRef" class="scrollable-container">
       <single-item-loader ref="sourceLoaderRef" v-model="sourceState" @error="app.toastError('获取订阅源数据失败！')">
         <template #default="{ load }">
           <v-window v-model="tab" class="pa-6">
@@ -312,14 +361,13 @@ watch(
                     :prepend-icon="mdiCheck"
                     :loading="sourceSaving"
                     @click="saveSource"
-                  >
-                    保存修改
+                    >保存修改
                   </v-btn>
                 </v-container>
                 <v-container class="pa-0 mt-12">
                   <span class="text-h6">其它操作</span>
                 </v-container>
-                <v-card class="my-4" variant="outlined">
+                <v-sheet class="my-4" border rounded>
                   <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
                     <v-container class="pa-0">
                       <p class="text-subtitle-1">立即更新</p>
@@ -331,8 +379,7 @@ watch(
                       color="warning"
                       :loading="runFetchJobLoading"
                       @click="runFetchJob"
-                    >
-                      立即更新
+                      >立即更新
                     </v-btn>
                   </v-container>
                   <v-divider></v-divider>
@@ -376,16 +423,12 @@ watch(
                       </v-card>
                     </v-menu>
                   </v-container>
-                </v-card>
+                </v-sheet>
               </v-container>
             </v-window-item>
             <v-window-item class="fill-height" :value="1">
               <v-container>
-                <items-loader
-                  v-model="rulesState"
-                  @loaded="onRulesLoaded"
-                  @error="app.toastError('查询规则列表失败！')"
-                >
+                <items-loader v-model="rulesState" @error="app.toastError('查询规则列表失败！')">
                   <template #prepend="{ load }">
                     <v-container class="pa-0 d-flex flex-row align-center">
                       <span class="text-h6">订阅源规则 ({{ rulesState.total }})</span>
@@ -396,38 +439,74 @@ watch(
                         :loading="rulesState.loading"
                         :prepend-icon="mdiRefresh"
                         @click="rulesState.reset() & load()"
-                      >
-                        重新加载
+                        >重新加载
                       </v-btn>
-                      <v-btn class="ml-2" variant="outlined" color="warning" :prepend-icon="mdiPlus">添加</v-btn>
+                      <v-btn
+                        class="ml-2"
+                        variant="outlined"
+                        color="warning"
+                        :prepend-icon="mdiPlus"
+                        :loading="ruleCreating"
+                        @click="createRule"
+                        >添加
+                      </v-btn>
                     </v-container>
                     <v-divider class="my-4"></v-divider>
                   </template>
-                  <v-card variant="outlined">
-                    <v-expansion-panels multiple variant="accordion" v-model="rulesExpanded">
-                      <v-expansion-panel elevation="0" v-for="rule in rulesState.items" :value="rule.id" :key="rule.id">
-                        <v-expansion-panel-title>
-                          <span class="text-subtitle-1 font-weight-bold">{{ rule.remark || '未命名规则' }}</span>
-                        </v-expansion-panel-title>
-                        <v-expansion-panel-text>
-                          <codemirror v-model="rule.code" :extensions="ruleCodeEditorExtensions"></codemirror>
-                          <v-divider class="my-2"></v-divider>
-                          <v-container fluid="" class="pa-0 d-flex flex-row justify-end">
-                            <v-btn
-                              variant="tonal"
-                              color="info"
-                              :prepend-icon="mdiCheck"
-                              @click="saveRuleCode(rule.id, rule.code)"
-                              :loading="editRuleId === rule.id"
-                              :disabled="editRuleId !== undefined && editRuleId !== rule.id"
-                            >
-                              保存代码
-                            </v-btn>
-                          </v-container>
-                        </v-expansion-panel-text>
-                      </v-expansion-panel>
-                    </v-expansion-panels>
-                  </v-card>
+                  <v-sheet class="my-4" border rounded v-for="(rule, index) in rulesState.items">
+                    <v-toolbar density="compact" color="background" class="px-4 py-2 d-flex flex-row align-center">
+                      <editable-content
+                        :save-fn="(remark) => Api.SubscribeRule.update(rule.id)({ remark })"
+                        @saved="(resp) => (rulesState.items[index] = resp.data)"
+                        @error="app.toastError('备注保存失败！')"
+                        v-model="rule.remark"
+                        maxlength="40"
+                      >
+                        <span class="text-subtitle-1 font-weight-bold">{{ rule.remark || '未命名规则' }}</span>
+                      </editable-content>
+                      <v-spacer></v-spacer>
+                      <span class="text-subtitle-2 font-weight-light">
+                        更新于 {{ new Date(rule.updateAt).toLocaleString() }}
+                      </span>
+                    </v-toolbar>
+                    <v-divider></v-divider>
+                    <codemirror v-model="rule.code" :extensions="ruleCodeEditorExtensions"></codemirror>
+                    <v-divider></v-divider>
+                    <v-container fluid class="px-4 py-2 d-flex flex-row justify-end">
+                      <v-menu location="left">
+                        <template #activator="{ props }">
+                          <v-btn
+                            variant="tonal"
+                            color="error"
+                            v-bind="props"
+                            :prepend-icon="mdiClose"
+                            :loading="deleteRuleId === rule.id"
+                            :disabled="deleteRuleId !== undefined && deleteRuleId !== rule.id"
+                            >删除规则
+                          </v-btn>
+                        </template>
+                        <v-card>
+                          <v-card-title>删除确认</v-card-title>
+                          <v-card-text>确定要删除该条规则吗？该操作不可撤销！</v-card-text>
+                          <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn color="primary" variant="text">取消</v-btn>
+                            <v-btn color="error" variant="plain" @click="deleteRule(rule.id)">确认</v-btn>
+                          </v-card-actions>
+                        </v-card>
+                      </v-menu>
+                      <v-btn
+                        class="ml-4"
+                        variant="tonal"
+                        color="info"
+                        :prepend-icon="mdiCheck"
+                        @click="saveRuleCode(rule.id, rule.code)"
+                        :loading="editRuleId === rule.id"
+                        :disabled="editRuleId !== undefined && editRuleId !== rule.id"
+                        >保存代码
+                      </v-btn>
+                    </v-container>
+                  </v-sheet>
                 </items-loader>
               </v-container>
             </v-window-item>
@@ -444,8 +523,7 @@ watch(
                         :prepend-icon="mdiRefresh"
                         :loading="rawDataState.loading"
                         @click="load"
-                      >
-                        刷新
+                        >刷新
                       </v-btn>
                     </v-container>
                     <v-divider class="my-4"></v-divider>
@@ -467,8 +545,7 @@ watch(
                         :loading="fetchLogsState.loading"
                         :prepend-icon="mdiRefresh"
                         @click="fetchLogsState.reset() & load()"
-                      >
-                        重新加载
+                        >重新加载
                       </v-btn>
                     </v-container>
                     <v-divider class="my-4"></v-divider>
@@ -517,8 +594,7 @@ watch(
                         :loading="downloadItemsState.loading"
                         :prepend-icon="mdiRefresh"
                         @click="downloadItemsState.reset() & load()"
-                      >
-                        重新加载
+                        >重新加载
                       </v-btn>
                     </v-container>
                     <v-divider class="my-4"></v-divider>
@@ -526,7 +602,7 @@ watch(
                   <v-alert
                     v-for="item in downloadItemsState.items"
                     :key="item.id"
-                    class="my-2"
+                    class="my-4"
                     variant="tonal"
                     :color="getDownloadItemColor(item)"
                     :icon="getDownloadItemIcon(item)"
@@ -534,7 +610,8 @@ watch(
                     <p class="text-subtitle-1 font-weight-bold" v-text="item.title"></p>
                     <p class="text-caption" v-text="item.url"></p>
                     <p class="text-caption">
-                      任务创建于 {{ new Date(item.createAt).toLocaleString() }} - {{ getDownloadItemStatusText(item) }}
+                      任务创建于 {{ new Date(item.createAt).toLocaleString() }} -
+                      {{ getDownloadItemStatusText(item) }}
                     </p>
                     <pre
                       v-if="item.status === 'FAILED'"

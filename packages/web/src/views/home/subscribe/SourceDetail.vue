@@ -470,7 +470,13 @@ watch(
                       </span>
                     </v-toolbar>
                     <v-divider></v-divider>
-                    <codemirror v-model="rule.code" :extensions="ruleCodeEditorExtensions"></codemirror>
+                    <codemirror
+                      indent-with-tab
+                      v-model="rule.code"
+                      @keydown.ctrl.prevent="(e) => e.code === 'KeyS' && saveRuleCode(rule.id, rule.code)"
+                      :extensions="ruleCodeEditorExtensions"
+                      style="cursor: text"
+                    ></codemirror>
                     <v-divider></v-divider>
                     <v-container fluid class="px-4 py-2 d-flex flex-row justify-end">
                       <v-menu location="left">
@@ -528,7 +534,12 @@ watch(
                     </v-container>
                     <v-divider class="my-4"></v-divider>
                   </template>
-                  <codemirror v-model="rawData" disabled :extensions="rawDataViewerExtensions"></codemirror>
+                  <codemirror
+                    v-model="rawData"
+                    disabled
+                    :extensions="rawDataViewerExtensions"
+                    style="cursor: text"
+                  ></codemirror>
                 </single-item-loader>
               </v-container>
             </v-window-item>

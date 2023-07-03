@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { mdiPlus, mdiRefresh } from '@mdi/js';
+import { mdiPlus, mdiProgressCheck, mdiProgressClose, mdiRefresh } from '@mdi/js';
 import { useSourceStore } from '@/store/source';
 import { useApp } from '@/store/app';
 import { Api } from '@/api/api';
@@ -75,6 +75,7 @@ const getFaviconUrl = (url: string) => {
               <v-list class="py-0 w-100">
                 <template v-for="source in sourceStore.items" :key="source.id">
                   <v-list-item lines="two" :to="`/subscribe/${source.id}`" active-class="source-active">
+                    <div class="ban"></div>
                     <template #prepend>
                       <v-icon size="x-large">
                         <v-img :src="getFaviconUrl(source.url)">
@@ -89,6 +90,12 @@ const getFaviconUrl = (url: string) => {
                       v-text="source.title"
                     ></v-list-item-title>
                     <v-list-item-subtitle class="py-1" v-text="source.url"></v-list-item-subtitle>
+                    <template #append>
+                      <v-icon
+                        :color="source.enabled ? 'success' : 'warning'"
+                        :icon="source.enabled ? mdiProgressCheck : mdiProgressClose"
+                      ></v-icon>
+                    </template>
                   </v-list-item>
                   <v-divider class="py-0"></v-divider>
                 </template>
@@ -106,6 +113,12 @@ const getFaviconUrl = (url: string) => {
 </template>
 
 <style lang="sass" scoped>
-.source-active
-  border-right: 4px solid rgb(var(--v-theme-primary-lighten-1))
+.ban
+  position: absolute
+  top: 0
+  right: 0
+  height: 100%
+
+.source-active .ban
+  border-left: 4px solid rgb(var(--v-theme-primary-lighten-1))
 </style>

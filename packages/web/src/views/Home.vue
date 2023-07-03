@@ -59,10 +59,10 @@ const navs = [
 <template>
   <v-layout class="overflow-hidden">
     <v-app-bar border="b" color="background" flat>
-      <v-app-bar-nav-icon class="d-flex d-md-none" variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
+      <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>MinaPlay</v-toolbar-title>
       <template v-slot:append>
-        <div class="d-none d-md-flex flex-row align-center">
+        <div class="d-flex flex-row align-center">
           <v-tooltip :text="darkMode ? '白天模式' : '夜间模式'" location="bottom" open-delay="500">
             <template v-slot:activator="{ props }">
               <v-btn icon v-bind="props" @click="toggleDarkMode">

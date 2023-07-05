@@ -9,6 +9,7 @@ import {
   Param,
   Post,
   Query,
+  Res,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -36,9 +37,9 @@ import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { File } from './file.entity';
 import { MoreThanOrEqual } from 'typeorm';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
+import { Response } from 'express';
 
 @Controller('file')
-@UseGuards(AuthorizationGuard)
 @ApiTags('file')
 @ApiBearerAuth()
 export class FileController {
@@ -48,6 +49,7 @@ export class FileController {
 
   @Post('image')
   @HttpCode(200)
+  @UseGuards(AuthorizationGuard)
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -97,6 +99,8 @@ export class FileController {
   }
 
   @Post('video')
+  @HttpCode(200)
+  @UseGuards(AuthorizationGuard)
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
@@ -156,6 +160,7 @@ export class FileController {
   @ApiOperation({
     description: '查看文件',
   })
+  @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
   async getFileById(@Param('id') id: string) {
     const file = await this.fileService.findOneBy({ id });
@@ -166,10 +171,24 @@ export class FileController {
     return file;
   }
 
+  @Get(':id/raw')
+  @ApiOperation({
+    description: '原始文件数据',
+  })
+  async getRawFileById(@Param('id') id: string, @Res() res: Response) {
+    const file = await this.fileService.findOneBy({ id });
+    if (!file || file.isExpired) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    res.sendFile(file.path);
+  }
+
   @Get()
   @ApiOperation({
     description: '查询文件',
   })
+  @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
   async queryFile(@Query() query: FileQueryDto) {
     const { keyword, md5, expired, userId } = query;
@@ -191,6 +210,7 @@ export class FileController {
   @ApiOperation({
     description: '删除文件',
   })
+  @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
   async deleteFile(@Param('id') id: string) {
     await this.fileService.delete({ id });

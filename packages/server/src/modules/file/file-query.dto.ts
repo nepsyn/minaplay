@@ -13,14 +13,6 @@ export class FileQueryDto extends ApiQueryDto<File> {
   keyword?: string;
 
   @ApiProperty({
-    description: '文件id',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  id?: string;
-
-  @ApiProperty({
     description: '文件md5',
     required: false,
   })

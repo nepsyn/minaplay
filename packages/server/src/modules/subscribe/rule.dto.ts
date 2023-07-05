@@ -8,7 +8,7 @@ export class RuleDto {
   })
   @IsOptional()
   @IsString()
-  @MaxLength(2048)
+  @MaxLength(20480)
   code: string;
 
   @ApiProperty({
@@ -17,7 +17,7 @@ export class RuleDto {
   })
   @IsString()
   @IsOptional()
-  @MaxLength(40)
+  @MaxLength(60)
   remark?: string;
 
   @ApiProperty({

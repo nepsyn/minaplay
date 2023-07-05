@@ -29,10 +29,10 @@ export class EpisodeDto {
   seriesId?: number;
 
   @ApiProperty({
-    description: '媒体文件id',
+    description: '媒体id',
     required: false,
   })
   @IsUUID()
   @IsOptional()
-  fileId?: string;
+  mediaId?: string;
 }

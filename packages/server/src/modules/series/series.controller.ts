@@ -75,12 +75,12 @@ export class SeriesController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async querySeries(@Query() query: SeriesQueryDto) {
-    const { keyword, id, name } = query;
+    const { keyword, name } = query;
     const [result, total] = await this.seriesService.findAndCount({
       where: buildQueryOptions<Series>({
         keyword,
         keywordProperties: (entity) => [entity.name, entity.description],
-        exact: { id, name },
+        exact: { name },
       }),
       skip: query.page * query.size,
       take: query.size,

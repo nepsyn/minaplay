@@ -14,6 +14,11 @@ export enum PermissionEnum {
   /** 上传视频 */
   FILE_UPLOAD_VIDEO = 'FILE_UPLOAD:VIDEO',
 
+  /** 媒体管理 */
+  MEDIA_OP = 'MEDIA:*',
+  /** 媒体查看 */
+  MEDIA_VIEW = 'MEDIA:VIEW',
+
   /** 剧集管理 */
   SERIES_OP = 'SERIES:*',
   /** 剧集查看 */

@@ -53,12 +53,12 @@ export class EpisodeController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
   async queryEpisode(@Query() query: EpisodeQueryDto) {
-    const { keyword, id, seriesId } = query;
+    const { seriesId } = query;
     const [result, total] = await this.episodeService.findAndCount({
       where: buildQueryOptions<Episode>({
-        keyword,
-        keywordProperties: (entity) => [entity.title],
-        exact: { id, series: { id: seriesId } },
+        exact: {
+          series: { id: seriesId },
+        },
       }),
       skip: query.page * query.size,
       take: query.size,
@@ -81,7 +81,7 @@ export class EpisodeController {
     const { id } = await this.episodeService.save({
       ...data,
       series: { id: data.seriesId },
-      file: { id: data.fileId },
+      media: { id: data.mediaId },
     });
 
     return await this.episodeService.findOneBy({ id });
@@ -108,7 +108,7 @@ export class EpisodeController {
     await this.episodeService.save({
       id,
       ...data,
-      file: { id: data.fileId },
+      media: { id: data.mediaId },
     });
 
     return await this.episodeService.findOneBy({ id });

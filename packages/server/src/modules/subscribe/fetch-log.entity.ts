@@ -1,6 +1,7 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Source } from './source.entity';
 import { Exclude } from 'class-transformer';
+import { DownloadItem } from './download-item.entity';
 
 /** 订阅解析日志 */
 @Entity()
@@ -15,6 +16,11 @@ export class FetchLog {
     eager: true,
   })
   source: Source;
+
+  /** 下载项目 */
+  @Exclude()
+  @OneToMany(() => DownloadItem, (download) => download.log)
+  downloads: DownloadItem[];
 
   /** 是否成功 */
   @Column()

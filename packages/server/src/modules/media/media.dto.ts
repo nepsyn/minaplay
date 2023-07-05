@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
-export class SeriesDto {
+export class MediaDto {
   @ApiProperty({
     description: '剧集名称',
     required: false,
@@ -21,19 +21,26 @@ export class SeriesDto {
   description?: string;
 
   @ApiProperty({
+    description: '是否公开',
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  isPublic?: boolean;
+
+  @ApiProperty({
+    description: '媒体文件id',
+    required: false,
+  })
+  @IsOptional()
+  @IsUUID()
+  fileId?: string;
+
+  @ApiProperty({
     description: '海报文件id',
     required: false,
   })
   @IsOptional()
   @IsUUID()
   posterFileId?: string;
-
-  @ApiProperty({
-    description: '剧集标签',
-    required: false,
-    type: [Number],
-  })
-  @IsOptional()
-  @IsArray()
-  tagIds?: number[];
 }

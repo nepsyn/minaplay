@@ -4,12 +4,13 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { File } from '../file/file.entity';
 import { Exclude } from 'class-transformer';
 import { Series } from './series.entity';
+import { Media } from '../media/media.entity';
 
 /** 单集 */
 @Entity()
@@ -18,26 +19,22 @@ export class Episode {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  /** 标题 */
-  @Column()
-  title: string;
-
   /** 本集集数 */
   @Column({
     nullable: true,
   })
   no?: string;
 
-  /** 文件 */
-  @Exclude()
-  @ManyToOne(() => File, {
+  /** 媒体 */
+  @OneToOne(() => Media, {
+    onDelete: 'CASCADE',
     eager: true,
   })
-  file: File;
+  media: Media;
 
   /** 剧集 */
-  @Exclude()
   @ManyToOne(() => Series, (series) => series.episodes, {
+    onDelete: 'CASCADE',
     eager: true,
   })
   series: Series;

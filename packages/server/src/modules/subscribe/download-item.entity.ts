@@ -1,7 +1,9 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Rule } from './rule.entity';
 import { SubscribeDownloadItemStatusEnum } from '../../enums/subscribe-download-item-status.enum';
 import { Source } from './source.entity';
+import { FetchLog } from './fetch-log.entity';
+import { Media } from '../media/media.entity';
 
 /** 订阅解析元素 */
 @Entity()
@@ -35,6 +37,18 @@ export class DownloadItem {
     eager: true,
   })
   rule: Rule;
+
+  /** 解析记录 */
+  @ManyToOne(() => FetchLog, {
+    onDelete: 'SET NULL',
+    nullable: true,
+    eager: true,
+  })
+  log?: FetchLog;
+
+  /** 对应文件列表 */
+  @OneToMany(() => Media, (media) => media.download)
+  medias: Media[];
 
   /** 下载状态 */
   @Column({

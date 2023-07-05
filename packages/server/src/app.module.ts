@@ -18,6 +18,7 @@ import { cpus } from 'os';
 import { UserModule } from './modules/user/user.module';
 import { SeriesModule } from './modules/series/series.module';
 import { SubscribeModule } from './modules/subscribe/subscribe.module';
+import { MediaModule } from './modules/media/media.module';
 
 @Module({
   imports: [
@@ -86,9 +87,16 @@ import { SubscribeModule } from './modules/subscribe/subscribe.module';
         mediasoupMaxIncomeBitrate: Number(configService.get('MS_AUDIO_MAX_INCOME_BITRATE', 1500000)),
         streamRtmpPort: Number(configService.get('STREAM_RTMP_PORT', 1935)),
         streamChunkSize: Number(configService.get('STREAM_CHUNK_SIZE', 60000)),
-        streamFfmpegPath: configService.get('STREAM_FFMPEG_PATH', 'ffmpeg'),
+        streamFfmpegPath: configService.get('FFMPEG_PATH', 'ffmpeg'),
         streamPublishKey: configService.get('STREAM_PUBLISH_KEY'),
         appHost: configService.get('APP_HOST', '127.0.0.1'),
+      }),
+    }),
+    MediaModule.registerAsync({
+      inject: [ConfigService],
+      isGlobal: true,
+      useFactory: (configService: ConfigService) => ({
+        ffmpegPath: configService.get('FFMPEG_PATH', 'ffmpeg'),
       }),
     }),
     FileModule,

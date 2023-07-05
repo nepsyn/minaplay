@@ -11,6 +11,7 @@ import { Aria2Service } from '../aria2/aria2.service';
 import { NodeVM } from 'vm2';
 import { VALID_VIDEO_MIME } from '../../constants';
 import { EpisodeService } from '../series/episode.service';
+import { MediaService } from '../media/media.service';
 
 @Injectable()
 @Processor('fetch-subscribe-source')
@@ -22,6 +23,7 @@ export class FetchSubscribeSourceConsumer {
     private downloadItemService: DownloadItemService,
     private aria2Service: Aria2Service,
     private episodeService: EpisodeService,
+    private mediaService: MediaService,
   ) {}
 
   @Process()
@@ -30,6 +32,11 @@ export class FetchSubscribeSourceConsumer {
 
     try {
       const data = await this.sourceService.readSource(source.url);
+      const log = await this.fetchLogService.save({
+        source: { id: source.id },
+        success: true,
+        data: JSON.stringify(data),
+      });
 
       if (data.entries.length > 0) {
         const [rules] = await this.ruleService.findAndCount({
@@ -37,13 +44,14 @@ export class FetchSubscribeSourceConsumer {
             source: { id: source.id },
           },
         });
+        const validRules = rules.filter((rule) => rule.codeFile.isExist);
 
         const vm = new NodeVM({
           require: false,
           timeout: 1000,
           allowAsync: true,
         });
-        const validRules = rules.filter((rule) => rule.codeFile.isExist);
+
         for (const rule of validRules) {
           const validEntries = data.entries.filter((entry) => entry.enclosure?.url);
           const validatorFunc = vm.runFile(rule.codeFile.path);
@@ -60,18 +68,29 @@ export class FetchSubscribeSourceConsumer {
                 url: entry.enclosure.url,
                 source: { id: source.id },
                 rule: { id: rule.id },
+                log: { id: log.id },
                 status: SubscribeDownloadItemStatusEnum.DOWNLOADING,
               });
 
               const task = await this.aria2Service.addTask(entry.enclosure.url);
               task.on('complete', async (files) => {
                 for (const file of files) {
-                  if (VALID_VIDEO_MIME.includes(file.mimetype) && rule.series) {
-                    await this.episodeService.save({
-                      title: file.filename,
-                      series: { id: rule.series.id },
+                  if (VALID_VIDEO_MIME.includes(file.mimetype)) {
+                    const { id } = await this.mediaService.save({
+                      name: file.name,
+                      download: { id: item.id },
+                      isPublic: true,
                       file: { id: file.id },
                     });
+                    const media = await this.mediaService.findOneBy({ id });
+                    await this.mediaService.generatePosterFile(media);
+
+                    if (rule.series) {
+                      await this.episodeService.save({
+                        media: { id: media.id },
+                        series: { id: rule.series.id },
+                      });
+                    }
                   }
                 }
 
@@ -91,12 +110,6 @@ export class FetchSubscribeSourceConsumer {
           }
         }
       }
-
-      await this.fetchLogService.save({
-        source: { id: source.id },
-        success: true,
-        data: JSON.stringify(data),
-      });
     } catch (error) {
       await this.fetchLogService.save({
         source: { id: source.id },

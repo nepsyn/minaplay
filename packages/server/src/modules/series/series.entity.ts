@@ -10,7 +10,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude } from 'class-transformer';
 import { Rule } from '../subscribe/rule.entity';
 import { SeriesTag } from './series-tag.entity';
 import { File } from '../file/file.entity';
@@ -30,19 +30,34 @@ export class Series {
   })
   name: string;
 
+  /** 剧描述称 */
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  description?: string;
+
   /** 创建用户 */
   @ManyToOne(() => User, (user) => user.series, {
     eager: true,
   })
   user: User;
 
-  /** 海报图 */
-  @Exclude()
+  /** 纵向海报图 */
   @ManyToOne(() => File, {
+    onDelete: 'SET NULL',
     eager: true,
     nullable: true,
   })
   poster?: File;
+
+  /** 横向海报图 */
+  @ManyToOne(() => File, {
+    onDelete: 'SET NULL',
+    eager: true,
+    nullable: true,
+  })
+  posterLandscape?: File;
 
   /** 标签 */
   @ManyToMany(() => SeriesTag, (tag) => tag.series, {
@@ -54,12 +69,6 @@ export class Series {
   /** 单集 */
   @OneToMany(() => Episode, (episode) => episode.series)
   episodes: Episode[];
-
-  /** 剧集描述 */
-  @Column({
-    nullable: true,
-  })
-  description: string;
 
   /** 订阅规则 */
   @OneToMany(() => Rule, (rule) => rule.series)
@@ -77,10 +86,4 @@ export class Series {
   @Exclude()
   @DeleteDateColumn()
   deleteAt: Date;
-
-  /** 海报文件 id */
-  @Expose()
-  get posterFileId() {
-    return this.poster?.id;
-  }
 }

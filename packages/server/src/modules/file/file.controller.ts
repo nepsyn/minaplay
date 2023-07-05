@@ -172,12 +172,12 @@ export class FileController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
   async queryFile(@Query() query: FileQueryDto) {
-    const { keyword, id, md5, expired, userId } = query;
+    const { keyword, md5, expired, userId } = query;
     const [result, total] = await this.fileService.findAndCount({
       where: buildQueryOptions<File>({
         keyword,
         keywordProperties: (entity) => [entity.name, entity.mimetype],
-        exact: { id, md5, expireAt: expired ? MoreThanOrEqual(new Date()) : undefined, user: { id: userId } },
+        exact: { md5, expireAt: expired ? MoreThanOrEqual(new Date()) : undefined, user: { id: userId } },
       }),
       skip: query.page * query.size,
       take: query.size,

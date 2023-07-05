@@ -1,6 +1,6 @@
 import { UserEntity } from './user.interface';
 import { SeriesEntity } from './series.interface';
-import { ApiQueryDto } from '@/api/interfaces/common.interface';
+import { ApiQueryDto } from './common.interface';
 
 export interface SourceEntity {
   /** id */

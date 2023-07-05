@@ -22,7 +22,7 @@ onBeforeMount(async () => {
     (error) => {
       if (error.response?.data?.code === ErrorCodeEnum.INVALID_TOKEN) {
         localStorage.removeItem('token');
-        router.replace({ name: 'login' });
+        router.replace('/login');
       }
       return Promise.reject(error);
     },

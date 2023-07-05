@@ -1,6 +1,6 @@
 import axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
-import { AuthData, LoginDto } from './interfaces/auth.interface';
-import { FileEntity } from './interfaces/file.interface';
+import { AuthData, LoginDto } from '@/interfaces/auth.interface';
+import { FileEntity } from '@/interfaces/file.interface';
 import {
   DownloadItemEntity,
   DownloadItemQueryDto,
@@ -13,8 +13,8 @@ import {
   SourceDto,
   SourceEntity,
   SourceQueryDto,
-} from './interfaces/subscribe.interface';
-import { ApiQueryResult } from './interfaces/common.interface';
+} from '@/interfaces/subscribe.interface';
+import { ApiQueryResult } from '@/interfaces/common.interface';
 
 class ApiHelper {
   private token: string | null = null;
@@ -90,7 +90,7 @@ class ApiHelper {
     delete: (id: number) => this.apiDelete(`/subscribe/${id}`),
     fetchRawData: (id: number) => this.apiGet<FeedData>(`/subscribe/${id}/raw`),
     invokeFetchJobById: (id: number) => this.apiPost(`/subscribe/${id}/run`),
-    getRulesById: (id: number) => this.apiGet<RuleEntity[]>(`/subscribe/${id}/rule`),
+    getRulesById: (id: number) => this.apiGet<ApiQueryResult<RuleEntity>, RuleQueryDto>(`/subscribe/${id}/rule`),
     getFetchLogsById: (id: number) =>
       this.apiGet<ApiQueryResult<FetchLogEntity>, FetchLogQueryDto>(`/subscribe/${id}/log`),
     getDownloadItemsById: (id: number) =>

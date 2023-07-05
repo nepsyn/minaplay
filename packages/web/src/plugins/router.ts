@@ -7,7 +7,11 @@ import Admin from '@/views/home/Admin.vue';
 import Setting from '@/views/home/Setting.vue';
 import { Api } from '@/api/api';
 import Login from '@/views/Login.vue';
-import SourceDetail from '@/views/home/subscribe/SourceDetail.vue';
+import SourceInfo from '@/views/home/subscribe/SourceDetail.vue';
+import SourceRules from '@/views/home/subscribe/SourceRules.vue';
+import SourceRawData from '@/views/home/subscribe/SourceRawData.vue';
+import SourceFetchLogs from '@/views/home/subscribe/SourceFetchLogs.vue';
+import SourceDownloadItems from '@/views/home/subscribe/SourceDownloadItems.vue';
 
 const LoginGuard: NavigationGuard = (to, from, next) => {
   if (!Api.isLogin) {
@@ -30,34 +34,50 @@ const routes: RouteRecordRaw[] = [
     redirect: '/media',
     children: [
       {
-        name: 'media',
         path: '/media',
         component: Media,
       },
       {
-        name: 'live',
         path: '/live',
         component: Live,
       },
       {
-        name: 'subscribe',
         path: '/subscribe',
         component: Subscribe,
         children: [
           {
-            name: 'subscribe-detail',
             path: '/subscribe/:id',
-            component: SourceDetail,
+            redirect: (to) => `/subscribe/${to.params.id}/detail`,
+            children: [
+              {
+                path: '/subscribe/:id/detail',
+                component: SourceInfo,
+              },
+              {
+                path: '/subscribe/:id/rules',
+                component: SourceRules,
+              },
+              {
+                path: '/subscribe/:id/raw',
+                component: SourceRawData,
+              },
+              {
+                path: '/subscribe/:id/logs',
+                component: SourceFetchLogs,
+              },
+              {
+                path: '/subscribe/:id/downloads',
+                component: SourceDownloadItems,
+              },
+            ],
           },
         ],
       },
       {
-        name: 'admin',
         path: '/admin',
         component: Admin,
       },
       {
-        name: 'setting',
         path: '/setting',
         component: Setting,
       },
@@ -65,7 +85,6 @@ const routes: RouteRecordRaw[] = [
     beforeEnter: LoginGuard,
   },
   {
-    name: 'login',
     path: '/login',
     component: Login,
   },

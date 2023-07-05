@@ -16,3 +16,14 @@ export type ApiQueryResult<T> = {
   size: number;
   total: number;
 };
+
+export interface SingleItemState<T = any> {
+  item: T | undefined;
+  first: boolean;
+}
+
+export interface MultiItemsState<T = any> {
+  items: Map<any, T>;
+  total: number;
+  all: boolean;
+}

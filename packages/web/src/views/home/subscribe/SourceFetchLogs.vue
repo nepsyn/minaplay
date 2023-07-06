@@ -71,29 +71,23 @@ watch(
       </v-container>
       <v-divider class="my-4"></v-divider>
       <items-provider ref="providerRef" class="pa-0" :load-fn="loadLogs" :items="logs">
-        <v-timeline side="end">
-          <v-timeline-item
-            hide-opposite
-            width="100%"
-            v-for="log in logs"
-            :key="log.id"
-            :dot-color="log.success ? 'success' : 'error'"
-            size="small"
-          >
-            <v-alert
-              variant="tonal"
-              :color="log.success ? 'success' : 'error'"
-              :icon="log.success ? mdiCheckCircle : mdiAlertCircle"
-            >
-              <v-container class="pa-0 d-flex flex-row align-center">
-                <span class="text-subtitle-1 font-weight-bold" v-text="log.success ? '解析成功' : '解析失败'"></span>
-                <v-spacer></v-spacer>
-                <span class="text-subtitle-1 font-weight-bold" v-text="new Date(log.createAt).toLocaleString()"></span>
-              </v-container>
-              <pre v-if="!log.success" class="text-body-2 mt-2 overflow-x-auto" v-text="log.error"></pre>
-            </v-alert>
-          </v-timeline-item>
-        </v-timeline>
+        <v-alert
+          class="my-4"
+          v-for="log in logs"
+          :key="log.id"
+          variant="tonal"
+          :color="log.success ? 'success' : 'error'"
+          :icon="log.success ? mdiCheckCircle : mdiAlertCircle"
+        >
+          <v-container class="pa-0 d-flex flex-row align-center">
+            <span class="text-subtitle-1 font-weight-bold" v-text="log.success ? '解析成功' : '解析失败'"></span>
+            <v-spacer></v-spacer>
+            <v-chip>
+              <span class="text-subtitle-1 font-weight-thin" v-text="new Date(log.createAt).toLocaleString()"></span>
+            </v-chip>
+          </v-container>
+          <pre v-if="!log.success" class="text-body-2 mt-2 overflow-x-auto" v-text="log.error"></pre>
+        </v-alert>
       </items-provider>
     </v-container>
   </v-container>

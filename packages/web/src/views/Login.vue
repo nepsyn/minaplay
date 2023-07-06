@@ -33,7 +33,7 @@ const login = async () => {
     const { token, ...user } = response.data;
     app.setUser(user);
     Api.setToken(token);
-    localStorage.setItem('token', token);
+    localStorage.setItem('minaplay_token', token);
 
     await router.replace((route.query.redirect_url as string) || '/');
   } catch (e: any) {

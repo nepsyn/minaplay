@@ -21,10 +21,12 @@ const onScroll = (e: any) => {
 
 const containerRef: Ref<any> = ref(null);
 const toTop = () => {
-  containerRef.value.scrollTo({
-    top: 0,
-    behavior: 'smooth',
-  });
+  if (containerRef.value) {
+    containerRef.value.scrollTo({
+      top: 0,
+      behavior: 'smooth',
+    });
+  }
 };
 
 defineExpose({

@@ -50,6 +50,12 @@ const ruleCodeEditorExtensions = computed(() =>
 );
 
 const editRuleId: Ref<number | undefined> = ref(undefined);
+const onKeydown = async (e: KeyboardEvent, id: number, code?: string) => {
+  if (e.code === 'KeyS') {
+    e.preventDefault();
+    await saveRuleCode(id, code);
+  }
+};
 const saveRuleCode = _.throttle(
   async (id: number, code?: string) => {
     editRuleId.value = id;
@@ -183,7 +189,7 @@ watch(
           <codemirror
             indent-with-tab
             v-model="rule.code"
-            @keydown.ctrl.prevent="(e) => e.code === 'KeyS' && saveRuleCode(rule.id, rule.code)"
+            @keydown.ctrl="(e) => onKeydown(e, rule.id, rule.code)"
             :extensions="ruleCodeEditorExtensions"
             style="cursor: text"
           ></codemirror>

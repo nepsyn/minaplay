@@ -37,9 +37,9 @@ const runFetchJob = _.throttle(
     runFetchJobLoading.value = true;
     try {
       await Api.SubscribeSource.invokeFetchJobById(sourceId.value)();
-      app.toast('请求更新成功', 'success');
+      app.toastSuccess('请求更新成功');
     } catch {
-      app.toast('请求更新失败', 'error');
+      app.toastError('请求更新失败');
     } finally {
       runFetchJobLoading.value = false;
     }
@@ -56,9 +56,9 @@ const saveSource = async () => {
     const response = await Api.SubscribeSource.update(sourceId.value)(data);
     source.value = response.data;
     subscribe.updateSource(response.data);
-    app.toast('保存订阅源信息成功', 'success');
+    app.toastSuccess('保存订阅源信息成功');
   } catch {
-    app.toast('保存订阅源信息失败', 'error');
+    app.toastError('保存订阅源信息失败');
   } finally {
     sourceSaving.value = false;
   }
@@ -73,7 +73,7 @@ const toggleEnabled = async () => {
     });
     subscribe.updateSource(response.data);
   } catch {
-    app.toast('更改订阅源启用状态失败', 'error');
+    app.toastError('更改订阅源启用状态失败');
   } finally {
     enabledToggling.value = false;
   }
@@ -86,9 +86,9 @@ const deleteSource = async () => {
     await Api.SubscribeSource.delete(sourceId.value)();
     subscribe.deleteSource(sourceId.value);
     await router.replace('/subscribe');
-    app.toast('订阅源已成功删除', 'success');
+    app.toastSuccess('订阅源已成功删除');
   } catch {
-    app.toast('删除订阅源失败！', 'error');
+    app.toastError('删除订阅源失败！');
   } finally {
     sourceDeleting.value = false;
   }

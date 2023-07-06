@@ -26,9 +26,9 @@ const loadRawData = async (done: any) => {
     done('ok');
   } catch (error: any) {
     if (error.response?.data?.code === ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT) {
-      app.toast('订阅源格式错误，请检查订阅源URL！', 'error');
+      app.toastError('订阅源格式错误，请检查订阅源URL');
     } else {
-      app.toast('获取订阅源数据失败！', 'error');
+      app.toastError('获取订阅源数据失败');
     }
     done('error');
   }

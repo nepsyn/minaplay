@@ -1,6 +1,13 @@
 import { defineStore } from 'pinia';
-import { reactive, ref, Ref } from 'vue';
-import { UserEntity } from '@/api/interfaces/user.interface';
+import { ref, Ref } from 'vue';
+import { UserEntity } from '@/interfaces/user.interface';
+
+export interface AppMessage {
+  id: number;
+  content: string;
+  type: 'error' | 'warning' | 'success' | 'info';
+  timeout: number;
+}
 
 export const useApp = defineStore('user', () => {
   const user: Ref<UserEntity | undefined> = ref(undefined);
@@ -8,30 +15,47 @@ export const useApp = defineStore('user', () => {
     user.value = _user;
   };
 
-  const snackbar = reactive({
-    show: false,
-    message: '',
-    color: 'success',
-  });
+  const counter = (function* () {
+    let counter = 0;
+    while (true) {
+      yield counter;
+      counter = (counter + 1) % 1024;
+    }
+  })();
+  const messages: Ref<AppMessage[]> = ref([]);
+  const closeToast = (id: number) => {
+    messages.value = messages.value.filter((v) => v.id !== id);
+  };
   const toast = (
-    message: string,
-    color: 'error' | 'warning' | 'success' | 'info' | 'primary' | 'secondary' = 'success',
+    content: string,
+    type: 'error' | 'warning' | 'success' | 'info' = 'success',
+    timeout: number = 5000,
   ) => {
-    snackbar.message = message;
-    snackbar.color = color;
-    snackbar.show = true;
+    const message = {
+      id: counter.next().value,
+      content,
+      type,
+      timeout,
+    };
+    messages.value.push(message);
+    if (timeout > 0) {
+      setTimeout(() => {
+        closeToast(message.id);
+      }, message.timeout);
+    }
   };
 
-  const toastSuccess = (message: string) => toast(message, 'success');
-  const toastWarning = (message: string) => toast(message, 'warning');
-  const toastError = (message: string) => toast(message, 'error');
-  const toastInfo = (message: string) => toast(message, 'info');
+  const toastSuccess = (content: string) => toast(content, 'success');
+  const toastWarning = (content: string) => toast(content, 'warning');
+  const toastError = (content: string) => toast(content, 'error');
+  const toastInfo = (content: string) => toast(content, 'info');
 
   return {
     user,
     setUser,
-    snackbar,
+    messages,
     toast,
+    closeToast,
     toastSuccess,
     toastWarning,
     toastError,

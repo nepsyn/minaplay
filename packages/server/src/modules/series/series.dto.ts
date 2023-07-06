@@ -29,6 +29,14 @@ export class SeriesDto {
   posterFileId?: string;
 
   @ApiProperty({
+    description: '横向海报文件id',
+    required: false,
+  })
+  @IsOptional()
+  @IsUUID()
+  posterLandscapeFileId?: string;
+
+  @ApiProperty({
     description: '剧集标签',
     required: false,
     type: [Number],

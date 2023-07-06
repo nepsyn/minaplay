@@ -24,14 +24,13 @@ import { Between } from 'typeorm';
 import { Media } from './media.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { MediaDto } from './media.dto';
-import { FileService } from '../file/file.service';
 
 @Controller('media')
 @UseGuards(AuthorizationGuard)
 @ApiTags('media')
 @ApiBearerAuth()
 export class MediaController {
-  constructor(private mediaService: MediaService, private fileService: FileService) {}
+  constructor(private mediaService: MediaService) {}
 
   @Get(':id')
   @ApiOperation({
@@ -99,18 +98,9 @@ export class MediaController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
   async updateMedia(@Param('id') id: string, @Body() data: MediaDto) {
-    if (data.fileId !== undefined) {
-      const file = await this.fileService.findOneBy({ id: data.fileId });
-      if (!file) {
-        throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-      }
-    }
-
-    if (data.posterFileId !== undefined) {
-      const file = await this.fileService.findOneBy({ id: data.posterFileId });
-      if (!file) {
-        throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-      }
+    const media = await this.mediaService.findOneBy({ id });
+    if (!media) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
     await this.mediaService.save({

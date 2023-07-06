@@ -63,6 +63,7 @@ export class SeriesController {
       ...data,
       user: { id: user.id },
       poster: { id: data.posterFileId },
+      posterLandscape: { id: data.posterLandscapeFileId },
       tags: data.tagIds?.map((id) => ({ id })),
     });
 
@@ -110,6 +111,7 @@ export class SeriesController {
       id,
       ...data,
       poster: { id: data.posterFileId },
+      posterLandscape: { id: data.posterLandscapeFileId },
       tags: data.tagIds?.map((id) => ({ id })),
     });
 

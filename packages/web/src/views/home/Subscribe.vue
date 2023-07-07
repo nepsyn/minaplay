@@ -77,13 +77,40 @@ const getFaviconUrl = (url: string) => {
   return `${u.protocol}//${u.host}/favicon.ico`;
 };
 
-const tab = ref('detail');
+const tabs = ref([
+  {
+    text: '订阅源信息',
+    route: 'detail',
+    icon: mdiInformationOutline,
+  },
+  {
+    text: '规则列表',
+    route: 'rules',
+    icon: mdiFileTreeOutline,
+  },
+  {
+    text: '数据查看',
+    route: 'raw',
+    icon: mdiRss,
+  },
+  {
+    text: '解析日志',
+    route: 'logs',
+    icon: mdiTimelineClockOutline,
+  },
+  {
+    text: '下载项目',
+    route: 'downloads',
+    icon: mdiDownloadCircleOutline,
+  },
+]);
+const tabValue = ref('detail');
 
 const providerRef: Ref<any> = ref(null);
 </script>
 
 <template>
-  <v-container fluid class="pa-0 main-content d-flex flex-row">
+  <v-container fluid class="pa-0 main-content d-flex flex-column">
     <v-row class="ma-0">
       <v-col cols="4" class="pa-0">
         <v-container fluid class="pa-0 d-flex flex-column align-center fill-height">
@@ -117,19 +144,24 @@ const providerRef: Ref<any> = ref(null);
           >
             <v-list class="py-0 w-100">
               <template v-for="source in subscribe.sources" :key="source.id">
-                <v-list-item lines="two" :to="`/subscribe/${source.id}/${tab}`" active-class="source-active">
+                <v-list-item
+                  lines="two"
+                  :to="`/subscribe/${source.id}`"
+                  @click.prevent="router.push(`/subscribe/${source.id}/${tabValue}`)"
+                  active-class="source-active"
+                >
                   <div class="ban"></div>
                   <template #prepend>
                     <v-icon size="x-large">
-                      <v-img :src="getFaviconUrl(source.url)">
-                        <template v-slot:placeholder>
-                          <v-img :src="BlankFavicon"></v-img>
+                      <v-img :src="getFaviconUrl(source.url)" aspect-ratio="1">
+                        <template #placeholder>
+                          <v-img :src="BlankFavicon" aspect-ratio="1"></v-img>
                         </template>
                       </v-img>
                     </v-icon>
                   </template>
-                  <v-list-item-title class="py-1 text-wrap font-weight-bold" v-text="source.title"></v-list-item-title>
-                  <v-list-item-subtitle class="py-1" v-text="source.url"></v-list-item-subtitle>
+                  <v-list-item-title class="py-1 text-wrap font-weight-bold">{{ source.title }}</v-list-item-title>
+                  <v-list-item-subtitle class="py-1">{{ source.url }}</v-list-item-subtitle>
                   <template #append>
                     <v-icon
                       :color="source.enabled ? 'success' : 'warning'"
@@ -147,24 +179,27 @@ const providerRef: Ref<any> = ref(null);
       <v-col cols="8" class="pa-0">
         <v-container v-if="sourceId" fluid class="pa-0 main-content d-flex flex-column">
           <v-toolbar flat color="background" density="compact" border="b">
-            <v-tabs v-model="tab" color="primary">
-              <v-tab value="detail" :to="`/subscribe/${sourceId}/detail`" :prepend-icon="mdiInformationOutline">
-                订阅源信息
-              </v-tab>
-              <v-tab value="rules" :to="`/subscribe/${sourceId}/rules`" :prepend-icon="mdiFileTreeOutline"
-                >规则列表
-              </v-tab>
-              <v-tab value="raw" :to="`/subscribe/${sourceId}/raw`" :prepend-icon="mdiRss">数据查看</v-tab>
-              <v-tab value="logs" :to="`/subscribe/${sourceId}/logs`" :prepend-icon="mdiTimelineClockOutline"
-                >解析日志
-              </v-tab>
-              <v-tab value="downloads" :to="`/subscribe/${sourceId}/downloads`" :prepend-icon="mdiDownloadCircleOutline"
-                >下载项目
+            <v-tabs v-model="tabValue" color="primary">
+              <v-tab
+                v-for="tab in tabs"
+                :to="`/subscribe/${sourceId}/${tab.route}`"
+                :text="tab.text"
+                :key="tab.route"
+                :value="tab.route"
+                rounded="0"
+                :prepend-icon="tab.icon"
+              >
               </v-tab>
             </v-tabs>
           </v-toolbar>
           <to-top-container class="scrollable-container">
-            <router-view></router-view>
+            <router-view v-slot="{ Component }">
+              <v-scroll-x-reverse-transition leave-absolute>
+                <keep-alive>
+                  <component :is="Component"></component>
+                </keep-alive>
+              </v-scroll-x-reverse-transition>
+            </router-view>
           </to-top-container>
         </v-container>
       </v-col>

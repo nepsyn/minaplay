@@ -34,7 +34,7 @@ onBeforeMount(async () => {
   <router-view />
   <v-layout>
     <v-layout-item
-      class="d-flex flex-column pointer-events-none"
+      class="d-flex flex-column justify-end pointer-events-none"
       :model-value="true"
       position="right"
       size="400"
@@ -43,7 +43,7 @@ onBeforeMount(async () => {
       <v-container fluid class="px-6 py-8">
         <v-slide-x-reverse-transition group>
           <v-alert
-            class="pointer-events-initial mb-2"
+            class="pointer-events-initial mt-2"
             v-for="message in app.messages"
             density="compact"
             :key="message.id"

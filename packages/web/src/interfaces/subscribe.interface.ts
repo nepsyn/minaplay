@@ -43,12 +43,11 @@ export interface RuleEntity {
   id: number;
   /** 备注 */
   remark?: string;
-  /** 代码 */
-  code?: string;
   /** 订阅源 */
   source: SourceEntity;
   /** 剧集 */
   series: SeriesEntity;
+  code: string;
   /** 创建时间 */
   createAt: Date;
   /** 更新时间 */
@@ -70,11 +69,15 @@ export interface RuleQueryDto extends ApiQueryDto<RuleEntity> {
 }
 
 export interface FetchLogEntity {
+  /** id */
   id: string;
+  /** 订阅源 */
   source: SourceEntity;
+  /** 是否成功 */
   success: boolean;
-  data?: string;
+  /** 错误内容 */
   error?: string;
+  /** 创建日期 */
   createAt: Date;
 }
 
@@ -84,13 +87,23 @@ export interface FetchLogQueryDto extends ApiQueryDto<FetchLogEntity> {
 }
 
 export interface DownloadItemEntity {
+  /** id */
   id: string;
+  /** 项目标题 */
   title: string;
+  /** 下载链接 */
   url: string;
+  /** 所属订阅源 */
   source: SourceEntity;
+  /** 命中规则 */
   rule: RuleEntity;
+  /** 解析记录 */
+  log?: FetchLogEntity;
+  /** 下载状态 */
   status: 'DOWNLOADED' | 'DOWNLOADING' | 'FAILED';
+  /** 错误内容 */
   error?: string;
+  /** 创建时间 */
   createAt: Date;
 }
 

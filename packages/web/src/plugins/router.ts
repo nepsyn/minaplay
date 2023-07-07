@@ -1,6 +1,6 @@
 import { createRouter, createWebHashHistory, NavigationGuard, RouteRecordRaw } from 'vue-router';
 import Home from '@/views/Home.vue';
-import Media from '@/views/home/Media.vue';
+import Resource from '@/views/home/Resource.vue';
 import Live from '@/views/home/Live.vue';
 import Subscribe from '@/views/home/Subscribe.vue';
 import Admin from '@/views/home/Admin.vue';
@@ -12,6 +12,8 @@ import SourceRules from '@/views/home/subscribe/SourceRules.vue';
 import SourceRawData from '@/views/home/subscribe/SourceRawData.vue';
 import SourceFetchLogs from '@/views/home/subscribe/SourceFetchLogs.vue';
 import SourceDownloadItems from '@/views/home/subscribe/SourceDownloadItems.vue';
+import SeriesView from '@/views/home/media/SeriesView.vue';
+import MediasView from '@/views/home/media/MediasView.vue';
 
 const LoginGuard: NavigationGuard = (to, from, next) => {
   if (!Api.isLogin) {
@@ -34,8 +36,19 @@ const routes: RouteRecordRaw[] = [
     redirect: '/media',
     children: [
       {
-        path: '/media',
-        component: Media,
+        path: '/resource',
+        component: Resource,
+        redirect: '/series',
+        children: [
+          {
+            path: '/series',
+            component: SeriesView,
+          },
+          {
+            path: '/media',
+            component: MediasView,
+          },
+        ],
       },
       {
         path: '/live',

@@ -29,7 +29,7 @@ export const useApp = defineStore('user', () => {
   const toast = (
     content: string,
     type: 'error' | 'warning' | 'success' | 'info' = 'success',
-    timeout: number = 5000,
+    timeout: number = 3000,
   ) => {
     const message = {
       id: counter.next().value,
@@ -45,10 +45,10 @@ export const useApp = defineStore('user', () => {
     }
   };
 
-  const toastSuccess = (content: string) => toast(content, 'success');
-  const toastWarning = (content: string) => toast(content, 'warning');
-  const toastError = (content: string) => toast(content, 'error');
-  const toastInfo = (content: string) => toast(content, 'info');
+  const toastSuccess = (content: string, timeout?: number) => toast(content, 'success', timeout);
+  const toastWarning = (content: string, timeout?: number) => toast(content, 'warning', timeout);
+  const toastError = (content: string, timeout?: number) => toast(content, 'error', timeout);
+  const toastInfo = (content: string, timeout?: number) => toast(content, 'info', timeout);
 
   return {
     user,

@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+  mdiCloudUploadOutline,
   mdiCog,
   mdiGithub,
   mdiMovieOpenPlay,
@@ -31,7 +32,7 @@ const navs = [
   {
     name: '内容库',
     icon: mdiMovieOpenPlay,
-    route: '/media',
+    route: '/resource',
   },
   {
     name: '一起看',
@@ -63,6 +64,14 @@ const navs = [
       <v-toolbar-title>MinaPlay</v-toolbar-title>
       <template v-slot:append>
         <div class="d-flex flex-row align-center">
+          <v-tooltip text="媒体文件上传" location="bottom" open-delay="500">
+            <template v-slot:activator="{ props }">
+              <v-btn icon v-bind="props">
+                <v-icon :icon="mdiCloudUploadOutline" size="large"></v-icon>
+              </v-btn>
+            </template>
+          </v-tooltip>
+          <v-divider class="mx-2" inset vertical></v-divider>
           <v-tooltip :text="darkMode ? '白天模式' : '夜间模式'" location="bottom" open-delay="500">
             <template v-slot:activator="{ props }">
               <v-btn icon v-bind="props" @click="toggleDarkMode">
@@ -70,7 +79,6 @@ const navs = [
               </v-btn>
             </template>
           </v-tooltip>
-          <v-divider class="mx-2" inset vertical></v-divider>
           <v-tooltip location="bottom" open-delay="500" text="GitHub仓库">
             <template v-slot:activator="{ props }">
               <v-btn icon v-bind="props" @click="openGitHubLink">

@@ -44,7 +44,6 @@ export class File {
   mimetype?: string;
 
   /** 文件来源 */
-  @Exclude()
   @Column({
     type: 'enum',
     enum: FileSourceEnum,

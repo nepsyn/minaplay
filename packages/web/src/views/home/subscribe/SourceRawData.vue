@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { mdiRefresh } from '@mdi/js';
-import SingleItemProvider from '@/components/SingleItemProvider.vue';
+import SingleItemProvider from '@/components/provider/SingleItemProvider.vue';
 import { Codemirror } from 'vue-codemirror';
 import { computed, ref, Ref, watch } from 'vue';
 import { json } from '@codemirror/lang-json';

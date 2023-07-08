@@ -15,6 +15,7 @@ import {
   SourceQueryDto,
 } from '@/interfaces/subscribe.interface';
 import { ApiQueryResult } from '@/interfaces/common.interface';
+import { MediaDto, MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
 
 class ApiHelper {
   private token: string | null = null;
@@ -78,8 +79,9 @@ class ApiHelper {
   };
 
   File = {
-    uploadImage: this.apiUpload<FileEntity>('/file/image/upload/'),
-    uploadVideo: this.apiUpload<FileEntity>('/file/video/upload/'),
+    buildRawPath: (id: string) => `${this.baseUrl}/file/${id}/raw`,
+    uploadImage: this.apiUpload<FileEntity>('/file/image'),
+    uploadVideo: this.apiUpload<FileEntity>('/file/video'),
   };
 
   SubscribeSource = {
@@ -102,6 +104,14 @@ class ApiHelper {
     query: this.apiGet<ApiQueryResult<RuleEntity>, RuleQueryDto>('/rule'),
     update: (id: number) => this.apiPut<RuleEntity, RuleDto>(`/rule/${id}`),
     delete: (id: number) => this.apiDelete(`/rule/${id}`),
+  };
+
+  Media = {
+    create: this.apiPost<MediaEntity, MediaDto>(`/media`),
+    getById: (id: number) => this.apiGet<MediaEntity>(`/media/${id}`),
+    query: this.apiGet<ApiQueryResult<MediaEntity>, MediaQueryDto>(`/media`),
+    update: (id: number) => this.apiPut<MediaEntity, MediaDto>(`/media/${id}`),
+    delete: (id: number) => this.apiDelete(`/media/${id}`),
   };
 }
 

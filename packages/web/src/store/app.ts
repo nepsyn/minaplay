@@ -44,11 +44,13 @@ export const useApp = defineStore('user', () => {
       }, message.timeout);
     }
   };
-
   const toastSuccess = (content: string, timeout?: number) => toast(content, 'success', timeout);
   const toastWarning = (content: string, timeout?: number) => toast(content, 'warning', timeout);
   const toastError = (content: string, timeout?: number) => toast(content, 'error', timeout);
   const toastInfo = (content: string, timeout?: number) => toast(content, 'info', timeout);
+
+  const uploadDrawer = ref(false);
+  const uploadFiles: Ref<File[]> = ref([]);
 
   return {
     user,
@@ -60,5 +62,7 @@ export const useApp = defineStore('user', () => {
     toastWarning,
     toastError,
     toastInfo,
+    uploadDrawer,
+    uploadFiles,
   };
 });

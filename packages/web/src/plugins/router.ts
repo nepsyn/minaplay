@@ -33,7 +33,7 @@ const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'home',
     component: Home,
-    redirect: '/media',
+    redirect: '/resource',
     children: [
       {
         path: '/resource',

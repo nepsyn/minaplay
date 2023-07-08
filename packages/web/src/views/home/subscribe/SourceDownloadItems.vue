@@ -6,7 +6,7 @@ import { ApiQueryDto } from '@/interfaces/common.interface';
 import { DownloadItemEntity } from '@/interfaces/subscribe.interface';
 import { Api } from '@/api/api';
 import { mdiAlertCircle, mdiCheckCircle, mdiDownloadCircle, mdiRefresh } from '@mdi/js';
-import ItemsProvider from '@/components/ItemsProvider.vue';
+import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 
 const app = useApp();
 const route = useRoute();

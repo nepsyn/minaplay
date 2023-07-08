@@ -7,7 +7,7 @@ import { Api } from '@/api/api';
 import { useRoute, useRouter } from 'vue-router';
 import _ from 'lodash';
 import { SourceEntity } from '@/interfaces/subscribe.interface';
-import SingleItemProvider from '@/components/SingleItemProvider.vue';
+import SingleItemProvider from '@/components/provider/SingleItemProvider.vue';
 
 const app = useApp();
 const route = useRoute();

@@ -11,8 +11,8 @@ import { useApp } from '@/store/app';
 import { useSubscribeStore } from '@/store/subscribe';
 import { ApiQueryDto } from '@/interfaces/common.interface';
 import { RuleEntity } from '@/interfaces/subscribe.interface';
-import ItemsProvider from '@/components/ItemsProvider.vue';
-import LabelEditor from '@/components/LabelEditor.vue';
+import ItemsProvider from '@/components/provider/ItemsProvider.vue';
+import LabelEditor from '@/components/provider/LabelEditor.vue';
 import { Codemirror } from 'vue-codemirror';
 
 const app = useApp();

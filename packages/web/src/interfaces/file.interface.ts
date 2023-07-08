@@ -9,6 +9,8 @@ export interface FileEntity {
   md5: string;
   /** 文件 mimetype */
   mimetype?: string;
+  /** 文件来源 */
+  source: 'USER_UPLOAD' | 'ARIA2_DOWNLOAD' | 'AUTO_GENERATED';
   /** 创建时间 */
   createAt: Date;
   /** 修改时间 */

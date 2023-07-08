@@ -13,12 +13,15 @@ import {
 import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { vuetify } from '@/main';
+import { useApp } from '@/store/app';
+
+const app = useApp();
+const theme = useTheme();
 
 const drawerWidth = ref(108);
 const drawer = ref(vuetify.display.mdAndUp.value);
 
 const darkMode = ref(false);
-const theme = useTheme();
 const toggleDarkMode = () => {
   theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark';
   darkMode.value = !darkMode.value;
@@ -59,14 +62,14 @@ const navs = [
 
 <template>
   <v-layout class="overflow-hidden">
-    <v-app-bar border="b" color="background" flat>
+    <v-app-bar order="1" border="b" color="background" flat style="z-index: 1005">
       <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
       <v-toolbar-title>MinaPlay</v-toolbar-title>
       <template v-slot:append>
         <div class="d-flex flex-row align-center">
           <v-tooltip text="媒体文件上传" location="bottom" open-delay="500">
             <template v-slot:activator="{ props }">
-              <v-btn icon v-bind="props">
+              <v-btn icon v-bind="props" @click="app.uploadDrawer = !app.uploadDrawer">
                 <v-icon :icon="mdiCloudUploadOutline" size="large"></v-icon>
               </v-btn>
             </template>
@@ -90,7 +93,7 @@ const navs = [
       </template>
     </v-app-bar>
 
-    <v-navigation-drawer v-model="drawer" :width="drawerWidth" elevation="0">
+    <v-navigation-drawer order="1" v-model="drawer" :width="drawerWidth" elevation="0">
       <v-list class="py-0" density="compact">
         <template v-for="({ icon, name, route }, index) in navs" :key="index">
           <v-list-item

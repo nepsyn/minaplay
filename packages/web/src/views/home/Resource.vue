@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { mdiFileVideo, mdiMultimedia } from '@mdi/js';
-import ToTopContainer from '@/components/ToTopContainer.vue';
+import ToTopContainer from '@/components/provider/ToTopContainer.vue';
 import { ref } from 'vue';
 
 const tabs = ref([

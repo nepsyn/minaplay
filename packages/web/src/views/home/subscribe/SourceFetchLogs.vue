@@ -6,7 +6,7 @@ import { useApp } from '@/store/app';
 import { Api } from '@/api/api';
 import { useRoute } from 'vue-router';
 import { mdiAlertCircle, mdiCheckCircle, mdiRefresh } from '@mdi/js';
-import ItemsProvider from '@/components/ItemsProvider.vue';
+import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 
 const app = useApp();
 const route = useRoute();

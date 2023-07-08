@@ -18,8 +18,8 @@ import { useRoute, useRouter } from 'vue-router';
 import BlankFavicon from '@/assets/blank_favicon.png';
 import { ApiQueryDto } from '@/interfaces/common.interface';
 import { SourceEntity } from '@/interfaces/subscribe.interface';
-import ItemsProvider from '@/components/ItemsProvider.vue';
-import ToTopContainer from '@/components/ToTopContainer.vue';
+import ItemsProvider from '@/components/provider/ItemsProvider.vue';
+import ToTopContainer from '@/components/provider/ToTopContainer.vue';
 
 const subscribe = useSubscribeStore();
 const app = useApp();

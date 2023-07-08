@@ -5,6 +5,9 @@ import { filesize } from 'filesize';
 import { Api } from '@/api/api';
 import { MediaEntity } from '@/interfaces/media.interface';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const props = defineProps<{
   file: File;
@@ -70,7 +73,14 @@ onMounted(async () => {
     <v-container fluid class="px-4 py-2 d-flex flex-row align-center justify-space-between">
       <span class="upload-title text-truncate" :title="file.name">{{ file.name }}</span>
       <div class="flex-shrink-0">
-        <v-btn variant="text" v-if="finished && !error" size="x-small" :icon="mdiShare" color="primary"></v-btn>
+        <v-btn
+          variant="text"
+          v-if="finished && !error"
+          size="x-small"
+          :icon="mdiShare"
+          color="primary"
+          @click="router.push(`/media/${media!.id}`)"
+        ></v-btn>
         <v-btn
           variant="text"
           v-if="finished"

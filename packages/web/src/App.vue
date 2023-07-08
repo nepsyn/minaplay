@@ -26,6 +26,8 @@ onBeforeMount(async () => {
         localStorage.removeItem('minaplay_token');
         app.toastWarning('登录验证已过期，请重新登录');
         router.replace('/login');
+      } else {
+        return Promise.reject(error);
       }
     },
   );

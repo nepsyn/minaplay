@@ -3,6 +3,9 @@ import MediaPlate from '@/components/resource/MediaPlate.vue';
 import { mdiHistory, mdiRefresh } from '@mdi/js';
 import { ref, Ref } from 'vue';
 import { MediaQueryDto } from '@/interfaces/media.interface';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const latestUpdateQuery: Ref<MediaQueryDto> = ref({
   page: 0,
@@ -14,7 +17,13 @@ const latestUpdateQuery: Ref<MediaQueryDto> = ref({
 
 <template>
   <v-container fluid class="px-8">
-    <media-plate title="最近更新" :query="latestUpdateQuery" :icon="mdiHistory" icon-color="primary">
+    <media-plate
+      title="最近更新"
+      :query="latestUpdateQuery"
+      :icon="mdiHistory"
+      icon-color="primary"
+      @media-click="(media) => router.push(`/media/${media.id}`)"
+    >
       <template #actions="{ load, reset, status }">
         <v-btn
           variant="outlined"

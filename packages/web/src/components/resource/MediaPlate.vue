@@ -37,7 +37,7 @@ const load = async (done: any) => {
     props.query.page!++;
     done(medias.value.length === response.data.total ? 'empty' : 'ok');
   } catch {
-    app.toastError('获取解析日志失败');
+    app.toastError('获取媒体文件列表失败');
     done('error');
   }
 };
@@ -71,7 +71,7 @@ const providerRef: Ref<any> = ref(null);
       </template>
       <v-row>
         <v-col :cols="12 / Number(cols)" v-for="media in medias" :key="media.id">
-          <media-overview @click="emits('media-click', media)" :media="media"></media-overview>
+          <media-overview play-on-hover @click="emits('media-click', media)" :media="media"></media-overview>
         </v-col>
       </v-row>
     </items-provider>

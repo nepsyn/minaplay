@@ -38,7 +38,13 @@ defineExpose({
   <div ref="containerRef" class="pa-0" @scroll="onScroll">
     <slot></slot>
     <slot name="activator" :to-top="toTop">
-      <v-layout-item :model-value="showToTop" position="bottom" class="text-end pointer-events-none" size="80">
+      <v-layout-item
+        order="1"
+        :model-value="showToTop"
+        position="bottom"
+        class="text-end pointer-events-none"
+        size="80"
+      >
         <v-btn
           class="mr-8 pointer-events-initial"
           :size="size!"

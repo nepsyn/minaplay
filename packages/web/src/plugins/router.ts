@@ -12,8 +12,9 @@ import SourceRules from '@/views/home/subscribe/SourceRules.vue';
 import SourceRawData from '@/views/home/subscribe/SourceRawData.vue';
 import SourceFetchLogs from '@/views/home/subscribe/SourceFetchLogs.vue';
 import SourceDownloadItems from '@/views/home/subscribe/SourceDownloadItems.vue';
-import SeriesView from '@/views/home/media/SeriesView.vue';
-import MediasView from '@/views/home/media/MediasView.vue';
+import SeriesView from '@/views/home/resource/SeriesView.vue';
+import MediasView from '@/views/home/resource/MediasView.vue';
+import MediaPlay from '@/views/home/resource/media/MediaPlay.vue';
 
 const LoginGuard: NavigationGuard = (to, from, next) => {
   if (!Api.isLogin) {
@@ -37,16 +38,25 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '/resource',
-        component: Resource,
-        redirect: '/series',
         children: [
           {
-            path: '/series',
-            component: SeriesView,
+            path: '/resource',
+            component: Resource,
+            redirect: '/series',
+            children: [
+              {
+                path: '/series',
+                component: SeriesView,
+              },
+              {
+                path: '/media',
+                component: MediasView,
+              },
+            ],
           },
           {
-            path: '/media',
-            component: MediasView,
+            path: '/media/:id',
+            component: MediaPlay,
           },
         ],
       },

@@ -1,5 +1,4 @@
 import {
-  BaseWsExceptionFilter,
   ConnectedSocket,
   MessageBody,
   OnGatewayDisconnect,
@@ -30,12 +29,13 @@ import { User } from '../user/user.entity';
 import { LiveVoiceService } from './live-voice.service';
 import { types as MediasoupTypes } from 'mediasoup';
 import { LiveStreamService } from './live-stream.service';
-import { FileService } from '../file/file.service';
 import { VALID_VIDEO_MIME } from '../../constants';
+import { ApplicationGatewayExceptionFilter } from '../../utils/application.gateway.exception.filter';
+import { MediaService } from '../media/media.service';
 
 @WebSocketGateway()
 @UseGuards(AuthorizationWsGuard)
-@UseFilters(BaseWsExceptionFilter)
+@UseFilters(ApplicationGatewayExceptionFilter)
 @UseInterceptors(ApplicationGatewayInterceptor, ClassSerializerInterceptor, LiveStateWsInterceptor)
 export class LiveGateway implements OnGatewayDisconnect {
   constructor(
@@ -43,7 +43,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     private liveVoiceService: LiveVoiceService,
     private liveChatService: LiveChatService,
     private liveStreamService: LiveStreamService,
-    private fileService: FileService,
+    private mediaService: MediaService,
   ) {}
 
   @WebSocketServer()
@@ -234,7 +234,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     await this.dispose(socket.data.live.id);
   }
 
-  @SubscribeMessage('stream-file')
+  @SubscribeMessage('stream-media')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
   @CreatorOnly()
@@ -243,19 +243,19 @@ export class LiveGateway implements OnGatewayDisconnect {
     @WsLiveState() state: LiveState,
     @MessageBody('id') id: string,
   ) {
-    const file = await this.fileService.findOneBy({ id });
-    if (!(file && file.isExist)) {
+    const media = await this.mediaService.findOneBy({ id });
+    if (!(media && media.file?.isExist)) {
       throw buildException(WsException, ErrorCodeEnum.NOT_FOUND);
     }
-    if (!VALID_VIDEO_MIME.includes(file.mimetype)) {
+    if (!VALID_VIDEO_MIME.includes(media.file.mimetype)) {
       throw buildException(WsException, ErrorCodeEnum.INVALID_VIDEO_FILE_TYPE);
     }
 
-    const url = await this.liveStreamService.publishVideoFile(socket.data.live.id, file.path);
+    const url = await this.liveStreamService.publishVideoFile(socket.data.live.id, media.file.path);
     state.stream = {
       type: 'server-push',
       media: {
-        title: file.name,
+        title: media.name,
         url,
       },
       updateAt: new Date(),
@@ -266,7 +266,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     });
   }
 
-  @SubscribeMessage('stop-stream-file')
+  @SubscribeMessage('stop-stream-media')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
   @CreatorOnly()

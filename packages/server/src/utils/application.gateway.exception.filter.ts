@@ -11,15 +11,33 @@ export class ApplicationGatewayExceptionFilter extends BaseWsExceptionFilter {
     const socket: Socket = host.switchToWs().getClient();
     const syncId: number = host.switchToWs().getData().sync;
     if (exception instanceof WsException) {
-      socket.emit('exception', {
-        sync: syncId,
-        ...(exception.getError() as object),
-      });
+      const error = exception.getError();
+      if (typeof error === 'object' && 'code' in error) {
+        socket.emit('exception', {
+          sync: syncId,
+          ...error,
+        });
+      } else {
+        socket.emit('exception', {
+          sync: syncId,
+          code: ErrorCodeEnum.UNKNOWN_ERROR,
+          error: exception.message,
+        });
+      }
     } else if (exception instanceof HttpException) {
-      socket.emit('exception', {
-        sync: syncId,
-        ...(exception.getResponse() as object),
-      });
+      const error = exception.getResponse();
+      if (typeof error === 'object' && 'code' in error) {
+        socket.emit('exception', {
+          sync: syncId,
+          ...error,
+        });
+      } else {
+        socket.emit('exception', {
+          sync: syncId,
+          code: ErrorCodeEnum.UNKNOWN_ERROR,
+          error: exception.message,
+        });
+      }
     } else {
       socket.emit('exception', {
         sync: syncId,

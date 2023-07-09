@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Ref, ref } from 'vue';
+import { ref } from 'vue';
 import { mdiChevronUp } from '@mdi/js';
 
 const props = withDefaults(
@@ -19,7 +19,7 @@ const onScroll = (e: any) => {
   showToTop.value = e.target.scrollTop >= Number(props.threshold);
 };
 
-const containerRef: Ref<any> = ref(null);
+const containerRef = ref<any>(null);
 const toTop = () => {
   if (containerRef.value) {
     containerRef.value.scrollTo({

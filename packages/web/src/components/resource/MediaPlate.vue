@@ -29,7 +29,7 @@ const emits = defineEmits<{
   (event: 'media-click', arg: MediaEntity): void;
 }>();
 
-const medias: Ref<MediaEntity[]> = ref([]);
+const medias = ref<MediaEntity[]>([]);
 const load = async (done: any) => {
   try {
     const response = await Api.Media.query(props.query);

@@ -3,7 +3,7 @@ import { MediaEntity } from '@/interfaces/media.interface';
 import { Api } from '@/api/api';
 import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
 import TimeAgo from '@/components/provider/TimeAgo.vue';
-import { computed, Ref, ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const props = withDefaults(
   defineProps<{
@@ -28,7 +28,7 @@ const sourceText = computed(() => {
   }
 });
 
-const videoRef: Ref<HTMLVideoElement> = ref(null as any);
+const videoRef = ref<HTMLVideoElement>(null as any);
 const handleHover = async (isHovering: boolean) => {
   if (isHovering && videoRef.value) {
     await videoRef.value.play();

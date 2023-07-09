@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, Ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { mdiEmoticonDeadOutline } from '@mdi/js';
 
 const props = withDefaults(
@@ -21,7 +21,7 @@ const props = withDefaults(
   },
 );
 
-const status: Ref<'loading' | 'ok' | 'error' | 'empty'> = ref('ok');
+const status = ref<'loading' | 'ok' | 'error' | 'empty'>('ok');
 const setStatus = (value: 'loading' | 'ok' | 'error' | 'empty') => {
   status.value = value;
 };

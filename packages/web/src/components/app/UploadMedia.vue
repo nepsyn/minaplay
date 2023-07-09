@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, Ref, ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import { mdiClose, mdiShare, mdiStop } from '@mdi/js';
 import { filesize } from 'filesize';
 import { Api } from '@/api/api';
@@ -15,10 +15,10 @@ const props = defineProps<{
 
 const progress = ref(0);
 const finished = ref(false);
-const error: Ref<string | undefined> = ref(undefined);
+const error = ref<string | undefined>(undefined);
 const controller = new AbortController();
 
-const media: Ref<MediaEntity | undefined> = ref(undefined);
+const media = ref<MediaEntity | undefined>(undefined);
 
 const doCancel = () => {
   controller.abort();

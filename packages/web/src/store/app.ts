@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
-import { UserEntity } from '@/interfaces/user.interface';
+import { AuthData } from '@/interfaces/auth.interface';
 
 export interface AppMessage {
   id: number;
@@ -10,8 +10,8 @@ export interface AppMessage {
 }
 
 export const useApp = defineStore('user', () => {
-  const user: Ref<UserEntity | undefined> = ref(undefined);
-  const setUser = (_user: UserEntity) => {
+  const user: Ref<AuthData | undefined> = ref(undefined);
+  const setUser = (_user: AuthData) => {
     user.value = _user;
   };
 

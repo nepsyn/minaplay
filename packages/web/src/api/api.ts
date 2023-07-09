@@ -108,7 +108,7 @@ class ApiHelper {
 
   Media = {
     create: this.apiPost<MediaEntity, MediaDto>(`/media`),
-    getById: (id: number) => this.apiGet<MediaEntity>(`/media/${id}`),
+    getById: (id: string) => this.apiGet<MediaEntity>(`/media/${id}`),
     query: this.apiGet<ApiQueryResult<MediaEntity>, MediaQueryDto>(`/media`),
     update: (id: number) => this.apiPut<MediaEntity, MediaDto>(`/media/${id}`),
     delete: (id: number) => this.apiDelete(`/media/${id}`),

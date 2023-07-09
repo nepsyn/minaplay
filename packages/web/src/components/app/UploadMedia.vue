@@ -25,7 +25,7 @@ const doCancel = () => {
   finished.value = true;
 };
 
-const emits = defineEmits(['close']);
+const emits = defineEmits(['close', 'uploaded', 'error']);
 
 onMounted(async () => {
   if (props.file.size > 4294967296) {
@@ -50,6 +50,7 @@ onMounted(async () => {
     });
 
     media.value = mediaResponse.data;
+    emits('uploaded', media);
   } catch (e: any) {
     if (controller.signal.aborted) {
       error.value = '已取消上传';
@@ -62,6 +63,7 @@ onMounted(async () => {
     } else {
       error.value = '上传失败';
     }
+    emits('error');
   } finally {
     finished.value = true;
   }

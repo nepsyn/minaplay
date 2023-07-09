@@ -12,7 +12,7 @@ const app = useApp();
 const router = useRouter();
 
 onBeforeMount(async () => {
-  const authToken = localStorage.getItem('token');
+  const authToken = localStorage.getItem('minaplay-token');
   if (authToken) {
     Api.setToken(authToken);
   }
@@ -23,7 +23,7 @@ onBeforeMount(async () => {
     },
     (error) => {
       if (error.response?.data?.code === ErrorCodeEnum.INVALID_TOKEN) {
-        localStorage.removeItem('minaplay_token');
+        localStorage.removeItem('minaplay-token');
         app.toastWarning('登录验证已过期，请重新登录');
         router.replace('/login');
       } else {
@@ -35,9 +35,11 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <router-view />
   <v-layout>
     <upload-drawer></upload-drawer>
+    <router-view />
+  </v-layout>
+  <v-layout>
     <messages-container></messages-container>
   </v-layout>
 </template>

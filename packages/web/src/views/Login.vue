@@ -5,6 +5,7 @@ import { Api } from '@/api/api';
 import LogoLandscape from '@/assets/logo_banner_landscape.jpeg';
 import { useRoute, useRouter } from 'vue-router';
 import { mdiAccountCircleOutline, mdiEye, mdiEyeOff, mdiLockOutline } from '@mdi/js';
+import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 
 const app = useApp();
 const route = useRoute();
@@ -18,11 +19,9 @@ const toggleAction = function () {
 const username = ref('');
 const password = ref('');
 const passwordVisible = ref(false);
-const error: Ref<string | undefined> = ref(undefined);
 const loading = ref(false);
 
 const login = async () => {
-  error.value = undefined;
   loading.value = true;
   try {
     const response = await Api.Auth.login({
@@ -30,17 +29,16 @@ const login = async () => {
       password: password.value,
     });
 
-    const { token, ...user } = response.data;
-    app.setUser(user);
-    Api.setToken(token);
-    localStorage.setItem('minaplay_token', token);
+    app.setUser(response.data);
+    Api.setToken(response.data.token);
+    localStorage.setItem('minaplay-token', response.data.token);
 
     await router.replace((route.query.redirect_url as string) || '/');
-  } catch (e: any) {
-    if (e.response) {
-      error.value = '用户名或密码错误！';
+  } catch (error: any) {
+    if (error.response?.data?.code === ErrorCodeEnum.WRONG_USERNAME_OR_PASSWORD) {
+      app.toastError('用户名或密码错误！');
     } else {
-      error.value = '网络错误，请稍后重试！';
+      app.toastError('网络错误，请稍后重试！');
     }
   } finally {
     loading.value = false;
@@ -83,7 +81,6 @@ const register = async () => {};
           :type="passwordVisible ? 'text' : 'password'"
           @keypress.enter="action === 'login' ? login() : register()"
         ></v-text-field>
-        <v-alert v-if="error" class="mb-0" text tile type="error">{{ error }}</v-alert>
       </v-card-text>
       <div class="pa-3">
         <v-btn :loading="loading" block color="primary" @click="action === 'login' ? login() : register()">

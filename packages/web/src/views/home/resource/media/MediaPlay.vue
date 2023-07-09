@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { useApp } from '@/store/app';
 import { useRoute } from 'vue-router';
-import { computed, onMounted, ref, Ref, shallowRef } from 'vue';
+import { computed, nextTick, ref, Ref, shallowRef } from 'vue';
 import SingleItemProvider from '@/components/provider/SingleItemProvider.vue';
 import { MediaEntity } from '@/interfaces/media.interface';
 import { Api } from '@/api/api';
 import Plyr from 'plyr';
 import ToTopContainer from '@/components/provider/ToTopContainer.vue';
+import 'plyr/dist/plyr.css';
+import { mdiMotionPlayOutline } from '@mdi/js';
 
 const app = useApp();
 const route = useRoute();
@@ -19,6 +21,12 @@ const loadMedia = async (done: any) => {
     const response = await Api.Media.getById(mediaId.value)();
     media.value = response.data;
     done('ok');
+    await nextTick(() => {
+      player.value = new Plyr('#player', {
+        autoplay: true,
+        controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+      });
+    });
   } catch {
     app.toastError('获取媒体文件失败');
     done('error');
@@ -26,29 +34,29 @@ const loadMedia = async (done: any) => {
 };
 
 const player: Ref<Plyr> = shallowRef(null as any);
-onMounted(() => {
-  player.value = new Plyr('#video');
-});
 </script>
 
 <template>
   <v-container fluid class="pa-0 main-content d-flex flex-column">
     <to-top-container class="scrollable-container">
-      <v-container class="py-4 px-6">
+      <v-container fluid class="py-4 px-6">
         <v-row>
           <v-col cols="8">
             <single-item-provider :item="media" :load-fn="loadMedia">
-              <v-container fluid class="pa-0 d-flex flex-column flex-wrap">
-                <span :title="media.name" class="text-h5 text-truncate">{{ media.name }}</span>
-                <span class="mt-1 text-caption">{{ new Date(media.createAt).toLocaleString() }}</span>
-              </v-container>
-              <v-responsive class="mt-4" :aspect-ratio="16 / 9" max-height="520">
-                <video id="video" autoplay controls preload="auto" class="w-100">
+              <v-responsive :aspect-ratio="16 / 9" max-height="520">
+                <video id="player" autoplay controls preload="auto" class="w-100">
                   <source :src="Api.File.buildRawPath(media.file!.id)" />
                 </video>
               </v-responsive>
-              <v-container fluid class="pa-0 mt-4 d-flex flex-column flex-wrap">
-                <span class="text-body-1">{{ media.description ?? '暂无无媒体描述' }}</span>
+              <v-container fluid class="pa-0 mt-4 d-flex flex-column">
+                <span :title="media.name" class="text-h5 text-wrap">{{ media.name }}</span>
+                <v-container fluid class="pa-0 d-flex flex-row align-center">
+                  <span class="mt-1 text-caption">上传于 {{ new Date(media.createAt).toLocaleString() }}</span>
+                  <v-spacer></v-spacer>
+                  <v-btn :prepend-icon="mdiMotionPlayOutline" variant="text" color="secondary">一起看</v-btn>
+                </v-container>
+                <v-divider class="my-2"></v-divider>
+                <pre class="text-subtitle-2 font-weight-light">{{ media.description ?? '暂无无媒体描述' }}</pre>
               </v-container>
             </single-item-provider>
           </v-col>

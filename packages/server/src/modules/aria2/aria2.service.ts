@@ -16,7 +16,8 @@ import { generateMD5 } from '../../utils/generate-md5.util';
 import path from 'path';
 import { FileSourceEnum } from '../../enums/file-source.enum';
 import { File } from '../file/file.entity';
-import FileType from 'file-type';
+import type FileType from 'file-type';
+import { importDynamic } from '../../utils/import-dynamic.util';
 
 @Injectable()
 export class Aria2Service implements OnModuleInit {
@@ -57,6 +58,8 @@ export class Aria2Service implements OnModuleInit {
   }
 
   private async websocketNotificationHandler(event: MessageEvent) {
+    const fileTypeFromFile: typeof FileType.fileTypeFromFile = (await importDynamic('file-type')).fileTypeFromFile;
+
     const message: Aria2WsMessage = JSON.parse(event.data.toString());
     if (['aria2.onDownloadComplete', 'aria2.onDownloadError'].includes(message.method)) {
       const gid = message.params[0].gid;
@@ -76,7 +79,7 @@ export class Aria2Service implements OnModuleInit {
 
           for (const file of status.files) {
             const fileStat = await stat(file.path);
-            const fileType = await FileType.fromFile(file.path);
+            const fileType = await fileTypeFromFile(file.path);
             const filename = path.basename(file.path);
             const record = await this.fileService.save({
               size: fileStat.size,

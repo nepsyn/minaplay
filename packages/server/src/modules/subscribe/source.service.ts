@@ -2,11 +2,12 @@ import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Source } from './source.entity';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { extract } from '@extractus/feed-extractor';
+import type FeedExtractor from '@extractus/feed-extractor';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
+import { importDynamic } from '../../utils/import-dynamic.util';
 
 @Injectable()
 export class SourceService implements OnModuleInit {
@@ -45,6 +46,7 @@ export class SourceService implements OnModuleInit {
   }
 
   async readSource(url: string) {
+    const extract: typeof FeedExtractor.extract = (await importDynamic('@extractus/feed-extractor')).extract;
     return await extract(url, {
       getExtraEntryFields: ({ enclosure }: any) => {
         if (enclosure) {

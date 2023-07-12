@@ -97,6 +97,7 @@ import { MediaModule } from './modules/media/media.module';
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
         ffmpegPath: configService.get('FFMPEG_PATH', 'ffmpeg'),
+        ffprobePath: configService.get('FFPROBE_PATH', 'ffprobe'),
       }),
     }),
     FileModule,

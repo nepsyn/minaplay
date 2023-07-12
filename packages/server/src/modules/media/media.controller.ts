@@ -24,13 +24,14 @@ import { Between } from 'typeorm';
 import { Media } from './media.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { MediaDto } from './media.dto';
+import { MediaFfmpegService } from './media-ffmpeg.service';
 
 @Controller('media')
 @UseGuards(AuthorizationGuard)
 @ApiTags('media')
 @ApiBearerAuth()
 export class MediaController {
-  constructor(private mediaService: MediaService) {}
+  constructor(private mediaService: MediaService, private mediaFfmpegService: MediaFfmpegService) {}
 
   @Get(':id')
   @ApiOperation({
@@ -85,8 +86,8 @@ export class MediaController {
       poster: { id: data.posterFileId },
     });
     const media = await this.mediaService.findOneBy({ id });
-    if (!media.poster) {
-      await this.mediaService.generatePosterFile(media);
+    if (!media.poster && media.file && media.file.isExist) {
+      await this.mediaFfmpegService.generateMediaPosterFile(media);
     }
 
     return media;

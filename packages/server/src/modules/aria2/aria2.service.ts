@@ -18,6 +18,7 @@ import { FileSourceEnum } from '../../enums/file-source.enum';
 import { File } from '../file/file.entity';
 import type FileType from 'file-type';
 import { importDynamic } from '../../utils/import-dynamic.util';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class Aria2Service implements OnModuleInit {
@@ -109,7 +110,7 @@ export class Aria2Service implements OnModuleInit {
     const tracker = await this.cacheStore.get<string>(Aria2Service.TRACKER_CACHE_KEY);
     const gid = await this.client.addUri([url], {
       'bt-tracker': tracker ?? '',
-      dir: ARIA2_DOWNLOAD_DIR,
+      dir: path.join(ARIA2_DOWNLOAD_DIR, randomUUID().replace(/-/g, '')),
     });
     const task = new Aria2DownloadTask(gid);
     this.tasks.set(gid, task);

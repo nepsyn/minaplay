@@ -7,13 +7,13 @@ import { FileModule } from '../file/file.module';
 import { MediaConfigurableModule } from './media.module-definition';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import { UserModule } from '../user/user.module';
-import { MediaFfmpegService } from './media-ffmpeg.service';
+import { MediaFileService } from './media-file.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Media]), FileModule, AuthorizationModule, UserModule],
-  providers: [MediaService, MediaFfmpegService],
+  providers: [MediaService, MediaFileService],
   controllers: [MediaController],
-  exports: [MediaService, MediaFfmpegService],
+  exports: [MediaService, MediaFileService],
 })
 export class MediaModule extends MediaConfigurableModule {
   declare static register: typeof MediaConfigurableModule.register;

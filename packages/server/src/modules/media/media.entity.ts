@@ -52,6 +52,14 @@ export class Media {
   })
   poster?: File;
 
+  /**元数据文件 */
+  @ManyToOne(() => File, {
+    onDelete: 'SET NULL',
+    nullable: true,
+    eager: true,
+  })
+  metadata?: File;
+
   /**对应文件 */
   @ManyToOne(() => File, {
     onDelete: 'SET NULL',

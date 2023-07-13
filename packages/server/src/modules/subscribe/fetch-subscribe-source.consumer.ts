@@ -12,7 +12,7 @@ import { NodeVM } from 'vm2';
 import { VALID_VIDEO_MIME } from '../../constants';
 import { EpisodeService } from '../series/episode.service';
 import { MediaService } from '../media/media.service';
-import { MediaFfmpegService } from '../media/media-ffmpeg.service';
+import { MediaFileService } from '../media/media-file.service';
 
 @Injectable()
 @Processor('fetch-subscribe-source')
@@ -25,7 +25,7 @@ export class FetchSubscribeSourceConsumer {
     private aria2Service: Aria2Service,
     private episodeService: EpisodeService,
     private mediaService: MediaService,
-    private mediaFfmpegService: MediaFfmpegService,
+    private mediaFileService: MediaFileService,
   ) {}
 
   @Process()
@@ -85,7 +85,8 @@ export class FetchSubscribeSourceConsumer {
                       file: { id: file.id },
                     });
                     const media = await this.mediaService.findOneBy({ id });
-                    await this.mediaFfmpegService.generateMediaPosterFile(media);
+                    await this.mediaFileService.generateMediaPosterFile(media);
+                    await this.mediaFileService.generateMediaMetadataFile(media);
 
                     if (rule.series) {
                       await this.episodeService.save({

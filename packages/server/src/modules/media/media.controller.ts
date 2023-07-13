@@ -24,14 +24,14 @@ import { Between } from 'typeorm';
 import { Media } from './media.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { MediaDto } from './media.dto';
-import { MediaFfmpegService } from './media-ffmpeg.service';
+import { MediaFileService } from './media-file.service';
 
 @Controller('media')
 @UseGuards(AuthorizationGuard)
 @ApiTags('media')
 @ApiBearerAuth()
 export class MediaController {
-  constructor(private mediaService: MediaService, private mediaFfmpegService: MediaFfmpegService) {}
+  constructor(private mediaService: MediaService, private mediaFileService: MediaFileService) {}
 
   @Get(':id')
   @ApiOperation({
@@ -87,7 +87,10 @@ export class MediaController {
     });
     const media = await this.mediaService.findOneBy({ id });
     if (!media.poster && media.file && media.file.isExist) {
-      await this.mediaFfmpegService.generateMediaPosterFile(media);
+      await this.mediaFileService.generateMediaPosterFile(media);
+    }
+    if (!media.metadata && media.file && media.file.isExist) {
+      await this.mediaFileService.generateMediaMetadataFile(media);
     }
 
     return media;

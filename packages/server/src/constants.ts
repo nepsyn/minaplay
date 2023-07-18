@@ -4,9 +4,7 @@ export const USER_UPLOAD_IMAGE_DIR = path.join(process.cwd(), 'resources/upload/
 export const USER_UPLOAD_VIDEO_DIR = path.join(process.cwd(), 'resources/upload/video');
 export const ARIA2_DOWNLOAD_DIR = path.join(process.cwd(), 'resources/download');
 export const SUBSCRIBE_RULE_SOURCE_DIR = path.join(process.cwd(), 'resources/rule');
-export const GENERATED_IMAGE_DIR = path.join(process.cwd(), 'resources/generated/image');
-export const GENERATED_METADATA_DIR = path.join(process.cwd(), 'resources/generated/metadata');
-export const GENERATED_SUBTITLE_DIR = path.join(process.cwd(), 'resources/generated/subtitle');
+export const GENERATED_DIR = path.join(process.cwd(), 'resources/generated');
 
 export const VALID_IMAGE_MIME = ['image/png', 'image/jpeg', 'image/gif'];
 export const VALID_VIDEO_MIME = [

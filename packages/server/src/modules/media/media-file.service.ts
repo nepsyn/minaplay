@@ -4,7 +4,7 @@ import { MEDIA_MODULE_OPTIONS_TOKEN } from './media.module-definition';
 import { MediaService } from './media.service';
 import { Media } from './media.entity';
 import fs from 'fs-extra';
-import { GENERATED_IMAGE_DIR, GENERATED_METADATA_DIR, GENERATED_SUBTITLE_DIR } from '../../constants';
+import { GENERATED_DIR } from '../../constants';
 import path from 'node:path';
 import { generateMD5 } from '../../utils/generate-md5.util';
 import { FileSourceEnum } from '../../enums/file-source.enum';
@@ -28,9 +28,9 @@ export class MediaFileService {
     const execa: typeof Execa.execa = (await importDynamic('execa')).execa;
 
     // 计算缩略图路径
-    const posterFileName = `${media.file.name}.png`;
-    const posterFilePath = path.join(GENERATED_IMAGE_DIR, media.id, posterFileName);
-    await fs.ensureDir(path.join(GENERATED_IMAGE_DIR, media.id));
+    const posterFileName = 'poster.png';
+    const posterFilePath = path.join(GENERATED_DIR, media.id, posterFileName);
+    await fs.ensureDir(path.join(GENERATED_DIR, media.id));
 
     try {
       await execa(
@@ -65,9 +65,9 @@ export class MediaFileService {
     const execa: typeof Execa.execa = (await importDynamic('execa')).execa;
 
     // 计算缩略图路径
-    const metadataFileName = `${media.file.name}.json`;
-    const metadataFilePath = path.join(GENERATED_METADATA_DIR, media.id, metadataFileName);
-    await fs.ensureDir(path.join(GENERATED_METADATA_DIR, media.id));
+    const metadataFileName = 'metadata.json';
+    const metadataFilePath = path.join(GENERATED_DIR, media.id, metadataFileName);
+    await fs.ensureDir(path.join(GENERATED_DIR, media.id));
 
     try {
       const cp = await execa(
@@ -106,9 +106,9 @@ export class MediaFileService {
 
     try {
       for (const [index, subtitle] of subtitles.entries()) {
-        const subtitleFileName = `${media.file.name}.${subtitle.tags.title ?? index}.ass`;
-        const subtitleFilePath = path.join(GENERATED_SUBTITLE_DIR, media.id, subtitleFileName);
-        await fs.ensureDir(path.join(GENERATED_SUBTITLE_DIR, media.id));
+        const subtitleFileName = `${subtitle.tags.title ?? index}.ass`;
+        const subtitleFilePath = path.join(GENERATED_DIR, media.id, subtitleFileName);
+        await fs.ensureDir(path.join(GENERATED_DIR, media.id));
 
         await execa(this.options.ffmpegPath, [`-i`, media.file.path, '-map', `0:s:${index}`, subtitleFilePath], {
           shell: true,

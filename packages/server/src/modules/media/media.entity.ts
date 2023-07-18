@@ -3,6 +3,8 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -67,6 +69,14 @@ export class Media {
     eager: true,
   })
   file?: File;
+
+  /** 字幕文件 */
+  @ManyToMany(() => File, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  @JoinTable()
+  subtitles: File[];
 
   /** 创建时间 */
   @CreateDateColumn()

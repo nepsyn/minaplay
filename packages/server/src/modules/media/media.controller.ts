@@ -25,6 +25,8 @@ import { Media } from './media.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { MediaDto } from './media.dto';
 import { MediaFileService } from './media-file.service';
+import { MediaMetadata } from '../../interfaces/media.metadata';
+import fs from 'fs-extra';
 
 @Controller('media')
 @UseGuards(AuthorizationGuard)
@@ -84,13 +86,37 @@ export class MediaController {
       ...data,
       file: { id: data.fileId },
       poster: { id: data.posterFileId },
+      subtitles: data.subtitleFilesId && data.subtitleFilesId.map((id) => ({ id })),
     });
     const media = await this.mediaService.findOneBy({ id });
-    if (!media.poster && media.file && media.file.isExist) {
-      await this.mediaFileService.generateMediaPosterFile(media);
-    }
-    if (!media.metadata && media.file && media.file.isExist) {
-      await this.mediaFileService.generateMediaMetadataFile(media);
+
+    if (media.file?.isExist) {
+      if (!media.poster) {
+        const poster = await this.mediaFileService.generateMediaPosterFile(media);
+        if (poster) {
+          await this.mediaService.save({
+            id: media.id,
+            poster: { id: poster.id },
+          });
+        }
+      }
+
+      if (!media.metadata) {
+        const metadataFile = await this.mediaFileService.generateMediaMetadataFile(media);
+        if (metadataFile) {
+          await this.mediaService.save({
+            id: media.id,
+            metadata: { id: metadataFile.id },
+          });
+
+          const metadata: MediaMetadata = await fs.readJson(metadataFile.path);
+          const subtitleFiles = await this.mediaFileService.generateMediaSubtitleFiles(media, metadata);
+          await this.mediaService.save({
+            id: media.id,
+            subtitles: subtitleFiles.filter(({ id }) => ({ id })),
+          });
+        }
+      }
     }
 
     return media;

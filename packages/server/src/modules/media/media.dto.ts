@@ -43,4 +43,12 @@ export class MediaDto {
   @IsOptional()
   @IsUUID()
   posterFileId?: string;
+
+  @ApiProperty({
+    description: '字幕文件id',
+    required: false,
+  })
+  @IsOptional()
+  @IsUUID('all', { each: true })
+  subtitleFilesId?: string[];
 }

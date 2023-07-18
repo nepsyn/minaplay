@@ -17,6 +17,7 @@ export class Schema1685281459266 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE \`file\` (\`id\` varchar(36) NOT NULL, \`filename\` varchar(255) NOT NULL, \`name\` varchar(255) NOT NULL, \`size\` int NOT NULL, \`md5\` varchar(255) NOT NULL, \`mimetype\` varchar(255) NULL, \`source\` enum ('USER_UPLOAD', 'ARIA2_DOWNLOAD', 'AUTO_GENERATED') NOT NULL, \`path\` varchar(255) NOT NULL, \`expireAt\` datetime NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleteAt\` datetime(6) NULL, \`userId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`live\` (\`id\` varchar(36) NOT NULL, \`title\` varchar(255) NULL, \`password\` varchar(255) NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`deleteAt\` datetime(6) NULL, \`posterId\` varchar(36) NULL, \`userId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`live_chat\` (\`id\` varchar(36) NOT NULL, \`type\` varchar(255) NOT NULL, \`content\` varchar(255) NOT NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`deleteAt\` datetime(6) NULL, \`liveId\` varchar(36) NULL, \`userId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`media_subtitles_file\` (\`mediaId\` varchar(36) NOT NULL, \`fileId\` varchar(36) NOT NULL, INDEX \`IDX_5e776063b8bc8f7c28565584b4\` (\`mediaId\`), INDEX \`IDX_13c2803c8f840d369c9f428200\` (\`fileId\`), PRIMARY KEY (\`mediaId\`, \`fileId\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`series_tags_series_tag\` (\`seriesId\` int NOT NULL, \`seriesTagId\` int NOT NULL, INDEX \`IDX_ca993323929471bd8b623edb9b\` (\`seriesId\`), INDEX \`IDX_73a4d6ff29acddce2059d6aa78\` (\`seriesTagId\`), PRIMARY KEY (\`seriesId\`, \`seriesTagId\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`user_permissions_permission\` (\`userId\` int NOT NULL, \`permissionName\` varchar(255) NOT NULL, INDEX \`IDX_5b72d197d92b8bafbe7906782e\` (\`userId\`), INDEX \`IDX_7691aabb0be21b97826f754a31\` (\`permissionName\`), PRIMARY KEY (\`userId\`, \`permissionName\`)) ENGINE=InnoDB`);
         await queryRunner.query(`ALTER TABLE \`media\` ADD CONSTRAINT \`FK_4841bb1d4497db26e56a9edabd9\` FOREIGN KEY (\`downloadId\`) REFERENCES \`download_item\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
@@ -41,6 +42,8 @@ export class Schema1685281459266 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`live\` ADD CONSTRAINT \`FK_edcfbd2bec0ad90cef885009c53\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`live_chat\` ADD CONSTRAINT \`FK_f7daa054784e42febe527143124\` FOREIGN KEY (\`liveId\`) REFERENCES \`live\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`live_chat\` ADD CONSTRAINT \`FK_ffa00cf1b8f5b6bbc372f205ee5\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`media_subtitles_file\` ADD CONSTRAINT \`FK_5e776063b8bc8f7c28565584b40\` FOREIGN KEY (\`mediaId\`) REFERENCES \`media\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
+        await queryRunner.query(`ALTER TABLE \`media_subtitles_file\` ADD CONSTRAINT \`FK_13c2803c8f840d369c9f428200e\` FOREIGN KEY (\`fileId\`) REFERENCES \`file\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE \`series_tags_series_tag\` ADD CONSTRAINT \`FK_ca993323929471bd8b623edb9b1\` FOREIGN KEY (\`seriesId\`) REFERENCES \`series\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
         await queryRunner.query(`ALTER TABLE \`series_tags_series_tag\` ADD CONSTRAINT \`FK_73a4d6ff29acddce2059d6aa782\` FOREIGN KEY (\`seriesTagId\`) REFERENCES \`series_tag\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`user_permissions_permission\` ADD CONSTRAINT \`FK_5b72d197d92b8bafbe7906782ec\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`id\`) ON DELETE CASCADE ON UPDATE CASCADE`);
@@ -52,6 +55,8 @@ export class Schema1685281459266 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`user_permissions_permission\` DROP FOREIGN KEY \`FK_5b72d197d92b8bafbe7906782ec\``);
         await queryRunner.query(`ALTER TABLE \`series_tags_series_tag\` DROP FOREIGN KEY \`FK_73a4d6ff29acddce2059d6aa782\``);
         await queryRunner.query(`ALTER TABLE \`series_tags_series_tag\` DROP FOREIGN KEY \`FK_ca993323929471bd8b623edb9b1\``);
+        await queryRunner.query(`ALTER TABLE \`media_subtitles_file\` DROP FOREIGN KEY \`FK_13c2803c8f840d369c9f428200e\``);
+        await queryRunner.query(`ALTER TABLE \`media_subtitles_file\` DROP FOREIGN KEY \`FK_5e776063b8bc8f7c28565584b40\``);
         await queryRunner.query(`ALTER TABLE \`live_chat\` DROP FOREIGN KEY \`FK_ffa00cf1b8f5b6bbc372f205ee5\``);
         await queryRunner.query(`ALTER TABLE \`live_chat\` DROP FOREIGN KEY \`FK_f7daa054784e42febe527143124\``);
         await queryRunner.query(`ALTER TABLE \`live\` DROP FOREIGN KEY \`FK_edcfbd2bec0ad90cef885009c53\``);
@@ -80,6 +85,9 @@ export class Schema1685281459266 implements MigrationInterface {
         await queryRunner.query(`DROP INDEX \`IDX_73a4d6ff29acddce2059d6aa78\` ON \`series_tags_series_tag\``);
         await queryRunner.query(`DROP INDEX \`IDX_ca993323929471bd8b623edb9b\` ON \`series_tags_series_tag\``);
         await queryRunner.query(`DROP TABLE \`series_tags_series_tag\``);
+        await queryRunner.query(`DROP INDEX \`IDX_13c2803c8f840d369c9f428200\` ON \`media_subtitles_file\``);
+        await queryRunner.query(`DROP INDEX \`IDX_5e776063b8bc8f7c28565584b4\` ON \`media_subtitles_file\``);
+        await queryRunner.query(`DROP TABLE \`media_subtitles_file\``);
         await queryRunner.query(`DROP TABLE \`live_chat\``);
         await queryRunner.query(`DROP TABLE \`live\``);
         await queryRunner.query(`DROP TABLE \`file\``);

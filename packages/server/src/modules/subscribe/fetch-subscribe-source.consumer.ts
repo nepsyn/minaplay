@@ -85,8 +85,7 @@ export class FetchSubscribeSourceConsumer {
                       file: { id: file.id },
                     });
                     const media = await this.mediaService.findOneBy({ id });
-                    await this.mediaFileService.generateMediaPosterFile(media);
-                    await this.mediaFileService.generateMediaMetadataFile(media);
+                    await this.mediaFileService.generateMediaFiles(media);
 
                     if (rule.series) {
                       await this.episodeService.save({

@@ -66,7 +66,6 @@ export class User {
   sources: Source[];
 
   /** 头像文件 */
-  @Exclude()
   @ManyToOne(() => File, {
     eager: true,
     nullable: true,
@@ -90,12 +89,6 @@ export class User {
   @Expose()
   get permissionNames() {
     return this.permissions?.map((permission) => permission.name) ?? [];
-  }
-
-  /** 头像文件 id */
-  @Expose()
-  get avatarFileId() {
-    return this.avatar?.id;
   }
 
   @BeforeInsert()

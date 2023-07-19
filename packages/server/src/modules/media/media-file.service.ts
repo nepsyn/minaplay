@@ -69,7 +69,7 @@ export class MediaFileService {
 
     const cp = await execa(
       this.options.ffprobePath,
-      ['-v quiet', '-i', media.file.path, '-print_format json', '-show_format', '-show_streams'],
+      ['-v quiet', '-i', media.file.path, '-print_format json', '-show_streams'],
       {
         shell: true,
         timeout: 5000,

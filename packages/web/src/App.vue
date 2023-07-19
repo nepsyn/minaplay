@@ -12,11 +12,6 @@ const app = useApp();
 const router = useRouter();
 
 onBeforeMount(async () => {
-  const authToken = localStorage.getItem('minaplay-token');
-  if (authToken) {
-    Api.setToken(authToken);
-  }
-
   axios.interceptors.response.use(
     (response) => {
       return response;
@@ -31,6 +26,18 @@ onBeforeMount(async () => {
       }
     },
   );
+
+  const authToken = localStorage.getItem('minaplay-token');
+  if (authToken) {
+    try {
+      Api.setToken(authToken);
+      const response = await Api.Auth.refreshToken();
+      const { token, ...user } = response.data;
+      app.setUser(user);
+      Api.setToken(token);
+      localStorage.setItem('minaplay-token', token);
+    } catch {}
+  }
 });
 </script>
 

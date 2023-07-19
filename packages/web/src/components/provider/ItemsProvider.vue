@@ -43,7 +43,7 @@ onMounted(async () => {
 
 <template>
   <v-container fluid>
-    <slot :items="items"></slot>
+    <slot :items="items" :status="status" :load="load"></slot>
     <slot name="loadMore" v-if="status === 'ok' && !hideLoadMore" :load="load">
       <v-container class="d-flex flex-column justify-center align-center">
         <v-btn variant="plain" color="primary" class="text-caption" @click="load">加载更多</v-btn>

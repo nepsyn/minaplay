@@ -61,7 +61,7 @@ onMounted(async () => {
         <a class="text-decoration-none text-primary clickable" @click="load">立即加载</a>
       </v-container>
     </slot>
-    <slot v-else :item="item"></slot>
+    <slot v-else :item="item" :load="load"></slot>
   </v-container>
 </template>
 

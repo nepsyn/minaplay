@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import {
+  mdiAccountCircle,
   mdiCloudUploadOutline,
   mdiCog,
   mdiGithub,
@@ -14,9 +15,13 @@ import { ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { vuetify } from '@/main';
 import { useApp } from '@/store/app';
+import { Api } from '@/api/api';
+import { useRoute, useRouter } from 'vue-router';
 
 const app = useApp();
 const theme = useTheme();
+const router = useRouter();
+const route = useRoute();
 
 const drawerWidth = ref(108);
 const drawer = ref(vuetify.display.mdAndUp.value);
@@ -29,6 +34,19 @@ const toggleDarkMode = () => {
 
 const openGitHubLink = () => {
   window.open('https://github.com/nepsyn/minaplay');
+};
+
+const logout = () => {
+  app.setUser(undefined);
+  Api.setToken(null);
+  localStorage.removeItem('minaplay-token');
+  app.toastSuccess('已注销登录');
+  router.replace({
+    path: '/login',
+    query: {
+      redirect_url: route.fullPath,
+    },
+  });
 };
 
 const navs = [
@@ -88,6 +106,21 @@ const navs = [
             </v-btn>
           </template>
         </v-tooltip>
+        <v-divider class="mx-2" inset vertical></v-divider>
+        <v-menu>
+          <template #activator="{ props }">
+            <v-avatar v-bind="props" style="cursor: pointer" size="40">
+              <v-img>
+                <template #placeholder>
+                  <v-icon size="40" :icon="mdiAccountCircle"></v-icon>
+                </template>
+              </v-img>
+            </v-avatar>
+          </template>
+          <v-card min-width="240">
+            <v-btn variant="plain" block color="error" @click="logout">注销登录</v-btn>
+          </v-card>
+        </v-menu>
       </div>
     </template>
   </v-app-bar>

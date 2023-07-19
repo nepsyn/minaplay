@@ -95,7 +95,7 @@ onMounted(async () => {
           <template #activator="{ props }">
             <v-btn variant="text" color="error" size="x-small" v-bind="props" :icon="mdiStop"></v-btn>
           </template>
-          <v-card flat rounded="0">
+          <v-card>
             <v-card-text>
               <h4 class="pb-2">确定取消</h4>
               <span>确定要取消上传文件吗？</span>

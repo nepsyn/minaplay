@@ -28,10 +28,10 @@ const login = async () => {
       username: username.value,
       password: password.value,
     });
-
-    app.setUser(response.data);
-    Api.setToken(response.data.token);
-    localStorage.setItem('minaplay-token', response.data.token);
+    const { token, ...user } = response.data;
+    app.setUser(user);
+    Api.setToken(token);
+    localStorage.setItem('minaplay-token', token);
 
     await router.replace((route.query.redirect_url as string) || '/');
   } catch (error: any) {

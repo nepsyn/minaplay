@@ -2,6 +2,7 @@
 import { computed, reactive, Ref, ref } from 'vue';
 import {
   mdiDownloadCircleOutline,
+  mdiEmoticonSadOutline,
   mdiFileTreeOutline,
   mdiInformationOutline,
   mdiPlus,
@@ -142,36 +143,55 @@ const providerRef: Ref<any> = ref(null);
             hide-empty
             class="pa-0 scrollable-container d-flex flex-column align-center"
           >
-            <v-list class="py-0 w-100">
-              <template v-for="source in subscribe.sources" :key="source.id">
-                <v-list-item
-                  lines="two"
-                  :to="`/subscribe/${source.id}`"
-                  @click.prevent="router.push(`/subscribe/${source.id}/${tabValue}`)"
-                  active-class="source-active"
-                >
-                  <div class="ban"></div>
-                  <template #prepend>
-                    <v-icon size="x-large">
-                      <v-img :src="getFaviconUrl(source.url)" aspect-ratio="1">
-                        <template #placeholder>
-                          <v-img :src="BlankFavicon" aspect-ratio="1"></v-img>
-                        </template>
-                      </v-img>
-                    </v-icon>
-                  </template>
-                  <v-list-item-title class="py-1 text-wrap font-weight-bold">{{ source.title }}</v-list-item-title>
-                  <v-list-item-subtitle class="py-1">{{ source.url }}</v-list-item-subtitle>
-                  <template #append>
-                    <v-icon
-                      :color="source.enabled ? 'success' : 'warning'"
-                      :icon="source.enabled ? mdiProgressCheck : mdiProgressClose"
-                    ></v-icon>
-                  </template>
-                </v-list-item>
-                <v-divider class="py-0"></v-divider>
-              </template>
-            </v-list>
+            <template #default="{ status }">
+              <v-list class="py-0 w-100">
+                <template v-for="source in subscribe.sources" :key="source.id">
+                  <v-list-item
+                    lines="two"
+                    :to="`/subscribe/${source.id}`"
+                    @click.prevent="router.push(`/subscribe/${source.id}/${tabValue}`)"
+                    active-class="source-active"
+                  >
+                    <div class="ban"></div>
+                    <template #prepend>
+                      <v-icon size="x-large">
+                        <v-img :src="getFaviconUrl(source.url)" aspect-ratio="1">
+                          <template #placeholder>
+                            <v-img :src="BlankFavicon" aspect-ratio="1"></v-img>
+                          </template>
+                        </v-img>
+                      </v-icon>
+                    </template>
+                    <v-list-item-title class="py-1 text-wrap font-weight-bold">{{ source.title }}</v-list-item-title>
+                    <v-list-item-subtitle class="py-1">{{ source.url }}</v-list-item-subtitle>
+                    <template #append>
+                      <v-icon
+                        :color="source.enabled ? 'success' : 'warning'"
+                        :icon="source.enabled ? mdiProgressCheck : mdiProgressClose"
+                      ></v-icon>
+                    </template>
+                  </v-list-item>
+                  <v-divider class="py-0"></v-divider>
+                </template>
+              </v-list>
+              <v-container
+                v-if="status !== 'loading' && subscribe.sources.length === 0"
+                class="d-flex flex-column align-center justify-center fill-height"
+              >
+                <v-icon size="40" :icon="mdiEmoticonSadOutline"></v-icon>
+                <div class="mt-2">
+                  <span class="text-caption">还没有创建任何订阅，试试</span>
+                  <a
+                    class="text-decoration-none text-caption text-primary ml-2"
+                    style="cursor: pointer"
+                    @click="createSource"
+                  >
+                    <v-icon size="x-small" :icon="mdiPlus"></v-icon>
+                    创建新订阅
+                  </a>
+                </div>
+              </v-container>
+            </template>
           </items-provider>
         </v-container>
       </v-col>

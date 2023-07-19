@@ -76,6 +76,7 @@ class ApiHelper {
   Auth = {
     login: this.apiPost<AuthData, LoginDto>('/auth/login/'),
     logout: this.apiPost('/auth/logout/'),
+    refreshToken: this.apiPost<AuthData>('/auth/refresh'),
   };
 
   File = {

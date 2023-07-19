@@ -1,3 +1,6 @@
+import { PermissionEnum } from '@/api/enums/permission.enum';
+import { FileEntity } from '@/interfaces/file.interface';
+
 export interface UserEntity {
   /** id */
   id: number;
@@ -8,5 +11,7 @@ export interface UserEntity {
   /** 修改时间 */
   updateAt: Date;
   /** 头像文件 id */
-  avatarFileId: string;
+  avatar?: FileEntity;
+  /** 权限列表 */
+  permissionNames: PermissionEnum[];
 }

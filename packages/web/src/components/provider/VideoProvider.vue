@@ -41,17 +41,6 @@ onMounted(async () => {
       wasmUrl,
     });
   }
-
-  player.value.on('captionsdisabled', () => {
-    renderer.value?.freeTrack();
-  });
-  player.value.on('languagechange', () => {
-    renderer.value?.freeTrack();
-    const subtitle = subtitles.value.find(({ name }) => name === player.value.language + '.ass');
-    if (subtitle) {
-      renderer.value?.setTrackByUrl(Api.File.buildRawPath(subtitle.id));
-    }
-  });
 });
 </script>
 

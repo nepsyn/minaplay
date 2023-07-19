@@ -75,8 +75,20 @@ export class Media {
     onDelete: 'CASCADE',
     eager: true,
   })
-  @JoinTable()
+  @JoinTable({
+    name: 'media_subtitle_files',
+  })
   subtitles: File[];
+
+  /** 附件 */
+  @ManyToMany(() => File, {
+    onDelete: 'CASCADE',
+    eager: true,
+  })
+  @JoinTable({
+    name: 'media_attachment_files',
+  })
+  attachments: File[];
 
   /** 创建时间 */
   @CreateDateColumn()

@@ -5,6 +5,8 @@ export interface MediaMetadata {
     codec_type: string;
     tags?: {
       title?: string;
+      filename?: string;
+      mimetype?: string;
     };
   }[];
 }

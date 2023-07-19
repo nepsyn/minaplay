@@ -29,7 +29,6 @@ export class AuthorizationService {
 
     return {
       ...instanceToPlain(user),
-      permissions: user.permissionNames,
       token,
     };
   }

@@ -87,9 +87,9 @@ export class User {
   deleteAt: Date;
 
   /** 权限名称列表 */
-  @Exclude()
+  @Expose()
   get permissionNames() {
-    return this.permissions?.map((permission) => permission.name);
+    return this.permissions?.map((permission) => permission.name) ?? [];
   }
 
   /** 头像文件 id */

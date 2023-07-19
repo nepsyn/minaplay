@@ -50,6 +50,17 @@ export class AuthorizationController {
     return await this.authService.login(user);
   }
 
+  @Post('refresh')
+  @ApiOperation({
+    description: '刷新令牌',
+  })
+  @UseGuards(AuthorizationGuard)
+  @ApiBearerAuth()
+  @HttpCode(200)
+  async refreshToken(@RequestUser() user: User) {
+    return await this.authService.login(user);
+  }
+
   @Post('logout')
   @ApiOperation({
     description: '用户登出',

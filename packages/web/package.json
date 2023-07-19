@@ -31,6 +31,7 @@
     "axios": "^1.4.0",
     "codemirror": "^6.0.1",
     "filesize": "^10.0.7",
+    "jassub": "^1.7.1",
     "lodash": "^4.17.21",
     "plyr": "^3.7.8",
     "socket.io-client": "^4.6.2",

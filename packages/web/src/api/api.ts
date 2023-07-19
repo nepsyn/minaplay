@@ -80,6 +80,7 @@ class ApiHelper {
 
   File = {
     buildRawPath: (id: string) => `${this.baseUrl}/file/${id}/raw`,
+    fetchRaw: (id: string, config?: AxiosRequestConfig) => this.apiGet(`/file/${id}/raw`, config),
     uploadImage: this.apiUpload<FileEntity>('/file/image'),
     uploadVideo: this.apiUpload<FileEntity>('/file/video'),
   };

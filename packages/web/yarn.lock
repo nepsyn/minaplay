@@ -703,6 +703,13 @@ is-number@^7.0.0:
   resolved "https://registry.yarnpkg.com/is-number/-/is-number-7.0.0.tgz#7535345b896734d5f80c4d06c50955527a14f12b"
   integrity sha512-41Cifkg6e8TylSpdtTpeLVMqvSBEVzTttHvERD741+pnZ8ANv0004MRL43QKPDlK9cGvNp6NZWZUBlbGXYxxng==
 
+jassub@^1.7.1:
+  version "1.7.1"
+  resolved "https://registry.yarnpkg.com/jassub/-/jassub-1.7.1.tgz#f45ab1e93bd2dff4ecc1708c8fdfc7cf5dd787e2"
+  integrity sha512-xvrF/4/4ifJCxyF9wgmNW/fzvKuqrvU3OKl1B4373STaCPhblMHkRCHDN6DnRdeI9jUyriWDPcKT97cg38YbNw==
+  dependencies:
+    rvfc-polyfill "^1.0.4"
+
 loadjs@^4.2.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/loadjs/-/loadjs-4.2.0.tgz#2a0336376397a6a43edf98c9ec3229ddd5abb6f6"
@@ -877,6 +884,11 @@ rollup@^3.25.2:
   integrity sha512-6umBIGVz93er97pMgQO08LuH3m6PUb3jlDUUGFsNJB6VgTCUaDFpupf5JfU30529m/UKOgmiX+uY6Sx8cOYpLA==
   optionalDependencies:
     fsevents "~2.3.2"
+
+rvfc-polyfill@^1.0.4:
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/rvfc-polyfill/-/rvfc-polyfill-1.0.6.tgz#da278efb361a4fb35b0de8834217d8669517840a"
+  integrity sha512-y7tu9Bh19CTnzBZWEQEEEo5UYvhVi5Ud9C3ndeWtm9m+tUO5vK8qqbpAMJfEDgRSFZokrVHmehnhGjd9LyazBg==
 
 sass@^1.62.0:
   version "1.63.6"

@@ -12,6 +12,10 @@ export interface MediaEntity {
   poster?: FileEntity;
   /**对应文件 */
   file?: FileEntity;
+  /** 字幕文件 */
+  subtitles?: FileEntity[];
+  /** 附件 */
+  attachments?: FileEntity[];
   /** 创建时间 */
   createAt: Date;
   /** 更新时间 */

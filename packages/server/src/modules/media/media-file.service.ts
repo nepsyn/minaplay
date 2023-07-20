@@ -33,7 +33,16 @@ export class MediaFileService {
 
     const cp = await execa(
       this.options.ffmpegPath,
-      ['-y', '-v quiet', '-i', media.file.path, '-threads 2', '-ss 00:00:01.000', '-vframes 1', posterFilePath],
+      [
+        '-y',
+        '-v quiet',
+        '-i',
+        `"${media.file.path}"`,
+        '-threads 2',
+        '-ss 00:00:01.000',
+        '-vframes 1',
+        `"${posterFilePath}"`,
+      ],
       {
         shell: true,
         timeout: 5000,
@@ -68,7 +77,7 @@ export class MediaFileService {
 
     const cp = await execa(
       this.options.ffprobePath,
-      ['-v quiet', '-i', media.file.path, '-print_format json', '-show_streams'],
+      ['-v quiet', '-i', `"${media.file.path}"`, '-print_format json', '-show_streams'],
       {
         shell: true,
         timeout: 5000,
@@ -107,7 +116,7 @@ export class MediaFileService {
 
       const cp = await execa(
         this.options.ffmpegPath,
-        ['-y', '-v quiet', '-i', media.file.path, '-map', `0:s:${index}`, subtitleFilePath],
+        ['-y', '-v quiet', '-i', `"${media.file.path}"`, '-map', `0:s:${index}`, `"${subtitleFilePath}"`],
         {
           shell: true,
           timeout: 5000,
@@ -146,7 +155,7 @@ export class MediaFileService {
 
       const cp = await execa(
         this.options.ffmpegPath,
-        ['-y', '-v quiet', `-dump_attachment:t:${index}`, attachmentFilePath, '-i', media.file.path],
+        ['-y', '-v quiet', `-dump_attachment:t:${index}`, `"${attachmentFilePath}"`, '-i', `"${media.file.path}"`],
         {
           shell: true,
           timeout: 5000,

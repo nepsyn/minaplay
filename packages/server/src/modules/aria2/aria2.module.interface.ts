@@ -4,4 +4,5 @@ export interface Aria2ModuleOptions {
   autoUpdateTracker?: boolean;
   trackerListUrl?: string;
   expireHours?: number;
+  httpProxy?: string;
 }

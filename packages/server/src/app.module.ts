@@ -75,6 +75,7 @@ import { MediaModule } from './modules/media/media.module';
         autoUpdateTracker: Number(configService.get('ARIA2_AUTO_UPDATE_TRACKER', 0)) === 1,
         trackerListUrl: configService.get('ARIA2_TRACKER_LIST_URL'),
         expireHours: Number(configService.get('ARIA2_EXPIRE_HOURS', 0)) || 0,
+        httpProxy: configService.get('APP_FETCH_HTTP_PROXY', undefined, undefined),
       }),
     }),
     LiveModule.registerAsync({
@@ -100,8 +101,14 @@ import { MediaModule } from './modules/media/media.module';
         ffprobePath: configService.get('FFPROBE_PATH', 'ffprobe'),
       }),
     }),
+    SubscribeModule.registerAsync({
+      inject: [ConfigService],
+      isGlobal: true,
+      useFactory: (configService: ConfigService) => ({
+        httpProxy: configService.get('APP_FETCH_HTTP_PROXY', undefined, undefined),
+      }),
+    }),
     FileModule,
-    SubscribeModule,
     AuthorizationModule,
     SeriesModule,
     UserModule,

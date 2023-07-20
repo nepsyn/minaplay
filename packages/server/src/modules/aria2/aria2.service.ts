@@ -19,6 +19,7 @@ import { File } from '../file/file.entity';
 import type FileType from 'file-type';
 import { importDynamic } from '../../utils/import-dynamic.util';
 import { randomUUID } from 'crypto';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 @Injectable()
 export class Aria2Service implements OnModuleInit {
@@ -119,8 +120,11 @@ export class Aria2Service implements OnModuleInit {
   }
 
   private async updateBtTrackers() {
+    const fetch = (await importDynamic('node-fetch')).default;
     try {
-      const response = await fetch(this.options.trackerListUrl);
+      const response = await fetch(this.options.trackerListUrl, {
+        agent: this.options.httpProxy && new HttpsProxyAgent(this.options.httpProxy),
+      });
       const rawText = await response.text();
       const tracker = rawText.replace(/\s+/g, ',');
       await this.cacheStore.set(Aria2Service.TRACKER_CACHE_KEY, tracker);

@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Source } from './source.entity';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
@@ -8,10 +8,15 @@ import { CronJob } from 'cron';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
 import { importDynamic } from '../../utils/import-dynamic.util';
+import { SubscribeModuleOptions } from './subscribe.module.interface';
+import { SUBSCRIBE_MODULE_OPTIONS_TOKEN } from './subscribe.module-definition';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 @Injectable()
 export class SourceService implements OnModuleInit {
   constructor(
+    @Inject(SUBSCRIBE_MODULE_OPTIONS_TOKEN)
+    private options: SubscribeModuleOptions,
     @InjectRepository(Source) private sourceRepository: Repository<Source>,
     private scheduleRegistry: SchedulerRegistry,
     @InjectQueue('fetch-subscribe-source') private fetchSubscribeSourceQueue: Queue,
@@ -47,22 +52,28 @@ export class SourceService implements OnModuleInit {
 
   async readSource(url: string) {
     const extract: typeof FeedExtractor.extract = (await importDynamic('@extractus/feed-extractor')).extract;
-    return await extract(url, {
-      getExtraEntryFields: ({ enclosure }: any) => {
-        if (enclosure) {
-          return {
-            enclosure: {
-              url: enclosure?.['@_url'],
-              type: enclosure?.['@_type'],
-            },
-          };
-        } else {
-          return {
-            enclosure: undefined,
-          };
-        }
+    return await extract(
+      url,
+      {
+        getExtraEntryFields: ({ enclosure }: any) => {
+          if (enclosure) {
+            return {
+              enclosure: {
+                url: enclosure?.['@_url'],
+                type: enclosure?.['@_type'],
+              },
+            };
+          } else {
+            return {
+              enclosure: undefined,
+            };
+          }
+        },
       },
-    });
+      {
+        agent: this.options.httpProxy && new HttpsProxyAgent(this.options.httpProxy),
+      },
+    );
   }
 
   async addFetchSubscribeDataJob(source: Source) {

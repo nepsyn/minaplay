@@ -16,8 +16,7 @@ import { generateMD5 } from '../../utils/generate-md5.util';
 import path from 'path';
 import { FileSourceEnum } from '../../enums/file-source.enum';
 import { File } from '../file/file.entity';
-import type FileType from 'file-type';
-import { importDynamic } from '../../utils/import-dynamic.util';
+import { importESM } from '../../utils/import-esm.util';
 import { randomUUID } from 'crypto';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
@@ -60,7 +59,7 @@ export class Aria2Service implements OnModuleInit {
   }
 
   private async websocketNotificationHandler(event: MessageEvent) {
-    const fileTypeFromFile: typeof FileType.fileTypeFromFile = (await importDynamic('file-type')).fileTypeFromFile;
+    const fileTypeFromFile = (await importESM<typeof import('file-type')>('file-type')).fileTypeFromFile;
 
     const message: Aria2WsMessage = JSON.parse(event.data.toString());
     if (['aria2.onDownloadComplete', 'aria2.onDownloadError'].includes(message.method)) {
@@ -120,7 +119,7 @@ export class Aria2Service implements OnModuleInit {
   }
 
   private async updateBtTrackers() {
-    const fetch = (await importDynamic('node-fetch')).default;
+    const fetch = (await importESM<typeof import('node-fetch')>('node-fetch')).default;
     try {
       const response = await fetch(this.options.trackerListUrl, {
         agent: this.options.httpProxy && new HttpsProxyAgent(this.options.httpProxy),

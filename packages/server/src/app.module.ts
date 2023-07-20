@@ -17,8 +17,8 @@ import { LiveModule } from './modules/live/live.module';
 import { cpus } from 'os';
 import { UserModule } from './modules/user/user.module';
 import { SeriesModule } from './modules/series/series.module';
-import { SubscribeModule } from './modules/subscribe/subscribe.module';
 import { MediaModule } from './modules/media/media.module';
+import { SubscribeModule } from './modules/subscribe/subscribe.module';
 
 @Module({
   imports: [

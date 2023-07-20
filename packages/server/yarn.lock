@@ -3284,14 +3284,14 @@ media-typer@0.3.0:
   integrity sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==
 
 mediasoup@^3.11.26:
-  version "3.12.4"
-  resolved "https://registry.yarnpkg.com/mediasoup/-/mediasoup-3.12.4.tgz#2b54bea159d9fbb9b65289afc00b7173dc6176dc"
-  integrity sha512-j4hEt9T4aIfmuwRB9fc2QkdURQ3sZWWDTHTFFCuxGPPAFU50wV5Ja+dKPVKwGo0Bo3mspDhyiTRRka4q23V6Fw==
+  version "3.12.8"
+  resolved "https://registry.yarnpkg.com/mediasoup/-/mediasoup-3.12.8.tgz#1113bb3acc5ce6af7d8327d7915dd68321ff3052"
+  integrity sha512-8K3UlFq9ZTnRbIWjrU/4WDWptKIBZfyqWrXMsaORc2uPmVfwSbMl0aMPc55FA64hg957l8QzKPnFkGBZgg7/4g==
   dependencies:
     debug "^4.3.4"
     h264-profile-level-id "^1.0.1"
     node-fetch "^3.3.1"
-    supports-color "^9.3.1"
+    supports-color "^9.4.0"
     tar "^6.1.15"
     uuid "^9.0.0"
 
@@ -4327,7 +4327,7 @@ supports-color@^8.0.0:
   dependencies:
     has-flag "^4.0.0"
 
-supports-color@^9.3.1:
+supports-color@^9.4.0:
   version "9.4.0"
   resolved "https://registry.yarnpkg.com/supports-color/-/supports-color-9.4.0.tgz#17bfcf686288f531db3dea3215510621ccb55954"
   integrity sha512-VL+lNrEoIXww1coLPOmiEmK/0sGigko5COxI09KzHc2VJXJsQ37UaQ+8quuxjDeA7+KnLGTWRyOXSLLR2Wb4jw==

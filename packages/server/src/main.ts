@@ -11,6 +11,9 @@ async function bootstrap() {
   // global prefix
   app.setGlobalPrefix('/api/v1');
 
+  // public dir
+  app.useStaticAssets('public');
+
   // enable cors
   app.enableCors();
 

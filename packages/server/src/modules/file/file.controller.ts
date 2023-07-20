@@ -184,6 +184,19 @@ export class FileController {
     res.sendFile(file.path);
   }
 
+  @Get(':id/download')
+  @ApiOperation({
+    description: '下载文件',
+  })
+  async downloadFileById(@Param('id') id: string, @Res() res: Response) {
+    const file = await this.fileService.findOneBy({ id });
+    if (!file || file.isExpired) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    res.download(file.path, file.name);
+  }
+
   @Get()
   @ApiOperation({
     description: '查询文件',

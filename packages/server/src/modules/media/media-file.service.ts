@@ -45,7 +45,7 @@ export class MediaFileService {
       ],
       {
         shell: true,
-        timeout: 5000,
+        timeout: 60000,
         reject: false,
       },
     );
@@ -80,7 +80,7 @@ export class MediaFileService {
       ['-v quiet', '-i', `"${media.file.path}"`, '-print_format json', '-show_streams'],
       {
         shell: true,
-        timeout: 5000,
+        timeout: 60000,
         reject: false,
       },
     );
@@ -119,7 +119,7 @@ export class MediaFileService {
         ['-y', '-v quiet', '-i', `"${media.file.path}"`, '-map', `0:s:${index}`, `"${subtitleFilePath}"`],
         {
           shell: true,
-          timeout: 5000,
+          timeout: 60000,
           reject: false,
         },
       );
@@ -158,7 +158,7 @@ export class MediaFileService {
         ['-y', '-v quiet', `-dump_attachment:t:${index}`, `"${attachmentFilePath}"`, '-i', `"${media.file.path}"`],
         {
           shell: true,
-          timeout: 5000,
+          timeout: 60000,
           reject: false,
         },
       );

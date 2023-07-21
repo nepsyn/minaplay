@@ -30,7 +30,8 @@ export class FetchSubscribeSourceConsumer {
 
   @Process()
   async fetchSubscribeSource(job: Job<Source>) {
-    const source = job.data;
+    const { id } = job.data;
+    const source = await this.sourceService.findOneBy({ id });
 
     try {
       const data = await this.sourceService.readSource(source.url);

@@ -5,6 +5,7 @@ import {
   mdiCog,
   mdiGithub,
   mdiMovieOpenPlay,
+  mdiPencil,
   mdiRssBox,
   mdiVideoVintage,
   mdiViewDashboard,
@@ -36,7 +37,10 @@ const openGitHubLink = () => {
   window.open('https://github.com/nepsyn/minaplay');
 };
 
+const logoutConfirmDialog = ref(false);
 const logout = () => {
+  logoutConfirmDialog.value = false;
+
   app.setUser(undefined);
   Api.setToken(null);
   localStorage.removeItem('minaplay-token');
@@ -117,8 +121,37 @@ const navs = [
               </v-img>
             </v-avatar>
           </template>
-          <v-card min-width="240">
-            <v-btn variant="plain" block color="error" @click="logout">注销登录</v-btn>
+          <v-card width="360" class="overflow-x-hidden">
+            <v-container fluid class="d-flex flex-row align-center">
+              <v-avatar size="64">
+                <v-img>
+                  <template #placeholder>
+                    <v-icon size="64" :icon="mdiAccountCircle"></v-icon>
+                  </template>
+                </v-img>
+              </v-avatar>
+              <v-container fluid class="py-0 d-flex flex-column">
+                <span class="text-h6 text-truncate">{{ app.user!.username }}</span>
+                <v-container fluid class="pa-0">
+                  <v-btn variant="tonal" color="primary" size="x-small" :prepend-icon="mdiPencil">编辑资料</v-btn>
+                </v-container>
+              </v-container>
+            </v-container>
+            <v-divider></v-divider>
+            <v-dialog v-model="logoutConfirmDialog" width="auto" min-width="480">
+              <template v-slot:activator="{ props: dialogProps }">
+                <v-btn variant="plain" block color="error" v-bind="dialogProps">注销登录</v-btn>
+              </template>
+              <v-card>
+                <v-card-title>注销确认</v-card-title>
+                <v-card-text>确定要退出登录吗？</v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary" variant="text" @click="logoutConfirmDialog = false">取消</v-btn>
+                  <v-btn color="error" variant="plain" @click="logout">确定</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </v-card>
         </v-menu>
       </div>

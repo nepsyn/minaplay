@@ -42,15 +42,15 @@ const routes: RouteRecordRaw[] = [
           {
             path: '/resource',
             component: Resource,
-            redirect: '/series',
+            redirect: '/media',
             children: [
-              {
-                path: '/series',
-                component: SeriesView,
-              },
               {
                 path: '/media',
                 component: MediasView,
+              },
+              {
+                path: '/series',
+                component: SeriesView,
               },
             ],
           },

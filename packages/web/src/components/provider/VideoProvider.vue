@@ -34,9 +34,7 @@ onMounted(async () => {
     renderer.value = new JASSUB({
       video: videoRef.value!,
       subUrl: Api.File.buildRawPath(subtitles.value[0].id),
-      fonts: attachments.value
-        .filter(({ mimetype }) => mimetype?.startsWith('font/'))
-        .map(({ id }) => Api.File.buildRawPath(id)),
+      fonts: attachments.value.map(({ id }) => Api.File.buildRawPath(id)),
       workerUrl,
       wasmUrl,
     });

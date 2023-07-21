@@ -80,7 +80,8 @@ watch(
           :loading="providerRef?.status === 'loading'"
           :prepend-icon="mdiRefresh"
           @click="resetDownloads() & providerRef?.load()"
-          >重新加载
+        >
+          重新加载
         </v-btn>
       </v-container>
       <v-divider class="my-4"></v-divider>

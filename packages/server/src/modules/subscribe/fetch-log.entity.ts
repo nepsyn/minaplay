@@ -26,14 +26,6 @@ export class FetchLog {
   @Column()
   success: boolean;
 
-  /** 原始数据 */
-  @Exclude()
-  @Column({
-    nullable: true,
-    type: 'text',
-  })
-  data?: string;
-
   /** 错误内容 */
   @Column({
     nullable: true,

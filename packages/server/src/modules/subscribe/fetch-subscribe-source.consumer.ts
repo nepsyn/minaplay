@@ -37,7 +37,6 @@ export class FetchSubscribeSourceConsumer {
       const log = await this.fetchLogService.save({
         source: { id: source.id },
         success: true,
-        data: JSON.stringify(data),
       });
 
       if (data.entries.length > 0) {

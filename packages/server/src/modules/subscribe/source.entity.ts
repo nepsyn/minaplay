@@ -22,7 +22,9 @@ export class Source {
   id: number;
 
   /** url */
-  @Column()
+  @Column({
+    type: 'text',
+  })
   url: string;
 
   /** 备注 */

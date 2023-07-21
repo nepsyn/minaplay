@@ -19,7 +19,9 @@ export class DownloadItem {
   title: string;
 
   /** 下载链接 */
-  @Column()
+  @Column({
+    type: 'text',
+  })
   url: string;
 
   /** 所属订阅源 */

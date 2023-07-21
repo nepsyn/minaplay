@@ -13,6 +13,11 @@ export const useApp = defineStore('user', () => {
   const user: Ref<UserEntity | undefined> = ref(undefined);
   const setUser = (_user: UserEntity | undefined) => {
     user.value = _user;
+    if (_user == null) {
+      localStorage.removeItem('minaplay-user');
+    } else {
+      localStorage.setItem('minaplay-user', String(_user.id));
+    }
   };
 
   const counter = (function* () {

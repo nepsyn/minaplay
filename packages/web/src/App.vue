@@ -6,6 +6,7 @@ import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useRouter } from 'vue-router';
 import UploadDrawer from '@/components/app/UploadDrawer.vue';
 import MessagesContainer from '@/components/app/MessagesContainer.vue';
+import { onBeforeMount } from 'vue';
 
 const app = useApp();
 const router = useRouter();
@@ -16,7 +17,8 @@ axios.interceptors.response.use(
   },
   (error) => {
     if (error.response?.data?.code === ErrorCodeEnum.INVALID_TOKEN) {
-      localStorage.removeItem('minaplay-token');
+      Api.setToken(null);
+      app.setUser(undefined);
       app.toastWarning('登录验证已过期，请重新登录');
       router.replace('/login');
     } else {
@@ -25,18 +27,19 @@ axios.interceptors.response.use(
   },
 );
 
-const authToken = localStorage.getItem('minaplay-token');
-if (authToken) {
-  Api.setToken(authToken);
-  Api.Auth.refreshToken()
-    .then((response) => {
-      const { token, ...user } = response.data;
-      app.setUser(user);
-      Api.setToken(token);
-      localStorage.setItem('minaplay-token', token);
-    })
-    .catch();
-}
+onBeforeMount(async () => {
+  if (Api.isLogin) {
+    try {
+      const response = await Api.User.getById(Number(localStorage.getItem('minaplay-user')))();
+      app.setUser(response.data);
+    } catch {
+      Api.setToken(null);
+      app.setUser(undefined);
+      app.toastWarning('登录验证已过期，请重新登录');
+      await router.replace('/login');
+    }
+  }
+});
 </script>
 
 <template>

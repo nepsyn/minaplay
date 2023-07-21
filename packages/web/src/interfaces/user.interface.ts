@@ -15,3 +15,7 @@ export interface UserEntity {
   /** 权限列表 */
   permissionNames: PermissionEnum[];
 }
+
+export interface UserDto {
+  avatarFileId?: string;
+}

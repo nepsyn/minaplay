@@ -41,9 +41,8 @@ const logoutConfirmDialog = ref(false);
 const logout = () => {
   logoutConfirmDialog.value = false;
 
-  app.setUser(undefined);
   Api.setToken(null);
-  localStorage.removeItem('minaplay-token');
+  app.setUser(undefined);
   app.toastSuccess('已注销登录');
   router.replace({
     path: '/login',
@@ -110,8 +109,8 @@ const navs = [
             </v-btn>
           </template>
         </v-tooltip>
-        <v-divider class="mx-2" inset vertical></v-divider>
-        <v-menu>
+        <v-divider v-if="app.user" class="mx-2" inset vertical></v-divider>
+        <v-menu v-if="app.user">
           <template #activator="{ props }">
             <v-avatar v-bind="props" style="cursor: pointer" size="40">
               <v-img>
@@ -131,7 +130,7 @@ const navs = [
                 </v-img>
               </v-avatar>
               <v-container fluid class="py-0 d-flex flex-column">
-                <span class="text-h6 text-truncate">{{ app.user!.username }}</span>
+                <span class="text-h6 text-truncate">{{ app.user?.username }}</span>
                 <v-container fluid class="pa-0">
                   <v-btn variant="tonal" color="primary" size="x-small" :prepend-icon="mdiPencil">编辑资料</v-btn>
                 </v-container>

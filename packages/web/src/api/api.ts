@@ -16,6 +16,7 @@ import {
 } from '@/interfaces/subscribe.interface';
 import { ApiQueryResult } from '@/interfaces/common.interface';
 import { MediaDto, MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
+import { UserDto, UserEntity } from '@/interfaces/user.interface';
 
 class ApiHelper {
   private token: string | null = null;
@@ -41,6 +42,11 @@ class ApiHelper {
 
   setToken(token: string | null) {
     this.token = token;
+    if (token == null) {
+      localStorage.removeItem('minaplay-token');
+    } else {
+      localStorage.setItem('minaplay-token', token);
+    }
   }
 
   private apiGet<T = any, Params = any>(url: string, config: AxiosRequestConfig = {}) {
@@ -99,6 +105,11 @@ class ApiHelper {
       this.apiGet<ApiQueryResult<FetchLogEntity>, FetchLogQueryDto>(`/subscribe/${id}/log`),
     getDownloadItemsById: (id: number) =>
       this.apiGet<ApiQueryResult<DownloadItemEntity>, DownloadItemQueryDto>(`/subscribe/${id}/download`),
+  };
+
+  User = {
+    getById: (id: number) => this.apiGet<UserEntity>(`/user/${id}`),
+    update: (id: number) => this.apiPut<UserEntity, UserDto>(`/user/${id}`),
   };
 
   SubscribeRule = {

@@ -11,22 +11,6 @@ import { onBeforeMount } from 'vue';
 const app = useApp();
 const router = useRouter();
 
-axios.interceptors.response.use(
-  (response) => {
-    return response;
-  },
-  (error) => {
-    if (error.response?.data?.code === ErrorCodeEnum.INVALID_TOKEN) {
-      Api.setToken(null);
-      app.setUser(undefined);
-      app.toastWarning('登录验证已过期，请重新登录');
-      router.replace('/login');
-    } else {
-      return Promise.reject(error);
-    }
-  },
-);
-
 onBeforeMount(async () => {
   if (Api.isLogin) {
     try {
@@ -37,6 +21,22 @@ onBeforeMount(async () => {
       app.setUser(undefined);
       app.toastWarning('登录验证已过期，请重新登录');
       await router.replace('/login');
+    } finally {
+      axios.interceptors.response.use(
+        (response) => {
+          return response;
+        },
+        (error) => {
+          if (error.response?.data?.code === ErrorCodeEnum.INVALID_TOKEN) {
+            Api.setToken(null);
+            app.setUser(undefined);
+            app.toastWarning('登录验证已过期，请重新登录');
+            router.replace('/login');
+          } else {
+            return Promise.reject(error);
+          }
+        },
+      );
     }
   }
 });

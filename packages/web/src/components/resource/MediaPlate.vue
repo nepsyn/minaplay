@@ -61,17 +61,23 @@ const providerRef: Ref<any> = ref(null);
       <v-spacer></v-spacer>
       <slot name="actions" :load="providerRef?.load" :reset="reset" :status="providerRef?.status"></slot>
     </v-container>
-    <items-provider ref="providerRef" :load-fn="load" :items="medias" hide-empty>
+    <items-provider class="pa-0" ref="providerRef" :load-fn="load" :items="medias" hide-empty>
       <template #loading>
-        <v-row>
+        <v-row no-gutters>
           <v-col :cols="12 / Number(cols)" v-for="index of Number(count)" :key="index">
-            <v-skeleton-loader type="image,list-item-two-line"></v-skeleton-loader>
+            <v-skeleton-loader class="pa-3" type="image,list-item-two-line"></v-skeleton-loader>
           </v-col>
         </v-row>
       </template>
-      <v-row>
+      <v-row no-gutters>
         <v-col :cols="12 / Number(cols)" v-for="media in medias" :key="media.id">
-          <media-overview play-on-hover @click="emits('media-click', media)" :media="media"></media-overview>
+          <media-overview
+            class="pa-3"
+            v-ripple
+            play-on-hover
+            @click="emits('media-click', media)"
+            :media="media"
+          ></media-overview>
         </v-col>
       </v-row>
     </items-provider>

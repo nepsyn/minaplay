@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, shallowRef } from 'vue';
+import { computed, onMounted, onUnmounted, ref, shallowRef } from 'vue';
 import 'plyr/dist/plyr.css';
 import Plyr from 'plyr';
 import JASSUB from 'jassub';
@@ -38,6 +38,16 @@ onMounted(async () => {
       workerUrl,
       wasmUrl,
     });
+  }
+});
+
+onUnmounted(async () => {
+  if (renderer.value) {
+    renderer.value.destroy();
+  }
+
+  if (player.value) {
+    player.value.destroy();
   }
 });
 </script>

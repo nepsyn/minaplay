@@ -129,8 +129,8 @@ const createRule = async () => {
 const providerRef: Ref<any> = ref(null);
 watch(
   () => route.params,
-  async (old, now) => {
-    if (old.id !== now?.id && !isNaN(Number(route.params.id))) {
+  async (now, old) => {
+    if (old?.id !== now.id && !isNaN(Number(now.id))) {
       resetRules();
       saveRuleCode.cancel();
 

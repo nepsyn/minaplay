@@ -84,7 +84,10 @@ const navs = [
 <template>
   <v-app-bar order="1" border="b" color="background" flat>
     <v-app-bar-nav-icon variant="text" @click.stop="drawer = !drawer"></v-app-bar-nav-icon>
-    <v-toolbar-title>MinaPlay</v-toolbar-title>
+
+    <v-badge color="info" content="alpha">
+      <v-toolbar-title>MinaPlay</v-toolbar-title>
+    </v-badge>
     <template v-slot:append>
       <div class="d-flex flex-row align-center">
         <v-tooltip text="媒体文件上传" location="bottom" open-delay="500">

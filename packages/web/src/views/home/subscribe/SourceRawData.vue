@@ -37,8 +37,8 @@ const loadRawData = async (done: any) => {
 const providerRef: Ref<any> = ref(null);
 watch(
   () => route.params,
-  async (old, now) => {
-    if (old.id !== now?.id && !isNaN(Number(route.params.id))) {
+  async (now, old) => {
+    if (old?.id !== now.id && !isNaN(Number(now.id))) {
       if (providerRef.value) {
         providerRef.value.status = 'initial';
       }

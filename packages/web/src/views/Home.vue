@@ -123,7 +123,7 @@ const navs = [
               </v-img>
             </v-avatar>
           </template>
-          <v-card width="360" class="overflow-x-hidden">
+          <v-card min-width="240" max-width="360" class="overflow-x-hidden">
             <v-container fluid class="d-flex flex-row align-center">
               <v-avatar size="64">
                 <v-img>
@@ -135,12 +135,12 @@ const navs = [
               <v-container fluid class="py-0 d-flex flex-column">
                 <span class="text-h6 text-truncate">{{ app.user?.username }}</span>
                 <v-container fluid class="pa-0">
-                  <v-btn variant="tonal" color="primary" size="x-small" :prepend-icon="mdiPencil">编辑资料</v-btn>
+                  <v-btn variant="tonal" color="primary" size="x-small" :prepend-icon="mdiPencil">编辑个人设置</v-btn>
                 </v-container>
               </v-container>
             </v-container>
             <v-divider></v-divider>
-            <v-dialog v-model="logoutConfirmDialog" width="auto" min-width="480">
+            <v-dialog v-model="logoutConfirmDialog" width="auto">
               <template v-slot:activator="{ props: dialogProps }">
                 <v-btn variant="plain" block color="error" v-bind="dialogProps">注销登录</v-btn>
               </template>

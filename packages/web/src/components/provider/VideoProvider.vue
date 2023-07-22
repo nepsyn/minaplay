@@ -53,7 +53,7 @@ onUnmounted(async () => {
 </script>
 
 <template>
-  <video ref="videoRef" :poster="poster" :src="Api.File.buildRawPath(media.file!.id)" class="w-100"></video>
+  <video ref="videoRef" :poster="poster" :src="Api.File.buildDownloadPath(media.file!.id)" class="w-100"></video>
 </template>
 
 <style scoped lang="sass"></style>

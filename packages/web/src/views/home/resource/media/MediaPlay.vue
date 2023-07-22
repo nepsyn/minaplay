@@ -22,7 +22,7 @@ const mediaId = computed(() => String(route.params.id));
 
 const media: Ref<MediaEntity> = ref(undefined as any);
 const playerOptions: Plyr.Options = {
-  controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'fullscreen'],
+  controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'fullscreen'],
   autoplay: true,
 };
 const loadMedia = async (done: any) => {

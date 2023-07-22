@@ -76,6 +76,7 @@ const providerRef: Ref<any> = ref(null);
             v-ripple
             play-on-hover
             @click="emits('media-click', media)"
+            @click.right.prevent
             :media="media"
           ></media-overview>
         </v-col>

@@ -5,8 +5,9 @@ import { computed, Ref, ref, watch } from 'vue';
 import { ApiQueryDto } from '@/interfaces/common.interface';
 import { DownloadItemEntity } from '@/interfaces/subscribe.interface';
 import { Api } from '@/api/api';
-import { mdiAlertCircle, mdiCheckCircle, mdiDownloadCircle, mdiRefresh } from '@mdi/js';
+import { mdiAlertCircle, mdiCheckCircle, mdiContentCopy, mdiDownloadCircle, mdiRefresh } from '@mdi/js';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
+import ActionBtn from '@/components/provider/ActionBtn.vue';
 
 const app = useApp();
 const route = useRoute();
@@ -52,6 +53,15 @@ const getDownloadItemStatusText = (item: DownloadItemEntity) => {
   return item.status === 'DOWNLOADED' ? '下载完成' : item.status === 'DOWNLOADING' ? '正在下载' : '下载失败';
 };
 
+const copyDownloadUrl = async (url: string) => {
+  try {
+    await navigator.clipboard.writeText(url);
+    app.toastSuccess('下载链接已复制到剪切板');
+  } catch {
+    app.toastError('复制下载链接失败');
+  }
+};
+
 const providerRef: Ref<any> = ref(null);
 watch(
   () => route.params,
@@ -74,18 +84,16 @@ watch(
       <v-container class="pa-0 d-flex flex-row align-center">
         <span class="text-h6">下载项目 ({{ downloadsTotal }})</span>
         <v-spacer></v-spacer>
-        <v-btn
-          variant="outlined"
+        <action-btn
+          text="重新加载"
           color="primary"
           :loading="providerRef?.status === 'loading'"
-          :prepend-icon="mdiRefresh"
+          :icon="mdiRefresh"
           @click="resetDownloads() & providerRef?.load()"
-        >
-          重新加载
-        </v-btn>
+        ></action-btn>
       </v-container>
       <v-divider class="my-4"></v-divider>
-      <items-provider ref="providerRef" class="pa-0" :load-fn="loadDownloads" :items="downloads">
+      <items-provider ref="providerRef" class="pa-0" :load-fn="loadDownloads" :items="downloads" auto-load>
         <v-alert
           v-for="item in downloads"
           :key="item.id"
@@ -95,7 +103,10 @@ watch(
           :icon="getDownloadItemIcon(item)"
         >
           <p class="text-subtitle-1 font-weight-bold" v-text="item.title"></p>
-          <p class="text-caption" v-text="item.url"></p>
+          <div v-if="item.url" class="d-flex flex-row justify-space-between align-center">
+            <span class="text-caption text-truncate" v-text="item.url"></span>
+            <v-btn :icon="mdiContentCopy" variant="text" size="x-small" @click="copyDownloadUrl(item.url)"></v-btn>
+          </div>
           <p class="text-caption">
             任务创建于 {{ new Date(item.createAt).toLocaleString() }} -
             {{ getDownloadItemStatusText(item) }}

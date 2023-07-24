@@ -5,14 +5,14 @@ import { ref } from 'vue';
 
 const tabs = ref([
   {
-    text: '媒体文件',
-    route: 'media',
-    icon: mdiFileVideo,
-  },
-  {
     text: '剧集',
     route: 'series',
     icon: mdiMultimedia,
+  },
+  {
+    text: '媒体文件',
+    route: 'media',
+    icon: mdiFileVideo,
   },
 ]);
 </script>

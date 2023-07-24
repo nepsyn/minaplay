@@ -52,26 +52,35 @@ onMounted(async () => {
     };
   }
 });
+
+const emits = defineEmits(['click:content']);
 </script>
 
 <template>
-  <v-container fluid class="pa-0 media-container">
+  <v-container fluid class="pa-0">
     <v-row no-gutters class="pa-0">
       <v-col cols="4" class="d-flex align-center">
         <v-img
-          class="poster"
+          class="poster clickable"
           :src="media.poster ? Api.File.buildRawPath(media.poster!.id) : MediaCoverFallback"
           :aspect-ratio="16 / 9"
+          @click="(e) => emits('click:content', e)"
         >
         </v-img>
       </v-col>
       <v-col cols="8">
         <v-container fluid class="pa-0 pl-2 d-flex flex-column align-start justify-space-between fill-height">
           <div class="d-flex flex-column">
-            <span class="media-title font-weight-bold" :title="media.name">{{ media.name }}</span>
+            <span
+              class="media-title font-weight-bold clickable"
+              @click="(e) => emits('click:content', e)"
+              :title="media.name"
+            >
+              {{ media.name }}
+            </span>
             <div>
               <slot v-if="showChips" name="chips">
-                <v-chip color="info" class="text-caption" size="x-small" style="cursor: pointer" label>
+                <v-chip color="info" class="text-caption" size="x-small" label>
                   {{ sourceText }}
                 </v-chip>
                 <v-chip
@@ -97,11 +106,11 @@ onMounted(async () => {
 </template>
 
 <style scoped lang="sass">
-.media-container
+.clickable
   cursor: pointer
 
 .poster
-  border-radius: 8px
+  border-radius: 4px
 
 .video-container
   height: 100%
@@ -114,4 +123,8 @@ onMounted(async () => {
   max-height: 2rem
   word-break: break-all
   text-overflow: ellipsis
+  transition: color 0.5s
+
+.media-title:hover
+  color: rgb(var(--v-theme-primary))
 </style>

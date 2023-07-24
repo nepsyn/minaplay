@@ -14,6 +14,7 @@ import { RuleEntity } from '@/interfaces/subscribe.interface';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import LabelEditor from '@/components/provider/LabelEditor.vue';
 import { Codemirror } from 'vue-codemirror';
+import ActionBtn from '@/components/provider/ActionBtn.vue';
 
 const app = useApp();
 const route = useRoute();
@@ -149,41 +150,35 @@ watch(
       <v-container fluid class="pa-0 d-flex flex-row align-center">
         <span class="text-h6">订阅源规则 ({{ rules.length }})</span>
         <v-spacer></v-spacer>
-        <v-btn
-          variant="outlined"
+        <action-btn
+          text="重新加载"
           color="primary"
           :loading="providerRef?.status === 'loading'"
-          :prepend-icon="mdiRefresh"
+          :icon="mdiRefresh"
           @click="resetRules() & providerRef.load()"
-          >重新加载
-        </v-btn>
-        <v-btn
+        ></action-btn>
+        <action-btn
           class="ml-2"
-          variant="outlined"
+          text="添加"
           color="warning"
-          :prepend-icon="mdiPlus"
+          :icon="mdiPlus"
           :loading="ruleCreating"
           @click="createRule"
-          >添加
-        </v-btn>
+        ></action-btn>
       </v-container>
       <v-divider class="my-4"></v-divider>
-      <items-provider ref="providerRef" :load-fn="loadRules" :items="rules" class="pa-0">
+      <items-provider ref="providerRef" :load-fn="loadRules" :items="rules" class="pa-0" auto-load>
         <v-sheet class="my-4" border rounded v-for="(rule, index) in rules">
           <v-toolbar density="compact" color="background" class="px-4 py-2 d-flex flex-row align-center">
             <label-editor
               :save-fn="(remark) => Api.SubscribeRule.update(rule.id)({ remark })"
-              @saved="(resp) => (rules[index] = resp.data)"
+              @saved="(resp) => (rules[index].remark = resp.data.remark)"
               @error="app.toastError('备注保存失败！')"
               v-model="rule.remark"
               maxlength="40"
             >
-              <span class="text-subtitle-1 font-weight-bold">{{ rule.remark || '未命名规则' }}</span>
+              <span class="text-subtitle-1 font-weight-bold text-truncate">{{ rule.remark || '未命名规则' }}</span>
             </label-editor>
-            <v-spacer></v-spacer>
-            <span class="text-subtitle-2 font-weight-light">
-              更新于 {{ new Date(rule.updateAt).toLocaleString() }}
-            </span>
           </v-toolbar>
           <v-divider></v-divider>
           <codemirror
@@ -204,7 +199,8 @@ watch(
                   :prepend-icon="mdiClose"
                   :loading="deleteRuleId === rule.id"
                   :disabled="deleteRuleId !== undefined && deleteRuleId !== rule.id"
-                  >删除规则
+                >
+                  删除规则
                 </v-btn>
               </template>
               <v-card>
@@ -225,7 +221,8 @@ watch(
               @click="saveRuleCode(rule.id, rule.code)"
               :loading="editRuleId === rule.id"
               :disabled="editRuleId !== undefined && editRuleId !== rule.id"
-              >保存代码
+            >
+              保存代码
             </v-btn>
           </v-container>
         </v-sheet>

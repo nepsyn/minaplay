@@ -11,6 +11,7 @@ const props = withDefaults(
     hideLoading?: boolean;
     hideError?: boolean;
     hideEmpty?: boolean;
+    autoLoad?: boolean;
   }>(),
   {
     lazy: false,
@@ -18,6 +19,7 @@ const props = withDefaults(
     hideLoading: false,
     hideError: false,
     hideEmpty: false,
+    autoLoad: false,
   },
 );
 
@@ -45,7 +47,10 @@ onMounted(async () => {
   <v-container fluid>
     <slot :items="items" :status="status" :load="load"></slot>
     <slot name="loadMore" v-if="status === 'ok' && !hideLoadMore" :load="load">
-      <v-container class="d-flex flex-column justify-center align-center">
+      <v-container
+        class="d-flex flex-column justify-center align-center"
+        v-intersect="(isIntersecting) => isIntersecting && autoLoad && load()"
+      >
         <v-btn variant="plain" color="primary" class="text-caption" @click="load">加载更多</v-btn>
       </v-container>
     </slot>

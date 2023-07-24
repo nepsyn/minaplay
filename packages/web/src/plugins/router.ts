@@ -15,6 +15,12 @@ import SourceDownloadItems from '@/views/home/subscribe/SourceDownloadItems.vue'
 import SeriesView from '@/views/home/resource/SeriesView.vue';
 import MediasView from '@/views/home/resource/MediasView.vue';
 import MediaPlay from '@/views/home/resource/media/MediaPlay.vue';
+import AdminOverview from '@/views/home/admin/AdminOverview.vue';
+import AdminUser from '@/views/home/admin/AdminUser.vue';
+import AdminSubscribe from '@/views/home/admin/AdminSubscribe.vue';
+import AdminMedia from '@/views/home/admin/AdminMedia.vue';
+import AdminSeries from '@/views/home/admin/AdminSeries.vue';
+import AdminDownload from '@/views/home/admin/AdminDownload.vue';
 
 const LoginGuard: NavigationGuard = (to, from, next) => {
   if (!Api.isLogin) {
@@ -42,15 +48,15 @@ const routes: RouteRecordRaw[] = [
           {
             path: '/resource',
             component: Resource,
-            redirect: '/media',
+            redirect: '/series',
             children: [
-              {
-                path: '/media',
-                component: MediasView,
-              },
               {
                 path: '/series',
                 component: SeriesView,
+              },
+              {
+                path: '/media',
+                component: MediasView,
               },
             ],
           },
@@ -99,6 +105,33 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/admin',
         component: Admin,
+        redirect: '/admin/overview',
+        children: [
+          {
+            path: '/admin/overview',
+            component: AdminOverview,
+          },
+          {
+            path: '/admin/user',
+            component: AdminUser,
+          },
+          {
+            path: '/admin/subscribe',
+            component: AdminSubscribe,
+          },
+          {
+            path: '/admin/media',
+            component: AdminMedia,
+          },
+          {
+            path: '/admin/series',
+            component: AdminSeries,
+          },
+          {
+            path: '/admin/download',
+            component: AdminDownload,
+          },
+        ],
       },
       {
         path: '/setting',

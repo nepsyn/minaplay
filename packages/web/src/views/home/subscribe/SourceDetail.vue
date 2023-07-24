@@ -8,6 +8,7 @@ import { useRoute, useRouter } from 'vue-router';
 import _ from 'lodash';
 import { SourceEntity } from '@/interfaces/subscribe.interface';
 import SingleItemProvider from '@/components/provider/SingleItemProvider.vue';
+import ActionBtn from '@/components/provider/ActionBtn.vue';
 
 const app = useApp();
 const route = useRoute();
@@ -116,7 +117,7 @@ watch(
       <v-container class="pa-0 d-flex flex-row align-center">
         <span class="text-h6">基本信息</span>
         <v-spacer></v-spacer>
-        <v-btn variant="outlined" color="primary" :prepend-icon="mdiRefresh" @click="providerRef.load()">刷新</v-btn>
+        <action-btn text="刷新" color="primary" :icon="mdiRefresh" @click="providerRef.load()"></action-btn>
       </v-container>
       <v-divider class="my-4"></v-divider>
       <v-container class="my-4 pa-0">

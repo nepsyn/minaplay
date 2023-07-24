@@ -22,6 +22,7 @@ import { SourceEntity } from '@/interfaces/subscribe.interface';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import ToTopContainer from '@/components/provider/ToTopContainer.vue';
 import { useDisplay } from 'vuetify';
+import ActionBtn from '@/components/provider/ActionBtn.vue';
 
 const subscribe = useSubscribeStore();
 const app = useApp();
@@ -124,23 +125,21 @@ const providerRef: Ref<any> = ref(null);
           <v-toolbar flat color="background" border="b">
             <v-toolbar-title>订阅列表 ({{ subscribe.sources.length }})</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn
-              @click="resetSources() & providerRef.load()"
-              variant="outlined"
+            <action-btn
+              text="刷新"
               color="primary"
               :loading="providerRef?.status === 'loading'"
-              :prepend-icon="mdiRefresh"
-              >刷新
-            </v-btn>
-            <v-btn
+              @click="resetSources() & providerRef.load()"
+              :icon="mdiRefresh"
+            ></action-btn>
+            <action-btn
               class="ml-2"
-              variant="outlined"
+              text="添加"
               color="warning"
-              :prepend-icon="mdiPlus"
               :loading="sourceCreating"
               @click="createSource()"
-              >添加
-            </v-btn>
+              :icon="mdiPlus"
+            ></action-btn>
           </v-toolbar>
           <items-provider
             ref="providerRef"
@@ -205,7 +204,7 @@ const providerRef: Ref<any> = ref(null);
       <v-col :cols="display.smAndUp.value ? 8 : 12" class="pa-0 fill-height">
         <v-container v-if="sourceId" fluid class="pa-0 main-content d-flex flex-column">
           <v-toolbar flat color="background" density="compact" border="b">
-            <v-tabs v-model="tabValue" color="primary">
+            <v-tabs v-model="tabValue" color="primary" show-arrows>
               <v-tab
                 v-for="tab in tabs"
                 replace

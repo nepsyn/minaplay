@@ -10,6 +10,7 @@ import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useApp } from '@/store/app';
 import { Api } from '@/api/api';
 import { useRoute } from 'vue-router';
+import ActionBtn from '@/components/provider/ActionBtn.vue';
 
 const app = useApp();
 const route = useRoute();
@@ -54,14 +55,13 @@ watch(
       <v-container fluid class="pa-0 d-flex flex-row align-center">
         <span class="text-h6">数据查看</span>
         <v-spacer></v-spacer>
-        <v-btn
-          variant="outlined"
+        <action-btn
+          text="刷新"
           color="primary"
-          :prepend-icon="mdiRefresh"
+          :icon="mdiRefresh"
           :loading="providerRef?.status === 'loading'"
           @click="providerRef?.load()"
-          >刷新
-        </v-btn>
+        ></action-btn>
       </v-container>
       <v-divider class="my-4"></v-divider>
       <single-item-provider ref="providerRef" class="pa-0" :item="rawData" :load-fn="loadRawData" lazy>

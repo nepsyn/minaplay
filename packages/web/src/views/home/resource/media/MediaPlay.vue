@@ -107,14 +107,14 @@ watch(
             </single-item-provider>
           </v-col>
           <v-col :cols="display.smAndUp.value ? 4 : 12">
-            <v-container fluid class="pa-0 mt-4">
+            <v-container fluid class="pa-0 mt-2">
               <v-divider class="py-0"></v-divider>
               <v-tabs v-model="tab" fixed-tabs color="primary">
                 <v-tab value="0" :prepend-icon="mdiPlaylistPlay">播放列表</v-tab>
                 <v-tab value="1" :prepend-icon="mdiInformationVariantCircleOutline">媒体信息</v-tab>
               </v-tabs>
               <v-divider class="py-0"></v-divider>
-              <v-window v-model="tab">
+              <v-window v-model="tab" class="pb-6">
                 <v-window-item value="0">
                   <items-provider ref="recommendProvider" class="pa-0" :load-fn="loadRecommends" :items="recommends">
                     <media-overview-landscape
@@ -122,7 +122,7 @@ watch(
                       class="pa-2"
                       v-ripple
                       :media="recommend"
-                      @click="router.push(`/media/${recommend.id}`)"
+                      @click:content="router.push(`/media/${recommend.id}`)"
                       @click.right.prevent
                     ></media-overview-landscape>
                   </items-provider>

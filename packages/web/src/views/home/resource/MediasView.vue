@@ -5,6 +5,7 @@ import { ref, Ref } from 'vue';
 import { MediaQueryDto } from '@/interfaces/media.interface';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
+import ActionBtn from '@/components/provider/ActionBtn.vue';
 
 const router = useRouter();
 const display = useDisplay();
@@ -25,18 +26,16 @@ const latestUpdateQuery: Ref<MediaQueryDto> = ref({
       :icon="mdiHistory"
       :cols="display.smAndUp.value ? 4 : 1"
       icon-color="primary"
-      @media-click="(media) => router.push(`/media/${media.id}`)"
+      @click:media="(media) => router.push(`/media/${media.id}`)"
     >
       <template #actions="{ load, reset, status }">
-        <v-btn
-          variant="outlined"
+        <action-btn
           color="primary"
-          :prepend-icon="mdiRefresh"
+          text="刷新"
+          :icon="mdiRefresh"
           @click="reset() & load?.()"
           :loading="status === 'loading'"
-        >
-          刷新
-        </v-btn>
+        ></action-btn>
       </template>
     </media-plate>
   </v-container>

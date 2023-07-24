@@ -37,10 +37,12 @@ const handleHover = async (isHovering: boolean) => {
     await videoRef.value.load();
   }
 };
+
+const emits = defineEmits(['click:content']);
 </script>
 
 <template>
-  <v-container fluid class="pa-0 d-flex flex-column media-container">
+  <v-container v-bind="props" fluid class="pa-0 d-flex flex-column">
     <v-hover
       :disabled="!playOnHover"
       open-delay="400"
@@ -49,8 +51,9 @@ const handleHover = async (isHovering: boolean) => {
     >
       <v-responsive v-bind="props" :aspect-ratio="16 / 9" max-height="200">
         <video
+          @click="(e) => emits('click:content', e)"
           ref="videoRef"
-          class="poster video-js video-container"
+          class="poster clickable video-container"
           :src="Api.File.buildRawPath(media.file!.id)"
           :controls="isHovering"
           preload="metadata"
@@ -62,7 +65,14 @@ const handleHover = async (isHovering: boolean) => {
       </v-responsive>
     </v-hover>
 
-    <span class="mt-2 media-title font-weight-bold" :title="media.name">{{ media.name }}</span>
+    <span
+      @click="(e) => emits('click:content', e)"
+      class="mt-2 clickable media-title font-weight-bold"
+      :title="media.name"
+    >
+      {{ media.name }}
+    </span>
+
     <div class="mt-1 text-caption">
       <span>{{ sourceText }}</span>
       ·
@@ -72,7 +82,7 @@ const handleHover = async (isHovering: boolean) => {
 </template>
 
 <style scoped lang="sass">
-.media-container
+.clickable
   cursor: pointer
 
 .poster
@@ -90,4 +100,8 @@ const handleHover = async (isHovering: boolean) => {
   max-height: 3rem
   word-break: break-all
   text-overflow: ellipsis
+  transition: color 0.5s
+
+.media-title:hover
+  color: rgb(var(--v-theme-primary))
 </style>

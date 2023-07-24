@@ -7,6 +7,7 @@ import { Api } from '@/api/api';
 import { useRoute } from 'vue-router';
 import { mdiAlertCircle, mdiCheckCircle, mdiRefresh } from '@mdi/js';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
+import ActionBtn from '@/components/provider/ActionBtn.vue';
 
 const app = useApp();
 const route = useRoute();
@@ -60,17 +61,16 @@ watch(
       <v-container class="pa-0 d-flex flex-row align-center">
         <span class="text-h6">解析日志 ({{ logsTotal }})</span>
         <v-spacer></v-spacer>
-        <v-btn
-          variant="outlined"
+        <action-btn
+          text="重新加载"
           color="primary"
           :loading="providerRef?.status === 'loading'"
-          :prepend-icon="mdiRefresh"
+          :icon="mdiRefresh"
           @click="resetLogs() & providerRef?.load()"
-          >重新加载
-        </v-btn>
+        ></action-btn>
       </v-container>
       <v-divider class="my-4"></v-divider>
-      <items-provider ref="providerRef" class="pa-0" :load-fn="loadLogs" :items="logs">
+      <items-provider ref="providerRef" class="pa-0" :load-fn="loadLogs" :items="logs" auto-load>
         <v-alert
           class="my-4"
           v-for="log in logs"

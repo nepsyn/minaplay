@@ -26,7 +26,7 @@ const props = withDefaults(
 );
 
 const emits = defineEmits<{
-  (event: 'media-click', arg: MediaEntity): void;
+  (event: 'click:media', arg: MediaEntity): void;
 }>();
 
 const medias = ref<MediaEntity[]>([]);
@@ -75,7 +75,7 @@ const providerRef: Ref<any> = ref(null);
             class="pa-3"
             v-ripple
             play-on-hover
-            @click="emits('media-click', media)"
+            @click:content="emits('click:media', media)"
             @click.right.prevent
             :media="media"
           ></media-overview>

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import {
-  mdiAccountCircle,
   mdiCloudUploadOutline,
   mdiCog,
   mdiGithub,
@@ -18,6 +17,7 @@ import { vuetify } from '@/main';
 import { useApp } from '@/store/app';
 import { Api } from '@/api/api';
 import { useRoute, useRouter } from 'vue-router';
+import UserAvatar from '@/components/provider/UserAvatar.vue';
 
 const app = useApp();
 const theme = useTheme();
@@ -115,23 +115,16 @@ const navs = [
         <v-divider v-if="app.user" class="mx-2" inset vertical></v-divider>
         <v-menu v-if="app.user">
           <template #activator="{ props }">
-            <v-avatar v-bind="props" style="cursor: pointer" size="40">
-              <v-img>
-                <template #placeholder>
-                  <v-icon size="40" :icon="mdiAccountCircle"></v-icon>
-                </template>
-              </v-img>
-            </v-avatar>
+            <user-avatar
+              :url="app.user.avatar && Api.File.buildRawPath(app.user.avatar.id)"
+              v-bind="props"
+              style="cursor: pointer"
+              size="40"
+            ></user-avatar>
           </template>
           <v-card min-width="240" max-width="360" class="overflow-x-hidden">
             <v-container fluid class="d-flex flex-row align-center">
-              <v-avatar size="64">
-                <v-img>
-                  <template #placeholder>
-                    <v-icon size="64" :icon="mdiAccountCircle"></v-icon>
-                  </template>
-                </v-img>
-              </v-avatar>
+              <user-avatar :url="app.user.avatar && Api.File.buildRawPath(app.user.avatar.id)" size="64"></user-avatar>
               <v-container fluid class="py-0 d-flex flex-column">
                 <span class="text-h6 text-truncate">{{ app.user?.username }}</span>
                 <v-container fluid class="pa-0">

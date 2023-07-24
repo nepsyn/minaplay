@@ -46,7 +46,7 @@ defineExpose({
         size="80"
       >
         <v-btn
-          class="mr-8 pointer-events-initial"
+          class="me-8 pointer-events-initial"
           :size="size!"
           color="primary"
           elevation="8"

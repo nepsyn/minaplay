@@ -57,6 +57,8 @@ export const useApp = defineStore('user', () => {
   const uploadDrawer = ref(false);
   const uploadFiles: Ref<File[]> = ref([]);
 
+  const darkMode = ref(false);
+
   return {
     user,
     setUser,
@@ -69,5 +71,6 @@ export const useApp = defineStore('user', () => {
     toastInfo,
     uploadDrawer,
     uploadFiles,
+    darkMode,
   };
 });

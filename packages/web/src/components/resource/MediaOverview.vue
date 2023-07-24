@@ -53,7 +53,7 @@ const emits = defineEmits(['click:content']);
         <video
           @click="(e) => emits('click:content', e)"
           ref="videoRef"
-          class="poster clickable video-container"
+          class="rounded-lg clickable video-container"
           :src="Api.File.buildRawPath(media.file!.id)"
           :controls="isHovering"
           preload="metadata"
@@ -82,12 +82,6 @@ const emits = defineEmits(['click:content']);
 </template>
 
 <style scoped lang="sass">
-.clickable
-  cursor: pointer
-
-.poster
-  border-radius: 8px
-
 .video-container
   width: 100%
   height: 100%

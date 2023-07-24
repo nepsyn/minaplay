@@ -89,7 +89,7 @@ watch(
     <to-top-container class="scrollable-container">
       <v-container fluid class="py-4 px-6">
         <v-row>
-          <v-col :cols="display.smAndUp.value ? 8 : 12">
+          <v-col cols="12" sm="8">
             <single-item-provider ref="mediaProvider" :item="media" :load-fn="loadMedia">
               <v-responsive :aspect-ratio="16 / 9" max-height="520">
                 <video-provider :media="media" :options="playerOptions"></video-provider>
@@ -106,7 +106,7 @@ watch(
               </v-container>
             </single-item-provider>
           </v-col>
-          <v-col :cols="display.smAndUp.value ? 4 : 12">
+          <v-col cols="12" sm="4">
             <v-container fluid class="pa-0 mt-2">
               <v-divider class="py-0"></v-divider>
               <v-tabs v-model="tab" fixed-tabs color="primary">

@@ -61,7 +61,7 @@ const emits = defineEmits(['click:content']);
     <v-row no-gutters class="pa-0">
       <v-col cols="4" class="d-flex align-center">
         <v-img
-          class="poster clickable"
+          class="rounded-lg clickable"
           :src="media.poster ? Api.File.buildRawPath(media.poster!.id) : MediaCoverFallback"
           :aspect-ratio="16 / 9"
           @click="(e) => emits('click:content', e)"
@@ -69,7 +69,7 @@ const emits = defineEmits(['click:content']);
         </v-img>
       </v-col>
       <v-col cols="8">
-        <v-container fluid class="pa-0 pl-2 d-flex flex-column align-start justify-space-between fill-height">
+        <v-container fluid class="pa-0 ps-2 d-flex flex-column align-start justify-space-between h-100">
           <div class="d-flex flex-column">
             <span
               class="media-title font-weight-bold clickable"
@@ -106,12 +106,6 @@ const emits = defineEmits(['click:content']);
 </template>
 
 <style scoped lang="sass">
-.clickable
-  cursor: pointer
-
-.poster
-  border-radius: 4px
-
 .video-container
   height: 100%
   object-fit: cover

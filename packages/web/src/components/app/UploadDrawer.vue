@@ -2,8 +2,10 @@
 import { useApp } from '@/store/app';
 import { mdiPlus } from '@mdi/js';
 import UploadMedia from '@/components/app/UploadMedia.vue';
+import { useDisplay } from 'vuetify';
 
 const app = useApp();
+const display = useDisplay();
 
 const selectAndUploadMedia = () => {
   const el = document.createElement('input');
@@ -24,13 +26,19 @@ const onDrop = (e: DragEvent) => {
 </script>
 
 <template>
-  <v-navigation-drawer order="0" width="360" location="right" temporary v-model="app.uploadDrawer">
-    <v-container fluid class="pa-0 d-flex flex-column fill-height">
+  <v-navigation-drawer
+    order="0"
+    :class="display.smAndUp.value ? 'w-25' : 'w-75'"
+    location="right"
+    temporary
+    v-model="app.uploadDrawer"
+  >
+    <v-container fluid class="pa-0 d-flex flex-column h-100">
       <v-container fluid class="pa-0">
         <v-toolbar color="background" rounded="0">
           <v-toolbar-title>上传列表</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn class="mr-5" color="primary" variant="outlined" :append-icon="mdiPlus" @click="selectAndUploadMedia">
+          <v-btn class="me-5" color="primary" variant="outlined" :append-icon="mdiPlus" @click="selectAndUploadMedia">
             选择文件
           </v-btn>
         </v-toolbar>
@@ -45,7 +53,7 @@ const onDrop = (e: DragEvent) => {
             @close="app.uploadFiles.splice(index, 1)"
           ></upload-media>
         </template>
-        <v-container v-else class="fill-height d-flex justify-center align-center">
+        <v-container v-else class="h-100 d-flex justify-center align-center">
           <div class="upload-box d-flex flex-column justify-center align-center">
             <v-icon size="40" :icon="mdiPlus"></v-icon>
             <span class="text-body-2 mt-2">将媒体文件拖动到此处上传</span>

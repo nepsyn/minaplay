@@ -2,6 +2,7 @@
 import {
   mdiCloudUploadOutline,
   mdiCog,
+  mdiDotsVertical,
   mdiGithub,
   mdiMovieOpenPlay,
   mdiPencil,
@@ -11,7 +12,7 @@ import {
   mdiWeatherNight,
   mdiWeatherSunny,
 } from '@mdi/js';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useTheme } from 'vuetify';
 import { vuetify } from '@/main';
 import { useApp } from '@/store/app';
@@ -27,10 +28,9 @@ const route = useRoute();
 const drawerWidth = ref(108);
 const drawer = ref(vuetify.display.mdAndUp.value);
 
-const darkMode = ref(false);
 const toggleDarkMode = () => {
   theme.global.name.value = theme.global.current.value.dark ? 'light' : 'dark';
-  darkMode.value = !darkMode.value;
+  app.darkMode = !app.darkMode;
 };
 
 const openGitHubLink = () => {
@@ -51,6 +51,26 @@ const logout = () => {
     },
   });
 };
+
+const actions = ref([
+  {
+    text: '媒体文件上传',
+    icon: mdiCloudUploadOutline,
+    click: () => {
+      app.uploadDrawer = !app.uploadDrawer;
+    },
+  },
+  {
+    text: computed(() => '切换' + (app.darkMode ? '白天模式' : '夜间模式')),
+    icon: computed(() => (app.darkMode ? mdiWeatherSunny : mdiWeatherNight)),
+    click: toggleDarkMode,
+  },
+  {
+    text: 'GitHub仓库',
+    icon: mdiGithub,
+    click: openGitHubLink,
+  },
+]);
 
 const navs = [
   {
@@ -90,28 +110,41 @@ const navs = [
     </v-badge>
     <template v-slot:append>
       <div class="d-flex flex-row align-center">
-        <v-tooltip text="媒体文件上传" location="bottom" open-delay="500">
+        <div class="d-none d-sm-flex">
+          <v-tooltip
+            v-for="(action, index) in actions"
+            :key="index"
+            :text="action.text"
+            location="bottom"
+            open-delay="500"
+          >
+            <template v-slot:activator="{ props }">
+              <v-btn icon v-bind="props" @click="action.click">
+                <v-icon :icon="action.icon" size="large"></v-icon>
+              </v-btn>
+            </template>
+          </v-tooltip>
+        </div>
+        <v-menu>
           <template v-slot:activator="{ props }">
-            <v-btn icon v-bind="props" @click="app.uploadDrawer = !app.uploadDrawer">
-              <v-icon :icon="mdiCloudUploadOutline" size="large"></v-icon>
+            <v-btn class="d-flex d-sm-none" icon v-bind="props">
+              <v-icon :icon="mdiDotsVertical" size="large"></v-icon>
             </v-btn>
           </template>
-        </v-tooltip>
-        <v-divider class="mx-2" inset vertical></v-divider>
-        <v-tooltip :text="darkMode ? '白天模式' : '夜间模式'" location="bottom" open-delay="500">
-          <template v-slot:activator="{ props }">
-            <v-btn icon v-bind="props" @click="toggleDarkMode">
-              <v-icon :icon="darkMode ? mdiWeatherSunny : mdiWeatherNight" size="large"></v-icon>
-            </v-btn>
-          </template>
-        </v-tooltip>
-        <v-tooltip location="bottom" open-delay="500" text="GitHub仓库">
-          <template v-slot:activator="{ props }">
-            <v-btn icon v-bind="props" @click="openGitHubLink">
-              <v-icon :icon="mdiGithub" size="large"></v-icon>
-            </v-btn>
-          </template>
-        </v-tooltip>
+          <v-card max-width="360" class="overflow-x-hidden">
+            <v-list density="compact" class="pa-0">
+              <v-list-item
+                link
+                v-for="(action, index) in actions"
+                :key="index"
+                @click="action.click"
+                :title="action.text"
+                :prepend-icon="action.icon"
+              >
+              </v-list-item>
+            </v-list>
+          </v-card>
+        </v-menu>
         <v-divider v-if="app.user" class="mx-2" inset vertical></v-divider>
         <v-menu v-if="app.user">
           <template #activator="{ props }">

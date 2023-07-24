@@ -7,9 +7,17 @@ import { useRouter } from 'vue-router';
 import UploadDrawer from '@/components/app/UploadDrawer.vue';
 import MessagesContainer from '@/components/app/MessagesContainer.vue';
 import { onBeforeMount } from 'vue';
+import { useTheme } from 'vuetify';
 
 const app = useApp();
 const router = useRouter();
+const theme = useTheme();
+
+try {
+  const themeMedia = matchMedia('(prefers-color-scheme: dark)');
+  theme.global.name.value = themeMedia.matches ? 'dark' : 'light';
+  app.darkMode = themeMedia.matches;
+} catch {}
 
 onBeforeMount(async () => {
   if (Api.isLogin) {

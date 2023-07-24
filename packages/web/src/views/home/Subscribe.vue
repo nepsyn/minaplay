@@ -116,12 +116,8 @@ const providerRef: Ref<any> = ref(null);
 <template>
   <v-container fluid class="pa-0 main-content d-flex flex-column">
     <v-row class="ma-0">
-      <v-col
-        v-if="display.smAndUp.value || isNaN(sourceId)"
-        :cols="display.smAndUp.value ? 4 : 12"
-        class="pa-0 fill-height"
-      >
-        <v-container fluid class="pa-0 d-flex flex-column align-center fill-height">
+      <v-col v-if="display.smAndUp.value || isNaN(sourceId)" cols="12" sm="4" class="pa-0 h-100">
+        <v-container fluid class="pa-0 d-flex flex-column align-center h-100">
           <v-toolbar flat color="background" border="b">
             <v-toolbar-title>订阅列表 ({{ subscribe.sources.length }})</v-toolbar-title>
             <v-spacer></v-spacer>
@@ -181,7 +177,7 @@ const providerRef: Ref<any> = ref(null);
               </v-list>
               <v-container
                 v-if="status !== 'loading' && subscribe.sources.length === 0"
-                class="d-flex flex-column align-center justify-center fill-height"
+                class="d-flex flex-column align-center justify-center h-100"
               >
                 <v-icon size="40" :icon="mdiEmoticonSadOutline"></v-icon>
                 <div class="mt-2">
@@ -200,8 +196,8 @@ const providerRef: Ref<any> = ref(null);
           </items-provider>
         </v-container>
       </v-col>
-      <v-divider v-if="display.smAndUp.value" vertical class="fill-height"></v-divider>
-      <v-col :cols="display.smAndUp.value ? 8 : 12" class="pa-0 fill-height">
+      <v-divider vertical class="h-100 d-none d-sm-flex"></v-divider>
+      <v-col cols="12" sm="8" class="pa-0 h-100">
         <v-container v-if="sourceId" fluid class="pa-0 main-content d-flex flex-column">
           <v-toolbar flat color="background" density="compact" border="b">
             <v-tabs v-model="tabValue" color="primary" show-arrows>

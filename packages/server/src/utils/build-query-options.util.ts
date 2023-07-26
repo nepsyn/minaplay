@@ -52,8 +52,7 @@ export function buildQueryOptions<T>(options: QueryOptions<T>): FindOptionsWhere
     for (const property of keywordProperties) {
       conditions.push({
         [property]: Like(`%${options.keyword}%`),
-        ...options.exact,
-      });
+      } as any);
     }
   } else if (options.exact) {
     const cleaned = removeUndefinedProperties(options.exact);

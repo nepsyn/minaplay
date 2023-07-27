@@ -3,6 +3,7 @@ import { useApp } from '@/store/app';
 import { mdiPlus } from '@mdi/js';
 import UploadMedia from '@/components/app/UploadMedia.vue';
 import { useDisplay } from 'vuetify';
+import ActionBtn from '@/components/provider/ActionBtn.vue';
 
 const app = useApp();
 const display = useDisplay();
@@ -38,9 +39,13 @@ const onDrop = (e: DragEvent) => {
         <v-toolbar color="background" rounded="0">
           <v-toolbar-title>上传列表</v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn class="me-5" color="primary" variant="outlined" :append-icon="mdiPlus" @click="selectAndUploadMedia">
-            选择文件
-          </v-btn>
+          <action-btn
+            class="me-4"
+            text="选择文件"
+            color="primary"
+            :icon="mdiPlus"
+            @click="selectAndUploadMedia"
+          ></action-btn>
         </v-toolbar>
         <v-divider></v-divider>
       </v-container>

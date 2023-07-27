@@ -16,7 +16,8 @@ import {
 } from '@/interfaces/subscribe.interface';
 import { ApiQueryResult } from '@/interfaces/common.interface';
 import { MediaDto, MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
-import { UserDto, UserEntity } from '@/interfaces/user.interface';
+import { UserDto, UserEntity, UserQueryDto } from '@/interfaces/user.interface';
+import { SeriesEntity, SeriesQueryDto } from '@/interfaces/series.interface';
 
 class ApiHelper {
   private token: string | null = null;
@@ -108,9 +109,14 @@ class ApiHelper {
       this.apiGet<ApiQueryResult<DownloadItemEntity>, DownloadItemQueryDto>(`/subscribe/${id}/download`),
   };
 
+  Series = {
+    query: this.apiGet<ApiQueryResult<SeriesEntity>, SeriesQueryDto>('/series'),
+  };
+
   User = {
     getById: (id: number) => this.apiGet<UserEntity>(`/user/${id}`),
     update: (id: number) => this.apiPut<UserEntity, UserDto>(`/user/${id}`),
+    query: this.apiGet<ApiQueryResult<UserEntity>, UserQueryDto>(`/user`),
   };
 
   SubscribeRule = {

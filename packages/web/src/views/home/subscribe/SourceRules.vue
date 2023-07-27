@@ -46,9 +46,7 @@ const resetRules = () => {
   rulesQuery.page = 0;
 };
 
-const ruleCodeEditorExtensions = computed(() =>
-  theme.global.name.value === 'dark' ? [javascript(), oneDark] : [javascript()],
-);
+const ruleCodeEditorExtensions = computed(() => (app.darkMode ? [javascript(), oneDark] : [javascript()]));
 
 const editRuleId: Ref<number | undefined> = ref(undefined);
 const onKeydown = async (e: KeyboardEvent, id: number, code?: string) => {
@@ -171,6 +169,7 @@ watch(
         <v-sheet class="my-4" border rounded v-for="(rule, index) in rules">
           <v-toolbar density="compact" color="background" class="px-4 py-2 d-flex flex-row align-center">
             <label-editor
+              class="text-truncate"
               :save-fn="(remark) => Api.SubscribeRule.update(rule.id)({ remark })"
               @saved="(resp) => (rules[index].remark = resp.data.remark)"
               @error="app.toastError('备注保存失败！')"

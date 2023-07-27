@@ -6,10 +6,12 @@ import LogoLandscape from '@/assets/logo_banner_landscape.jpeg';
 import { useRoute, useRouter } from 'vue-router';
 import { mdiAccountCircleOutline, mdiEye, mdiEyeOff, mdiLockOutline } from '@mdi/js';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
+import { useDisplay } from 'vuetify';
 
 const app = useApp();
 const route = useRoute();
 const router = useRouter();
+const display = useDisplay();
 
 const action: Ref<'login' | 'register'> = ref('login');
 const toggleAction = function () {
@@ -49,7 +51,7 @@ const register = async () => {};
 
 <template>
   <v-container class="d-flex justify-center align-center login-page overflow-y-auto" fluid>
-    <v-card width="640">
+    <v-card :class="display.smAndUp.value ? 'w-50' : 'w-100'">
       <v-img :src="LogoLandscape"></v-img>
       <v-card-title class="d-flex flex-row justify-space-between align-center">
         <span class="py-2" v-if="action === 'login'">登录到 Minaplay</span>

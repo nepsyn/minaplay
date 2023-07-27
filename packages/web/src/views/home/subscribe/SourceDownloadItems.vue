@@ -53,14 +53,7 @@ const getDownloadItemStatusText = (item: DownloadItemEntity) => {
   return item.status === 'DOWNLOADED' ? '下载完成' : item.status === 'DOWNLOADING' ? '正在下载' : '下载失败';
 };
 
-const copyDownloadUrl = async (url: string) => {
-  try {
-    await navigator.clipboard.writeText(url);
-    app.toastSuccess('下载链接已复制到剪切板');
-  } catch {
-    app.toastError('复制下载链接失败');
-  }
-};
+const copyDownloadUrl = async (url: string) => app.copyContent(url, '下载链接已复制到剪切板', '复制下载链接失败');
 
 const providerRef: Ref<any> = ref(null);
 watch(

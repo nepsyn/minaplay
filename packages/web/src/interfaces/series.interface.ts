@@ -31,7 +31,7 @@ export interface SeriesDto {
   tagIds?: number[];
 }
 
-export interface SeriesQueryDto {
+export interface SeriesQueryDto extends ApiQueryDto<SeriesEntity> {
   keyword?: string;
   name?: string;
 }

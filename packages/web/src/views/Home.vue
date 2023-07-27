@@ -61,7 +61,7 @@ const actions = ref([
     },
   },
   {
-    text: computed(() => '切换' + (app.darkMode ? '白天模式' : '夜间模式')),
+    text: computed(() => '切换' + (app.darkMode ? '浅色模式' : '深色模式')),
     icon: computed(() => (app.darkMode ? mdiWeatherSunny : mdiWeatherNight)),
     click: toggleDarkMode,
   },

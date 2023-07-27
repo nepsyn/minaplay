@@ -52,10 +52,10 @@ const providerRef: Ref<any> = ref(null);
 </script>
 
 <template>
-  <v-container fluid class="pa-0">
-    <v-container fluid class="mb-2 px-3 d-flex align-center">
+  <v-container fluid>
+    <v-container fluid class="px-3 d-flex align-center">
       <v-container fluid class="pa-0 d-flex align-center">
-        <v-icon size="x-large" :color="iconColor!" :icon="icon"></v-icon>
+        <v-icon size="40" :color="iconColor!" :icon="icon"></v-icon>
         <span class="ml-2 text-h5">{{ title }}</span>
       </v-container>
       <v-spacer></v-spacer>

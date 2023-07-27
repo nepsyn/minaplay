@@ -19,7 +19,7 @@ const latestUpdateQuery: Ref<MediaQueryDto> = ref({
 </script>
 
 <template>
-  <v-container fluid class="px-8 pb-6">
+  <v-container>
     <media-plate
       title="最近更新"
       :query="latestUpdateQuery"

@@ -88,12 +88,15 @@ const emits = defineEmits(['click:content']);
   object-fit: cover
 
 .media-title
+  display: -webkit-box
   overflow: hidden
   font-size: 1rem
   line-height: 1.5rem
   max-height: 3rem
   word-break: break-all
   text-overflow: ellipsis
+  -webkit-box-orient: vertical
+  -webkit-line-clamp: 2
   transition: color 0.5s
 
 .media-title:hover

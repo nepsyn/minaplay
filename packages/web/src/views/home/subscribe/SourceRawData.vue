@@ -18,7 +18,7 @@ const theme = useTheme();
 
 const sourceId = computed(() => Number(route.params.id));
 
-const rawDataViewerExtensions = computed(() => (theme.global.name.value === 'dark' ? [json(), oneDark] : [json()]));
+const rawDataViewerExtensions = computed(() => (app.darkMode ? [json(), oneDark] : [json()]));
 const rawData = ref('');
 const loadRawData = async (done: any) => {
   try {

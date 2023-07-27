@@ -116,7 +116,7 @@ const providerRef: Ref<any> = ref(null);
 <template>
   <v-container fluid class="pa-0 main-content d-flex flex-column">
     <v-row class="ma-0">
-      <v-col v-if="display.smAndUp.value || isNaN(sourceId)" cols="12" sm="4" class="pa-0 h-100">
+      <v-col v-if="display.mdAndUp.value || isNaN(sourceId)" cols="12" md="4" class="pa-0 h-100">
         <v-container fluid class="pa-0 d-flex flex-column align-center h-100">
           <v-toolbar flat color="background" border="b">
             <v-toolbar-title>订阅列表 ({{ subscribe.sources.length }})</v-toolbar-title>
@@ -196,8 +196,8 @@ const providerRef: Ref<any> = ref(null);
           </items-provider>
         </v-container>
       </v-col>
-      <v-divider vertical class="h-100 d-none d-sm-flex"></v-divider>
-      <v-col cols="12" sm="8" class="pa-0 h-100">
+      <v-divider vertical class="h-100 d-none d-md-flex"></v-divider>
+      <v-col cols="12" md="8" class="pa-0 h-100">
         <v-container v-if="sourceId" fluid class="pa-0 main-content d-flex flex-column">
           <v-toolbar flat color="background" density="compact" border="b">
             <v-tabs v-model="tabValue" color="primary" show-arrows>

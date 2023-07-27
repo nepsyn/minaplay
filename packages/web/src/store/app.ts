@@ -59,6 +59,15 @@ export const useApp = defineStore('user', () => {
 
   const darkMode = ref(false);
 
+  const copyContent = async (url: string, successText?: string, errorText?: string) => {
+    try {
+      await navigator.clipboard.writeText(url);
+      toastSuccess(successText ?? '已复制到剪切板');
+    } catch {
+      toastError(errorText ?? '复制失败');
+    }
+  };
+
   return {
     user,
     setUser,
@@ -72,5 +81,6 @@ export const useApp = defineStore('user', () => {
     uploadDrawer,
     uploadFiles,
     darkMode,
+    copyContent,
   };
 });

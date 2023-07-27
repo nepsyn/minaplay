@@ -44,7 +44,7 @@ onMounted(async () => {
     <slot name="loading" v-if="status === 'loading' && !hideLoading">
       <v-container class="d-flex flex-column justify-center align-center">
         <v-progress-circular color="primary" indeterminate></v-progress-circular>
-        <span class="text-caption mt-2">加载中，请稍候~~~</span>
+        <span class="text-caption mt-2 text-medium-emphasis">加载中，请稍候~~~</span>
       </v-container>
     </slot>
     <slot name="error" v-else-if="status === 'error' && !hideError" :load="load">

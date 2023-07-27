@@ -3,7 +3,7 @@ import { mdiAccountCircle } from '@mdi/js';
 
 const props = withDefaults(
   defineProps<{
-    url?: string;
+    src?: string;
     size?: string | number;
   }>(),
   {
@@ -14,7 +14,7 @@ const props = withDefaults(
 
 <template>
   <v-avatar :size="size!">
-    <v-img :src="url!">
+    <v-img :src="src!">
       <template #placeholder>
         <v-icon :size="size!" :icon="mdiAccountCircle"></v-icon>
       </template>

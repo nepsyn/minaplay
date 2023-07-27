@@ -12,6 +12,7 @@ import Plyr from 'plyr';
 import { useDisplay } from 'vuetify';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
+import ActionBtn from '@/components/provider/ActionBtn.vue';
 
 const app = useApp();
 const route = useRoute();
@@ -99,7 +100,7 @@ watch(
                 <v-container fluid class="pa-0 d-flex flex-row align-center">
                   <span class="mt-1 text-caption">上传于 {{ new Date(media.createAt).toLocaleString() }}</span>
                   <v-spacer></v-spacer>
-                  <v-btn :prepend-icon="mdiMotionPlayOutline" variant="text" color="secondary">一起看</v-btn>
+                  <action-btn text="一起看" :icon="mdiMotionPlayOutline" variant="text" color="secondary"></action-btn>
                 </v-container>
                 <v-divider class="my-2"></v-divider>
                 <pre class="text-subtitle-2 font-weight-light">{{ media.description ?? '暂无无媒体描述' }}</pre>

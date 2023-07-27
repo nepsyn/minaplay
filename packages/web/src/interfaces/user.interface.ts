@@ -1,5 +1,6 @@
 import { PermissionEnum } from '@/api/enums/permission.enum';
 import { FileEntity } from '@/interfaces/file.interface';
+import { ApiQueryDto } from '@/interfaces/common.interface';
 
 export interface UserEntity {
   /** id */
@@ -18,4 +19,9 @@ export interface UserEntity {
 
 export interface UserDto {
   avatarFileId?: string;
+}
+
+export interface UserQueryDto extends ApiQueryDto<UserEntity> {
+  keyword?: string;
+  username?: string;
 }

@@ -9,18 +9,22 @@ const props = withDefaults(
     color?: string;
     icon?: string;
     loading?: boolean;
+    size?: string;
+    variant?: 'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain';
   }>(),
   {
     loading: false,
+    variant: 'outlined',
   },
 );
 </script>
 
 <template>
   <v-btn
-    :variant="display.smAndUp.value ? 'outlined' : 'text'"
+    :variant="display.smAndUp.value ? variant! : 'text'"
     :text="text!"
     :color="color!"
+    :size="size!"
     :loading="loading!"
     :icon="display.smAndUp.value ? undefined : icon as any"
     :prepend-icon="icon!"

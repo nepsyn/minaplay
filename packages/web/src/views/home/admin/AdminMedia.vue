@@ -13,10 +13,17 @@ import {
   mdiCloudUploadOutline,
   mdiDelete,
   mdiFileVideo,
+  mdiPencil,
+  mdiRefresh,
 } from '@mdi/js';
 import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
+import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
+import { useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
 
 const app = useApp();
+const router = useRouter();
+const display = useDisplay();
 
 const items = ref<MediaEntity[]>([]);
 const options = ref({
@@ -34,10 +41,6 @@ const headers = ref([
   {
     title: '标题',
     key: 'name',
-  },
-  {
-    title: '描述',
-    key: 'description',
   },
   {
     title: '海报图',
@@ -89,6 +92,58 @@ const useQuery = async () => {
   query.value = Object.assign({}, edit.value);
   options.value.page = 1;
   await loadItems(options.value);
+};
+
+const deleteItem = async (id: string) => {
+  loading.value = true;
+  try {
+    await Api.Media.delete(id)();
+    items.value = items.value.filter(({ id: val }) => val !== id);
+    app.toastSuccess('删除媒体文件成功');
+  } catch {
+    app.toastError('删除媒体文件失败');
+  } finally {
+    loading.value = false;
+  }
+};
+
+const getFiles = (item: MediaEntity) => {
+  return [item.file]
+    .concat([item.poster])
+    .concat(item.subtitles)
+    .concat(item.attachments)
+    .filter((v) => v != undefined);
+};
+const openUrl = (url: string) => {
+  window.open(url);
+};
+
+const editDialog = ref(false);
+const editItem = ref<MediaEntity | undefined>(undefined);
+const openEdit = (item: MediaEntity) => {
+  editItem.value = Object.assign({}, item);
+  editDialog.value = true;
+};
+const editLoading = ref(false);
+const saveEdit = async () => {
+  editLoading.value = true;
+  try {
+    const response = await Api.Media.update(editItem.value!.id)({
+      name: editItem.value!.name,
+      description: editItem.value!.description,
+    });
+    const index = items.value.findIndex(({ id }) => id === editItem.value!.id);
+    if (index > -1) {
+      console.log(index);
+      items.value[index] = response.data;
+    }
+    editDialog.value = false;
+    app.toastSuccess('修改媒体信息成功');
+  } catch {
+    app.toastError('修改媒体信息失败');
+  } finally {
+    editLoading.value = false;
+  }
 };
 </script>
 
@@ -171,6 +226,7 @@ const useQuery = async () => {
           v-model:items-per-page="options.itemsPerPage"
           v-model:page="options.page"
           v-model:sort-by="options.sortBy"
+          expand-on-click
           :headers="headers"
           :items-length="total"
           :items="items"
@@ -181,7 +237,7 @@ const useQuery = async () => {
           items-per-page-text="每页数量："
           :page-text="`第 ${options.page} 页，共 ${Math.ceil(total / options.itemsPerPage)} 页`"
           hover
-          item-value="name"
+          item-value="id"
           @update:options="loadItems"
           density="compact"
           class="text-caption font-weight-bold"
@@ -189,6 +245,13 @@ const useQuery = async () => {
           <template #bottom>
             <v-divider></v-divider>
             <v-container fluid class="py-1 px-2 d-flex flex-row align-center">
+              <action-btn
+                color="primary"
+                text="刷新"
+                :icon="mdiRefresh"
+                size="small"
+                @click="loadItems(options)"
+              ></action-btn>
               <v-spacer></v-spacer>
               <v-pagination
                 show-first-last-page
@@ -198,6 +261,37 @@ const useQuery = async () => {
                 :length="Math.ceil(total / options.itemsPerPage)"
               ></v-pagination>
             </v-container>
+          </template>
+          <template #expanded-row="{ item }">
+            <tr>
+              <td :colspan="headers.length">
+                <v-container fluid>
+                  <v-row>
+                    <v-col cols="12" sm="6" class="border rounded d-flex align-center justify-center">
+                      <media-overview-landscape
+                        :media="item.raw"
+                        @click:content="router.push(`/media/${item.raw.id}`)"
+                      ></media-overview-landscape>
+                    </v-col>
+                    <v-col cols="12" sm="6" class="d-flex flex-column">
+                      <span class="text-subtitle-2 font-weight-bold">媒体文件描述</span>
+                      <pre class="text-caption mt-1">{{ item.raw.description ?? '暂无媒体文件描述' }}</pre>
+                      <span class="text-subtitle-2 font-weight-bold mt-1">文件列表</span>
+                      <div>
+                        <span
+                          class="mr-2 text-caption text-primary text-decoration-underline clickable text-break"
+                          v-for="file in getFiles(item.raw)"
+                          :key="file!.id"
+                          @click="openUrl(Api.File.buildDownloadPath(file!.id))"
+                        >
+                          {{ file.name }}
+                        </span>
+                      </div>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </td>
+            </tr>
           </template>
           <template #item.poster="{ item }">
             <v-responsive :aspect-ratio="16 / 9" class="pa-1">
@@ -232,11 +326,81 @@ const useQuery = async () => {
             {{ new Date(item.raw.createAt).toLocaleString() }}
           </template>
           <template #item.actions="{ item }">
-            <action-btn text="删除" :icon="mdiDelete" size="small" color="error" variant="tonal"></action-btn>
+            <v-container fluid class="pa-0 d-flex flex-row">
+              <action-btn
+                text="编辑"
+                :icon="mdiPencil"
+                size="small"
+                color="secondary"
+                variant="tonal"
+                @click.stop="openEdit(item.raw)"
+              ></action-btn>
+              <v-menu>
+                <template #activator="{ props }">
+                  <action-btn
+                    class="ms-1"
+                    v-bind="props"
+                    text="删除"
+                    :icon="mdiDelete"
+                    size="small"
+                    color="error"
+                    variant="tonal"
+                  ></action-btn>
+                </template>
+                <v-card>
+                  <v-card-title>删除确认</v-card-title>
+                  <v-card-text>确定要删除该媒体文件吗？该操作不可撤销！</v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" variant="text">取消</v-btn>
+                    <v-btn color="error" variant="plain" @click="deleteItem(item.raw.id)">确定</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-menu>
+            </v-container>
           </template>
         </v-data-table-server>
       </v-sheet>
     </v-container>
+    <v-dialog
+      :class="display.smAndUp.value ? 'w-75' : 'w-100'"
+      :fullscreen="!display.smAndUp.value"
+      v-model="editDialog"
+      scrollable
+    >
+      <v-card>
+        <v-toolbar color="primary">
+          <v-btn :icon="mdiClose" @click="editDialog = false"></v-btn>
+          <v-toolbar-title>编辑 {{ editItem!.id }}</v-toolbar-title>
+          <action-btn :icon="mdiCheck" text="保存" variant="text" :loading="editLoading" @click="saveEdit"></action-btn>
+        </v-toolbar>
+        <v-container class="d-flex flex-column">
+          <v-container class="pa-0">
+            <span class="text-body-1">标题</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              v-model="editItem!.name"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1">描述</span>
+            <v-textarea
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              rows="2"
+              v-model="editItem!.description"
+            ></v-textarea>
+          </v-container>
+        </v-container>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 

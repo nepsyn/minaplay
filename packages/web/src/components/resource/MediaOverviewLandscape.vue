@@ -28,28 +28,23 @@ const sourceText = computed(() => {
   }
 });
 
-const videoRef = ref<HTMLVideoElement>(null as any);
-const handleHover = async (isHovering: boolean) => {
-  if (isHovering && videoRef.value) {
-    await videoRef.value.play();
-  } else {
-    await videoRef.value.pause();
-    await videoRef.value.load();
-  }
-};
-
 const duration = ref(0);
 const minutes = computed(() => {
   return Math.floor(duration.value / 60);
 });
 const seconds = computed(() => {
-  return Math.floor(duration.value) % 60;
+  return String(Math.floor(duration.value) % 60).padStart(2, '0');
 });
 onMounted(async () => {
-  if (videoRef.value) {
-    videoRef.value.onloadedmetadata = () => {
-      duration.value = videoRef.value.duration;
+  if (props.media.file?.id) {
+    const videoEl = document.createElement('video');
+    videoEl.preload = 'metadata';
+    videoEl.autoplay = false;
+    videoEl.onloadedmetadata = () => {
+      duration.value = videoEl.duration;
+      videoEl.remove();
     };
+    videoEl.src = Api.File.buildDownloadPath(props.media.file.id);
   }
 });
 
@@ -83,15 +78,11 @@ const emits = defineEmits(['click:content']);
                 <v-chip color="info" class="text-caption" size="x-small" label>
                   {{ sourceText }}
                 </v-chip>
-                <v-chip
-                  v-if="duration > 0"
-                  color="info"
-                  class="ml-1 text-caption"
-                  size="x-small"
-                  style="cursor: pointer"
-                  label
-                >
+                <v-chip v-if="duration > 0" color="info" class="ml-1 text-caption" size="x-small" label>
                   {{ minutes }}:{{ seconds }}
+                </v-chip>
+                <v-chip v-if="media.subtitles?.length > 0" color="info" class="ml-1 text-caption" size="x-small" label>
+                  外部字幕
                 </v-chip>
               </slot>
             </div>

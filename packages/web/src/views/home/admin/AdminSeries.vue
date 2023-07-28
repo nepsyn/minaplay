@@ -3,7 +3,7 @@ import { useApp } from '@/store/app';
 import { ref } from 'vue';
 import { Api } from '@/api/api';
 import { SeriesEntity, SeriesQueryDto } from '@/interfaces/series.interface';
-import { mdiCheck, mdiChevronDown, mdiChevronUp, mdiClose, mdiMultimedia } from '@mdi/js';
+import { mdiCheck, mdiChevronDown, mdiChevronUp, mdiClose, mdiMultimedia, mdiRefresh } from '@mdi/js';
 import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 
@@ -164,7 +164,7 @@ const useQuery = async () => {
           items-per-page-text="每页数量："
           :page-text="`第 ${options.page} 页，共 ${Math.ceil(total / options.itemsPerPage)} 页`"
           hover
-          item-value="name"
+          item-value="id"
           @update:options="loadItems"
           density="compact"
           class="text-caption font-weight-bold"
@@ -172,6 +172,13 @@ const useQuery = async () => {
           <template #bottom>
             <v-divider></v-divider>
             <v-container fluid class="py-1 px-2 d-flex flex-row align-center">
+              <action-btn
+                color="primary"
+                text="刷新"
+                :icon="mdiRefresh"
+                size="small"
+                @click="loadItems(options)"
+              ></action-btn>
               <v-spacer></v-spacer>
               <v-pagination
                 show-first-last-page

@@ -84,7 +84,6 @@ export class MediaController {
       ...data,
       file: { id: data.fileId },
       poster: { id: data.posterFileId },
-      subtitles: data.subtitleFilesId && data.subtitleFilesId.map((id) => ({ id })),
     });
 
     const media = await this.mediaService.findOneBy({ id });

@@ -15,12 +15,17 @@ const props = withDefaults(
     icon: string;
     title: string;
     query: MediaQueryDto;
-    cols?: string | number;
     count?: string | number;
+    cols?: string | number;
+    sm?: string | number;
+    md?: string | number;
+    lg?: string | number;
+    xl?: string | number;
+    xxl?: string | number;
   }>(),
   {
     iconColor: 'primary',
-    cols: 4,
+    cols: 3,
     count: 8,
   },
 );
@@ -64,13 +69,31 @@ const providerRef: Ref<any> = ref(null);
     <items-provider class="pa-0" ref="providerRef" :load-fn="load" :items="medias" hide-empty>
       <template #loading>
         <v-row no-gutters>
-          <v-col :cols="12 / Number(cols)" v-for="index of Number(count)" :key="index">
+          <v-col
+            :cols="cols!"
+            :sm="sm!"
+            :md="md!"
+            :lg="lg!"
+            :xl="xl!"
+            :xxl="xxl!"
+            v-for="index of Number(count)"
+            :key="index"
+          >
             <v-skeleton-loader class="pa-3" type="image,list-item-two-line"></v-skeleton-loader>
           </v-col>
         </v-row>
       </template>
       <v-row no-gutters>
-        <v-col :cols="12 / Number(cols)" v-for="media in medias" :key="media.id">
+        <v-col
+          :cols="cols!"
+          :sm="sm!"
+          :md="md!"
+          :lg="lg!"
+          :xl="xl!"
+          :xxl="xxl!"
+          v-for="media in medias"
+          :key="media.id"
+        >
           <media-overview
             class="pa-3"
             v-ripple

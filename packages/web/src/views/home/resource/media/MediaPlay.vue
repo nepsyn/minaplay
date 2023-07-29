@@ -9,7 +9,6 @@ import ToTopContainer from '@/components/provider/ToTopContainer.vue';
 import { mdiInformationVariantCircleOutline, mdiMotionPlayOutline, mdiPlaylistPlay } from '@mdi/js';
 import VideoProvider from '@/components/provider/VideoProvider.vue';
 import Plyr from 'plyr';
-import { useDisplay } from 'vuetify';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
@@ -17,7 +16,6 @@ import ActionBtn from '@/components/provider/ActionBtn.vue';
 const app = useApp();
 const route = useRoute();
 const router = useRouter();
-const display = useDisplay();
 
 const mediaId = computed(() => String(route.params.id));
 
@@ -90,7 +88,7 @@ watch(
     <to-top-container class="scrollable-container">
       <v-container fluid class="py-4 px-6">
         <v-row>
-          <v-col cols="12" sm="8">
+          <v-col cols="12" md="8">
             <single-item-provider ref="mediaProvider" :item="media" :load-fn="loadMedia">
               <v-responsive :aspect-ratio="16 / 9" max-height="520">
                 <video-provider :media="media" :options="playerOptions"></video-provider>
@@ -103,11 +101,14 @@ watch(
                   <action-btn text="一起看" :icon="mdiMotionPlayOutline" variant="text" color="secondary"></action-btn>
                 </v-container>
                 <v-divider class="my-2"></v-divider>
-                <pre class="text-subtitle-2 font-weight-light">{{ media.description ?? '暂无无媒体描述' }}</pre>
+                <pre
+                  class="text-subtitle-2 font-weight-light text-pre-wrap text-break"
+                  v-text="media.description ?? '暂无无媒体描述'"
+                ></pre>
               </v-container>
             </single-item-provider>
           </v-col>
-          <v-col cols="12" sm="4">
+          <v-col cols="12" md="4">
             <v-container fluid class="pa-0 mt-2">
               <v-divider class="py-0"></v-divider>
               <v-tabs v-model="tab" fixed-tabs color="primary">

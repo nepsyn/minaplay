@@ -20,6 +20,8 @@ import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
+import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
+import ViewImg from '@/components/provider/ViewImg.vue';
 
 const app = useApp();
 const router = useRouter();
@@ -131,19 +133,44 @@ const saveEdit = async () => {
     const response = await Api.Media.update(editItem.value!.id)({
       name: editItem.value!.name,
       description: editItem.value!.description,
+      posterFileId: editItem.value!.poster?.id,
     });
     const index = items.value.findIndex(({ id }) => id === editItem.value!.id);
     if (index > -1) {
-      console.log(index);
       items.value[index] = response.data;
     }
     editDialog.value = false;
-    app.toastSuccess('修改媒体信息成功');
+    app.toastSuccess('保存媒体文件信息成功');
   } catch {
-    app.toastError('修改媒体信息失败');
+    app.toastError('保存媒体文件信息失败');
   } finally {
     editLoading.value = false;
   }
+};
+const posterUploading = ref(false);
+const selectAndUploadPoster = () => {
+  const el = document.createElement('input');
+  el.accept = 'image/*';
+  el.type = 'file';
+  el.onchange = async (e) => {
+    const file: File = (e.target as any).files[0];
+    if (file) {
+      posterUploading.value = true;
+      try {
+        const response = await Api.File.uploadImage(file);
+        editItem.value!.poster = response.data;
+      } catch (error: any) {
+        if (error?.response?.data?.code === ErrorCodeEnum.INVALID_IMAGE_FILE_TYPE) {
+          app.toastError('图片文件类型错误');
+        } else {
+          app.toastError('海报文件上传失败');
+        }
+      } finally {
+        posterUploading.value = false;
+      }
+    }
+  };
+  el.click();
 };
 </script>
 
@@ -275,11 +302,14 @@ const saveEdit = async () => {
                     </v-col>
                     <v-col cols="12" sm="6" class="d-flex flex-column">
                       <span class="text-subtitle-2 font-weight-bold">媒体文件描述</span>
-                      <pre class="text-caption mt-1">{{ item.raw.description ?? '暂无媒体文件描述' }}</pre>
-                      <span class="text-subtitle-2 font-weight-bold mt-1">文件列表</span>
+                      <pre
+                        class="text-caption mt-1 text-pre-wrap text-break"
+                        v-text="item.raw.description ?? '暂无媒体文件描述'"
+                      ></pre>
+                      <span class="text-subtitle-2 font-weight-bold mt-2">文件列表</span>
                       <div>
                         <span
-                          class="mr-2 text-caption text-primary text-decoration-underline clickable text-break"
+                          class="me-2 text-caption text-primary text-decoration-underline clickable text-break"
                           v-for="file in getFiles(item.raw)"
                           :key="file!.id"
                           @click="openUrl(Api.File.buildDownloadPath(file!.id))"
@@ -294,33 +324,13 @@ const saveEdit = async () => {
             </tr>
           </template>
           <template #item.poster="{ item }">
-            <v-responsive :aspect-ratio="16 / 9" class="pa-1">
-              <v-overlay close-on-content-click close-on-back class="align-center justify-center">
-                <v-container class="d-flex align-center justify-center" style="height: 100vh; width: 100vw">
-                  <v-img
-                    class="rounded"
-                    :src="item.raw.poster ? Api.File.buildRawPath(item.raw.poster.id) : MediaCoverFallback"
-                  >
-                    <template #placeholder>
-                      <v-img :src="MediaCoverFallback"></v-img>
-                    </template>
-                  </v-img>
-                </v-container>
-
-                <template #activator="{ props }">
-                  <v-img
-                    v-bind="props"
-                    class="rounded"
-                    min-width="80"
-                    :src="item.raw.poster ? Api.File.buildRawPath(item.raw.poster.id) : MediaCoverFallback"
-                  >
-                    <template #placeholder>
-                      <v-img :src="MediaCoverFallback"></v-img>
-                    </template>
-                  </v-img>
-                </template>
-              </v-overlay>
-            </v-responsive>
+            <v-container class="pa-1">
+              <view-img
+                min-width="80"
+                max-width="120"
+                :src="item.raw.poster ? Api.File.buildRawPath(item.raw.poster.id) : MediaCoverFallback"
+              ></view-img>
+            </v-container>
           </template>
           <template #item.createAt="{ item }">
             {{ new Date(item.raw.createAt).toLocaleString() }}
@@ -371,34 +381,64 @@ const saveEdit = async () => {
       <v-card>
         <v-toolbar color="primary">
           <v-btn :icon="mdiClose" @click="editDialog = false"></v-btn>
-          <v-toolbar-title>编辑 {{ editItem!.id }}</v-toolbar-title>
+          <v-toolbar-title>编辑{{ editItem!.id }}</v-toolbar-title>
           <action-btn :icon="mdiCheck" text="保存" variant="text" :loading="editLoading" @click="saveEdit"></action-btn>
         </v-toolbar>
-        <v-container class="d-flex flex-column">
-          <v-container class="pa-0">
-            <span class="text-body-1">标题</span>
-            <v-text-field
-              class="mt-2"
-              variant="outlined"
-              hide-details
-              color="primary"
-              density="compact"
-              v-model="editItem!.name"
-            ></v-text-field>
+        <v-card-text>
+          <v-container class="d-flex flex-column">
+            <v-container class="pa-0">
+              <span class="text-body-1">标题</span>
+              <v-text-field
+                class="mt-2"
+                variant="outlined"
+                hide-details
+                color="primary"
+                density="compact"
+                v-model="editItem!.name"
+              ></v-text-field>
+            </v-container>
+            <v-container class="mt-4 pa-0">
+              <span class="text-body-1">描述</span>
+              <v-textarea
+                class="mt-2"
+                variant="outlined"
+                hide-details
+                color="primary"
+                density="compact"
+                rows="2"
+                v-model="editItem!.description"
+              ></v-textarea>
+            </v-container>
+            <v-container class="mt-4 pa-0">
+              <span class="text-body-1">封面图片</span>
+              <v-row class="mt-2">
+                <v-col cols="12" md="8">
+                  <v-img
+                    class="rounded"
+                    cover
+                    min-width="80"
+                    :src="editItem!.poster ? Api.File.buildRawPath(editItem!.poster.id) : MediaCoverFallback"
+                  >
+                    <template #placeholder>
+                      <v-img :src="MediaCoverFallback"></v-img>
+                    </template>
+                  </v-img>
+                </v-col>
+                <v-col cols="12" md="4">
+                  <v-btn
+                    :prepend-icon="mdiCloudUploadOutline"
+                    color="warning"
+                    text="上传图片"
+                    variant="outlined"
+                    block
+                    :loading="posterUploading"
+                    @click="selectAndUploadPoster"
+                  ></v-btn>
+                </v-col>
+              </v-row>
+            </v-container>
           </v-container>
-          <v-container class="mt-4 pa-0">
-            <span class="text-body-1">描述</span>
-            <v-textarea
-              class="mt-2"
-              variant="outlined"
-              hide-details
-              color="primary"
-              density="compact"
-              rows="2"
-              v-model="editItem!.description"
-            ></v-textarea>
-          </v-container>
-        </v-container>
+        </v-card-text>
       </v-card>
     </v-dialog>
   </v-container>

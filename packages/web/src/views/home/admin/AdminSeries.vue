@@ -3,11 +3,28 @@ import { useApp } from '@/store/app';
 import { ref } from 'vue';
 import { Api } from '@/api/api';
 import { SeriesEntity, SeriesQueryDto } from '@/interfaces/series.interface';
-import { mdiCheck, mdiChevronDown, mdiChevronUp, mdiClose, mdiMultimedia, mdiRefresh } from '@mdi/js';
+import {
+  mdiCheck,
+  mdiChevronDown,
+  mdiChevronUp,
+  mdiClose,
+  mdiCloudUploadOutline,
+  mdiDelete,
+  mdiMultimedia,
+  mdiPencil,
+  mdiPlus,
+  mdiRefresh,
+} from '@mdi/js';
 import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
+import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
+import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
+import { useDisplay } from 'vuetify';
+import ViewImg from '@/components/provider/ViewImg.vue';
+import UserAvatar from '@/components/provider/UserAvatar.vue';
 
 const app = useApp();
+const display = useDisplay();
 
 const items = ref<SeriesEntity[]>([]);
 const options = ref({
@@ -27,10 +44,6 @@ const headers = ref([
     key: 'name',
   },
   {
-    title: '描述',
-    key: 'description',
-  },
-  {
     title: '海报图',
     key: 'poster',
     sortable: false,
@@ -41,8 +54,8 @@ const headers = ref([
     sortable: false,
   },
   {
-    title: '标签',
-    key: 'tags',
+    title: '创建用户',
+    key: 'user',
     sortable: false,
   },
   {
@@ -89,6 +102,88 @@ const useQuery = async () => {
   options.value.page = 1;
   await loadItems(options.value);
 };
+
+const deleteItem = async (id: number) => {
+  loading.value = true;
+  try {
+    await Api.Series.delete(id)();
+    items.value = items.value.filter(({ id: val }) => val !== id);
+    app.toastSuccess('删除剧集成功');
+  } catch {
+    app.toastError('删除剧集失败');
+  } finally {
+    loading.value = false;
+  }
+};
+
+const editDialog = ref(false);
+const editItem = ref<SeriesEntity | undefined>(undefined);
+const openEdit = (item?: SeriesEntity) => {
+  editItem.value = Object.assign(
+    {
+      name: undefined,
+      description: undefined,
+      poster: undefined,
+      posterLandscape: undefined,
+    },
+    item,
+  );
+  editDialog.value = true;
+};
+const editLoading = ref(false);
+const saveEdit = async () => {
+  editLoading.value = true;
+  try {
+    const action = editItem.value?.id !== undefined ? Api.Series.update(editItem.value?.id) : Api.Series.create;
+    const response = await action({
+      name: editItem.value!.name,
+      description: editItem.value!.description,
+      posterFileId: editItem.value!.poster?.id,
+      posterLandscapeFileId: editItem.value!.posterLandscape?.id,
+    });
+    const index = items.value.findIndex(({ id }) => id === editItem.value!.id);
+    if (index > -1) {
+      items.value[index] = response.data;
+    } else {
+      items.value.unshift(response.data);
+    }
+    editDialog.value = false;
+    app.toastSuccess('保存剧集信息成功');
+  } catch (error: any) {
+    if (error?.response?.data?.code === ErrorCodeEnum.DUPLICATE_SERIES_NAME) {
+      app.toastError('已存在同名剧集');
+    } else {
+      app.toastError('保存剧集信息失败');
+    }
+  } finally {
+    editLoading.value = false;
+  }
+};
+const posterUploading = ref(false);
+const selectAndUploadPoster = (landscape = false) => {
+  const el = document.createElement('input');
+  el.accept = 'image/*';
+  el.type = 'file';
+  el.onchange = async (e) => {
+    const file: File = (e.target as any).files[0];
+    if (file) {
+      posterUploading.value = true;
+      try {
+        const response = await Api.File.uploadImage(file);
+        editItem.value![landscape ? 'posterLandscape' : 'poster'] = response.data;
+      } catch (error: any) {
+        if (error?.response?.data?.code === ErrorCodeEnum.INVALID_IMAGE_FILE_TYPE) {
+          app.toastError('图片文件类型错误');
+        } else {
+          app.toastError('海报文件上传失败');
+        }
+      } finally {
+        posterUploading.value = false;
+      }
+    }
+  };
+  el.click();
+};
 </script>
 
 <template>
@@ -99,6 +194,7 @@ const useQuery = async () => {
         <span class="ml-4 text-h5">剧集管理</span>
       </v-container>
       <v-spacer></v-spacer>
+      <action-btn color="warning" :icon="mdiPlus" text="新建" @click="openEdit()"></action-btn>
       <action-btn
         color="primary"
         class="ms-2"
@@ -154,6 +250,7 @@ const useQuery = async () => {
           v-model:items-per-page="options.itemsPerPage"
           v-model:page="options.page"
           v-model:sort-by="options.sortBy"
+          expand-on-click
           :headers="headers"
           :items-length="total"
           :items="items"
@@ -189,15 +286,198 @@ const useQuery = async () => {
               ></v-pagination>
             </v-container>
           </template>
-          <template #item.poster="{ item }"> TODO poster</template>
-          <template #item.posterLandscape="{ item }"> TODO poster landscape</template>
-          <template #item.tags="{ item }"> TODO tags</template>
+          <template #expanded-row="{ item }">
+            <tr>
+              <td :colspan="headers.length">
+                <v-container fluid>
+                  <v-row>
+                    <v-col cols="12" sm="6" class="d-flex rounded border">
+                      <span class="text-subtitle-2 font-weight-bold">单集列表</span>
+                    </v-col>
+                    <v-col cols="12" sm="6" class="d-flex flex-column">
+                      <span class="text-subtitle-2 font-weight-bold">剧集描述</span>
+                      <pre
+                        class="text-caption mt-1 text-pre-wrap text-break"
+                        v-text="item.raw.description ?? '暂无剧集描述'"
+                      ></pre>
+                      <span class="text-subtitle-2 font-weight-bold mt-2">剧集标签</span>
+                      <div>
+                        <v-chip
+                          v-for="tag in item.raw.tags ?? []"
+                          :key="tag!.id"
+                          label
+                          color="primary"
+                          class="me-2 text-caption"
+                        ></v-chip>
+                      </div>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </td>
+            </tr>
+          </template>
+          <template #item.poster="{ item }">
+            <v-container class="pa-1">
+              <view-img
+                :aspect-ratio="3 / 4"
+                min-width="32"
+                max-width="64"
+                :src="item.raw.poster ? Api.File.buildRawPath(item.raw.poster.id) : MediaCoverFallback"
+              ></view-img>
+            </v-container>
+          </template>
+          <template #item.posterLandscape="{ item }">
+            <v-container class="pa-1">
+              <view-img
+                min-width="80"
+                max-width="120"
+                :src="
+                  item.raw.posterLandscape ? Api.File.buildRawPath(item.raw.posterLandscape.id) : MediaCoverFallback
+                "
+              ></view-img>
+            </v-container>
+          </template>
+          <template #item.user="{ item }">
+            <v-tooltip :text="item.raw.user?.username ?? '未设置'">
+              <template #activator="{ props }">
+                <user-avatar
+                  v-bind="props"
+                  size="40"
+                  :src="item.raw.user?.avatar && Api.File.buildRawPath(item.raw.user.avatar.id)"
+                ></user-avatar>
+              </template>
+            </v-tooltip>
+          </template>
+          <template #item.createAt="{ item }">
+            {{ new Date(item.raw.createAt).toLocaleString() }}
+          </template>
           <template #item.actions="{ item }">
-            <v-btn variant="tonal" color="warning" text="修改权限" size="small"></v-btn>
+            <action-btn
+              text="编辑"
+              :icon="mdiPencil"
+              size="small"
+              color="secondary"
+              variant="tonal"
+              @click.stop="openEdit(item.raw)"
+            ></action-btn>
+            <v-menu>
+              <template #activator="{ props }">
+                <action-btn
+                  class="ms-1"
+                  v-bind="props"
+                  text="删除"
+                  :icon="mdiDelete"
+                  size="small"
+                  color="error"
+                  variant="tonal"
+                ></action-btn>
+              </template>
+              <v-card>
+                <v-card-title>删除确认</v-card-title>
+                <v-card-text>确定要删除该媒体文件吗？该操作不可撤销！</v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary" variant="text">取消</v-btn>
+                  <v-btn color="error" variant="plain" @click="deleteItem(item.raw.id)">确定</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-menu>
           </template>
         </v-data-table-server>
       </v-sheet>
     </v-container>
+    <v-dialog
+      :class="display.smAndUp.value ? 'w-75' : 'w-100'"
+      :fullscreen="!display.smAndUp.value"
+      v-model="editDialog"
+      scrollable
+    >
+      <v-card>
+        <v-toolbar color="primary">
+          <v-btn :icon="mdiClose" @click="editDialog = false"></v-btn>
+          <v-toolbar-title>编辑{{ editItem!.id !== undefined ? '剧集信息' : '新剧集信息' }}</v-toolbar-title>
+          <action-btn :icon="mdiCheck" text="保存" variant="text" :loading="editLoading" @click="saveEdit"></action-btn>
+        </v-toolbar>
+        <v-card-text>
+          <v-container class="d-flex flex-column">
+            <v-container class="pa-0">
+              <span class="text-body-1">名称</span>
+              <v-text-field
+                class="mt-2"
+                variant="outlined"
+                hide-details
+                color="primary"
+                density="compact"
+                v-model="editItem!.name"
+              ></v-text-field>
+            </v-container>
+            <v-container class="mt-4 pa-0">
+              <span class="text-body-1">描述</span>
+              <v-textarea
+                class="mt-2"
+                variant="outlined"
+                hide-details
+                color="primary"
+                density="compact"
+                rows="2"
+                v-model="editItem!.description"
+              ></v-textarea>
+            </v-container>
+            <v-container class="mt-4 pa-0">
+              <v-row>
+                <v-col cols="12" md="4">
+                  <span class="text-body-1">海报图片</span>
+                  <v-img
+                    :aspect-ratio="3 / 4"
+                    class="rounded mt-2"
+                    cover
+                    min-width="80"
+                    :src="editItem!.poster ? Api.File.buildRawPath(editItem!.poster.id) : MediaCoverFallback"
+                  >
+                    <template #placeholder>
+                      <v-img :src="MediaCoverFallback"></v-img>
+                    </template>
+                  </v-img>
+                  <v-btn
+                    class="mt-2"
+                    :prepend-icon="mdiCloudUploadOutline"
+                    color="warning"
+                    text="上传图片"
+                    variant="outlined"
+                    block
+                    :loading="posterUploading"
+                    @click="selectAndUploadPoster(false)"
+                  ></v-btn>
+                </v-col>
+                <v-col cols="12" md="8">
+                  <span class="text-body-1">水平海报图片</span>
+                  <v-img
+                    class="rounded mt-2"
+                    cover
+                    min-width="80"
+                    :src="editItem!.posterLandscape ? Api.File.buildRawPath(editItem!.posterLandscape.id) : MediaCoverFallback"
+                  >
+                    <template #placeholder>
+                      <v-img :src="MediaCoverFallback"></v-img>
+                    </template>
+                  </v-img>
+                  <v-btn
+                    class="mt-2"
+                    :prepend-icon="mdiCloudUploadOutline"
+                    color="warning"
+                    text="上传图片"
+                    variant="outlined"
+                    block
+                    :loading="posterUploading"
+                    @click="selectAndUploadPoster(true)"
+                  ></v-btn>
+                </v-col>
+              </v-row>
+            </v-container>
+          </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 

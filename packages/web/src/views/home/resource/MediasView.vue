@@ -4,11 +4,9 @@ import { mdiHistory, mdiRefresh } from '@mdi/js';
 import { ref, Ref } from 'vue';
 import { MediaQueryDto } from '@/interfaces/media.interface';
 import { useRouter } from 'vue-router';
-import { useDisplay } from 'vuetify';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 
 const router = useRouter();
-const display = useDisplay();
 
 const latestUpdateQuery: Ref<MediaQueryDto> = ref({
   page: 0,
@@ -24,7 +22,10 @@ const latestUpdateQuery: Ref<MediaQueryDto> = ref({
       title="最近更新"
       :query="latestUpdateQuery"
       :icon="mdiHistory"
-      :cols="display.smAndUp.value ? 4 : 1"
+      cols="12"
+      sm="6"
+      md="4"
+      lg="3"
       icon-color="primary"
       @click:media="(media) => router.push(`/media/${media.id}`)"
     >

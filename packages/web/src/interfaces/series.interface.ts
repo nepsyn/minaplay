@@ -28,6 +28,7 @@ export interface SeriesDto {
   name?: string;
   description?: string;
   posterFileId?: string;
+  posterLandscapeFileId?: string;
   tagIds?: number[];
 }
 

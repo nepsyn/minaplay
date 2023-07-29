@@ -183,7 +183,13 @@ const useQuery = async () => {
             {{ new Date(item.raw.createAt).toLocaleString() }}
           </template>
           <template #item.actions="{ item }">
-            <v-btn variant="tonal" color="warning" text="修改权限" size="small"></v-btn>
+            <v-btn
+              v-if="item.raw.id !== app.user?.id"
+              variant="tonal"
+              color="warning"
+              text="修改权限"
+              size="small"
+            ></v-btn>
           </template>
         </v-data-table-server>
       </v-sheet>

@@ -103,7 +103,7 @@ export class SeriesController {
     }
 
     const sameNameSeries = await this.seriesService.findOneBy({ name: data.name });
-    if (sameNameSeries) {
+    if (sameNameSeries && sameNameSeries.id !== id) {
       throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATE_SERIES_NAME);
     }
 

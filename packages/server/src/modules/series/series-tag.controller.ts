@@ -54,7 +54,7 @@ export class SeriesTagController {
     }
 
     const sameNameSeriesTag = await this.seriesTagService.findOneBy({ name: data.name });
-    if (sameNameSeriesTag) {
+    if (sameNameSeriesTag && sameNameSeriesTag.id !== id) {
       throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATE_SERIES_TAG_NAME);
     }
 

@@ -26,6 +26,7 @@ import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { PermissionEnum } from '../../enums/permission.enum';
 import { ErrorCodeEnum } from '../../enums/error-code.enum';
+import { Between } from 'typeorm';
 
 @Controller('series')
 @UseGuards(AuthorizationGuard)
@@ -76,12 +77,17 @@ export class SeriesController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async querySeries(@Query() query: SeriesQueryDto) {
-    const { keyword, name } = query;
+    const { keyword, id, name, userId, start, end } = query;
     const [result, total] = await this.seriesService.findAndCount({
       where: buildQueryOptions<Series>({
         keyword,
         keywordProperties: (entity) => [entity.name, entity.description],
-        exact: { name },
+        exact: {
+          id,
+          name,
+          user: { id: userId },
+          createAt: start != null ? Between(new Date(start), end ? new Date(end) : new Date()) : undefined,
+        },
       }),
       skip: query.page * query.size,
       take: query.size,

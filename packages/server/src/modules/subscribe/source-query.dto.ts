@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { Source } from './source.entity';
 import { Transform } from 'class-transformer';
@@ -14,12 +14,29 @@ export class SourceQueryDto extends ApiQueryDto<Source> {
   keyword?: string;
 
   @ApiProperty({
+    description: '订阅源id',
+    required: false,
+  })
+  @Transform(({ value }) => Number(value))
+  @IsOptional()
+  @IsInt()
+  id?: number;
+
+  @ApiProperty({
     description: '订阅源url',
     required: false,
   })
   @IsOptional()
   @IsString()
   url?: string;
+
+  @ApiProperty({
+    description: '是否启用',
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  enabled?: boolean;
 
   @ApiProperty({
     description: '创建用户id',

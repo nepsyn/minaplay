@@ -6,6 +6,15 @@ import { Transform } from 'class-transformer';
 
 export class EpisodeQueryDto extends ApiQueryDto<Episode> {
   @ApiProperty({
+    description: '单集id',
+    required: false,
+  })
+  @Transform(({ value }) => Number(value))
+  @IsOptional()
+  @IsInt()
+  id?: number;
+
+  @ApiProperty({
     description: '剧集id',
     required: false,
   })

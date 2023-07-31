@@ -91,12 +91,17 @@ export class SourceController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async querySource(@Query() query: SourceQueryDto) {
-    const { keyword, url, userId } = query;
+    const { keyword, id, url, enabled, userId } = query;
     const [result, total] = await this.sourceService.findAndCount({
       where: buildQueryOptions<Source>({
         keyword,
         keywordProperties: (entity) => [entity.title, entity.url, entity.remark],
-        exact: { url, user: { id: userId } },
+        exact: {
+          id,
+          url,
+          enabled,
+          user: { id: userId },
+        },
       }),
       skip: query.page * query.size,
       take: query.size,

@@ -1,7 +1,7 @@
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { Media } from './media.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsOptional, IsString } from 'class-validator';
+import { IsDate, IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class MediaQueryDto extends ApiQueryDto<Media> {
   @ApiProperty({
@@ -11,6 +11,14 @@ export class MediaQueryDto extends ApiQueryDto<Media> {
   @IsOptional()
   @IsString()
   keyword?: string;
+
+  @ApiProperty({
+    description: '媒体文件id',
+    required: false,
+  })
+  @IsOptional()
+  @IsUUID()
+  id?: string;
 
   @ApiProperty({
     description: '开始时间',

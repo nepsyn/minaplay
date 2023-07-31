@@ -39,12 +39,15 @@ export class UserController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.USER_OP, PermissionEnum.USER_VIEW)
   async queryUser(@Query() query: UserQueryDto) {
-    const { keyword, username } = query;
+    const { keyword, id, username } = query;
     const [result, total] = await this.userService.findAndCount({
       where: buildQueryOptions<User>({
         keyword,
         keywordProperties: (entity) => [entity.username],
-        exact: { username },
+        exact: {
+          id,
+          username,
+        },
       }),
       skip: query.page * query.size,
       take: query.size,

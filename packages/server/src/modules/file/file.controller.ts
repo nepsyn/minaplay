@@ -35,7 +35,7 @@ import { USER_UPLOAD_IMAGE_DIR, USER_UPLOAD_VIDEO_DIR, VALID_IMAGE_MIME, VALID_V
 import { FileQueryDto } from './file-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { File } from './file.entity';
-import { MoreThanOrEqual } from 'typeorm';
+import { Between, MoreThanOrEqual } from 'typeorm';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { Response } from 'express';
 
@@ -204,12 +204,19 @@ export class FileController {
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
   async queryFile(@Query() query: FileQueryDto) {
-    const { keyword, md5, expired, userId } = query;
+    const { keyword, id, md5, source, expired, userId, start, end } = query;
     const [result, total] = await this.fileService.findAndCount({
       where: buildQueryOptions<File>({
         keyword,
         keywordProperties: (entity) => [entity.name, entity.mimetype],
-        exact: { md5, expireAt: expired ? MoreThanOrEqual(new Date()) : undefined, user: { id: userId } },
+        exact: {
+          id,
+          md5,
+          source,
+          expireAt: expired ? MoreThanOrEqual(new Date()) : undefined,
+          user: { id: userId },
+          createAt: start != null ? Between(new Date(start), end != null ? new Date(end) : new Date()) : undefined,
+        },
       }),
       skip: query.page * query.size,
       take: query.size,

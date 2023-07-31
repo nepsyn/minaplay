@@ -53,10 +53,11 @@ export class EpisodeController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
   async queryEpisode(@Query() query: EpisodeQueryDto) {
-    const { seriesId } = query;
+    const { id, seriesId } = query;
     const [result, total] = await this.episodeService.findAndCount({
       where: buildQueryOptions<Episode>({
         exact: {
+          id,
           series: { id: seriesId },
         },
       }),
@@ -97,7 +98,7 @@ export class EpisodeController {
     if (!episode) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
-    
+
     await this.episodeService.save({
       id,
       ...data,

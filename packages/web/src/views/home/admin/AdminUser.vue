@@ -7,6 +7,7 @@ import { Api } from '@/api/api';
 import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 import UserAvatar from '@/components/provider/UserAvatar.vue';
+import { PermissionEnum } from '@/api/enums/permission.enum';
 
 const app = useApp();
 
@@ -61,18 +62,17 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   }
 };
 
-const edit = ref<UserQueryDto>({
-  keyword: undefined,
-  username: undefined,
-});
+const edit = ref<UserQueryDto>({});
 const query = ref<UserQueryDto>({});
 const expand = ref(false);
 const reset = async () => {
-  edit.value.keyword = undefined;
-  edit.value.username = undefined;
+  edit.value = {};
 };
 const useQuery = async () => {
-  query.value = Object.assign({}, edit.value);
+  query.value = Object.assign(
+    {},
+    Object.fromEntries(Object.entries(edit.value).map(([key, value]) => [key, value || undefined])),
+  );
   options.value.page = 1;
   await loadItems(options.value);
 };
@@ -99,7 +99,7 @@ const useQuery = async () => {
         <v-sheet rounded border class="pa-4 d-flex flex-column">
           <span class="text-h6">条件查询</span>
           <v-row class="mt-2">
-            <v-col cols="12" sm="6">
+            <v-col cols="12">
               <v-text-field
                 v-model.trim="edit.keyword"
                 variant="outlined"
@@ -107,6 +107,17 @@ const useQuery = async () => {
                 color="primary"
                 hide-details
                 label="查询关键字(模糊查询)"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model.number="edit.id"
+                type="number"
+                variant="outlined"
+                density="compact"
+                color="primary"
+                hide-details
+                label="用户ID(精确查询)"
               ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6">
@@ -184,7 +195,7 @@ const useQuery = async () => {
           </template>
           <template #item.actions="{ item }">
             <v-btn
-              v-if="item.raw.id !== app.user?.id"
+              v-if="item.raw.id !== app.user?.id && app.hasPermission(PermissionEnum.ROOT_OP)"
               variant="tonal"
               color="warning"
               text="修改权限"

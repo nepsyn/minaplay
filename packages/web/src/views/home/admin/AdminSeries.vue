@@ -8,7 +8,6 @@ import {
   mdiChevronDown,
   mdiChevronUp,
   mdiClose,
-  mdiCloudUploadOutline,
   mdiDelete,
   mdiMultimedia,
   mdiPencil,
@@ -22,6 +21,7 @@ import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
 import { useDisplay } from 'vuetify';
 import ViewImg from '@/components/provider/ViewImg.vue';
 import UserAvatar from '@/components/provider/UserAvatar.vue';
+import SeriesEditDialog from '@/components/edit/SeriesEditDialog.vue';
 
 const app = useApp();
 const display = useDisplay();
@@ -87,18 +87,17 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   }
 };
 
-const edit = ref<SeriesQueryDto>({
-  keyword: undefined,
-  name: undefined,
-});
+const edit = ref<SeriesQueryDto>({});
 const query = ref<SeriesQueryDto>();
 const expand = ref(false);
 const reset = async () => {
-  edit.value.keyword = undefined;
-  edit.value.name = undefined;
+  edit.value = {};
 };
 const useQuery = async () => {
-  query.value = Object.assign({}, edit.value);
+  query.value = Object.assign(
+    {},
+    Object.fromEntries(Object.entries(edit.value).map(([key, value]) => [key, value || undefined])),
+  );
   options.value.page = 1;
   await loadItems(options.value);
 };
@@ -117,7 +116,7 @@ const deleteItem = async (id: number) => {
 };
 
 const editDialog = ref(false);
-const editItem = ref<SeriesEntity | undefined>(undefined);
+const editItem = ref<SeriesEntity>({} as any);
 const openEdit = (item?: SeriesEntity) => {
   editItem.value = Object.assign(
     {
@@ -130,59 +129,21 @@ const openEdit = (item?: SeriesEntity) => {
   );
   editDialog.value = true;
 };
-const editLoading = ref(false);
-const saveEdit = async () => {
-  editLoading.value = true;
-  try {
-    const action = editItem.value?.id !== undefined ? Api.Series.update(editItem.value?.id) : Api.Series.create;
-    const response = await action({
-      name: editItem.value!.name,
-      description: editItem.value!.description,
-      posterFileId: editItem.value!.poster?.id,
-      posterLandscapeFileId: editItem.value!.posterLandscape?.id,
-    });
-    const index = items.value.findIndex(({ id }) => id === editItem.value!.id);
-    if (index > -1) {
-      items.value[index] = response.data;
-    } else {
-      items.value.unshift(response.data);
-    }
-    editDialog.value = false;
-    app.toastSuccess('保存剧集信息成功');
-  } catch (error: any) {
-    if (error?.response?.data?.code === ErrorCodeEnum.DUPLICATE_SERIES_NAME) {
-      app.toastError('已存在同名剧集');
-    } else {
-      app.toastError('保存剧集信息失败');
-    }
-  } finally {
-    editLoading.value = false;
+const onEditSaved = (data: SeriesEntity) => {
+  const index = items.value.findIndex(({ id }) => id === data.id);
+  if (index > -1) {
+    items.value[index] = data;
+  } else {
+    items.value.unshift(data);
   }
+  app.toastSuccess('保存剧集信息成功');
 };
-const posterUploading = ref(false);
-const selectAndUploadPoster = (landscape = false) => {
-  const el = document.createElement('input');
-  el.accept = 'image/*';
-  el.type = 'file';
-  el.onchange = async (e) => {
-    const file: File = (e.target as any).files[0];
-    if (file) {
-      posterUploading.value = true;
-      try {
-        const response = await Api.File.uploadImage(file);
-        editItem.value![landscape ? 'posterLandscape' : 'poster'] = response.data;
-      } catch (error: any) {
-        if (error?.response?.data?.code === ErrorCodeEnum.INVALID_IMAGE_FILE_TYPE) {
-          app.toastError('图片文件类型错误');
-        } else {
-          app.toastError('海报文件上传失败');
-        }
-      } finally {
-        posterUploading.value = false;
-      }
-    }
-  };
-  el.click();
+const onEditError = (error: any) => {
+  if (error?.response?.data?.code === ErrorCodeEnum.DUPLICATE_SERIES_NAME) {
+    app.toastError('已存在同名剧集');
+  } else {
+    app.toastError('保存剧集信息失败');
+  }
 };
 </script>
 
@@ -194,7 +155,8 @@ const selectAndUploadPoster = (landscape = false) => {
         <span class="ml-4 text-h5">剧集管理</span>
       </v-container>
       <v-spacer></v-spacer>
-      <action-btn color="warning" :icon="mdiPlus" text="新建" @click="openEdit()"></action-btn>
+      <action-btn color="warning" :icon="mdiPlus" text="新建" @click="openEdit"></action-btn>
+
       <action-btn
         color="primary"
         class="ms-2"
@@ -208,7 +170,7 @@ const selectAndUploadPoster = (landscape = false) => {
         <v-sheet rounded border class="pa-4 d-flex flex-column">
           <span class="text-h6">条件查询</span>
           <v-row class="mt-2">
-            <v-col cols="12" sm="6">
+            <v-col cols="12">
               <v-text-field
                 v-model.trim="edit.keyword"
                 variant="outlined"
@@ -216,6 +178,17 @@ const selectAndUploadPoster = (landscape = false) => {
                 color="primary"
                 hide-details
                 label="查询关键字(模糊查询)"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                v-model.number="edit.id"
+                type="number"
+                variant="outlined"
+                density="compact"
+                color="primary"
+                hide-details
+                label="剧集ID(精确查询)"
               ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6">
@@ -226,6 +199,37 @@ const selectAndUploadPoster = (landscape = false) => {
                 color="primary"
                 hide-details
                 label="剧集名称(精确查询)"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model.number="edit.userId"
+                type="number"
+                variant="outlined"
+                density="compact"
+                color="primary"
+                hide-details
+                label="剧集创建用户ID(精确查询)"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="edit.start"
+                variant="outlined"
+                density="compact"
+                color="primary"
+                hide-details
+                label="创建起始时间范围(精确查询)"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-text-field
+                v-model="edit.end"
+                variant="outlined"
+                density="compact"
+                color="primary"
+                hide-details
+                label="创建结束时间范围(精确查询)"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -298,16 +302,18 @@ const selectAndUploadPoster = (landscape = false) => {
                       <span class="text-subtitle-2 font-weight-bold">剧集描述</span>
                       <pre
                         class="text-caption mt-1 text-pre-wrap text-break"
-                        v-text="item.raw.description ?? '暂无剧集描述'"
+                        v-text="item.raw.description || '暂无剧集描述'"
                       ></pre>
                       <span class="text-subtitle-2 font-weight-bold mt-2">剧集标签</span>
                       <div>
                         <v-chip
+                          density="compact"
                           v-for="tag in item.raw.tags ?? []"
                           :key="tag!.id"
                           label
                           color="primary"
-                          class="me-2 text-caption"
+                          class="me-2 my-1 text-caption"
+                          :text="tag.name"
                         ></v-chip>
                       </div>
                     </v-col>
@@ -352,132 +358,45 @@ const selectAndUploadPoster = (landscape = false) => {
             {{ new Date(item.raw.createAt).toLocaleString() }}
           </template>
           <template #item.actions="{ item }">
-            <action-btn
-              text="编辑"
-              :icon="mdiPencil"
-              size="small"
-              color="secondary"
-              variant="tonal"
-              @click.stop="openEdit(item.raw)"
-            ></action-btn>
-            <v-menu>
-              <template #activator="{ props }">
-                <action-btn
-                  class="ms-1"
-                  v-bind="props"
-                  text="删除"
-                  :icon="mdiDelete"
-                  size="small"
-                  color="error"
-                  variant="tonal"
-                ></action-btn>
-              </template>
-              <v-card>
-                <v-card-title>删除确认</v-card-title>
-                <v-card-text>确定要删除该媒体文件吗？该操作不可撤销！</v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="primary" variant="text">取消</v-btn>
-                  <v-btn color="error" variant="plain" @click="deleteItem(item.raw.id)">确定</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-menu>
+            <v-container fluid class="pa-0 d-flex flex-row">
+              <action-btn
+                text="编辑"
+                :icon="mdiPencil"
+                size="small"
+                color="secondary"
+                variant="tonal"
+                @click.stop="openEdit(item.raw)"
+              ></action-btn>
+
+              <v-menu>
+                <template #activator="{ props }">
+                  <action-btn
+                    class="ms-1"
+                    v-bind="props"
+                    text="删除"
+                    :icon="mdiDelete"
+                    size="small"
+                    color="error"
+                    variant="tonal"
+                  ></action-btn>
+                </template>
+                <v-card>
+                  <v-card-title>删除确认</v-card-title>
+                  <v-card-text>确定要删除该媒体文件吗？该操作不可撤销！</v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" variant="text">取消</v-btn>
+                    <v-btn color="error" variant="plain" @click="deleteItem(item.raw.id)">确定</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-menu>
+            </v-container>
           </template>
         </v-data-table-server>
       </v-sheet>
     </v-container>
-    <v-dialog
-      :class="display.smAndUp.value ? 'w-75' : 'w-100'"
-      :fullscreen="!display.smAndUp.value"
-      v-model="editDialog"
-      scrollable
-    >
-      <v-card>
-        <v-toolbar color="primary">
-          <v-btn :icon="mdiClose" @click="editDialog = false"></v-btn>
-          <v-toolbar-title>编辑{{ editItem!.id !== undefined ? '剧集信息' : '新剧集信息' }}</v-toolbar-title>
-          <action-btn :icon="mdiCheck" text="保存" variant="text" :loading="editLoading" @click="saveEdit"></action-btn>
-        </v-toolbar>
-        <v-card-text>
-          <v-container class="d-flex flex-column">
-            <v-container class="pa-0">
-              <span class="text-body-1">名称</span>
-              <v-text-field
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                v-model="editItem!.name"
-              ></v-text-field>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <span class="text-body-1">描述</span>
-              <v-textarea
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                rows="2"
-                v-model="editItem!.description"
-              ></v-textarea>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <v-row>
-                <v-col cols="12" md="4">
-                  <span class="text-body-1">海报图片</span>
-                  <v-img
-                    :aspect-ratio="3 / 4"
-                    class="rounded mt-2"
-                    cover
-                    min-width="80"
-                    :src="editItem!.poster ? Api.File.buildRawPath(editItem!.poster.id) : MediaCoverFallback"
-                  >
-                    <template #placeholder>
-                      <v-img :src="MediaCoverFallback"></v-img>
-                    </template>
-                  </v-img>
-                  <v-btn
-                    class="mt-2"
-                    :prepend-icon="mdiCloudUploadOutline"
-                    color="warning"
-                    text="上传图片"
-                    variant="outlined"
-                    block
-                    :loading="posterUploading"
-                    @click="selectAndUploadPoster(false)"
-                  ></v-btn>
-                </v-col>
-                <v-col cols="12" md="8">
-                  <span class="text-body-1">水平海报图片</span>
-                  <v-img
-                    class="rounded mt-2"
-                    cover
-                    min-width="80"
-                    :src="editItem!.posterLandscape ? Api.File.buildRawPath(editItem!.posterLandscape.id) : MediaCoverFallback"
-                  >
-                    <template #placeholder>
-                      <v-img :src="MediaCoverFallback"></v-img>
-                    </template>
-                  </v-img>
-                  <v-btn
-                    class="mt-2"
-                    :prepend-icon="mdiCloudUploadOutline"
-                    color="warning"
-                    text="上传图片"
-                    variant="outlined"
-                    block
-                    :loading="posterUploading"
-                    @click="selectAndUploadPoster(true)"
-                  ></v-btn>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-container>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+    <series-edit-dialog v-model="editDialog" :item="editItem" @saved="onEditSaved" @error="onEditError">
+    </series-edit-dialog>
   </v-container>
 </template>
 

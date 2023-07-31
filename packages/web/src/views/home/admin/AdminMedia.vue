@@ -20,8 +20,8 @@ import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
 import { useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
-import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import ViewImg from '@/components/provider/ViewImg.vue';
+import MediaEditDialog from '@/components/edit/MediaEditDialog.vue';
 
 const app = useApp();
 const router = useRouter();
@@ -78,20 +78,17 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   }
 };
 
-const edit = ref<MediaQueryDto>({
-  keyword: undefined,
-  start: undefined,
-  end: undefined,
-});
+const edit = ref<MediaQueryDto>({});
 const query = ref<MediaQueryDto>({});
 const expand = ref(false);
 const reset = async () => {
-  edit.value.keyword = undefined;
-  edit.value.start = undefined;
-  edit.value.end = undefined;
+  edit.value = {};
 };
 const useQuery = async () => {
-  query.value = Object.assign({}, edit.value);
+  query.value = Object.assign(
+    {},
+    Object.fromEntries(Object.entries(edit.value).map(([key, value]) => [key, value || undefined])),
+  );
   options.value.page = 1;
   await loadItems(options.value);
 };
@@ -121,56 +118,28 @@ const openUrl = (url: string) => {
 };
 
 const editDialog = ref(false);
-const editItem = ref<MediaEntity | undefined>(undefined);
+const editItem = ref<MediaEntity>({} as any);
 const openEdit = (item: MediaEntity) => {
-  editItem.value = Object.assign({}, item);
+  editItem.value = Object.assign(
+    {
+      name: undefined,
+      description: undefined,
+      poster: undefined,
+    },
+    item,
+  );
   editDialog.value = true;
 };
-const editLoading = ref(false);
-const saveEdit = async () => {
-  editLoading.value = true;
-  try {
-    const response = await Api.Media.update(editItem.value!.id)({
-      name: editItem.value!.name,
-      description: editItem.value!.description,
-      posterFileId: editItem.value!.poster?.id,
-    });
-    const index = items.value.findIndex(({ id }) => id === editItem.value!.id);
-    if (index > -1) {
-      items.value[index] = response.data;
-    }
-    editDialog.value = false;
-    app.toastSuccess('保存媒体文件信息成功');
-  } catch {
-    app.toastError('保存媒体文件信息失败');
-  } finally {
-    editLoading.value = false;
+const onEditSaved = (data: MediaEntity) => {
+  const index = items.value.findIndex(({ id }) => id === editItem.value!.id);
+  if (index > -1) {
+    items.value[index] = data;
   }
+  editDialog.value = false;
+  app.toastSuccess('保存媒体文件信息成功');
 };
-const posterUploading = ref(false);
-const selectAndUploadPoster = () => {
-  const el = document.createElement('input');
-  el.accept = 'image/*';
-  el.type = 'file';
-  el.onchange = async (e) => {
-    const file: File = (e.target as any).files[0];
-    if (file) {
-      posterUploading.value = true;
-      try {
-        const response = await Api.File.uploadImage(file);
-        editItem.value!.poster = response.data;
-      } catch (error: any) {
-        if (error?.response?.data?.code === ErrorCodeEnum.INVALID_IMAGE_FILE_TYPE) {
-          app.toastError('图片文件类型错误');
-        } else {
-          app.toastError('海报文件上传失败');
-        }
-      } finally {
-        posterUploading.value = false;
-      }
-    }
-  };
-  el.click();
+const onEditError = (error: any) => {
+  app.toastError('保存媒体文件信息失败');
 };
 </script>
 
@@ -209,6 +178,16 @@ const selectAndUploadPoster = () => {
                 color="primary"
                 hide-details
                 label="查询关键字(模糊查询)"
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12">
+              <v-text-field
+                v-model.trim="edit.id"
+                variant="outlined"
+                density="compact"
+                color="primary"
+                hide-details
+                label="媒体文件ID(精确查询)"
               ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6">
@@ -304,7 +283,7 @@ const selectAndUploadPoster = () => {
                       <span class="text-subtitle-2 font-weight-bold">媒体文件描述</span>
                       <pre
                         class="text-caption mt-1 text-pre-wrap text-break"
-                        v-text="item.raw.description ?? '暂无媒体文件描述'"
+                        v-text="item.raw.description || '暂无媒体文件描述'"
                       ></pre>
                       <span class="text-subtitle-2 font-weight-bold mt-2">文件列表</span>
                       <div>
@@ -372,75 +351,12 @@ const selectAndUploadPoster = () => {
         </v-data-table-server>
       </v-sheet>
     </v-container>
-    <v-dialog
-      :class="display.smAndUp.value ? 'w-75' : 'w-100'"
-      :fullscreen="!display.smAndUp.value"
+    <media-edit-dialog
       v-model="editDialog"
-      scrollable
-    >
-      <v-card>
-        <v-toolbar color="primary">
-          <v-btn :icon="mdiClose" @click="editDialog = false"></v-btn>
-          <v-toolbar-title>编辑{{ editItem!.id }}</v-toolbar-title>
-          <action-btn :icon="mdiCheck" text="保存" variant="text" :loading="editLoading" @click="saveEdit"></action-btn>
-        </v-toolbar>
-        <v-card-text>
-          <v-container class="d-flex flex-column">
-            <v-container class="pa-0">
-              <span class="text-body-1">标题</span>
-              <v-text-field
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                v-model="editItem!.name"
-              ></v-text-field>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <span class="text-body-1">描述</span>
-              <v-textarea
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                rows="2"
-                v-model="editItem!.description"
-              ></v-textarea>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <span class="text-body-1">封面图片</span>
-              <v-row class="mt-2">
-                <v-col cols="12" md="8">
-                  <v-img
-                    class="rounded"
-                    cover
-                    min-width="80"
-                    :src="editItem!.poster ? Api.File.buildRawPath(editItem!.poster.id) : MediaCoverFallback"
-                  >
-                    <template #placeholder>
-                      <v-img :src="MediaCoverFallback"></v-img>
-                    </template>
-                  </v-img>
-                </v-col>
-                <v-col cols="12" md="4">
-                  <v-btn
-                    :prepend-icon="mdiCloudUploadOutline"
-                    color="warning"
-                    text="上传图片"
-                    variant="outlined"
-                    block
-                    :loading="posterUploading"
-                    @click="selectAndUploadPoster"
-                  ></v-btn>
-                </v-col>
-              </v-row>
-            </v-container>
-          </v-container>
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+      :item="editItem"
+      @saved="onEditSaved"
+      @error="onEditError"
+    ></media-edit-dialog>
   </v-container>
 </template>
 

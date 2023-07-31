@@ -23,5 +23,6 @@ export interface UserDto {
 
 export interface UserQueryDto extends ApiQueryDto<UserEntity> {
   keyword?: string;
+  id?: number;
   username?: string;
 }

@@ -40,6 +40,8 @@ onBeforeMount(async () => {
             app.setUser(undefined);
             app.toastWarning('登录验证已过期，请重新登录');
             router.replace('/login');
+          } else if (error.response?.data?.code === ErrorCodeEnum.NO_PERMISSION) {
+            app.toastError('没有权限执行该操作');
           } else {
             return Promise.reject(error);
           }

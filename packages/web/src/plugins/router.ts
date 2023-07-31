@@ -21,17 +21,18 @@ import AdminSubscribe from '@/views/home/admin/AdminSubscribe.vue';
 import AdminMedia from '@/views/home/admin/AdminMedia.vue';
 import AdminSeries from '@/views/home/admin/AdminSeries.vue';
 import AdminDownload from '@/views/home/admin/AdminDownload.vue';
+import { PermissionEnum } from '@/api/enums/permission.enum';
 
 const LoginGuard: NavigationGuard = (to, from, next) => {
-  if (!Api.isLogin) {
+  if (Api.isLogin) {
+    next();
+  } else {
     next({
       path: '/login',
       query: {
         redirect_url: to.fullPath,
       },
     });
-  } else {
-    next();
   }
 };
 
@@ -53,16 +54,25 @@ const routes: RouteRecordRaw[] = [
               {
                 path: '/series',
                 component: SeriesView,
+                meta: {
+                  permission: [PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW],
+                },
               },
               {
                 path: '/media',
                 component: MediasView,
+                meta: {
+                  permission: [PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW],
+                },
               },
             ],
           },
           {
             path: '/media/:id',
             component: MediaPlay,
+            meta: {
+              permission: [PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW],
+            },
           },
         ],
       },
@@ -77,6 +87,9 @@ const routes: RouteRecordRaw[] = [
           {
             path: '/subscribe/:id',
             redirect: (to) => `/subscribe/${to.params.id}/detail`,
+            meta: {
+              permission: [PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP],
+            },
             children: [
               {
                 path: '/subscribe/:id/detail',
@@ -110,26 +123,44 @@ const routes: RouteRecordRaw[] = [
           {
             path: '/admin/overview',
             component: AdminOverview,
+            meta: {
+              permission: [PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/admin/user',
             component: AdminUser,
+            meta: {
+              permission: [PermissionEnum.ROOT_OP, PermissionEnum.USER_OP],
+            },
           },
           {
             path: '/admin/subscribe',
             component: AdminSubscribe,
+            meta: {
+              permission: [PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP],
+            },
           },
           {
             path: '/admin/media',
             component: AdminMedia,
+            meta: {
+              permission: [PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP],
+            },
           },
           {
             path: '/admin/series',
             component: AdminSeries,
+            meta: {
+              permission: [PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP],
+            },
           },
           {
             path: '/admin/download',
             component: AdminDownload,
+            meta: {
+              permission: [PermissionEnum.ROOT_OP],
+            },
           },
         ],
       },

@@ -32,6 +32,7 @@ export interface MediaDto {
 
 export interface MediaQueryDto extends ApiQueryDto<MediaEntity> {
   keyword?: string;
-  start?: Date;
-  end?: Date;
+  id?: string;
+  start?: string;
+  end?: string;
 }

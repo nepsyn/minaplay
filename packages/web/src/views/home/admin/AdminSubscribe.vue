@@ -88,22 +88,17 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   }
 };
 
-const edit = ref<SourceQueryDto>({
-  keyword: undefined,
-  id: undefined,
-  url: undefined,
-  userId: undefined,
-});
+const edit = ref<SourceQueryDto>({});
 const query = ref<SourceQueryDto>({});
 const expand = ref(false);
 const reset = async () => {
-  edit.value.keyword = undefined;
-  edit.value.id = undefined;
-  edit.value.url = undefined;
-  edit.value.userId = undefined;
+  edit.value = {};
 };
 const useQuery = async () => {
-  query.value = Object.assign({}, edit.value);
+  query.value = Object.assign(
+    {},
+    Object.fromEntries(Object.entries(edit.value).map(([key, value]) => [key, value || undefined])),
+  );
   options.value.page = 1;
   await loadItems(options.value);
 };
@@ -142,7 +137,7 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
         <v-sheet rounded border class="pa-4 d-flex flex-column">
           <span class="text-h6">条件查询</span>
           <v-row class="mt-2">
-            <v-col cols="12" sm="6">
+            <v-col cols="12">
               <v-text-field
                 v-model.trim="edit.keyword"
                 variant="outlined"
@@ -172,6 +167,22 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
                 hide-details
                 label="订阅源链接(精确查询)"
               ></v-text-field>
+            </v-col>
+            <v-col cols="12" sm="6">
+              <v-select
+                v-model="edit.enabled"
+                :items="[
+                  { title: '是', value: 1 },
+                  { title: '否', value: 0 },
+                ]"
+                item-title="title"
+                item-value="value"
+                variant="outlined"
+                density="compact"
+                color="primary"
+                hide-details
+                label="是否启用(精确查询)"
+              ></v-select>
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field

@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, Ref } from 'vue';
 import { UserEntity } from '@/interfaces/user.interface';
+import { PermissionEnum } from '@/api/enums/permission.enum';
 
 export interface AppMessage {
   id: number;
@@ -18,6 +19,9 @@ export const useApp = defineStore('user', () => {
     } else {
       localStorage.setItem('minaplay-user', String(_user.id));
     }
+  };
+  const hasPermission = (...permissions: PermissionEnum[]) => {
+    return user.value && permissions.some((name) => user.value?.permissionNames.includes(name));
   };
 
   const counter = (function* () {
@@ -71,6 +75,7 @@ export const useApp = defineStore('user', () => {
   return {
     user,
     setUser,
+    hasPermission,
     messages,
     toast,
     closeToast,

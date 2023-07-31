@@ -35,6 +35,7 @@ export interface SourceQueryDto extends ApiQueryDto<SourceEntity> {
   keyword?: string;
   id?: number;
   url?: string;
+  enabled?: number;
   userId?: number;
 }
 

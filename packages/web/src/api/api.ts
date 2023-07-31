@@ -17,7 +17,14 @@ import {
 import { ApiQueryResult } from '@/interfaces/common.interface';
 import { MediaDto, MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
 import { UserDto, UserEntity, UserQueryDto } from '@/interfaces/user.interface';
-import { SeriesDto, SeriesEntity, SeriesQueryDto } from '@/interfaces/series.interface';
+import {
+  SeriesDto,
+  SeriesEntity,
+  SeriesQueryDto,
+  SeriesTagDto,
+  SeriesTagEntity,
+  SeriesTagQueryDto,
+} from '@/interfaces/series.interface';
 
 class ApiHelper {
   private token: string | null = null;
@@ -115,6 +122,13 @@ class ApiHelper {
     update: (id: number) => this.apiPut<SeriesEntity, SeriesDto>(`/series/${id}`),
     delete: (id: number) => this.apiDelete(`/series/${id}`),
     query: this.apiGet<ApiQueryResult<SeriesEntity>, SeriesQueryDto>('/series'),
+  };
+
+  SeriesTag = {
+    create: this.apiPost<SeriesTagEntity, SeriesTagDto>('/series/-/tag'),
+    update: (id: number) => this.apiPut<SeriesTagEntity, SeriesTagDto>(`/series/-/tag/${id}`),
+    delete: (id: number) => this.apiDelete(`/series/-/tag/${id}`),
+    query: this.apiGet<ApiQueryResult<SeriesTagEntity>, SeriesTagQueryDto>('/series/-/tag'),
   };
 
   User = {

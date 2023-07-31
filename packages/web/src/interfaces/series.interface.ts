@@ -34,7 +34,11 @@ export interface SeriesDto {
 
 export interface SeriesQueryDto extends ApiQueryDto<SeriesEntity> {
   keyword?: string;
+  id?: number;
   name?: string;
+  userId?: number;
+  start?: string;
+  end?: string;
 }
 
 export interface SeriesTagEntity {
@@ -46,6 +50,14 @@ export interface SeriesTagEntity {
   createAt: Date;
   /** 修改时间 */
   updateAt: Date;
+}
+
+export interface SeriesTagDto {
+  name?: string;
+}
+
+export interface SeriesTagQueryDto extends ApiQueryDto<SeriesTagEntity> {
+  keyword?: string;
 }
 
 export interface EpisodeEntity {
@@ -71,5 +83,6 @@ export interface EpisodeDto {
 }
 
 export interface EpisodeQueryDto extends ApiQueryDto<EpisodeEntity> {
+  id?: number;
   seriesId?: number;
 }

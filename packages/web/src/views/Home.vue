@@ -19,6 +19,7 @@ import { useApp } from '@/store/app';
 import { Api } from '@/api/api';
 import { useRoute, useRouter } from 'vue-router';
 import UserAvatar from '@/components/provider/UserAvatar.vue';
+import { PermissionEnum } from '@/api/enums/permission.enum';
 
 const app = useApp();
 const theme = useTheme();
@@ -82,16 +83,21 @@ const navs = [
     name: '一起看',
     icon: mdiVideoVintage,
     route: '/live',
+    permission: [PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW],
   },
   {
     name: '订阅',
     icon: mdiRssBox,
     route: '/subscribe',
+    permission: [PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP],
   },
   {
     name: '控制台',
     icon: mdiViewDashboard,
     route: '/admin',
+    permission: Object.keys(PermissionEnum)
+      .filter((key) => key.endsWith('_OP'))
+      .map((key) => PermissionEnum[key as keyof typeof PermissionEnum]),
   },
   {
     name: '设置',
@@ -188,8 +194,9 @@ const navs = [
 
   <v-navigation-drawer order="1" v-model="drawer" :width="drawerWidth" elevation="0">
     <v-list class="py-0" density="compact">
-      <template v-for="({ icon, name, route }, index) in navs" :key="index">
+      <template v-for="({ icon, name, route, permission }, index) in navs" :key="index">
         <v-list-item
+          v-if="!permission || app.hasPermission(...permission)"
           :ripple="false"
           :style="{ height: `${drawerWidth - 20}px` }"
           :to="route"

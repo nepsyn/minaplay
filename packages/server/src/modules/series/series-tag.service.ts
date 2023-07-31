@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SeriesTag } from './series-tag.entity';
-import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
 export class SeriesTagService {
@@ -13,6 +13,10 @@ export class SeriesTagService {
 
   async findOneBy(where: FindOptionsWhere<SeriesTag>) {
     return await this.seriesTagRepository.findOneBy(where);
+  }
+
+  async findAndCount(options?: FindManyOptions<SeriesTag>) {
+    return await this.seriesTagRepository.findAndCount(options);
   }
 
   async delete(where: FindOptionsWhere<SeriesTag>) {

@@ -19,7 +19,7 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   })
   @Transform(({ value }) => Number(value))
   @IsOptional()
-  @IsString()
+  @IsInt()
   id?: number;
 
   @ApiProperty({

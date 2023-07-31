@@ -34,6 +34,7 @@ export class SourceQueryDto extends ApiQueryDto<Source> {
     description: '是否启用',
     required: false,
   })
+  @Transform(({ value }) => Boolean(Number(value)))
   @IsOptional()
   @IsBoolean()
   enabled?: boolean;

@@ -34,6 +34,13 @@ function removeUndefinedProperties(obj: any): any {
 export function buildQueryOptions<T>(options: QueryOptions<T>): FindOptionsWhere<T>[] {
   const conditions: FindOptionsWhere<T>[] = [];
 
+  if (options.exact) {
+    const cleaned = removeUndefinedProperties(options.exact);
+    if (Object.keys(cleaned).length > 0) {
+      conditions.push(cleaned);
+    }
+  }
+
   if (options.keyword && options.keywordProperties) {
     const keywordProperties =
       typeof options.keywordProperties === 'function'
@@ -53,11 +60,6 @@ export function buildQueryOptions<T>(options: QueryOptions<T>): FindOptionsWhere
       conditions.push({
         [property]: Like(`%${options.keyword}%`),
       } as any);
-    }
-  } else if (options.exact) {
-    const cleaned = removeUndefinedProperties(options.exact);
-    if (Object.keys(cleaned).length > 0) {
-      conditions.push(cleaned);
     }
   }
 

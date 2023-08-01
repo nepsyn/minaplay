@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { useApp } from '@/store/app';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { Api } from '@/api/api';
-import { MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
+import { MediaEntity } from '@/interfaces/media.interface';
 import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 import {
@@ -18,12 +18,14 @@ import {
 } from '@mdi/js';
 import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import ViewImg from '@/components/provider/ViewImg.vue';
 import MediaEditDialog from '@/components/edit/MediaEditDialog.vue';
+import { SeriesQueryDto } from '@/interfaces/series.interface';
 
 const app = useApp();
+const route = useRoute();
 const router = useRouter();
 const display = useDisplay();
 
@@ -60,10 +62,11 @@ const headers = ref([
   },
 ]);
 const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
+  items.value = [];
   loading.value = true;
   try {
     const response = await Api.Media.query({
-      ...query.value,
+      ...route.query,
       page: page - 1,
       size: itemsPerPage,
       sort: sortBy?.[0]?.key,
@@ -78,19 +81,32 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   }
 };
 
-const edit = ref<MediaQueryDto>({});
-const query = ref<MediaQueryDto>({});
 const expand = ref(false);
+const edit = ref<SeriesQueryDto>({});
+watch(
+  () => [route.query],
+  async () => {
+    edit.value = Object.assign({}, route.query);
+    options.value.page = 1;
+    await loadItems(options.value);
+  },
+  { immediate: true },
+);
 const reset = async () => {
   edit.value = {};
 };
-const useQuery = async () => {
-  query.value = Object.assign(
-    {},
-    Object.fromEntries(Object.entries(edit.value).map(([key, value]) => [key, value || undefined])),
-  );
-  options.value.page = 1;
-  await loadItems(options.value);
+const setQuery = async () => {
+  await router.replace({
+    path: route.path,
+    query: Object.assign(
+      {},
+      Object.fromEntries(
+        Object.entries(edit.value)
+          .filter(([_, value]) => value !== undefined && String(value).length > 0)
+          .map(([key, value]) => [key, String(value)]),
+      ),
+    ),
+  });
 };
 
 const deleteItem = async (id: string) => {
@@ -220,7 +236,7 @@ const onEditError = (error: any) => {
               :icon="mdiCheck"
               color="primary"
               variant="tonal"
-              @click="useQuery"
+              @click="setQuery"
             ></action-btn>
           </v-container>
         </v-sheet>

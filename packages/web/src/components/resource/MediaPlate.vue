@@ -97,7 +97,6 @@ const providerRef: Ref<any> = ref(null);
           <media-overview
             class="pa-3"
             v-ripple
-            play-on-hover
             @click:content="emits('click:media', media)"
             @click.right.prevent
             :media="media"

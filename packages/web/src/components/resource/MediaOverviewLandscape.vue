@@ -57,6 +57,7 @@ const emits = defineEmits(['click:content']);
       <v-col cols="4" class="d-flex align-center">
         <v-img
           class="rounded-lg clickable"
+          cover
           :src="media.poster ? Api.File.buildRawPath(media.poster!.id) : MediaCoverFallback"
           :aspect-ratio="16 / 9"
           @click="(e) => emits('click:content', e)"
@@ -97,10 +98,6 @@ const emits = defineEmits(['click:content']);
 </template>
 
 <style scoped lang="sass">
-.video-container
-  height: 100%
-  object-fit: cover
-
 .media-title
   display: -webkit-box
   overflow: hidden

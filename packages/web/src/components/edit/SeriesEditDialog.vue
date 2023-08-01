@@ -6,6 +6,7 @@ import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useApp } from '@/store/app';
 import { mdiCheck, mdiClose, mdiCloudUploadOutline } from '@mdi/js';
 import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
+import SeriesCoverFallback from '@/assets/series_cover_fallback.jpg';
 import { useDisplay } from 'vuetify';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 import _ from 'lodash';
@@ -202,10 +203,10 @@ const queryTags = _.debounce(
                   class="rounded mt-2"
                   cover
                   min-width="80"
-                  :src="item.poster ? Api.File.buildRawPath(item.poster.id) : MediaCoverFallback"
+                  :src="item.poster ? Api.File.buildRawPath(item.poster.id) : SeriesCoverFallback"
                 >
                   <template #placeholder>
-                    <v-img :src="MediaCoverFallback"></v-img>
+                    <v-img :src="SeriesCoverFallback"></v-img>
                   </template>
                 </v-img>
                 <v-btn

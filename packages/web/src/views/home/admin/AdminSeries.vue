@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useApp } from '@/store/app';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { Api } from '@/api/api';
 import { SeriesEntity, SeriesQueryDto } from '@/interfaces/series.interface';
 import {
@@ -22,8 +22,12 @@ import { useDisplay } from 'vuetify';
 import ViewImg from '@/components/provider/ViewImg.vue';
 import UserAvatar from '@/components/provider/UserAvatar.vue';
 import SeriesEditDialog from '@/components/edit/SeriesEditDialog.vue';
+import SeriesCoverFallback from '@/assets/series_cover_fallback.jpg';
+import { useRoute, useRouter } from 'vue-router';
 
 const app = useApp();
+const route = useRoute();
+const router = useRouter();
 const display = useDisplay();
 
 const items = ref<SeriesEntity[]>([]);
@@ -69,10 +73,11 @@ const headers = ref([
   },
 ]);
 const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
+  items.value = [];
   loading.value = true;
   try {
     const response = await Api.Series.query({
-      ...query.value,
+      ...route.query,
       page: page - 1,
       size: itemsPerPage,
       sort: sortBy?.[0]?.key,
@@ -87,19 +92,32 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   }
 };
 
-const edit = ref<SeriesQueryDto>({});
-const query = ref<SeriesQueryDto>();
 const expand = ref(false);
+const edit = ref<SeriesQueryDto>({});
+watch(
+  () => [route.query],
+  async () => {
+    edit.value = Object.assign({}, route.query);
+    options.value.page = 1;
+    await loadItems(options.value);
+  },
+  { immediate: true },
+);
 const reset = async () => {
   edit.value = {};
 };
-const useQuery = async () => {
-  query.value = Object.assign(
-    {},
-    Object.fromEntries(Object.entries(edit.value).map(([key, value]) => [key, value || undefined])),
-  );
-  options.value.page = 1;
-  await loadItems(options.value);
+const setQuery = async () => {
+  await router.replace({
+    path: route.path,
+    query: Object.assign(
+      {},
+      Object.fromEntries(
+        Object.entries(edit.value)
+          .filter(([_, value]) => value !== undefined && String(value).length > 0)
+          .map(([key, value]) => [key, String(value)]),
+      ),
+    ),
+  });
 };
 
 const deleteItem = async (id: number) => {
@@ -242,7 +260,7 @@ const onEditError = (error: any) => {
               :icon="mdiCheck"
               color="primary"
               variant="tonal"
-              @click="useQuery"
+              @click="setQuery"
             ></action-btn>
           </v-container>
         </v-sheet>
@@ -306,6 +324,7 @@ const onEditError = (error: any) => {
                       ></pre>
                       <span class="text-subtitle-2 font-weight-bold mt-2">剧集标签</span>
                       <div>
+                        <span v-if="item.raw.tags?.length === 0" class="text-caption mt-1">无</span>
                         <v-chip
                           density="compact"
                           v-for="tag in item.raw.tags ?? []"
@@ -328,7 +347,7 @@ const onEditError = (error: any) => {
                 :aspect-ratio="3 / 4"
                 min-width="32"
                 max-width="64"
-                :src="item.raw.poster ? Api.File.buildRawPath(item.raw.poster.id) : MediaCoverFallback"
+                :src="item.raw.poster ? Api.File.buildRawPath(item.raw.poster.id) : SeriesCoverFallback"
               ></view-img>
             </v-container>
           </template>

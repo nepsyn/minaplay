@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { mdiAccountMultiple, mdiCheck, mdiChevronDown, mdiChevronUp, mdiClose, mdiRefresh } from '@mdi/js';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { UserEntity, UserQueryDto } from '@/interfaces/user.interface';
 import { useApp } from '@/store/app';
 import { Api } from '@/api/api';
@@ -8,8 +8,11 @@ import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 import UserAvatar from '@/components/provider/UserAvatar.vue';
 import { PermissionEnum } from '@/api/enums/permission.enum';
+import { useRoute, useRouter } from 'vue-router';
 
 const app = useApp();
+const router = useRouter();
+const route = useRoute();
 
 const items = ref<UserEntity[]>([]);
 const options = ref({
@@ -44,10 +47,11 @@ const headers = ref([
   },
 ]);
 const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
+  items.value = [];
   loading.value = true;
   try {
     const response = await Api.User.query({
-      ...query.value,
+      ...route.query,
       page: page - 1,
       size: itemsPerPage,
       sort: sortBy?.[0]?.key,
@@ -62,19 +66,32 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   }
 };
 
-const edit = ref<UserQueryDto>({});
-const query = ref<UserQueryDto>({});
 const expand = ref(false);
+const edit = ref<UserQueryDto>({});
+watch(
+  () => [route.query],
+  async () => {
+    edit.value = Object.assign({}, route.query);
+    options.value.page = 1;
+    await loadItems(options.value);
+  },
+  { immediate: true },
+);
 const reset = async () => {
   edit.value = {};
 };
-const useQuery = async () => {
-  query.value = Object.assign(
-    {},
-    Object.fromEntries(Object.entries(edit.value).map(([key, value]) => [key, value || undefined])),
-  );
-  options.value.page = 1;
-  await loadItems(options.value);
+const setQuery = async () => {
+  await router.replace({
+    path: route.path,
+    query: Object.assign(
+      {},
+      Object.fromEntries(
+        Object.entries(edit.value)
+          .filter(([_, value]) => value !== undefined && String(value).length > 0)
+          .map(([key, value]) => [key, String(value)]),
+      ),
+    ),
+  });
 };
 </script>
 
@@ -140,7 +157,7 @@ const useQuery = async () => {
               :icon="mdiCheck"
               color="primary"
               variant="tonal"
-              @click="useQuery"
+              @click="setQuery"
             ></action-btn>
           </v-container>
         </v-sheet>

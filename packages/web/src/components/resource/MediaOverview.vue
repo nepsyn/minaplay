@@ -3,17 +3,11 @@ import { MediaEntity } from '@/interfaces/media.interface';
 import { Api } from '@/api/api';
 import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
 import TimeAgo from '@/components/provider/TimeAgo.vue';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
-const props = withDefaults(
-  defineProps<{
-    media: MediaEntity;
-    playOnHover?: boolean;
-  }>(),
-  {
-    playOnHover: false,
-  },
-);
+const props = defineProps<{
+  media: MediaEntity;
+}>();
 
 const sourceText = computed(() => {
   switch (props.media.file?.source) {
@@ -28,42 +22,22 @@ const sourceText = computed(() => {
   }
 });
 
-const videoRef = ref<HTMLVideoElement>(null as any);
-const handleHover = async (isHovering: boolean) => {
-  if (isHovering && videoRef.value) {
-    await videoRef.value.play();
-  } else {
-    await videoRef.value.pause();
-    await videoRef.value.load();
-  }
-};
-
 const emits = defineEmits(['click:content']);
 </script>
 
 <template>
   <v-container v-bind="props" fluid class="pa-0 d-flex flex-column">
-    <v-hover
-      :disabled="!playOnHover"
-      open-delay="400"
-      v-slot:default="{ isHovering, props }"
-      @update:model-value="handleHover"
+    <v-img
+      :aspect-ratio="16 / 9"
+      cover
+      :src="media.poster ? Api.File.buildRawPath(media.poster!.id) : MediaCoverFallback"
+      class="rounded-lg clickable"
+      @click="(e) => emits('click:content', e)"
     >
-      <v-responsive v-bind="props" :aspect-ratio="16 / 9" max-height="200">
-        <video
-          @click="(e) => emits('click:content', e)"
-          ref="videoRef"
-          class="rounded-lg clickable video-container"
-          :src="Api.File.buildRawPath(media.file!.id)"
-          :controls="isHovering"
-          preload="metadata"
-          muted
-          :poster="media.poster ? Api.File.buildRawPath(media.poster!.id) : MediaCoverFallback"
-          controlslist="nodownload noremoteplayback"
-          disablepictureinpicture
-        ></video>
-      </v-responsive>
-    </v-hover>
+      <template #placeholder>
+        <v-img :src="MediaCoverFallback"></v-img>
+      </template>
+    </v-img>
 
     <span
       @click="(e) => emits('click:content', e)"
@@ -82,11 +56,6 @@ const emits = defineEmits(['click:content']);
 </template>
 
 <style scoped lang="sass">
-.video-container
-  width: 100%
-  height: 100%
-  object-fit: cover
-
 .media-title
   display: -webkit-box
   overflow: hidden

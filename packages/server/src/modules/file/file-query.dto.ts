@@ -1,8 +1,9 @@
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { File } from './file.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsDate, IsInt, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsBoolean, IsDateString, IsInt, IsOptional, IsString, IsUUID } from 'class-validator';
 import { FileSourceEnum } from '../../enums/file-source.enum';
+import { Transform } from 'class-transformer';
 
 export class FileQueryDto extends ApiQueryDto<File> {
   @ApiProperty({
@@ -41,6 +42,7 @@ export class FileQueryDto extends ApiQueryDto<File> {
     description: '文件是否过期',
     required: false,
   })
+  @Transform(({ value }) => Boolean(Number(value)))
   @IsOptional()
   @IsBoolean()
   expired?: boolean;
@@ -58,14 +60,14 @@ export class FileQueryDto extends ApiQueryDto<File> {
     required: false,
   })
   @IsOptional()
-  @IsDate()
-  start?: Date;
+  @IsDateString()
+  start?: string;
 
   @ApiProperty({
     description: '结束时间',
     required: false,
   })
   @IsOptional()
-  @IsDate()
-  end?: Date;
+  @IsDateString()
+  end?: string;
 }

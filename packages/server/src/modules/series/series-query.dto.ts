@@ -1,7 +1,7 @@
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { Series } from './series.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class SeriesQueryDto extends ApiQueryDto<Series> {
@@ -44,14 +44,14 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
     required: false,
   })
   @IsOptional()
-  @IsDate()
-  start?: Date;
+  @IsDateString()
+  start?: string;
 
   @ApiProperty({
     description: '结束时间',
     required: false,
   })
   @IsOptional()
-  @IsDate()
-  end?: Date;
+  @IsDateString()
+  end?: string;
 }

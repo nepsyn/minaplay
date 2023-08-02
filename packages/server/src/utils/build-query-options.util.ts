@@ -1,4 +1,4 @@
-import { FindOptionsWhere, Like } from 'typeorm';
+import { FindOperator, FindOptionsWhere, Like } from 'typeorm';
 
 type EntityKeys<T> = { [K in keyof T]: K };
 
@@ -9,7 +9,7 @@ interface QueryOptions<T> {
 }
 
 function removeUndefinedProperties(obj: any): any {
-  if (typeof obj !== 'object' || obj === null) {
+  if (typeof obj !== 'object' || obj === null || obj instanceof FindOperator) {
     return obj;
   }
 

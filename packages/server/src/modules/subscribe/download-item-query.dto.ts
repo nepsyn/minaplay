@@ -1,7 +1,7 @@
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { FetchLog } from './fetch-log.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsEnum, IsOptional, IsString } from 'class-validator';
 import { SubscribeDownloadItemStatusEnum } from '../../enums/subscribe-download-item-status.enum';
 
 export class DownloadItemQueryDto extends ApiQueryDto<FetchLog> {
@@ -18,16 +18,16 @@ export class DownloadItemQueryDto extends ApiQueryDto<FetchLog> {
     required: false,
   })
   @IsOptional()
-  @IsDate()
-  start?: Date;
+  @IsDateString()
+  start?: string;
 
   @ApiProperty({
     description: '结束时间',
     required: false,
   })
   @IsOptional()
-  @IsDate()
-  end?: Date;
+  @IsDateString()
+  end?: string;
 
   @ApiProperty({
     description: '结束时间',

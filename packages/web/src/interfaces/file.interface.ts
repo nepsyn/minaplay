@@ -1,3 +1,6 @@
+import { ApiQueryDto } from '@/interfaces/common.interface';
+import { FileSourceEnum } from '@/api/enums/file-source.enum';
+
 export interface FileEntity {
   /** 媒体id */
   id: string;
@@ -10,11 +13,19 @@ export interface FileEntity {
   /** 文件 mimetype */
   mimetype?: string;
   /** 文件来源 */
-  source: 'USER_UPLOAD' | 'ARIA2_DOWNLOAD' | 'AUTO_GENERATED';
+  source: FileSourceEnum;
   /** 创建时间 */
   createAt: Date;
   /** 修改时间 */
   updateAt: Date;
-  /** 文件是否过期 */
-  isExpired: boolean;
+}
+
+export interface FileQueryDto extends ApiQueryDto<FileEntity> {
+  keyword?: string;
+  id?: string;
+  md5?: string;
+  source?: FileSourceEnum;
+  userId?: number;
+  start?: Date;
+  end?: Date;
 }

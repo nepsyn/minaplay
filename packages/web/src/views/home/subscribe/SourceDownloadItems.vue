@@ -8,6 +8,7 @@ import { Api } from '@/api/api';
 import { mdiAlertCircle, mdiCheckCircle, mdiContentCopy, mdiDownloadCircle, mdiRefresh } from '@mdi/js';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
+import { SubscribeDownloadItemStatusEnum } from '@/api/enums/subscribe-download-item-status.enum';
 
 const app = useApp();
 const route = useRoute();
@@ -39,18 +40,35 @@ const resetDownloads = () => {
   downloadsQuery.page = 0;
 };
 
-const getDownloadItemColor = (item: DownloadItemEntity) => {
-  return item.status === 'DOWNLOADED' ? 'success' : item.status === 'DOWNLOADING' ? 'secondary-lighten-1' : 'error';
+const getDownloadItemColor = (status: SubscribeDownloadItemStatusEnum) => {
+  switch (status) {
+    case SubscribeDownloadItemStatusEnum.DOWNLOADED:
+      return 'success';
+    case SubscribeDownloadItemStatusEnum.DOWNLOADING:
+      return 'secondary-lighten-1';
+    case SubscribeDownloadItemStatusEnum.FAILED:
+      return 'error';
+  }
 };
-const getDownloadItemIcon = (item: DownloadItemEntity) => {
-  return item.status === 'DOWNLOADED'
-    ? mdiCheckCircle
-    : item.status === 'DOWNLOADING'
-    ? mdiDownloadCircle
-    : mdiAlertCircle;
+const getDownloadItemIcon = (status: SubscribeDownloadItemStatusEnum) => {
+  switch (status) {
+    case SubscribeDownloadItemStatusEnum.DOWNLOADED:
+      return mdiCheckCircle;
+    case SubscribeDownloadItemStatusEnum.DOWNLOADING:
+      return mdiDownloadCircle;
+    case SubscribeDownloadItemStatusEnum.FAILED:
+      return mdiAlertCircle;
+  }
 };
-const getDownloadItemStatusText = (item: DownloadItemEntity) => {
-  return item.status === 'DOWNLOADED' ? '下载完成' : item.status === 'DOWNLOADING' ? '正在下载' : '下载失败';
+const getDownloadItemStatusText = (status: SubscribeDownloadItemStatusEnum) => {
+  switch (status) {
+    case SubscribeDownloadItemStatusEnum.DOWNLOADED:
+      return '下载完成';
+    case SubscribeDownloadItemStatusEnum.DOWNLOADING:
+      return '正在下载';
+    case SubscribeDownloadItemStatusEnum.FAILED:
+      return '下载失败';
+  }
 };
 
 const copyDownloadUrl = async (url: string) => app.copyContent(url, '下载链接已复制到剪切板', '复制下载链接失败');
@@ -92,8 +110,8 @@ watch(
           :key="item.id"
           class="my-4"
           variant="tonal"
-          :color="getDownloadItemColor(item)"
-          :icon="getDownloadItemIcon(item)"
+          :color="getDownloadItemColor(item.status)"
+          :icon="getDownloadItemIcon(item.status)"
         >
           <p class="text-subtitle-1 font-weight-bold" v-text="item.title"></p>
           <div v-if="item.url" class="d-flex flex-row justify-space-between align-center">
@@ -102,7 +120,7 @@ watch(
           </div>
           <p class="text-caption">
             任务创建于 {{ new Date(item.createAt).toLocaleString() }} -
-            {{ getDownloadItemStatusText(item) }}
+            {{ getDownloadItemStatusText(item.status) }}
           </p>
           <pre v-if="item.status === 'FAILED'" class="text-body-2 mt-2 overflow-x-auto" v-text="item.error"></pre>
         </v-alert>

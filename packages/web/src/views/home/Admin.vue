@@ -1,6 +1,14 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { mdiAccountMultiple, mdiDownloadCircle, mdiFileVideo, mdiGaugeFull, mdiMultimedia, mdiRssBox } from '@mdi/js';
+import {
+  mdiAccountMultiple,
+  mdiDownloadCircle,
+  mdiFileMultiple,
+  mdiFileVideo,
+  mdiGaugeFull,
+  mdiMultimedia,
+  mdiRssBox,
+} from '@mdi/js';
 import ToTopContainer from '@/components/provider/ToTopContainer.vue';
 
 const tabs = ref([
@@ -28,6 +36,11 @@ const tabs = ref([
     text: '剧集',
     route: '/admin/series',
     icon: mdiMultimedia,
+  },
+  {
+    text: '文件',
+    route: '/admin/file',
+    icon: mdiFileMultiple,
   },
   {
     text: '下载内容',

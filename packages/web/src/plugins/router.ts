@@ -22,6 +22,7 @@ import AdminMedia from '@/views/home/admin/AdminMedia.vue';
 import AdminSeries from '@/views/home/admin/AdminSeries.vue';
 import AdminDownload from '@/views/home/admin/AdminDownload.vue';
 import { PermissionEnum } from '@/api/enums/permission.enum';
+import AdminFile from '@/views/home/admin/AdminFile.vue';
 
 const LoginGuard: NavigationGuard = (to, from, next) => {
   if (Api.isLogin) {
@@ -153,6 +154,13 @@ const routes: RouteRecordRaw[] = [
             component: AdminSeries,
             meta: {
               permission: [PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP],
+            },
+          },
+          {
+            path: '/admin/file',
+            component: AdminFile,
+            meta: {
+              permission: [PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP],
             },
           },
           {

@@ -1,6 +1,6 @@
 import axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 import { AuthData, LoginDto } from '@/interfaces/auth.interface';
-import { FileEntity } from '@/interfaces/file.interface';
+import { FileEntity, FileQueryDto } from '@/interfaces/file.interface';
 import {
   DownloadItemEntity,
   DownloadItemQueryDto,
@@ -99,6 +99,8 @@ class ApiHelper {
     fetchRaw: (id: string, config?: AxiosRequestConfig) => this.apiGet(`/file/${id}/raw`, config),
     uploadImage: this.apiUpload<FileEntity>('/file/image'),
     uploadVideo: this.apiUpload<FileEntity>('/file/video'),
+    query: this.apiGet<ApiQueryResult<FileEntity>, FileQueryDto>('/file'),
+    delete: (id: string) => this.apiDelete(`/file/${id}`),
   };
 
   SubscribeSource = {

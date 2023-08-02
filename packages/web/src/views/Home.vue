@@ -60,6 +60,7 @@ const actions = ref([
     click: () => {
       app.uploadDrawer = !app.uploadDrawer;
     },
+    permission: [PermissionEnum.ROOT_OP, PermissionEnum.FILE_UPLOAD_VIDEO],
   },
   {
     text: computed(() => '切换' + (app.darkMode ? '浅色模式' : '深色模式')),
@@ -118,15 +119,15 @@ const navs = [
       <div class="d-flex flex-row align-center">
         <div class="d-none d-sm-flex">
           <v-tooltip
-            v-for="(action, index) in actions"
+            v-for="({ click, text, icon, permission }, index) in actions"
             :key="index"
-            :text="action.text"
+            :text="text"
             location="bottom"
             open-delay="500"
           >
             <template v-slot:activator="{ props }">
-              <v-btn icon v-bind="props" @click="action.click">
-                <v-icon :icon="action.icon" size="large"></v-icon>
+              <v-btn v-if="!permission || app.hasPermission(...permission)" icon v-bind="props" @click="click">
+                <v-icon :icon="icon" size="large"></v-icon>
               </v-btn>
             </template>
           </v-tooltip>
@@ -139,15 +140,16 @@ const navs = [
           </template>
           <v-card max-width="360" class="overflow-x-hidden">
             <v-list density="compact" class="pa-0">
-              <v-list-item
-                link
-                v-for="(action, index) in actions"
-                :key="index"
-                @click="action.click"
-                :title="action.text"
-                :prepend-icon="action.icon"
-              >
-              </v-list-item>
+              <template v-for="({ click, text, icon, permission }, index) in actions">
+                <v-list-item
+                  link
+                  v-if="!permission || app.hasPermission(...permission)"
+                  :key="index"
+                  @click="click"
+                  :title="text"
+                  :prepend-icon="icon"
+                ></v-list-item>
+              </template>
             </v-list>
           </v-card>
         </v-menu>

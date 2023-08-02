@@ -62,6 +62,9 @@ const emits = defineEmits(['click:content']);
           :aspect-ratio="16 / 9"
           @click="(e) => emits('click:content', e)"
         >
+          <template #placeholder>
+            <v-img :src="MediaCoverFallback"></v-img>
+          </template>
         </v-img>
       </v-col>
       <v-col cols="8">

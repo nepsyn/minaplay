@@ -1,13 +1,13 @@
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOptionsWhere, LessThanOrEqual, Repository } from 'typeorm';
 import { File } from './file.entity';
-import { SchedulerRegistry } from '@nestjs/schedule';
+import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
-import { access, constants, unlink } from 'fs-extra';
+import { unlink } from 'fs-extra';
 
 @Injectable()
-export class FileService {
+export class FileService implements OnModuleInit {
   private logger = new ConsoleLogger(FileService.name);
 
   constructor(
@@ -15,34 +15,33 @@ export class FileService {
     private scheduleRegistry: SchedulerRegistry,
   ) {}
 
-  async save(file: DeepPartial<File>) {
-    const record = await this.fileRepository.save(file);
-    if (record.expireAt && !record.isExpired) {
-      const name = `delete-file-${record.id}`;
-      if (this.scheduleRegistry.doesExist('cron', name)) {
-        const job = this.scheduleRegistry.getCronJob(name);
-        job.stop();
-        this.scheduleRegistry.deleteCronJob(name);
+  async onModuleInit() {
+    const job = new CronJob({
+      cronTime: CronExpression.EVERY_HOUR,
+      onTick: async () => await this.cleanExpiredFiles(),
+      runOnInit: true,
+    });
+    this.scheduleRegistry.addCronJob('auto-clean-files', job);
+  }
+
+  private async cleanExpiredFiles() {
+    const files = await this.fileRepository.find({
+      where: {
+        expireAt: LessThanOrEqual(new Date()),
+      },
+    });
+    for (const file of files) {
+      try {
+        await unlink(file.path);
+        await this.fileRepository.softDelete({ id: file.id });
+      } catch (error) {
+        this.logger.error(`Delete file '${file.id}' error`, error.stack);
       }
-
-      const job = new CronJob(file.expireAt as Date, async () => {
-        try {
-          await access(record.path, constants.W_OK);
-          await unlink(record.path);
-          job.stop();
-          this.scheduleRegistry.addCronJob(name, job);
-        } catch (error) {
-          this.logger.error(`Delete local expired file failed with uuid: ${record.id}`);
-          if (error.stack) {
-            this.logger.error(error.stack);
-          }
-        }
-      });
-      job.start();
-      this.scheduleRegistry.addCronJob(name, job);
     }
+  }
 
-    return record;
+  async save(file: DeepPartial<File>) {
+    return await this.fileRepository.save(file);
   }
 
   async findOneBy(where: FindOptionsWhere<File>) {
@@ -54,7 +53,7 @@ export class FileService {
   }
 
   async delete(where: FindOptionsWhere<File>) {
-    const result = await this.fileRepository.delete(where);
+    const result = await this.fileRepository.softDelete(where);
     return result.affected > 0;
   }
 }

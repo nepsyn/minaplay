@@ -1,7 +1,6 @@
-import { Exclude, Expose } from 'class-transformer';
-import { access, constants, pathExistsSync, unlink } from 'fs-extra';
+import { Exclude } from 'class-transformer';
+import { pathExistsSync } from 'fs-extra';
 import {
-  AfterLoad,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -56,6 +55,7 @@ export class File {
   path: string;
 
   /** 过期时间 */
+  @Exclude()
   @Column({
     nullable: true,
   })
@@ -85,21 +85,5 @@ export class File {
   @Exclude()
   get isExist() {
     return pathExistsSync(this.path);
-  }
-
-  /** 文件是否过期 */
-  @Expose()
-  get isExpired() {
-    return this.expireAt && this.expireAt && this.expireAt.getTime() <= new Date().getTime();
-  }
-
-  @AfterLoad()
-  async afterLoad() {
-    if (this.isExpired && this.isExist) {
-      try {
-        await access(this.path, constants.W_OK);
-        await unlink(this.path);
-      } catch {}
-    }
   }
 }

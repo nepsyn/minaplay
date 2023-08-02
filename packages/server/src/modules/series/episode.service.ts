@@ -20,6 +20,6 @@ export class EpisodeService {
   }
 
   async delete(where: FindOptionsWhere<Episode>) {
-    await this.episodeRepository.delete(where);
+    await this.episodeRepository.softDelete(where);
   }
 }

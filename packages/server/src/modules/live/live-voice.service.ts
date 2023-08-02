@@ -31,10 +31,7 @@ export class LiveVoiceService implements OnModuleInit {
         logLevel: 'none',
       });
       worker.on('died', (error: Error) => {
-        this.logger.error(`Mediasoup worker(${i}) died`);
-        if (error.stack) {
-          this.logger.error(error.stack);
-        }
+        this.logger.error(`Mediasoup worker(${i}) died`, error.stack);
       });
       this.workers.push(worker);
     }

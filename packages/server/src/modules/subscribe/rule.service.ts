@@ -20,7 +20,7 @@ export class RuleService {
   }
 
   async delete(where: FindOptionsWhere<Rule>) {
-    const result = await this.ruleRepository.delete(where);
+    const result = await this.ruleRepository.softDelete(where);
     return result.affected > 0;
   }
 }

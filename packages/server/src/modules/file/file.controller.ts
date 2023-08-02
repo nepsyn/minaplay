@@ -35,7 +35,7 @@ import { USER_UPLOAD_IMAGE_DIR, USER_UPLOAD_VIDEO_DIR, VALID_IMAGE_MIME, VALID_V
 import { FileQueryDto } from './file-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { File } from './file.entity';
-import { Between, MoreThanOrEqual } from 'typeorm';
+import { Between } from 'typeorm';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { Response } from 'express';
 
@@ -179,7 +179,7 @@ export class FileController {
   })
   async getRawFileById(@Param('id') id: string, @Res() res: Response) {
     const file = await this.fileService.findOneBy({ id });
-    if (!file || file.isExpired) {
+    if (!file || !file.isExist) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
@@ -192,7 +192,7 @@ export class FileController {
   })
   async downloadFileById(@Param('id') id: string, @Res() res: Response) {
     const file = await this.fileService.findOneBy({ id });
-    if (!file || file.isExpired) {
+    if (!file || !file.isExist) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
@@ -206,7 +206,7 @@ export class FileController {
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
   async queryFile(@Query() query: FileQueryDto) {
-    const { keyword, id, md5, source, expired, userId, start, end } = query;
+    const { keyword, id, md5, source, userId, start, end } = query;
     const [result, total] = await this.fileService.findAndCount({
       where: buildQueryOptions<File>({
         keyword,
@@ -215,7 +215,6 @@ export class FileController {
           id,
           md5,
           source,
-          expireAt: expired ? MoreThanOrEqual(new Date()) : undefined,
           user: { id: userId },
           createAt: start != null ? Between(new Date(start), end != null ? new Date(end) : new Date()) : undefined,
         },

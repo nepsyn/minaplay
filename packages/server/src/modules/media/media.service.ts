@@ -1,15 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOptionsWhere, In, Repository } from 'typeorm';
 import { Media } from './media.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MEDIA_MODULE_OPTIONS_TOKEN } from './media.module-definition';
 import { MediaModuleOptions } from './media.module.interface';
+import { FileService } from '../file/file.service';
+import { File } from '../file/file.entity';
 
 @Injectable()
 export class MediaService {
   constructor(
     @Inject(MEDIA_MODULE_OPTIONS_TOKEN) private options: MediaModuleOptions,
     @InjectRepository(Media) private mediaRepository: Repository<Media>,
+    private fileService: FileService,
   ) {}
 
   async save(media: DeepPartial<Media>) {
@@ -25,7 +28,21 @@ export class MediaService {
   }
 
   async delete(where: FindOptionsWhere<Media>) {
-    const result = await this.mediaRepository.delete(where);
+    const medias = await this.mediaRepository.find({ where });
+    for (const media of medias) {
+      const ids = []
+        .concat(media.file)
+        .concat(media.metadata)
+        .concat(media.poster)
+        .concat(media.attachments)
+        .filter((v) => v != null)
+        .map((v: File) => v.id);
+      await this.fileService.delete({
+        id: In(ids),
+      });
+    }
+
+    const result = await this.mediaRepository.softDelete(where);
     return result.affected > 0;
   }
 }

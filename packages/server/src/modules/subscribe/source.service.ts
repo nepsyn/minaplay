@@ -45,7 +45,7 @@ export class SourceService implements OnModuleInit {
   }
 
   async delete(where: FindOptionsWhere<Source>) {
-    const result = await this.sourceRepository.delete(where);
+    const result = await this.sourceRepository.softDelete(where);
     return result.affected > 0;
   }
 

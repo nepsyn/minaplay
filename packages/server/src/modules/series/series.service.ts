@@ -20,7 +20,7 @@ export class SeriesService {
   }
 
   async delete(where: FindOptionsWhere<Series>) {
-    const result = await this.seriesRepository.delete(where);
+    const result = await this.seriesRepository.softDelete(where);
     return result.affected > 0;
   }
 }

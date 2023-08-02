@@ -25,19 +25,9 @@ export class FileService implements OnModuleInit {
   }
 
   private async cleanExpiredFiles() {
-    const files = await this.fileRepository.find({
-      where: {
-        expireAt: LessThanOrEqual(new Date()),
-      },
+    await this.delete({
+      expireAt: LessThanOrEqual(new Date()),
     });
-    for (const file of files) {
-      try {
-        await unlink(file.path);
-        await this.fileRepository.softDelete({ id: file.id });
-      } catch (error) {
-        this.logger.error(`Delete file '${file.id}' error`, error.stack);
-      }
-    }
   }
 
   async save(file: DeepPartial<File>) {
@@ -53,7 +43,18 @@ export class FileService implements OnModuleInit {
   }
 
   async delete(where: FindOptionsWhere<File>) {
-    const result = await this.fileRepository.softDelete(where);
-    return result.affected > 0;
+    const files = await this.fileRepository.find({ where });
+    let affected = 0;
+    for (const file of files) {
+      try {
+        await unlink(file.path);
+        await this.fileRepository.softDelete({ id: file.id });
+        affected++;
+      } catch (error) {
+        this.logger.error(`Delete file '${file.id}' error`, error.stack);
+      }
+    }
+
+    return affected > 0;
   }
 }

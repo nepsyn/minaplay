@@ -78,6 +78,7 @@ export class AuthorizationController {
     description: '注销指定用户',
   })
   @ApiBearerAuth()
+  @HttpCode(200)
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.USER_OP)
   async logoutUser(@Param('userId') userId: number) {
@@ -90,6 +91,7 @@ export class AuthorizationController {
     description: '设置用户权限',
   })
   @ApiBearerAuth()
+  @HttpCode(200)
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP)
   async grantPermissions(@RequestUser() operator: User, @Param('userId') userId: number, @Body() data: PermissionDto) {

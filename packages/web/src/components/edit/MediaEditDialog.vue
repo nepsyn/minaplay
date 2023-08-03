@@ -39,6 +39,11 @@ const emits = defineEmits<{
 
 const editLoading = ref(false);
 const saveEdit = async () => {
+  if (props.item.name === undefined || String(props.item.name).trim().length === 0) {
+    app.toastError('媒体文件名称不可为空');
+    return;
+  }
+
   editLoading.value = true;
   try {
     const action = props.item?.id !== undefined ? Api.Media.update(props.item.id) : Api.Media.create;

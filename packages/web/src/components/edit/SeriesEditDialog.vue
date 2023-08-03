@@ -41,6 +41,11 @@ const emits = defineEmits<{
 
 const editLoading = ref(false);
 const saveEdit = async () => {
+  if (props.item.name === undefined || String(props.item.name).trim().length === 0) {
+    app.toastError('剧集名称不可为空');
+    return;
+  }
+
   editLoading.value = true;
   try {
     const action = props.item?.id !== undefined ? Api.Series.update(props.item.id) : Api.Series.create;

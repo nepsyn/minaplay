@@ -142,7 +142,6 @@ watch(
           color="primary"
           density="compact"
           v-model="source!.url"
-          maxlength="256"
         ></v-text-field>
       </v-container>
       <v-container class="my-4 pa-0">

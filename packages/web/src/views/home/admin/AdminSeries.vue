@@ -23,7 +23,7 @@ import ViewImg from '@/components/provider/ViewImg.vue';
 import UserAvatar from '@/components/provider/UserAvatar.vue';
 import SeriesEditDialog from '@/components/edit/SeriesEditDialog.vue';
 import SeriesCoverFallback from '@/assets/series_cover_fallback.jpg';
-import { useRoute, useRouter } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
 const app = useApp();
 const route = useRoute();
@@ -77,7 +77,11 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   loading.value = true;
   try {
     const response = await Api.Series.query({
-      ...route.query,
+      ...Object.fromEntries(
+        Object.entries(edit.value)
+          .filter(([_, value]) => value !== undefined && String(value).length > 0)
+          .map(([key, value]) => [key, String(value)]),
+      ),
       page: page - 1,
       size: itemsPerPage,
       sort: sortBy?.[0]?.key,
@@ -95,29 +99,23 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
 const expand = ref(false);
 const edit = ref<SeriesQueryDto>({});
 watch(
-  () => [route.query],
-  async () => {
-    edit.value = Object.assign({}, route.query);
-    options.value.page = 1;
-    await loadItems(options.value);
+  () => [route.path, route.query],
+  (newValue, oldValue) => {
+    if (newValue[0] !== oldValue?.[0]) {
+      edit.value = Object.assign({}, route.query);
+      options.value.page = 1;
+    }
   },
   { immediate: true },
 );
+onBeforeRouteUpdate(async (to, from, next) => {
+  edit.value = Object.assign({}, to.query);
+  options.value.page = 1;
+  await loadItems(options.value);
+  next();
+});
 const reset = async () => {
   edit.value = {};
-};
-const setQuery = async () => {
-  await router.replace({
-    path: route.path,
-    query: Object.assign(
-      {},
-      Object.fromEntries(
-        Object.entries(edit.value)
-          .filter(([_, value]) => value !== undefined && String(value).length > 0)
-          .map(([key, value]) => [key, String(value)]),
-      ),
-    ),
-  });
 };
 
 const deleteItem = async (id: number) => {
@@ -136,15 +134,7 @@ const deleteItem = async (id: number) => {
 const editDialog = ref(false);
 const editItem = ref<SeriesEntity>({} as any);
 const openEdit = (item?: SeriesEntity) => {
-  editItem.value = Object.assign(
-    {
-      name: undefined,
-      description: undefined,
-      poster: undefined,
-      posterLandscape: undefined,
-    },
-    item,
-  );
+  editItem.value = Object.assign({}, item);
   editDialog.value = true;
 };
 const onEditSaved = (data: SeriesEntity) => {
@@ -260,7 +250,7 @@ const onEditError = (error: any) => {
               :icon="mdiCheck"
               color="primary"
               variant="tonal"
-              @click="setQuery"
+              @click="loadItems(options)"
             ></action-btn>
           </v-container>
         </v-sheet>
@@ -401,7 +391,7 @@ const onEditError = (error: any) => {
                 </template>
                 <v-card>
                   <v-card-title>删除确认</v-card-title>
-                  <v-card-text>确定要删除该媒体文件吗？该操作不可撤销！</v-card-text>
+                  <v-card-text>确定要删除该剧集吗？该操作不可撤销！</v-card-text>
                   <v-card-actions>
                     <v-spacer></v-spacer>
                     <v-btn color="primary" variant="text">取消</v-btn>

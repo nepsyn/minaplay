@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useApp } from '@/store/app';
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { Api } from '@/api/api';
 import {
   mdiCheck,
@@ -15,7 +15,7 @@ import {
 import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 import { useDisplay } from 'vuetify';
-import { useRoute, useRouter } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { FileEntity, FileQueryDto } from '@/interfaces/file.interface';
 import { filesize } from 'filesize';
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
@@ -65,7 +65,11 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   loading.value = true;
   try {
     const response = await Api.File.query({
-      ...route.query,
+      ...Object.fromEntries(
+        Object.entries(edit.value)
+          .filter(([_, value]) => value !== undefined && String(value).length > 0)
+          .map(([key, value]) => [key, String(value)]),
+      ),
       page: page - 1,
       size: itemsPerPage,
       sort: sortBy?.[0]?.key,
@@ -93,30 +97,14 @@ const getSourceText = (source: FileSourceEnum) => {
 
 const expand = ref(false);
 const edit = ref<FileQueryDto>({});
-watch(
-  () => [route.query],
-  async () => {
-    edit.value = Object.assign({}, route.query);
-    options.value.page = 1;
-    await loadItems(options.value);
-  },
-  { immediate: true },
-);
+onBeforeRouteUpdate(async (to, from, next) => {
+  edit.value = Object.assign({}, to.query);
+  options.value.page = 1;
+  await loadItems(options.value);
+  next();
+});
 const reset = async () => {
   edit.value = {};
-};
-const setQuery = async () => {
-  await router.replace({
-    path: route.path,
-    query: Object.assign(
-      {},
-      Object.fromEntries(
-        Object.entries(edit.value)
-          .filter(([_, value]) => value !== undefined && String(value).length > 0)
-          .map(([key, value]) => [key, String(value)]),
-      ),
-    ),
-  });
 };
 
 const openDownload = (id: string) => {
@@ -247,7 +235,7 @@ const deleteItem = async (id: string) => {
               :icon="mdiCheck"
               color="primary"
               variant="tonal"
-              @click="setQuery"
+              @click="loadItems(options)"
             ></action-btn>
           </v-container>
         </v-sheet>

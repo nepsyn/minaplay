@@ -1,5 +1,5 @@
 import axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
-import { AuthData, LoginDto } from '@/interfaces/auth.interface';
+import { AuthData, LoginDto, PermissionDto } from '@/interfaces/auth.interface';
 import { FileEntity, FileQueryDto } from '@/interfaces/file.interface';
 import {
   DownloadItemEntity,
@@ -91,6 +91,7 @@ class ApiHelper {
     login: this.apiPost<AuthData, LoginDto>('/auth/login/'),
     logout: this.apiPost('/auth/logout/'),
     refreshToken: this.apiPost<AuthData>('/auth/refresh'),
+    grant: (userId: number) => this.apiPost<UserEntity, PermissionDto>(`/auth/${userId}/grant`),
   };
 
   File = {

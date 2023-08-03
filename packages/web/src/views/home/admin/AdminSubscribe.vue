@@ -16,7 +16,7 @@ import {
 import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 import UserAvatar from '@/components/provider/UserAvatar.vue';
-import { useRoute, useRouter } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
 const app = useApp();
 const route = useRoute();
@@ -75,7 +75,11 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   loading.value = true;
   try {
     const response = await Api.SubscribeSource.query({
-      ...route.query,
+      ...Object.fromEntries(
+        Object.entries(edit.value)
+          .filter(([_, value]) => value !== undefined && String(value).length > 0)
+          .map(([key, value]) => [key, String(value)]),
+      ),
       page: page - 1,
       size: itemsPerPage,
       sort: sortBy?.[0]?.key,
@@ -93,29 +97,23 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
 const expand = ref(false);
 const edit = ref<SourceQueryDto>({});
 watch(
-  () => [route.query],
-  async () => {
-    edit.value = Object.assign({}, route.query);
-    options.value.page = 1;
-    await loadItems(options.value);
+  () => [route.path, route.query],
+  (newValue, oldValue) => {
+    if (newValue[0] !== oldValue?.[0]) {
+      edit.value = Object.assign({}, route.query);
+      options.value.page = 1;
+    }
   },
   { immediate: true },
 );
+onBeforeRouteUpdate(async (to, from, next) => {
+  edit.value = Object.assign({}, to.query);
+  options.value.page = 1;
+  await loadItems(options.value);
+  next();
+});
 const reset = async () => {
   edit.value = {};
-};
-const setQuery = async () => {
-  await router.replace({
-    path: route.path,
-    query: Object.assign(
-      {},
-      Object.fromEntries(
-        Object.entries(edit.value)
-          .filter(([_, value]) => value !== undefined && String(value).length > 0)
-          .map(([key, value]) => [key, String(value)]),
-      ),
-    ),
-  });
 };
 
 const toggleEnabledId = ref<number | undefined>(undefined);
@@ -220,7 +218,7 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
               :icon="mdiCheck"
               color="primary"
               variant="tonal"
-              @click="setQuery"
+              @click="loadItems(options)"
             ></action-btn>
           </v-container>
         </v-sheet>

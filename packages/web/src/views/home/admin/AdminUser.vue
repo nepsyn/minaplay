@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { mdiAccountMultiple, mdiCheck, mdiChevronDown, mdiChevronUp, mdiClose, mdiRefresh } from '@mdi/js';
+import {
+  mdiAccountMultiple,
+  mdiAccountTagOutline,
+  mdiCheck,
+  mdiChevronDown,
+  mdiChevronUp,
+  mdiClose,
+  mdiRefresh,
+} from '@mdi/js';
 import { ref, watch } from 'vue';
 import { UserEntity, UserQueryDto } from '@/interfaces/user.interface';
 import { useApp } from '@/store/app';
@@ -8,7 +16,8 @@ import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 import UserAvatar from '@/components/provider/UserAvatar.vue';
 import { PermissionEnum } from '@/api/enums/permission.enum';
-import { useRoute, useRouter } from 'vue-router';
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+import PermissionEditDialog from '@/components/edit/PermissionEditDialog.vue';
 
 const app = useApp();
 const router = useRouter();
@@ -51,7 +60,11 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   loading.value = true;
   try {
     const response = await Api.User.query({
-      ...route.query,
+      ...Object.fromEntries(
+        Object.entries(edit.value)
+          .filter(([_, value]) => value !== undefined && String(value).length > 0)
+          .map(([key, value]) => [key, String(value)]),
+      ),
       page: page - 1,
       size: itemsPerPage,
       sort: sortBy?.[0]?.key,
@@ -69,29 +82,42 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
 const expand = ref(false);
 const edit = ref<UserQueryDto>({});
 watch(
-  () => [route.query],
-  async () => {
-    edit.value = Object.assign({}, route.query);
-    options.value.page = 1;
-    await loadItems(options.value);
+  () => [route.path, route.query],
+  (newValue, oldValue) => {
+    if (newValue[0] !== oldValue?.[0]) {
+      edit.value = Object.assign({}, route.query);
+      options.value.page = 1;
+    }
   },
   { immediate: true },
 );
+onBeforeRouteUpdate(async (to, from, next) => {
+  edit.value = Object.assign({}, to.query);
+  options.value.page = 1;
+  await loadItems(options.value);
+  next();
+});
 const reset = async () => {
   edit.value = {};
 };
-const setQuery = async () => {
-  await router.replace({
-    path: route.path,
-    query: Object.assign(
-      {},
-      Object.fromEntries(
-        Object.entries(edit.value)
-          .filter(([_, value]) => value !== undefined && String(value).length > 0)
-          .map(([key, value]) => [key, String(value)]),
-      ),
-    ),
-  });
+
+const editDialog = ref(false);
+const editItem = ref<UserEntity>({} as any);
+const openEdit = (item?: UserEntity) => {
+  editItem.value = Object.assign({}, item);
+  editDialog.value = true;
+};
+const onEditSaved = (data: UserEntity) => {
+  const index = items.value.findIndex(({ id }) => id === data.id);
+  if (index > -1) {
+    items.value[index] = data;
+  } else {
+    items.value.unshift(data);
+  }
+  app.toastSuccess('保存用户权限成功');
+};
+const onEditError = (error: any) => {
+  app.toastError('保存用户权限失败');
 };
 </script>
 
@@ -157,7 +183,7 @@ const setQuery = async () => {
               :icon="mdiCheck"
               color="primary"
               variant="tonal"
-              @click="setQuery"
+              @click="loadItems(options)"
             ></action-btn>
           </v-container>
         </v-sheet>
@@ -211,17 +237,31 @@ const setQuery = async () => {
             {{ new Date(item.raw.createAt).toLocaleString() }}
           </template>
           <template #item.actions="{ item }">
-            <v-btn
-              v-if="item.raw.id !== app.user?.id && app.hasPermission(PermissionEnum.ROOT_OP)"
-              variant="tonal"
-              color="warning"
-              text="修改权限"
-              size="small"
-            ></v-btn>
+            <v-container fluid class="pa-0 d-flex flex-row">
+              <action-btn
+                v-if="
+                  item.raw.id !== app.user?.id &&
+                  app.hasPermission(PermissionEnum.ROOT_OP) &&
+                  !item.raw.permissionNames?.includes(PermissionEnum.ROOT_OP)
+                "
+                text="修改权限"
+                :icon="mdiAccountTagOutline"
+                size="small"
+                color="warning"
+                variant="tonal"
+                @click.stop="openEdit(item.raw)"
+              ></action-btn>
+            </v-container>
           </template>
         </v-data-table-server>
       </v-sheet>
     </v-container>
+    <permission-edit-dialog
+      v-model="editDialog"
+      :item="editItem"
+      @saved="onEditSaved"
+      @error="onEditError"
+    ></permission-edit-dialog>
   </v-container>
 </template>
 

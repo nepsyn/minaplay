@@ -4,6 +4,7 @@ import Router from './plugins/router';
 import Vuetify from './plugins/vuetify';
 import Pinia from './plugins/pinia';
 import { Api } from '@/api/api';
+import { registerSW } from 'virtual:pwa-register';
 import '@/scss/main.scss';
 
 Api.setToken(localStorage.getItem('minaplay-token'));
@@ -15,3 +16,7 @@ export const pinia = Pinia();
 
 app.use(router).use(vuetify).use(pinia);
 app.mount('#app');
+
+if ('serviceWorker' in navigator) {
+  registerSW();
+}

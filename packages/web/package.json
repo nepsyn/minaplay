@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:prod": "vite build --mode production"
+    "build:prod": "vite build --mode production",
+    "generate-pwa-assets": "pwa-assets-generator --preset minimal public/logo.jpeg"
   },
   "devDependencies": {
     "@mdi/js": "^7.2.96",
@@ -17,6 +18,7 @@
     "sass": "^1.62.0",
     "typescript": "^4.9.5",
     "vite": "^4.2.0",
+    "vite-plugin-pwa": "^0.16.4",
     "vite-plugin-vuetify": "^1.0.2",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6",

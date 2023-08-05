@@ -96,9 +96,7 @@ const navs = [
     name: '控制台',
     icon: mdiViewDashboard,
     route: '/admin',
-    permission: Object.keys(PermissionEnum)
-      .filter((key) => key.endsWith('_OP'))
-      .map((key) => PermissionEnum[key as keyof typeof PermissionEnum]),
+    permission: Object.values(PermissionEnum).filter((key) => key.endsWith(':*')),
   },
   {
     name: '设置',

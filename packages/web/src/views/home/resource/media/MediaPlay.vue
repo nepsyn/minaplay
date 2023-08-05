@@ -6,7 +6,7 @@ import SingleItemProvider from '@/components/provider/SingleItemProvider.vue';
 import { MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
 import { Api } from '@/api/api';
 import ToTopContainer from '@/components/provider/ToTopContainer.vue';
-import { mdiInformationVariantCircleOutline, mdiMotionPlayOutline, mdiPlaylistPlay } from '@mdi/js';
+import { mdiMotionPlayOutline, mdiPlaylistPlay } from '@mdi/js';
 import VideoProvider from '@/components/provider/VideoProvider.vue';
 import Plyr from 'plyr';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
@@ -101,36 +101,31 @@ watch(
                   <action-btn text="一起看" :icon="mdiMotionPlayOutline" variant="text" color="secondary"></action-btn>
                 </v-container>
                 <v-divider class="my-2"></v-divider>
-                <pre
-                  class="text-subtitle-2 font-weight-light text-pre-wrap text-break"
-                  v-text="media.description ?? '暂无无媒体描述'"
-                ></pre>
+                <v-sheet min-height="100">
+                  <pre
+                    class="text-subtitle-2 font-weight-light text-pre-wrap text-break"
+                    v-text="media.description ?? '暂无无媒体描述'"
+                  ></pre>
+                </v-sheet>
               </v-container>
             </single-item-provider>
           </v-col>
           <v-col cols="12" md="4">
             <v-container fluid class="pa-0 mt-2">
-              <v-divider class="py-0"></v-divider>
-              <v-tabs v-model="tab" fixed-tabs color="primary">
-                <v-tab value="0" :prepend-icon="mdiPlaylistPlay">播放列表</v-tab>
-                <v-tab value="1" :prepend-icon="mdiInformationVariantCircleOutline">媒体信息</v-tab>
-              </v-tabs>
-              <v-divider class="py-0"></v-divider>
-              <v-window v-model="tab" class="pb-6">
-                <v-window-item value="0">
-                  <items-provider ref="recommendProvider" class="pa-0" :load-fn="loadRecommends" :items="recommends">
-                    <media-overview-landscape
-                      v-for="recommend in recommendsWithOutCurrent"
-                      class="pa-2"
-                      v-ripple
-                      :media="recommend"
-                      @click:content="router.push(`/media/${recommend.id}`)"
-                      @click.right.prevent
-                    ></media-overview-landscape>
-                  </items-provider>
-                </v-window-item>
-                <v-window-item value="1">info</v-window-item>
-              </v-window>
+              <div class="pa-2 d-flex align-center">
+                <v-icon :icon="mdiPlaylistPlay" size="large"></v-icon>
+                <span class="ms-2 text-h6">播放列表</span>
+              </div>
+              <items-provider ref="recommendProvider" class="pa-0" :load-fn="loadRecommends" :items="recommends">
+                <media-overview-landscape
+                  v-for="recommend in recommendsWithOutCurrent"
+                  class="pa-2"
+                  v-ripple
+                  :media="recommend"
+                  @click:content="router.push(`/media/${recommend.id}`)"
+                  @click.right.prevent
+                ></media-overview-landscape>
+              </items-provider>
             </v-container>
           </v-col>
         </v-row>

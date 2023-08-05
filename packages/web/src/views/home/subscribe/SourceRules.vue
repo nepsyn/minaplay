@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { mdiCheck, mdiClose, mdiPlus, mdiRefresh } from '@mdi/js';
+import { mdiCheck, mdiDelete, mdiPlus, mdiRefresh } from '@mdi/js';
 import { Api } from '@/api/api';
 import { computed, ref, Ref, watch } from 'vue';
 import { javascript } from '@codemirror/lang-javascript';
@@ -191,16 +191,15 @@ watch(
           <v-container fluid class="px-4 py-2 d-flex flex-row justify-end">
             <v-menu location="left">
               <template #activator="{ props }">
-                <v-btn
+                <action-btn
                   variant="tonal"
                   color="error"
                   v-bind="props"
-                  :prepend-icon="mdiClose"
+                  :icon="mdiDelete"
+                  text="删除规则"
                   :loading="deleteRuleId === rule.id"
                   :disabled="deleteRuleId !== undefined && deleteRuleId !== rule.id"
-                >
-                  删除规则
-                </v-btn>
+                ></action-btn>
               </template>
               <v-card>
                 <v-card-title>删除确认</v-card-title>
@@ -212,17 +211,17 @@ watch(
                 </v-card-actions>
               </v-card>
             </v-menu>
-            <v-btn
+            <action-btn
               class="ml-4"
               variant="tonal"
               color="info"
-              :prepend-icon="mdiCheck"
+              :icon="mdiCheck"
+              text="保存代码"
               @click="saveRuleCode(rule.id, rule.code)"
               :loading="editRuleId === rule.id"
               :disabled="editRuleId !== undefined && editRuleId !== rule.id"
             >
-              保存代码
-            </v-btn>
+            </action-btn>
           </v-container>
         </v-sheet>
       </items-provider>

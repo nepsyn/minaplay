@@ -11,6 +11,7 @@ const props = withDefaults(
     loading?: boolean;
     size?: string;
     variant?: 'flat' | 'text' | 'elevated' | 'tonal' | 'outlined' | 'plain';
+    disabled?: boolean;
   }>(),
   {
     loading: false,
@@ -28,6 +29,7 @@ const props = withDefaults(
     :loading="loading!"
     :icon="display.smAndUp.value ? undefined : icon as any"
     :prepend-icon="icon!"
+    :disabled="disabled!"
   >
   </v-btn>
 </template>

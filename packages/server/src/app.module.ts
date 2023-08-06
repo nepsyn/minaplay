@@ -70,7 +70,9 @@ import { SubscribeModule } from './modules/subscribe/subscribe.module';
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
-        rpcUrl: configService.get('ARIA2_RPC_URL', '127.0.0.1:6800/jsonrpc'),
+        rpcHost: configService.get('ARIA2_RPC_HOST', '127.0.0.1'),
+        rpcPort: Number(configService.get('ARIA2_RPC_PORT', 6800)),
+        rpcPath: configService.get('ARIA2_RPC_PATH', '/jsonrpc'),
         rpcSecret: configService.get('ARIA2_RPC_SECRET'),
         autoUpdateTracker: Number(configService.get('ARIA2_AUTO_UPDATE_TRACKER', 0)) === 1,
         trackerListUrl: configService.get('ARIA2_TRACKER_LIST_URL'),

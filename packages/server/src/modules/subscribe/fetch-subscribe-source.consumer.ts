@@ -14,6 +14,8 @@ import { EpisodeService } from '../series/episode.service';
 import { MediaService } from '../media/media.service';
 import { MediaFileService } from '../media/media-file.service';
 import { MediaDescriptor } from '../media/media.descriptor.interface';
+import { DownloadItem } from './download-item.entity';
+import { DeepPartial } from 'typeorm';
 
 @Injectable()
 @Processor('fetch-subscribe-source')
@@ -66,24 +68,28 @@ export class FetchSubscribeSourceConsumer {
                 continue;
               }
 
-              const item = await this.downloadItemService.save({
+              const itemProps: DeepPartial<DownloadItem> = {
                 title: entry.title,
                 url: entry.enclosure.url,
                 source: { id: source.id },
                 rule: { id: rule.id },
                 log: { id: log.id },
+              };
+              const item = await this.downloadItemService.save({
+                ...itemProps,
                 status: SubscribeDownloadItemStatusEnum.DOWNLOADING,
               });
 
               const task = await this.aria2Service.addTask(entry.enclosure.url);
               task.on('complete', async (files) => {
                 for (const file of files) {
+                  const copy = Object.assign({}, file);
                   if (VALID_VIDEO_MIME.includes(file.mimetype)) {
                     const { id } = await this.mediaService.save({
-                      name: descriptor?.name?.(file) ?? file.name,
-                      description: descriptor?.description?.(file),
+                      name: descriptor?.name?.(copy) ?? file.name,
+                      description: descriptor?.description?.(copy),
                       download: { id: item.id },
-                      isPublic: descriptor?.isPublic?.(file) ?? true,
+                      isPublic: descriptor?.isPublic?.(copy) ?? true,
                       file: { id: file.id },
                     });
                     const media = await this.mediaService.findOneBy({ id });
@@ -91,7 +97,7 @@ export class FetchSubscribeSourceConsumer {
 
                     if (rule.series) {
                       await this.episodeService.save({
-                        no: descriptor?.no?.(file),
+                        no: descriptor?.no?.(copy),
                         media: { id: media.id },
                         series: { id: rule.series.id },
                       });
@@ -101,12 +107,14 @@ export class FetchSubscribeSourceConsumer {
 
                 await this.downloadItemService.save({
                   id: item.id,
+                  ...itemProps,
                   status: SubscribeDownloadItemStatusEnum.DOWNLOADED,
                 });
               });
               task.on('error', async (status) => {
                 await this.downloadItemService.save({
                   id: item.id,
+                  ...itemProps,
                   status: SubscribeDownloadItemStatusEnum.FAILED,
                   error: status.errorMessage,
                 });

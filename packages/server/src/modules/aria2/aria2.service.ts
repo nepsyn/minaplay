@@ -5,10 +5,6 @@ import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { ARIA2_MODULE_OPTIONS_TOKEN } from './aria2.module-definition';
 import { Aria2ModuleOptions } from './aria2.module.interface';
-import { type _AsyncVersionOf } from 'async-call-rpc/src/types';
-import { type Aria2, createClient } from 'a2c';
-import { Aria2WsMessage } from './aria2-ws.interface';
-import { MessageEvent, WebSocket } from 'ws';
 import { ARIA2_DOWNLOAD_DIR } from '../../constants';
 import { createReadStream, stat } from 'fs-extra';
 import { FileService } from '../file/file.service';
@@ -19,11 +15,11 @@ import { File } from '../file/file.entity';
 import { importESM } from '../../utils/import-esm.util';
 import { randomUUID } from 'crypto';
 import { HttpsProxyAgent } from 'https-proxy-agent';
+import { Aria2WsClient } from './aria2.ws-client';
 
 @Injectable()
 export class Aria2Service implements OnModuleInit {
-  private client: _AsyncVersionOf<Aria2>;
-  private socket: WebSocket;
+  private client: Aria2WsClient;
 
   private tasks: Map<string, Aria2DownloadTask> = new Map();
 
@@ -38,15 +34,7 @@ export class Aria2Service implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    this.client = createClient({
-      url: `http://${this.options.rpcUrl}`,
-      secret: this.options.rpcSecret,
-    });
-    const info = await this.client.getVersion();
-    this.logger.log(`Aria2 service is running, version=${info.version}`);
-
-    this.socket = new WebSocket(`ws://${this.options.rpcUrl}`);
-    this.socket.onmessage = this.websocketNotificationHandler.bind(this);
+    await this.connectWs();
 
     if (this.options.autoUpdateTracker) {
       const job = new CronJob({
@@ -58,51 +46,76 @@ export class Aria2Service implements OnModuleInit {
     }
   }
 
-  private async websocketNotificationHandler(event: MessageEvent) {
+  private async connectWs() {
+    this.client = new Aria2WsClient({
+      host: this.options.rpcHost,
+      port: this.options.rpcPort,
+      path: this.options.rpcPath,
+      auth: {
+        secret: this.options.rpcSecret,
+      },
+    });
+
+    this.client.on('ws.close', () => {
+      this.logger.error('Aria2 WS connection closed, reconnect in 5 seconds');
+      setTimeout(() => this.connectWs(), 5000);
+    });
+    this.client.conn.onerror = (event) => {
+      this.logger.error(event.error);
+    };
+
+    const info = await this.client.getVersion();
+    this.logger.log(`Aria2 service is running, version=${info.version}`);
+
+    this.client.on('aria2.onDownloadComplete', this.onDownloadComplete.bind(this));
+    this.client.on('aria2.onDownloadError', this.onDownloadError.bind(this));
+  }
+
+  private async onDownloadComplete({ gid }: { gid: string }) {
     const fileTypeFromFile = (await importESM<typeof import('file-type')>('file-type')).fileTypeFromFile;
 
-    const message: Aria2WsMessage = JSON.parse(event.data.toString());
-    if (['aria2.onDownloadComplete', 'aria2.onDownloadError'].includes(message.method)) {
-      const gid = message.params[0].gid;
-      const status = await this.client.tellStatus(gid);
-      const parentGid = typeof status.following === 'string' ? status.following : gid;
-      const task = this.tasks.get(parentGid);
-
-      if (task) {
-        if (message.method === 'aria2.onDownloadComplete') {
-          const files: File[] = [];
-          let expireAt = new Date();
-          if (this.options.expireHours > 0) {
-            expireAt.setHours(expireAt.getHours() + this.options.expireHours);
-          } else {
-            expireAt = null;
-          }
-
-          for (const file of status.files) {
-            const fileStat = await stat(file.path);
-            const fileType = await fileTypeFromFile(file.path);
-            const filename = path.basename(file.path);
-            const record = await this.fileService.save({
-              size: fileStat.size,
-              filename: filename,
-              name: filename,
-              md5: await generateMD5(createReadStream(file.path)),
-              mimetype: fileType && fileType.mime,
-              source: FileSourceEnum.ARIA2_DOWNLOAD,
-              path: file.path,
-              expireAt,
-            });
-            files.push(record);
-          }
-
-          if (status.following || !status.followedBy) {
-            task.emit('complete', files);
-            this.tasks.delete(parentGid);
-          }
-        } else {
-          task.emit('error', status);
-        }
+    const status = await this.client.tellStatus(gid);
+    const parentGid = typeof status.following === 'string' ? status.following : gid;
+    const task = this.tasks.get(parentGid);
+    if (task) {
+      const files: File[] = [];
+      let expireAt = new Date();
+      if (this.options.expireHours > 0) {
+        expireAt.setHours(expireAt.getHours() + this.options.expireHours);
+      } else {
+        expireAt = null;
       }
+
+      for (const file of status.files) {
+        const fileStat = await stat(file.path);
+        const fileType = await fileTypeFromFile(file.path);
+        const filename = path.basename(file.path);
+        const record = await this.fileService.save({
+          size: fileStat.size,
+          filename: filename,
+          name: filename,
+          md5: await generateMD5(createReadStream(file.path)),
+          mimetype: fileType && fileType.mime,
+          source: FileSourceEnum.ARIA2_DOWNLOAD,
+          path: file.path,
+          expireAt,
+        });
+        files.push(record);
+      }
+
+      if (status.following || !status.followedBy) {
+        task.emit('complete', files);
+        this.tasks.delete(parentGid);
+      }
+    }
+  }
+
+  private async onDownloadError({ gid }: { gid: string }) {
+    const status = await this.client.tellStatus(gid);
+    const parentGid = typeof status.following === 'string' ? status.following : gid;
+    const task = this.tasks.get(parentGid);
+    if (task) {
+      task.emit('error', status);
     }
   }
 

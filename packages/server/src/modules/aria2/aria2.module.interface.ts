@@ -1,5 +1,7 @@
 export interface Aria2ModuleOptions {
-  rpcUrl: string;
+  rpcHost: string;
+  rpcPort: number;
+  rpcPath: string;
   rpcSecret?: string;
   autoUpdateTracker?: boolean;
   trackerListUrl?: string;

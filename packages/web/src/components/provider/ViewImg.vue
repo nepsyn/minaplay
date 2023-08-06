@@ -25,7 +25,9 @@ const props = withDefaults(
     <v-container class="d-flex align-center justify-center" style="height: 100vh; width: 100vw">
       <v-img :aspect-ratio="aspectRatio!" :src="src">
         <template #placeholder>
-          <v-progress-circular indeterminate color="primary"></v-progress-circular>
+          <v-container fluid class="d-flex h-100 w-100 align-center justify-center">
+            <v-progress-circular indeterminate color="primary"></v-progress-circular>
+          </v-container>
         </template>
       </v-img>
     </v-container>

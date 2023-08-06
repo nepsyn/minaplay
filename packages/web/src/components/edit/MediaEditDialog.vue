@@ -62,29 +62,22 @@ const saveEdit = async () => {
   }
 };
 const posterUploading = ref(false);
-const selectAndUploadPoster = () => {
-  const el = document.createElement('input');
-  el.accept = 'image/*';
-  el.type = 'file';
-  el.onchange = async (e) => {
-    const file: File = (e.target as any).files[0];
-    if (file) {
-      posterUploading.value = true;
-      try {
-        const response = await Api.File.uploadImage(file);
-        props.item.poster = response.data;
-      } catch (error: any) {
-        if (error?.response?.data?.code === ErrorCodeEnum.INVALID_IMAGE_FILE_TYPE) {
-          app.toastError('图片文件类型错误');
-        } else {
-          app.toastError('海报文件上传失败');
-        }
-      } finally {
-        posterUploading.value = false;
+const selectAndUploadPoster = async () => {
+  app.selectFile('image/*', async (file) => {
+    posterUploading.value = true;
+    try {
+      const response = await Api.File.uploadImage(file);
+      props.item.poster = response.data;
+    } catch (error: any) {
+      if (error?.response?.data?.code === ErrorCodeEnum.INVALID_IMAGE_FILE_TYPE) {
+        app.toastError('图片类型错误');
+      } else {
+        app.toastError('图片上传失败');
       }
+    } finally {
+      posterUploading.value = false;
     }
-  };
-  el.click();
+  });
 };
 </script>
 

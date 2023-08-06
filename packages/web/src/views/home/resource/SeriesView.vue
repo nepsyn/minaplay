@@ -1,5 +1,11 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import SeriesCarousel from '@/components/resource/SeriesCarousel.vue';
+</script>
 
-<template></template>
+<template>
+  <v-container>
+    <series-carousel></series-carousel>
+  </v-container>
+</template>
 
 <style scoped lang="sass"></style>

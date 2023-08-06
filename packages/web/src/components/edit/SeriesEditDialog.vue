@@ -66,28 +66,21 @@ const saveEdit = async () => {
 };
 const posterUploading = ref(false);
 const selectAndUploadPoster = (landscape = false) => {
-  const el = document.createElement('input');
-  el.accept = 'image/*';
-  el.type = 'file';
-  el.onchange = async (e) => {
-    const file: File = (e.target as any).files[0];
-    if (file) {
-      posterUploading.value = true;
-      try {
-        const response = await Api.File.uploadImage(file);
-        props.item[landscape ? 'posterLandscape' : 'poster'] = response.data;
-      } catch (error: any) {
-        if (error?.response?.data?.code === ErrorCodeEnum.INVALID_IMAGE_FILE_TYPE) {
-          app.toastError('图片文件类型错误');
-        } else {
-          app.toastError('图片文件上传失败');
-        }
-      } finally {
-        posterUploading.value = false;
+  app.selectFile('image/*', async (file) => {
+    posterUploading.value = true;
+    try {
+      const response = await Api.File.uploadImage(file);
+      props.item[landscape ? 'posterLandscape' : 'poster'] = response.data;
+    } catch (error: any) {
+      if (error?.response?.data?.code === ErrorCodeEnum.INVALID_IMAGE_FILE_TYPE) {
+        app.toastError('图片类型错误');
+      } else {
+        app.toastError('图片上传失败');
       }
+    } finally {
+      posterUploading.value = false;
     }
-  };
-  el.click();
+  });
 };
 const searchTag = ref('');
 const tags = ref<SeriesTagEntity[]>([]);
@@ -192,6 +185,7 @@ const queryTags = _.debounce(
               multiple
               v-model="item.tags"
               v-model:search.trim="searchTag"
+              @focus.once="queryTags"
               @keydown.enter="saveTag(searchTag)"
             >
               <template #append-inner>

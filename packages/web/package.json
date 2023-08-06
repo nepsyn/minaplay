@@ -39,6 +39,7 @@
     "plyr": "^3.7.8",
     "socket.io-client": "^4.6.2",
     "timeago.js": "^4.0.2",
-    "vue-codemirror": "^6.1.1"
+    "vue-codemirror": "^6.1.1",
+    "vue-cropper": "^1.0.9"
   }
 }

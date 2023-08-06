@@ -72,6 +72,19 @@ export const useApp = defineStore('user', () => {
     }
   };
 
+  const selectFile = (accept: string, onSelected: (file: File) => any) => {
+    const el = document.createElement('input');
+    el.accept = accept;
+    el.type = 'file';
+    el.onchange = async (e) => {
+      const file = (e.target as any).files?.[0];
+      if (file) {
+        await onSelected(file);
+      }
+    };
+    el.click();
+  };
+
   return {
     user,
     setUser,
@@ -87,5 +100,6 @@ export const useApp = defineStore('user', () => {
     uploadFiles,
     darkMode,
     copyContent,
+    selectFile,
   };
 });

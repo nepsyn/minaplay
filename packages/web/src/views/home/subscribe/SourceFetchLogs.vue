@@ -5,7 +5,7 @@ import { computed, Ref, ref, watch } from 'vue';
 import { useApp } from '@/store/app';
 import { Api } from '@/api/api';
 import { useRoute } from 'vue-router';
-import { mdiAlertCircle, mdiCheckCircle, mdiRefresh } from '@mdi/js';
+import { mdiAlertCircle, mdiCheckCircle, mdiDelete, mdiRefresh } from '@mdi/js';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 
@@ -39,6 +39,23 @@ const resetLogs = () => {
   logsQuery.page = 0;
 };
 
+const logsClearing = ref(false);
+const clearLogs = async () => {
+  logsClearing.value = true;
+  try {
+    await Api.SubscribeSource.clearFetchLogsById(sourceId.value)();
+    logsTotal.value = 0;
+    logs.value = [];
+    if (providerRef.value) {
+      providerRef.value.status = 'empty';
+    }
+  } catch {
+    app.toastError('清空解析日志失败');
+  } finally {
+    logsClearing.value = false;
+  }
+};
+
 const providerRef: Ref<any> = ref(null);
 watch(
   () => route.params,
@@ -61,7 +78,29 @@ watch(
       <v-container class="pa-0 d-flex flex-row align-center">
         <span class="text-h6">解析日志 ({{ logsTotal }})</span>
         <v-spacer></v-spacer>
+        <v-menu location="bottom">
+          <template #activator="{ props }">
+            <action-btn
+              text="清空日志"
+              color="error"
+              :disabled="providerRef?.status === 'loading'"
+              :loading="logsClearing"
+              :icon="mdiDelete"
+              v-bind="props"
+            ></action-btn>
+          </template>
+          <v-card>
+            <v-card-title>清空确认</v-card-title>
+            <v-card-text>确定要清空当前订阅源的解析日志吗？</v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn variant="text" color="primary">取消</v-btn>
+              <v-btn variant="plain" color="error" @click="clearLogs">确认</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-menu>
         <action-btn
+          class="ms-1"
           text="重新加载"
           color="primary"
           :loading="providerRef?.status === 'loading'"

@@ -122,7 +122,7 @@ onMounted(async () => {
         <span v-else class="text-success">已完成</span>
       </template>
       <template v-else>
-        <span>{{ progress.toFixed(2) }} %</span>
+        <span>{{ progress >= 100 ? '正在生成资源文件' : `${progress.toFixed(2)} %` }}</span>
       </template>
     </v-container>
     <v-divider></v-divider>

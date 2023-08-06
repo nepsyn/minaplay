@@ -3307,6 +3307,11 @@ vue-codemirror@^6.1.1:
     "@codemirror/state" "6.x"
     "@codemirror/view" "6.x"
 
+vue-cropper@^1.0.9:
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/vue-cropper/-/vue-cropper-1.0.9.tgz#de402c57cadc221e9a2063399ff35bb04220ef22"
+  integrity sha512-JhQwxmjqmQohzI7sAp5O/Rfdxuw5HOEYkKjnp/De7iCi6c8Mv6M3N9HpMt9xgWCFchX3/DfXBv2axCZOCg3G8Q==
+
 vue-demi@>=0.14.5:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.14.5.tgz#676d0463d1a1266d5ab5cba932e043d8f5f2fbd9"
@@ -3348,9 +3353,9 @@ vue@^3.2.47:
     "@vue/shared" "3.3.4"
 
 vuetify@^3.1.14:
-  version "3.3.7"
-  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.3.7.tgz#858dceca1a2bcb465b1214b611c70625868ce99b"
-  integrity sha512-+Avd/vXdDZsct7PiXbOlgEKy8ZhxlaWZERv4MZ1x4tyJ5AoTm/jZW33u6TzlwhilqBgqKJFOe2UOH60LkKlukQ==
+  version "3.3.11"
+  resolved "https://registry.yarnpkg.com/vuetify/-/vuetify-3.3.11.tgz#b63e6b19a8517bef11e5382b1db06ee37e693853"
+  integrity sha512-hlbSgxXCcEu4VelJMRHKhvLpaitLsruHvdvolbqbCS6Z64XoulUDw3CQ9ay6WGBL7uckmop0bUYidD2d8mN0UQ==
 
 w3c-keyname@^2.2.4:
   version "2.2.8"

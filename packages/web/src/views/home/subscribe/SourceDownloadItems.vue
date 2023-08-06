@@ -5,7 +5,7 @@ import { computed, Ref, ref, watch } from 'vue';
 import { ApiQueryDto } from '@/interfaces/common.interface';
 import { DownloadItemEntity } from '@/interfaces/subscribe.interface';
 import { Api } from '@/api/api';
-import { mdiAlertCircle, mdiCheckCircle, mdiContentCopy, mdiDownloadCircle, mdiRefresh } from '@mdi/js';
+import { mdiAlertCircle, mdiCheckCircle, mdiContentCopy, mdiDelete, mdiDownloadCircle, mdiRefresh } from '@mdi/js';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 import { SubscribeDownloadItemStatusEnum } from '@/api/enums/subscribe-download-item-status.enum';
@@ -71,6 +71,23 @@ const getDownloadItemStatusText = (status: SubscribeDownloadItemStatusEnum) => {
   }
 };
 
+const downloadsClearing = ref(false);
+const clearDownloads = async () => {
+  downloadsClearing.value = true;
+  try {
+    await Api.SubscribeSource.clearDownloadItemsById(sourceId.value)();
+    downloadsTotal.value = 0;
+    downloads.value = [];
+    if (providerRef.value) {
+      providerRef.value.status = 'empty';
+    }
+  } catch {
+    app.toastError('删除已结束项目失败');
+  } finally {
+    downloadsClearing.value = false;
+  }
+};
+
 const copyDownloadUrl = async (url: string) => app.copyContent(url, '下载链接已复制到剪切板', '复制下载链接失败');
 
 const providerRef: Ref<any> = ref(null);
@@ -95,7 +112,29 @@ watch(
       <v-container class="pa-0 d-flex flex-row align-center">
         <span class="text-h6">下载项目 ({{ downloadsTotal }})</span>
         <v-spacer></v-spacer>
+        <v-menu location="bottom">
+          <template #activator="{ props }">
+            <action-btn
+              text="删除已结束项目"
+              color="error"
+              :disabled="providerRef?.status === 'loading'"
+              :loading="downloadsClearing"
+              :icon="mdiDelete"
+              v-bind="props"
+            ></action-btn>
+          </template>
+          <v-card>
+            <v-card-title>删除确认</v-card-title>
+            <v-card-text>确定要删除已结束的下载项目吗？该操作可能导致订阅源中资源的重复下载。</v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn variant="text" color="primary">取消</v-btn>
+              <v-btn variant="plain" color="error" @click="clearDownloads">确认</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-menu>
         <action-btn
+          class="ms-1"
           text="重新加载"
           color="primary"
           :loading="providerRef?.status === 'loading'"

@@ -18,6 +18,9 @@ import { ApiQueryResult } from '@/interfaces/common.interface';
 import { MediaDto, MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
 import { UserDto, UserEntity, UserQueryDto } from '@/interfaces/user.interface';
 import {
+  EpisodeDto,
+  EpisodeEntity,
+  EpisodeQueryDto,
   SeriesDto,
   SeriesEntity,
   SeriesQueryDto,
@@ -115,8 +118,10 @@ class ApiHelper {
     getRulesById: (id: number) => this.apiGet<ApiQueryResult<RuleEntity>, RuleQueryDto>(`/subscribe/${id}/rule`),
     getFetchLogsById: (id: number) =>
       this.apiGet<ApiQueryResult<FetchLogEntity>, FetchLogQueryDto>(`/subscribe/${id}/log`),
+    clearFetchLogsById: (id: number) => this.apiDelete(`/subscribe/${id}/log`),
     getDownloadItemsById: (id: number) =>
       this.apiGet<ApiQueryResult<DownloadItemEntity>, DownloadItemQueryDto>(`/subscribe/${id}/download`),
+    clearDownloadItemsById: (id: number) => this.apiDelete(`/subscribe/${id}/download`),
   };
 
   Series = {
@@ -125,6 +130,14 @@ class ApiHelper {
     update: (id: number) => this.apiPut<SeriesEntity, SeriesDto>(`/series/${id}`),
     delete: (id: number) => this.apiDelete(`/series/${id}`),
     query: this.apiGet<ApiQueryResult<SeriesEntity>, SeriesQueryDto>('/series'),
+  };
+
+  Episode = {
+    create: this.apiPost<EpisodeEntity, EpisodeDto>('/episode'),
+    getById: (id: number) => this.apiGet<EpisodeEntity>(`/episode/${id}`),
+    update: (id: number) => this.apiPut<EpisodeEntity, EpisodeDto>(`/episode/${id}`),
+    delete: (id: number) => this.apiDelete(`/episode/${id}`),
+    query: this.apiGet<ApiQueryResult<EpisodeEntity>, EpisodeQueryDto>('/episode'),
   };
 
   SeriesTag = {

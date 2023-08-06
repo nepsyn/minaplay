@@ -30,12 +30,13 @@ import { RuleService } from './rule.service';
 import { FetchLogService } from './fetch-log.service';
 import { FetchLogQueryDto } from './fetch-log-query.dto';
 import { FetchLog } from './fetch-log.entity';
-import { Between } from 'typeorm';
+import { Between, Not } from 'typeorm';
 import { DownloadItemQueryDto } from './download-item-query.dto';
 import { DownloadItemService } from './download-item.service';
 import { DownloadItem } from './download-item.entity';
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { Rule } from './rule.entity';
+import { SubscribeDownloadItemStatusEnum } from '../../enums/subscribe-download-item-status.enum';
 
 @Controller('subscribe')
 @UseGuards(AuthorizationGuard)
@@ -231,6 +232,23 @@ export class SourceController {
     return new ApiPaginationResultDto(result, total, query.page, query.size);
   }
 
+  @Delete(':id/log')
+  @ApiOperation({
+    description: '删除所有订阅源解析日志',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  async deleteFetchLogsBySourceId(@Param('id', ParseIntPipe) id: number) {
+    const source = await this.sourceService.findOneBy({ id });
+    if (!source) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    await this.fetchLogService.delete({
+      source: { id },
+    });
+    return {};
+  }
+
   @Get(':id/download')
   @ApiOperation({
     description: '获取订阅源下载项目',
@@ -259,5 +277,23 @@ export class SourceController {
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
+  }
+
+  @Delete(':id/download')
+  @ApiOperation({
+    description: '删除所有订阅源已停止下载项目',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  async deleteDownloadItemsBySourceId(@Param('id', ParseIntPipe) id: number) {
+    const source = await this.sourceService.findOneBy({ id });
+    if (!source) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    await this.downloadItemService.delete({
+      source: { id },
+      status: Not(SubscribeDownloadItemStatusEnum.DOWNLOADING),
+    });
+    return {};
   }
 }

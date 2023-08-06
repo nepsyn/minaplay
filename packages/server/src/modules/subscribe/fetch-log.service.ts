@@ -18,4 +18,9 @@ export class FetchLogService {
   async findAndCount(options?: FindManyOptions<FetchLog>) {
     return await this.fetchLogRepository.findAndCount(options);
   }
+
+  async delete(where: FindOptionsWhere<FetchLog>) {
+    const result = await this.fetchLogRepository.delete(where);
+    return result.affected > 0;
+  }
 }

@@ -30,4 +30,8 @@ export class DownloadItemService implements OnModuleInit {
   async findAndCount(options?: FindManyOptions<DownloadItem>) {
     return await this.downloadItemRepository.findAndCount(options);
   }
+
+  async delete(where: FindOptionsWhere<DownloadItem>) {
+    return await this.downloadItemRepository.delete(where);
+  }
 }

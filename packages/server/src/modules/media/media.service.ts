@@ -34,6 +34,7 @@ export class MediaService {
         .concat(media.file)
         .concat(media.metadata)
         .concat(media.poster)
+        .concat(media.subtitles)
         .concat(media.attachments)
         .filter((v) => v != null)
         .map((v: File) => v.id);

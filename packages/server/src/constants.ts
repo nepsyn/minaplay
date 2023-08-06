@@ -1,5 +1,7 @@
 import path from 'path';
 
+export const RESOURCE_DIR = path.join(process.cwd(), 'resources');
+
 export const USER_UPLOAD_IMAGE_DIR = path.join(process.cwd(), 'resources/upload/image');
 export const USER_UPLOAD_VIDEO_DIR = path.join(process.cwd(), 'resources/upload/video');
 export const ARIA2_DOWNLOAD_DIR = path.join(process.cwd(), 'resources/download');

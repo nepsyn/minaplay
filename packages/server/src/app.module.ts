@@ -19,6 +19,7 @@ import { UserModule } from './modules/user/user.module';
 import { SeriesModule } from './modules/series/series.module';
 import { MediaModule } from './modules/media/media.module';
 import { SubscribeModule } from './modules/subscribe/subscribe.module';
+import { SystemModule } from './modules/system/system.module';
 
 @Module({
   imports: [
@@ -114,6 +115,7 @@ import { SubscribeModule } from './modules/subscribe/subscribe.module';
     AuthorizationModule,
     SeriesModule,
     UserModule,
+    SystemModule,
   ],
   providers: [
     {

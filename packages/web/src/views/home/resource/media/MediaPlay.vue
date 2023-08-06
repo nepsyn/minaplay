@@ -6,22 +6,25 @@ import SingleItemProvider from '@/components/provider/SingleItemProvider.vue';
 import { MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
 import { Api } from '@/api/api';
 import ToTopContainer from '@/components/provider/ToTopContainer.vue';
-import { mdiContentCopy, mdiMotionPlayOutline, mdiPlaylistPlay, mdiVlc } from '@mdi/js';
+import { mdiContentCopy, mdiDotsVertical, mdiMotionPlayOutline, mdiPlaylistPlay, mdiVlc } from '@mdi/js';
 import VideoProvider from '@/components/provider/VideoProvider.vue';
-import Plyr from 'plyr';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
+import { useDisplay } from 'vuetify';
 
 const app = useApp();
 const route = useRoute();
 const router = useRouter();
+const display = useDisplay();
 
 const mediaId = computed(() => String(route.params.id));
 
 const media: Ref<MediaEntity> = ref(undefined as any);
-const playerOptions: Plyr.Options = {
-  controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'fullscreen'],
+const playerOptions = {
+  controls: display.smAndUp.value
+    ? ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'download', 'fullscreen']
+    : ['play-large', 'play', 'progress', 'current-time', 'fullscreen'],
   autoplay: true,
 };
 const loadMedia = async (done: any) => {
@@ -81,6 +84,30 @@ watch(
     }
   },
 );
+
+const actions = ref([
+  {
+    text: '复制链接',
+    icon: mdiContentCopy,
+    color: 'primary',
+    href: undefined,
+    click: () => app.copyContent(Api.File.buildRawPath(media.value.file!.id), '复制链接成功', '复制链接失败'),
+  },
+  {
+    text: 'VLC播放',
+    icon: mdiVlc,
+    color: 'warning',
+    href: computed(() => `vlc://${Api.File.buildRawPath(media.value.file!.id)}`),
+    click: undefined,
+  },
+  {
+    text: '一起看',
+    icon: mdiMotionPlayOutline,
+    color: 'secondary',
+    href: undefined,
+    click: undefined,
+  },
+]);
 </script>
 
 <template>
@@ -98,39 +125,51 @@ watch(
                 <v-container fluid class="pa-0 mt-1 d-flex flex-row align-center">
                   <span class="mt-1 text-caption">上传于 {{ new Date(media.createAt).toLocaleString() }}</span>
                   <v-spacer></v-spacer>
-                  <action-btn
-                    text="复制链接"
-                    :icon="mdiContentCopy"
-                    variant="text"
-                    color="primary"
-                    size="small"
-                    @click="app.copyContent(Api.File.buildRawPath(media.file!.id), '复制链接成功', '复制链接失败')"
-                  ></action-btn>
-                  <action-btn
-                    text="VLC播放"
-                    :icon="mdiVlc"
-                    variant="text"
-                    color="warning"
-                    size="small"
-                    :href="`vlc://${Api.File.buildRawPath(media.file!.id)}`"
-                    class="ms-1"
-                  ></action-btn>
-                  <action-btn
-                    text="一起看"
-                    :icon="mdiMotionPlayOutline"
-                    variant="text"
-                    color="secondary"
-                    size="small"
-                    class="ms-1"
-                  ></action-btn>
+                  <div class="d-none d-sm-flex">
+                    <action-btn
+                      v-for="(action, index) in actions"
+                      :key="index"
+                      :text="action.text"
+                      :icon="action.icon"
+                      :color="action.color"
+                      variant="text"
+                      size="small"
+                      :href="action.href"
+                      @click="action.click?.()"
+                    ></action-btn>
+                  </div>
+                  <v-menu location="bottom">
+                    <template #activator="{ props }">
+                      <v-btn
+                        variant="text"
+                        class="d-flex d-sm-none"
+                        :icon="mdiDotsVertical"
+                        size="small"
+                        v-bind="props"
+                      ></v-btn>
+                    </template>
+                    <v-card>
+                      <v-list class="pa-0" density="compact">
+                        <v-list-item
+                          v-for="(action, index) in actions"
+                          :key="index"
+                          :prepend-icon="action.icon"
+                          :base-color="action.color"
+                          :href="action.href!"
+                          @click="action.click?.()"
+                        >
+                          {{ action.text }}
+                        </v-list-item>
+                      </v-list>
+                    </v-card>
+                  </v-menu>
                 </v-container>
                 <v-divider class="my-2"></v-divider>
-                <v-sheet min-height="100">
-                  <pre
-                    class="text-subtitle-2 font-weight-light text-pre-wrap text-break"
-                    v-text="media.description ?? '暂无无媒体描述'"
-                  ></pre>
-                </v-sheet>
+                <pre
+                  style="min-height: 100px"
+                  class="text-subtitle-2 font-weight-light text-pre-wrap text-break bg-transparent"
+                  v-text="media.description ?? '暂无无媒体描述'"
+                ></pre>
               </v-container>
             </single-item-provider>
           </v-col>

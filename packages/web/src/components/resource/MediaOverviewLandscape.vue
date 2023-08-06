@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { MediaEntity } from '@/interfaces/media.interface';
-import { computed, onMounted, ref } from 'vue';
+import { computed } from 'vue';
 import { Api } from '@/api/api';
 import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
 import TimeAgo from '@/components/provider/TimeAgo.vue';
@@ -25,26 +25,6 @@ const sourceText = computed(() => {
       return '自动生成';
     default:
       return '未知来源';
-  }
-});
-
-const duration = ref(0);
-const minutes = computed(() => {
-  return Math.floor(duration.value / 60);
-});
-const seconds = computed(() => {
-  return String(Math.floor(duration.value) % 60).padStart(2, '0');
-});
-onMounted(async () => {
-  if (props.media.file?.id) {
-    const videoEl = document.createElement('video');
-    videoEl.preload = 'metadata';
-    videoEl.autoplay = false;
-    videoEl.onloadedmetadata = () => {
-      duration.value = videoEl.duration;
-      videoEl.remove();
-    };
-    videoEl.src = Api.File.buildDownloadPath(props.media.file.id);
   }
 });
 
@@ -81,9 +61,6 @@ const emits = defineEmits(['click:content']);
               <slot v-if="showChips" name="chips">
                 <v-chip color="info" class="text-caption" size="x-small" label>
                   {{ sourceText }}
-                </v-chip>
-                <v-chip v-if="duration > 0" color="info" class="ml-1 text-caption" size="x-small" label>
-                  {{ minutes }}:{{ seconds }}
                 </v-chip>
                 <v-chip v-if="media.subtitles?.length > 0" color="info" class="ml-1 text-caption" size="x-small" label>
                   外部字幕

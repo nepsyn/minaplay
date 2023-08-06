@@ -25,6 +25,8 @@ import { Media } from './media.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { MediaDto } from './media.dto';
 import { MediaFileService } from './media-file.service';
+import { RequestUser } from '../authorization/request.user.decorator';
+import { User } from '../user/user.entity';
 
 @Controller('media')
 @UseGuards(AuthorizationGuard)
@@ -33,13 +35,21 @@ import { MediaFileService } from './media-file.service';
 export class MediaController {
   constructor(private mediaService: MediaService, private mediaFileService: MediaFileService) {}
 
+  private hasOpPermission(user: User) {
+    const permissions = user.permissions.map(({ name }) => name);
+    return [PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP].some((v) => permissions.includes(v));
+  }
+
   @Get(':id')
   @ApiOperation({
     description: '查看媒体',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
-  async getMediaById(@Param('id') id: string) {
-    const media = await this.mediaService.findOneBy({ id });
+  async getMediaById(@Param('id') id: string, @RequestUser() user: User) {
+    const media = await this.mediaService.findOneBy({
+      id,
+      ...(!this.hasOpPermission(user) ? { isPublic: true } : {}),
+    });
     if (!media) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
@@ -52,7 +62,7 @@ export class MediaController {
     description: '查询媒体',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
-  async queryMedia(@Query() query: MediaQueryDto) {
+  async queryMedia(@Query() query: MediaQueryDto, @RequestUser() user: User) {
     const { keyword, id, start, end } = query;
     const [result, total] = await this.mediaService.findAndCount({
       where: buildQueryOptions<Media>({
@@ -61,6 +71,7 @@ export class MediaController {
         exact: {
           id,
           createAt: start != null ? Between(new Date(start), end != null ? new Date(end) : new Date()) : undefined,
+          isPublic: !this.hasOpPermission(user) ? true : undefined,
         },
       }),
       skip: query.page * query.size,

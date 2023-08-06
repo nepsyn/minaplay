@@ -13,6 +13,7 @@ import { VALID_VIDEO_MIME } from '../../constants';
 import { EpisodeService } from '../series/episode.service';
 import { MediaService } from '../media/media.service';
 import { MediaFileService } from '../media/media-file.service';
+import { MediaDescriptor } from '../media/media.descriptor.interface';
 
 @Injectable()
 @Processor('fetch-subscribe-source')
@@ -58,8 +59,8 @@ export class FetchSubscribeSourceConsumer {
           const validEntries = data.entries.filter((entry) => entry.enclosure?.url);
           const validatorFunc = vm.runFile(rule.codeFile.path);
           for (const entry of validEntries) {
-            const valid = validatorFunc(entry);
-            if (valid) {
+            const descriptor: MediaDescriptor = await validatorFunc(entry);
+            if (descriptor) {
               const sameNameItem = await this.downloadItemService.findOneBy({ title: entry.title });
               if (sameNameItem) {
                 continue;
@@ -79,9 +80,10 @@ export class FetchSubscribeSourceConsumer {
                 for (const file of files) {
                   if (VALID_VIDEO_MIME.includes(file.mimetype)) {
                     const { id } = await this.mediaService.save({
-                      name: file.name,
+                      name: descriptor?.name?.(file) ?? file.name,
+                      description: descriptor?.description?.(file),
                       download: { id: item.id },
-                      isPublic: true,
+                      isPublic: descriptor?.isPublic?.(file) ?? true,
                       file: { id: file.id },
                     });
                     const media = await this.mediaService.findOneBy({ id });
@@ -89,6 +91,7 @@ export class FetchSubscribeSourceConsumer {
 
                     if (rule.series) {
                       await this.episodeService.save({
+                        no: descriptor?.no?.(file),
                         media: { id: media.id },
                         series: { id: rule.series.id },
                       });

@@ -31,7 +31,6 @@ export class Media {
   description?: string;
 
   /** 是否公开 */
-  @Exclude()
   @Column({
     default: true,
   })

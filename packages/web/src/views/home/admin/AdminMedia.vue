@@ -52,6 +52,10 @@ const headers = ref([
     sortable: false,
   },
   {
+    title: '是否公开',
+    key: 'isPublic',
+  },
+  {
     title: '创建时间',
     key: 'createAt',
   },
@@ -317,6 +321,10 @@ const onEditError = (error: any) => {
                 :src="item.raw.poster ? Api.File.buildRawPath(item.raw.poster.id) : MediaCoverFallback"
               ></view-img>
             </v-container>
+          </template>
+          <template #item.isPublic="{ item }">
+            <v-icon :icon="item.raw.isPublic ? mdiCheck : mdiClose" :color="item.raw.isPublic ? 'success' : 'error'">
+            </v-icon>
           </template>
           <template #item.createAt="{ item }">
             {{ new Date(item.raw.createAt).toLocaleString() }}

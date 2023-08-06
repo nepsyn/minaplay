@@ -62,6 +62,9 @@ const emits = defineEmits(['click:content']);
                 <v-chip color="info" class="text-caption" size="x-small" label>
                   {{ sourceText }}
                 </v-chip>
+                <v-chip v-if="!media.isPublic" color="info" class="ml-1 text-caption" size="x-small" label>
+                  未公开
+                </v-chip>
                 <v-chip v-if="media.subtitles?.length > 0" color="info" class="ml-1 text-caption" size="x-small" label>
                   外部字幕
                 </v-chip>

@@ -51,6 +51,7 @@ const saveEdit = async () => {
       name: props.item.name,
       description: props.item.description,
       posterFileId: props.item.poster?.id,
+      isPublic: props.item.isPublic,
     });
     emits('saved', response.data);
     dialog.value = false;
@@ -124,6 +125,13 @@ const selectAndUploadPoster = () => {
               rows="2"
               v-model="item.description"
             ></v-textarea>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <v-switch inset hide-details color="primary" density="compact" v-model="item.isPublic">
+              <template #prepend>
+                <span class="text-body-1"> 是否公开 </span>
+              </template>
+            </v-switch>
           </v-container>
           <v-container class="mt-4 pa-0">
             <span class="text-body-1">封面图片</span>

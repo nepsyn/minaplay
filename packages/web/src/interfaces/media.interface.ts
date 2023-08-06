@@ -8,6 +8,8 @@ export interface MediaEntity {
   name: string;
   /** 简介 */
   description?: string;
+  /** 是否公开 */
+  isPublic: boolean;
   /** 封面图片 */
   poster?: FileEntity;
   /**对应文件 */

@@ -131,9 +131,6 @@ const getFiles = (item: MediaEntity) => {
     .concat(item.attachments)
     .filter((v) => v != undefined);
 };
-const openUrl = (url: string) => {
-  window.open(url);
-};
 
 const editDialog = ref(false);
 const editItem = ref<MediaEntity>({} as any);
@@ -298,14 +295,15 @@ const onEditError = (error: any) => {
                       ></pre>
                       <span class="text-subtitle-2 font-weight-bold mt-2">文件列表</span>
                       <div>
-                        <span
-                          class="me-2 text-caption text-primary text-decoration-underline clickable text-break"
+                        <a
                           v-for="file in getFiles(item.raw)"
+                          class="me-2 text-caption text-info text-decoration-underline text-break"
                           :key="file!.id"
-                          @click="openUrl(Api.File.buildDownloadPath(file!.id))"
+                          :href="Api.File.buildDownloadPath(file!.id)"
+                          download
                         >
                           {{ file.name }}
-                        </span>
+                        </a>
                       </div>
                     </v-col>
                   </v-row>

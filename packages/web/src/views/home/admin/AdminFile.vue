@@ -107,9 +107,6 @@ const reset = async () => {
   edit.value = {};
 };
 
-const openDownload = (id: string) => {
-  window.open(Api.File.buildDownloadPath(id));
-};
 const deleteItem = async (id: string) => {
   loading.value = true;
   try {
@@ -316,7 +313,9 @@ const deleteItem = async (id: string) => {
                 size="small"
                 color="primary"
                 variant="tonal"
-                @click="openDownload(item.raw.id)"
+                :href="Api.File.buildDownloadPath(item.raw.id)"
+                download
+                @click.stop
               ></action-btn>
               <v-menu>
                 <template #activator="{ props }">

@@ -376,7 +376,6 @@ const onEditError = (error: any) => {
                 variant="tonal"
                 @click.stop="openEdit(item.raw)"
               ></action-btn>
-
               <v-menu>
                 <template #activator="{ props }">
                   <action-btn

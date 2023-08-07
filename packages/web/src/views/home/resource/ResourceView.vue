@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import MediaPlate from '@/components/resource/MediaPlate.vue';
-import { mdiRefresh, mdiUpdate } from '@mdi/js';
+import { mdiPlaylistPlay, mdiRefresh } from '@mdi/js';
 import { ref, Ref } from 'vue';
 import { MediaQueryDto } from '@/interfaces/media.interface';
 import { useRouter } from 'vue-router';
@@ -19,9 +19,9 @@ const latestUpdateQuery: Ref<MediaQueryDto> = ref({
 <template>
   <v-container>
     <media-plate
-      title="最近更新"
+      title="播放列表"
       :query="latestUpdateQuery"
-      :icon="mdiUpdate"
+      :icon="mdiPlaylistPlay"
       cols="12"
       sm="6"
       md="4"

@@ -306,14 +306,16 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
             {{ new Date(item.raw.createAt).toLocaleString() }}
           </template>
           <template #item.actions="{ item }">
-            <action-btn
-              text="编辑"
-              :icon="mdiShare"
-              variant="tonal"
-              color="secondary"
-              size="small"
-              @click="router.push(`/subscribe/${item.raw.id}`)"
-            ></action-btn>
+            <v-container fluid class="pa-0 d-flex flex-row">
+              <action-btn
+                text="编辑"
+                :icon="mdiShare"
+                variant="tonal"
+                color="secondary"
+                size="small"
+                @click.stop="router.push(`/subscribe/${item.raw.id}`)"
+              ></action-btn>
+            </v-container>
           </template>
         </v-data-table-server>
       </v-sheet>

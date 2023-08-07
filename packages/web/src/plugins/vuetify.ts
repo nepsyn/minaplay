@@ -43,7 +43,7 @@ export default () =>
         dark,
       },
       variations: {
-        colors: ['primary', 'secondary'],
+        colors: ['primary', 'secondary', 'error', 'warning', 'success', 'info'],
         lighten: 2,
         darken: 2,
       },

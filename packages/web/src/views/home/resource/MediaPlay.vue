@@ -91,13 +91,25 @@ const actions = ref([
     icon: mdiContentCopy,
     color: 'primary',
     href: undefined,
-    click: () => app.copyContent(Api.File.buildRawPath(media.value.file!.id), '复制链接成功', '复制链接失败'),
+    click: () => {
+      let path = Api.File.buildRawPath(media.value.file!.id);
+      if (path.startsWith('/')) {
+        path = `${window.origin}${path}`;
+      }
+      app.copyContent(path, '复制链接成功', '复制链接失败');
+    },
   },
   {
     text: 'VLC播放',
     icon: mdiVlc,
     color: 'warning',
-    href: computed(() => `vlc://${Api.File.buildRawPath(media.value.file!.id)}`),
+    href: computed(() => {
+      let path = Api.File.buildRawPath(media.value.file!.id);
+      if (path.startsWith('/')) {
+        path = `${window.origin}${path}`;
+      }
+      return `vlc://${path}`;
+    }),
     click: undefined,
   },
   {

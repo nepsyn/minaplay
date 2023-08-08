@@ -16,6 +16,7 @@ export class SystemService implements OnModuleInit {
   async getMemoryUsage() {
     return {
       total: os.totalmem(),
+      free: os.freemem(),
       used: process.memoryUsage().rss,
     };
   }
@@ -27,6 +28,7 @@ export class SystemService implements OnModuleInit {
     return {
       disk: diskSpace.diskPath,
       total: diskSpace.size,
+      free: diskSpace.free,
       used: await getFolderSize(RESOURCE_DIR),
     };
   }

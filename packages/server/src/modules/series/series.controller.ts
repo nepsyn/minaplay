@@ -75,7 +75,7 @@ export class SeriesController {
   @ApiOperation({
     description: '查询剧集',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
   async querySeries(@Query() query: SeriesQueryDto) {
     const { keyword, id, name, userId, start, end } = query;
     const [result, total] = await this.seriesService.findAndCount({

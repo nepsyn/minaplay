@@ -76,7 +76,7 @@ export class SourceController {
   @ApiOperation({
     description: '获取订阅源信息',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP, PermissionEnum.SUBSCRIBE_VIEW)
   async getSourceById(@Param('id', ParseIntPipe) id: number) {
     const source = await this.sourceService.findOneBy({ id });
     if (!source) {
@@ -90,7 +90,7 @@ export class SourceController {
   @ApiOperation({
     description: '查询订阅源',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP, PermissionEnum.SUBSCRIBE_VIEW)
   async querySource(@Query() query: SourceQueryDto) {
     const { keyword, id, url, enabled, userId } = query;
     const [result, total] = await this.sourceService.findAndCount({

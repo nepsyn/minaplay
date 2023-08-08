@@ -16,6 +16,7 @@ import { MediaFileService } from '../media/media-file.service';
 import { MediaDescriptor } from '../media/media.descriptor.interface';
 import { DownloadItem } from './download-item.entity';
 import { DeepPartial } from 'typeorm';
+import { File } from '../file/file.entity';
 
 @Injectable()
 @Processor('fetch-subscribe-source')
@@ -30,6 +31,19 @@ export class FetchSubscribeSourceConsumer {
     private mediaService: MediaService,
     private mediaFileService: MediaFileService,
   ) {}
+
+  private async buildValue<T extends string | boolean>(
+    fnOrValue?: ((file: File) => Promise<T> | T) | T,
+    file?: File,
+  ): Promise<T> {
+    if (typeof fnOrValue === 'function') {
+      return fnOrValue(file);
+    } else if (fnOrValue !== undefined) {
+      return fnOrValue;
+    } else {
+      return undefined;
+    }
+  }
 
   @Process()
   async fetchSubscribeSource(job: Job<Source>) {
@@ -83,13 +97,13 @@ export class FetchSubscribeSourceConsumer {
               const task = await this.aria2Service.addTask(entry.enclosure.url);
               task.on('complete', async (files) => {
                 for (const file of files) {
-                  const copy = Object.assign({}, file);
+                  const copy = Object.freeze(Object.assign({}, file));
                   if (VALID_VIDEO_MIME.includes(file.mimetype)) {
                     const { id } = await this.mediaService.save({
-                      name: descriptor?.name?.(copy) ?? file.name,
-                      description: descriptor?.description?.(copy),
+                      name: (await this.buildValue(descriptor.name, copy)) ?? file.name,
+                      description: await this.buildValue(descriptor.description, copy),
                       download: { id: item.id },
-                      isPublic: descriptor?.isPublic?.(copy) ?? true,
+                      isPublic: (await this.buildValue(descriptor.isPublic, copy)) ?? true,
                       file: { id: file.id },
                     });
                     const media = await this.mediaService.findOneBy({ id });
@@ -97,7 +111,7 @@ export class FetchSubscribeSourceConsumer {
 
                     if (rule.series) {
                       await this.episodeService.save({
-                        no: descriptor?.no?.(copy),
+                        no: await this.buildValue(descriptor.no, copy),
                         media: { id: media.id },
                         series: { id: rule.series.id },
                       });

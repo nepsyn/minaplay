@@ -25,9 +25,7 @@ export class Series {
   id: number;
 
   /** 剧集名称 */
-  @Column({
-    unique: true,
-  })
+  @Column()
   name: string;
 
   /** 剧描述称 */

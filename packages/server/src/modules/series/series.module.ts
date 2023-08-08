@@ -9,9 +9,10 @@ import { Episode } from './episode.entity';
 import { EpisodeService } from './episode.service';
 import { SeriesTagController } from './series-tag.controller';
 import { EpisodeController } from './episode.controller';
+import { FileModule } from '../file/file.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Series, SeriesTag, Episode])],
+  imports: [TypeOrmModule.forFeature([Series, SeriesTag, Episode]), FileModule],
   providers: [SeriesService, SeriesTagService, EpisodeService],
   controllers: [SeriesController, SeriesTagController, EpisodeController],
   exports: [SeriesService, SeriesTagService, EpisodeService],

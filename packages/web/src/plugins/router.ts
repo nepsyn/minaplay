@@ -21,6 +21,7 @@ import AdminSeries from '@/views/home/admin/AdminSeries.vue';
 import AdminDownload from '@/views/home/admin/AdminDownload.vue';
 import AdminFile from '@/views/home/admin/AdminFile.vue';
 import MediaPlay from '@/views/home/resource/MediaPlay.vue';
+import SeriesDetail from '@/views/home/resource/SeriesDetail.vue';
 
 const LoginGuard: NavigationGuard = (to, from, next) => {
   if (Api.isLogin) {
@@ -53,6 +54,10 @@ const routes: RouteRecordRaw[] = [
               {
                 path: '/resource',
                 component: ResourceView,
+              },
+              {
+                path: '/series/:id',
+                component: SeriesDetail,
               },
               {
                 path: '/media/:id',
@@ -101,7 +106,6 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/admin',
         component: Admin,
-        redirect: '/admin/overview',
         children: [
           {
             path: '/admin/overview',

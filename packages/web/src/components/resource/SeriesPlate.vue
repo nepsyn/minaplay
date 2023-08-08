@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { VSkeletonLoader } from 'vuetify/labs/components';
-import MediaOverview from '@/components/resource/MediaOverview.vue';
-import { MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
-import { ref, Ref } from 'vue';
-import ItemsProvider from '@/components/provider/ItemsProvider.vue';
-import { Api } from '@/api/api';
 import { useApp } from '@/store/app';
+import { VSkeletonLoader } from 'vuetify/labs/components';
+import ItemsProvider from '@/components/provider/ItemsProvider.vue';
+import { Ref, ref } from 'vue';
+import { Api } from '@/api/api';
+import { SeriesEntity, SeriesQueryDto } from '@/interfaces/series.interface';
+import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 
 const app = useApp();
 
@@ -14,7 +14,7 @@ const props = withDefaults(
     iconColor?: string;
     icon: string;
     title: string;
-    query: MediaQueryDto;
+    query: SeriesQueryDto;
     count?: string | number;
     cols?: string | number;
     sm?: string | number;
@@ -25,29 +25,29 @@ const props = withDefaults(
   }>(),
   {
     iconColor: 'primary',
-    cols: 3,
-    count: 8,
+    cols: 2,
+    count: 6,
   },
 );
 
 const emits = defineEmits<{
-  (event: 'click:media', arg: MediaEntity): void;
+  (event: 'click:series', arg: SeriesEntity): void;
 }>();
 
-const medias = ref<MediaEntity[]>([]);
+const series = ref<SeriesEntity[]>([]);
 const load = async (done: any) => {
   try {
-    const response = await Api.Media.query(props.query);
-    medias.value.push(...response.data.items);
+    const response = await Api.Series.query(props.query);
+    series.value.push(...response.data.items);
     props.query.page!++;
-    done(medias.value.length === response.data.total ? 'empty' : 'ok');
+    done(series.value.length === response.data.total ? 'empty' : 'ok');
   } catch {
     done('error');
   }
 };
 const reset = () => {
   props.query.page = 0;
-  medias.value = [];
+  series.value = [];
 };
 
 defineExpose({ load, reset });
@@ -65,7 +65,7 @@ const providerRef: Ref<any> = ref(null);
       <v-spacer></v-spacer>
       <slot name="actions" :load="providerRef?.load" :reset="reset" :status="providerRef?.status"></slot>
     </v-container>
-    <items-provider class="pa-0" ref="providerRef" :load-fn="load" :items="medias">
+    <items-provider class="pa-0" ref="providerRef" :load-fn="load" :items="series">
       <template #loading>
         <v-row no-gutters>
           <v-col
@@ -78,35 +78,26 @@ const providerRef: Ref<any> = ref(null);
             v-for="index of Number(count)"
             :key="index"
           >
-            <v-skeleton-loader class="pa-3" type="image,list-item-two-line"></v-skeleton-loader>
+            <v-skeleton-loader class="pa-3" type="image,list-item"></v-skeleton-loader>
           </v-col>
         </v-row>
       </template>
       <template #empty>
         <div>
-          <v-container v-if="medias.length === 0" class="d-flex flex-column justify-center align-center">
+          <v-container v-if="series.length === 0" class="d-flex flex-column justify-center align-center">
             <span class="text-caption text-medium-emphasis">这里空空如也~~~</span>
           </v-container>
         </div>
       </template>
       <v-row no-gutters>
-        <v-col
-          :cols="cols!"
-          :sm="sm!"
-          :md="md!"
-          :lg="lg!"
-          :xl="xl!"
-          :xxl="xxl!"
-          v-for="media in medias"
-          :key="media.id"
-        >
-          <media-overview
+        <v-col :cols="cols!" :sm="sm!" :md="md!" :lg="lg!" :xl="xl!" :xxl="xxl!" v-for="item in series" :key="item.id">
+          <series-overview
             class="pa-3"
             v-ripple
-            @click:content="emits('click:media', media)"
+            @click:content="emits('click:series', item)"
             @click.right.prevent
-            :media="media"
-          ></media-overview>
+            :series="item"
+          ></series-overview>
         </v-col>
       </v-row>
     </items-provider>

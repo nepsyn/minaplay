@@ -69,7 +69,9 @@ onMounted(async () => {
     </slot>
     <slot name="empty" v-if="status === 'empty' && !hideEmpty" :load="load">
       <v-container class="d-flex flex-column justify-center align-center">
-        <span class="text-caption mt-2 text-medium-emphasis">没有更多了~~~</span>
+        <span class="text-caption text-medium-emphasis">
+          {{ items.length > 0 ? '没有更多了~~~' : '这里空空如也~~~' }}
+        </span>
       </v-container>
     </slot>
   </v-container>

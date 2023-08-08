@@ -149,24 +149,24 @@ watch(
         <span class="text-h6">订阅源规则 ({{ rules.length }})</span>
         <v-spacer></v-spacer>
         <action-btn
-          text="重新加载"
-          color="primary"
-          :loading="providerRef?.status === 'loading'"
-          :icon="mdiRefresh"
-          @click="resetRules() & providerRef.load()"
-        ></action-btn>
-        <action-btn
-          class="ml-2"
           text="添加"
           color="warning"
           :icon="mdiPlus"
           :loading="ruleCreating"
           @click="createRule"
         ></action-btn>
+        <action-btn
+          class="ms-1"
+          text="重新加载"
+          color="primary"
+          :loading="providerRef?.status === 'loading'"
+          :icon="mdiRefresh"
+          @click="resetRules() & providerRef.load()"
+        ></action-btn>
       </v-container>
       <v-divider class="my-4"></v-divider>
       <items-provider ref="providerRef" :load-fn="loadRules" :items="rules" class="pa-0" auto-load>
-        <v-sheet class="my-4" border rounded v-for="(rule, index) in rules">
+        <v-container fluid class="pa-0 my-4 border rounded" v-for="(rule, index) in rules">
           <v-toolbar density="compact" color="background" class="px-4 py-2 d-flex flex-row align-center">
             <label-editor
               class="text-truncate"
@@ -223,7 +223,7 @@ watch(
             >
             </action-btn>
           </v-container>
-        </v-sheet>
+        </v-container>
       </items-provider>
     </v-container>
   </v-container>

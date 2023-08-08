@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import {
   mdiAccountMultiple,
   mdiChevronDown,
@@ -11,11 +11,12 @@ import {
   mdiRssBox,
 } from '@mdi/js';
 import ToTopContainer from '@/components/provider/ToTopContainer.vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { PermissionEnum } from '@/api/enums/permission.enum';
 import { useApp } from '@/store/app';
 
 const app = useApp();
+const route = useRoute();
 const router = useRouter();
 
 const tabs = ref([
@@ -62,6 +63,13 @@ const tabs = ref([
     permission: [PermissionEnum.ROOT_OP],
   },
 ]);
+
+onMounted(async () => {
+  if (route.path === '/admin') {
+    const tab = tabs.value.find(({ permission }) => app.hasPermission(...permission));
+    await router.replace(tab ? tab.route : '/resource');
+  }
+});
 </script>
 
 <template>

@@ -122,19 +122,19 @@ const providerRef: Ref<any> = ref(null);
             <v-toolbar-title>订阅列表 ({{ subscribe.sources.length }})</v-toolbar-title>
             <v-spacer></v-spacer>
             <action-btn
-              text="刷新"
-              color="primary"
-              :loading="providerRef?.status === 'loading'"
-              @click="resetSources() & providerRef.load()"
-              :icon="mdiRefresh"
-            ></action-btn>
-            <action-btn
-              class="ml-2"
               text="添加"
               color="warning"
               :loading="sourceCreating"
               @click="createSource()"
               :icon="mdiPlus"
+            ></action-btn>
+            <action-btn
+              class="ms-1"
+              text="刷新"
+              color="primary"
+              :loading="providerRef?.status === 'loading'"
+              @click="resetSources() & providerRef.load()"
+              :icon="mdiRefresh"
             ></action-btn>
           </v-toolbar>
           <items-provider

@@ -5,7 +5,6 @@ import { computed, ref, Ref, watch } from 'vue';
 import SingleItemProvider from '@/components/provider/SingleItemProvider.vue';
 import { MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
 import { Api } from '@/api/api';
-import ToTopContainer from '@/components/provider/ToTopContainer.vue';
 import { mdiContentCopy, mdiDotsVertical, mdiMotionPlayOutline, mdiPlaylistPlay, mdiVlc } from '@mdi/js';
 import VideoProvider from '@/components/provider/VideoProvider.vue';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
@@ -124,88 +123,86 @@ const actions = ref([
 
 <template>
   <v-container fluid class="pa-0 main-content d-flex flex-column">
-    <to-top-container class="scrollable-container">
-      <v-container fluid class="py-4 px-6">
-        <v-row>
-          <v-col cols="12" md="8">
-            <single-item-provider ref="mediaProvider" :item="media" :load-fn="loadMedia">
-              <v-responsive :aspect-ratio="16 / 9" max-height="520">
-                <video-provider :media="media" :options="playerOptions"></video-provider>
-              </v-responsive>
-              <v-container fluid class="pa-0 mt-4 d-flex flex-column">
-                <span class="text-h5 text-wrap">{{ media.name }}</span>
-                <v-container fluid class="pa-0 mt-1 d-flex flex-row align-center">
-                  <span class="mt-1 text-caption">上传于 {{ new Date(media.createAt).toLocaleString() }}</span>
-                  <v-spacer></v-spacer>
-                  <div class="d-none d-sm-flex">
-                    <action-btn
-                      v-for="(action, index) in actions"
-                      :key="index"
-                      :text="action.text"
-                      :icon="action.icon"
-                      :color="action.color"
+    <v-container fluid class="py-4 px-6">
+      <v-row>
+        <v-col cols="12" md="8">
+          <single-item-provider ref="mediaProvider" :item="media" :load-fn="loadMedia">
+            <v-responsive :aspect-ratio="16 / 9" max-height="520">
+              <video-provider :media="media" :options="playerOptions"></video-provider>
+            </v-responsive>
+            <v-container fluid class="pa-0 mt-4 d-flex flex-column">
+              <span class="text-h5 text-wrap">{{ media.name }}</span>
+              <v-container fluid class="pa-0 mt-1 d-flex flex-row align-center">
+                <span class="mt-1 text-caption">上传于 {{ new Date(media.createAt).toLocaleString() }}</span>
+                <v-spacer></v-spacer>
+                <div class="d-none d-sm-flex">
+                  <action-btn
+                    v-for="(action, index) in actions"
+                    :key="index"
+                    :text="action.text"
+                    :icon="action.icon"
+                    :color="action.color"
+                    variant="text"
+                    size="small"
+                    :href="action.href"
+                    @click="action.click?.()"
+                  ></action-btn>
+                </div>
+                <v-menu location="bottom">
+                  <template #activator="{ props }">
+                    <v-btn
                       variant="text"
+                      class="d-flex d-sm-none"
+                      :icon="mdiDotsVertical"
                       size="small"
-                      :href="action.href"
-                      @click="action.click?.()"
-                    ></action-btn>
-                  </div>
-                  <v-menu location="bottom">
-                    <template #activator="{ props }">
-                      <v-btn
-                        variant="text"
-                        class="d-flex d-sm-none"
-                        :icon="mdiDotsVertical"
-                        size="small"
-                        v-bind="props"
-                      ></v-btn>
-                    </template>
-                    <v-card>
-                      <v-list class="pa-0" density="compact">
-                        <v-list-item
-                          v-for="(action, index) in actions"
-                          :key="index"
-                          :prepend-icon="action.icon"
-                          :base-color="action.color"
-                          :href="action.href!"
-                          @click="action.click?.()"
-                        >
-                          {{ action.text }}
-                        </v-list-item>
-                      </v-list>
-                    </v-card>
-                  </v-menu>
-                </v-container>
-                <v-divider class="my-2"></v-divider>
-                <pre
-                  style="min-height: 100px"
-                  class="text-subtitle-2 font-weight-light text-pre-wrap text-break bg-transparent"
-                  v-text="media.description ?? '暂无无媒体描述'"
-                ></pre>
+                      v-bind="props"
+                    ></v-btn>
+                  </template>
+                  <v-card>
+                    <v-list class="pa-0" density="compact">
+                      <v-list-item
+                        v-for="(action, index) in actions"
+                        :key="index"
+                        :prepend-icon="action.icon"
+                        :base-color="action.color"
+                        :href="action.href!"
+                        @click="action.click?.()"
+                      >
+                        {{ action.text }}
+                      </v-list-item>
+                    </v-list>
+                  </v-card>
+                </v-menu>
               </v-container>
-            </single-item-provider>
-          </v-col>
-          <v-col cols="12" md="4">
-            <v-container fluid class="pa-0 mt-2">
-              <div class="pa-2 d-flex align-center">
-                <v-icon :icon="mdiPlaylistPlay" size="large"></v-icon>
-                <span class="ms-2 text-h6">播放列表</span>
-              </div>
-              <items-provider ref="recommendProvider" class="pa-0" :load-fn="loadRecommends" :items="recommends">
-                <media-overview-landscape
-                  v-for="recommend in recommendsWithOutCurrent"
-                  class="pa-2"
-                  v-ripple
-                  :media="recommend"
-                  @click:content="router.push(`/media/${recommend.id}`)"
-                  @click.right.prevent
-                ></media-overview-landscape>
-              </items-provider>
+              <v-divider class="my-2"></v-divider>
+              <pre
+                style="min-height: 100px"
+                class="text-subtitle-2 font-weight-light text-pre-wrap text-break bg-transparent"
+                v-text="media.description ?? '暂无无媒体描述'"
+              ></pre>
             </v-container>
-          </v-col>
-        </v-row>
-      </v-container>
-    </to-top-container>
+          </single-item-provider>
+        </v-col>
+        <v-col cols="12" md="4">
+          <v-container fluid class="pa-0 mt-2">
+            <div class="pa-2 d-flex align-center">
+              <v-icon :icon="mdiPlaylistPlay" size="large"></v-icon>
+              <span class="ms-2 text-h6">播放列表</span>
+            </div>
+            <items-provider ref="recommendProvider" class="pa-0" :load-fn="loadRecommends" :items="recommends">
+              <media-overview-landscape
+                v-for="recommend in recommendsWithOutCurrent"
+                class="pa-2"
+                v-ripple
+                :media="recommend"
+                @click:content="router.push(`/media/${recommend.id}`)"
+                @click.right.prevent
+              ></media-overview-landscape>
+            </items-provider>
+          </v-container>
+        </v-col>
+      </v-row>
+    </v-container>
   </v-container>
 </template>
 

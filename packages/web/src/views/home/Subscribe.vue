@@ -175,23 +175,27 @@ const providerRef: Ref<any> = ref(null);
                   <v-divider class="py-0"></v-divider>
                 </template>
               </v-list>
-              <v-container
-                v-if="status !== 'loading' && subscribe.sources.length === 0"
-                class="d-flex flex-column align-center justify-center h-100"
-              >
-                <v-icon size="40" :icon="mdiEmoticonSadOutline"></v-icon>
-                <div class="mt-2">
-                  <span class="text-caption">还没有创建任何订阅，试试</span>
-                  <a
-                    class="text-decoration-none text-caption text-primary ml-2"
-                    style="cursor: pointer"
-                    @click="createSource"
-                  >
-                    <v-icon size="x-small" :icon="mdiPlus"></v-icon>
-                    创建新订阅
-                  </a>
-                </div>
-              </v-container>
+            </template>
+            <template #empty>
+              <div>
+                <v-container
+                  v-if="subscribe.sources.length === 0"
+                  class="d-flex flex-column align-center justify-center h-100"
+                >
+                  <v-icon size="40" :icon="mdiEmoticonSadOutline"></v-icon>
+                  <div class="mt-2">
+                    <span class="text-caption">还没有创建任何订阅，试试</span>
+                    <a
+                      class="text-decoration-none text-caption text-primary ml-2"
+                      style="cursor: pointer"
+                      @click="createSource"
+                    >
+                      <v-icon size="x-small" :icon="mdiPlus"></v-icon>
+                      创建新订阅
+                    </a>
+                  </div>
+                </v-container>
+              </div>
             </template>
           </items-provider>
         </v-container>

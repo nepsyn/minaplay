@@ -49,21 +49,15 @@ const routes: RouteRecordRaw[] = [
         children: [
           {
             path: '/resource',
-            component: Resource,
-            children: [
-              {
-                path: '/resource',
-                component: ResourceView,
-              },
-              {
-                path: '/series/:id',
-                component: SeriesDetail,
-              },
-              {
-                path: '/media/:id',
-                component: MediaPlay,
-              },
-            ],
+            component: ResourceView,
+          },
+          {
+            path: '/series/:id',
+            component: SeriesDetail,
+          },
+          {
+            path: '/media/:id',
+            component: MediaPlay,
           },
         ],
       },

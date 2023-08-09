@@ -67,8 +67,6 @@ export interface EpisodeEntity {
   no?: string;
   /** 媒体 */
   media: MediaEntity;
-  /** 剧集 */
-  series: SeriesEntity;
   /** 创建时间 */
   createAt: Date;
   /** 更新时间 */

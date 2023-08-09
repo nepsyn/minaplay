@@ -35,7 +35,6 @@ export class Episode {
   /** 剧集 */
   @ManyToOne(() => Series, (series) => series.episodes, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   series: Series;
 

@@ -65,7 +65,7 @@ const providerRef: Ref<any> = ref(null);
       <v-spacer></v-spacer>
       <slot name="actions" :load="providerRef?.load" :reset="reset" :status="providerRef?.status"></slot>
     </v-container>
-    <items-provider class="pa-0" ref="providerRef" :load-fn="load" :items="series">
+    <items-provider class="pa-0" ref="providerRef" :load-fn="load" :items="series" :hide-empty="series.length > 0">
       <template #loading>
         <v-row no-gutters>
           <v-col
@@ -78,16 +78,9 @@ const providerRef: Ref<any> = ref(null);
             v-for="index of Number(count)"
             :key="index"
           >
-            <v-skeleton-loader class="pa-3" type="image,list-item"></v-skeleton-loader>
+            <v-skeleton-loader class="pa-3" type="image,image,list-item"></v-skeleton-loader>
           </v-col>
         </v-row>
-      </template>
-      <template #empty>
-        <div>
-          <v-container v-if="series.length === 0" class="d-flex flex-column justify-center align-center">
-            <span class="text-caption text-medium-emphasis">这里空空如也~~~</span>
-          </v-container>
-        </div>
       </template>
       <v-row no-gutters>
         <v-col :cols="cols!" :sm="sm!" :md="md!" :lg="lg!" :xl="xl!" :xxl="xxl!" v-for="item in series" :key="item.id">

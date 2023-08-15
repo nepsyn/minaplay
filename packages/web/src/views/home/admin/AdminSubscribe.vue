@@ -99,7 +99,7 @@ const edit = ref<SourceQueryDto>({});
 watch(
   () => [route.path, route.query],
   (newValue, oldValue) => {
-    if (newValue[0] !== oldValue?.[0]) {
+    if (newValue[0] !== oldValue?.[0] && route.name === 'admin-subscribe') {
       edit.value = Object.assign({}, route.query);
       options.value.page = 1;
     }
@@ -107,9 +107,11 @@ watch(
   { immediate: true },
 );
 onBeforeRouteUpdate(async (to, from, next) => {
-  edit.value = Object.assign({}, to.query);
-  options.value.page = 1;
-  await loadItems(options.value);
+  if (to.name === 'admin-subscribe') {
+    edit.value = Object.assign({}, to.query);
+    options.value.page = 1;
+    await loadItems(options.value);
+  }
   next();
 });
 const reset = async () => {
@@ -130,7 +132,7 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
 </script>
 
 <template>
-  <v-container>
+  <v-container fluid class="py-4 px-6">
     <v-container fluid class="d-flex align-center">
       <v-container fluid class="pa-0 d-flex align-center">
         <v-icon size="40" color="primary" :icon="mdiRssBox"></v-icon>

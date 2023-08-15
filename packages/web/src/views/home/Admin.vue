@@ -111,7 +111,9 @@ onMounted(async () => {
     <to-top-container class="scrollable-container">
       <router-view v-slot="{ Component }">
         <v-scroll-x-reverse-transition leave-absolute>
-          <component :is="Component"></component>
+          <keep-alive>
+            <component :is="Component"></component>
+          </keep-alive>
         </v-scroll-x-reverse-transition>
       </router-view>
     </to-top-container>

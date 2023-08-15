@@ -94,7 +94,7 @@ const providerRef: Ref<any> = ref(null);
 watch(
   () => route.params,
   async (now, old) => {
-    if (old?.id !== now.id && !isNaN(Number(now.id))) {
+    if (old?.id !== now.id && !isNaN(Number(now.id)) && route.name === 'source-downloads') {
       resetDownloads();
 
       if (providerRef.value) {

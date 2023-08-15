@@ -79,8 +79,3 @@ export interface EpisodeDto {
   seriesId?: number;
   mediaId?: string;
 }
-
-export interface EpisodeQueryDto extends ApiQueryDto<EpisodeEntity> {
-  id?: number;
-  seriesId?: number;
-}

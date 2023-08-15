@@ -26,7 +26,7 @@ const seriesQuery: Ref<SeriesQueryDto> = ref({
 </script>
 
 <template>
-  <v-container>
+  <v-container fluid class="py-4 px-6">
     <series-plate
       class="py-0"
       title="剧集列表"

@@ -198,7 +198,7 @@ const queryTags = _.debounce(
               <v-col cols="12" md="4">
                 <span class="text-body-1">海报图片</span>
                 <v-img
-                  :aspect-ratio="3 / 4"
+                  :aspect-ratio="1 / 1.4"
                   class="rounded mt-2"
                   cover
                   min-width="80"

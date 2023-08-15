@@ -98,9 +98,11 @@ const getSourceText = (source: FileSourceEnum) => {
 const expand = ref(false);
 const edit = ref<FileQueryDto>({});
 onBeforeRouteUpdate(async (to, from, next) => {
-  edit.value = Object.assign({}, to.query);
-  options.value.page = 1;
-  await loadItems(options.value);
+  if (to.name === 'admin-file') {
+    edit.value = Object.assign({}, to.query);
+    options.value.page = 1;
+    await loadItems(options.value);
+  }
   next();
 });
 const reset = async () => {
@@ -122,7 +124,7 @@ const deleteItem = async (id: string) => {
 </script>
 
 <template>
-  <v-container>
+  <v-container fluid class="py-4 px-6">
     <v-container fluid class="d-flex align-center">
       <v-container fluid class="pa-0 d-flex align-center">
         <v-icon size="40" color="primary" :icon="mdiFileMultiple"></v-icon>

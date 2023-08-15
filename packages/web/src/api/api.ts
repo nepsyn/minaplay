@@ -14,13 +14,12 @@ import {
   SourceEntity,
   SourceQueryDto,
 } from '@/interfaces/subscribe.interface';
-import { ApiQueryResult } from '@/interfaces/common.interface';
+import { ApiQueryDto, ApiQueryResult } from '@/interfaces/common.interface';
 import { MediaDto, MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
 import { UserDto, UserEntity, UserQueryDto } from '@/interfaces/user.interface';
 import {
   EpisodeDto,
   EpisodeEntity,
-  EpisodeQueryDto,
   SeriesDto,
   SeriesEntity,
   SeriesQueryDto,
@@ -130,14 +129,15 @@ class ApiHelper {
     update: (id: number) => this.apiPut<SeriesEntity, SeriesDto>(`/series/${id}`),
     delete: (id: number) => this.apiDelete(`/series/${id}`),
     query: this.apiGet<ApiQueryResult<SeriesEntity>, SeriesQueryDto>('/series'),
+    getEpisodesById: (id: number) =>
+      this.apiGet<ApiQueryResult<EpisodeEntity>, ApiQueryDto<EpisodeEntity>>(`/series/${id}/episode`),
   };
 
   Episode = {
-    create: this.apiPost<EpisodeEntity, EpisodeDto>('/episode'),
-    getById: (id: number) => this.apiGet<EpisodeEntity>(`/episode/${id}`),
-    update: (id: number) => this.apiPut<EpisodeEntity, EpisodeDto>(`/episode/${id}`),
-    delete: (id: number) => this.apiDelete(`/episode/${id}`),
-    query: this.apiGet<ApiQueryResult<EpisodeEntity>, EpisodeQueryDto>('/episode'),
+    create: this.apiPost<EpisodeEntity, EpisodeDto>('/series/-/episode'),
+    getById: (id: number) => this.apiGet<EpisodeEntity>(`/series/-/episode/${id}`),
+    update: (id: number) => this.apiPut<EpisodeEntity, EpisodeDto>(`/series/-/episode/${id}`),
+    delete: (id: number) => this.apiDelete(`/series/-/episode/${id}`),
   };
 
   SeriesTag = {

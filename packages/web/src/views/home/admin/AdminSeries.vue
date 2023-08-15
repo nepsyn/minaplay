@@ -13,6 +13,7 @@ import {
   mdiPencil,
   mdiPlus,
   mdiRefresh,
+  mdiShare,
 } from '@mdi/js';
 import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
@@ -101,7 +102,7 @@ const edit = ref<SeriesQueryDto>({});
 watch(
   () => [route.path, route.query],
   (newValue, oldValue) => {
-    if (newValue[0] !== oldValue?.[0]) {
+    if (newValue[0] !== oldValue?.[0] && route.name === 'admin-series') {
       edit.value = Object.assign({}, route.query);
       options.value.page = 1;
     }
@@ -109,9 +110,11 @@ watch(
   { immediate: true },
 );
 onBeforeRouteUpdate(async (to, from, next) => {
-  edit.value = Object.assign({}, to.query);
-  options.value.page = 1;
-  await loadItems(options.value);
+  if (to.name === 'admin-series') {
+    edit.value = Object.assign({}, to.query);
+    options.value.page = 1;
+    await loadItems(options.value);
+  }
   next();
 });
 const reset = async () => {
@@ -156,7 +159,7 @@ const onEditError = (error: any) => {
 </script>
 
 <template>
-  <v-container>
+  <v-container fluid class="py-4 px-6">
     <v-container fluid class="d-flex align-center">
       <v-container fluid class="pa-0 d-flex align-center">
         <v-icon size="40" color="primary" :icon="mdiMultimedia"></v-icon>
@@ -369,6 +372,15 @@ const onEditError = (error: any) => {
           <template #item.actions="{ item }">
             <v-container fluid class="pa-0 d-flex flex-row">
               <action-btn
+                text="转到"
+                :icon="mdiShare"
+                size="small"
+                color="primary"
+                variant="tonal"
+                @click.stop="router.push(`/series/${item.raw.id}`)"
+              ></action-btn>
+              <action-btn
+                class="ms-1"
                 text="编辑"
                 :icon="mdiPencil"
                 size="small"

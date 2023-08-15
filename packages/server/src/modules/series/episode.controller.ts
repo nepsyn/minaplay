@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -9,7 +8,6 @@ import {
   ParseIntPipe,
   Post,
   Put,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { EpisodeService } from './episode.service';
@@ -21,12 +19,8 @@ import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { EpisodeDto } from './episode.dto';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { SeriesService } from './series.service';
-import { EpisodeQueryDto } from './episode-query.dto';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
-import { Episode } from './episode.entity';
 
-@Controller('episode')
+@Controller('series/-/episode')
 @UseGuards(AuthorizationGuard)
 @ApiTags('series')
 @ApiBearerAuth()
@@ -47,36 +41,15 @@ export class EpisodeController {
     return episode;
   }
 
-  @Get()
-  @ApiOperation({
-    description: '查询单集',
-  })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
-  async queryEpisode(@Query() query: EpisodeQueryDto) {
-    const { id, seriesId } = query;
-    const [result, total] = await this.episodeService.findAndCount({
-      where: buildQueryOptions<Episode>({
-        exact: {
-          id,
-          series: { id: seriesId },
-        },
-      }),
-      skip: query.page * query.size,
-      take: query.size,
-      order: { [query.sort]: query.order },
-    });
-
-    return new ApiPaginationResultDto(result, total, query.page, query.size);
-  }
-
   @Post()
   @ApiOperation({
     description: '创建单集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async createEpisode(@Body() data: EpisodeDto) {
-    if (data.seriesId == null) {
-      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    const series = await this.seriesService.findOneBy({ id: data.seriesId });
+    if (!series) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
     const { id } = await this.episodeService.save({
@@ -99,9 +72,17 @@ export class EpisodeController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
+    if (data.seriesId !== undefined) {
+      const series = await this.seriesService.findOneBy({ id: data.seriesId });
+      if (!series) {
+        throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+      }
+    }
+
     await this.episodeService.save({
       id,
       ...data,
+      series: { id: data.seriesId },
       media: { id: data.mediaId },
     });
 

@@ -4,7 +4,6 @@ import {
   DeleteDateColumn,
   Entity,
   ManyToOne,
-  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
@@ -26,7 +25,7 @@ export class Episode {
   no?: string;
 
   /** 媒体 */
-  @OneToOne(() => Media, {
+  @ManyToOne(() => Media, {
     onDelete: 'CASCADE',
     eager: true,
   })

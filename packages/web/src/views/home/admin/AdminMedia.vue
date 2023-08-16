@@ -15,6 +15,7 @@ import {
   mdiFileVideo,
   mdiPencil,
   mdiRefresh,
+  mdiShare,
 } from '@mdi/js';
 import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
@@ -332,6 +333,15 @@ const onEditError = (error: any) => {
           <template #item.actions="{ item }">
             <v-container fluid class="pa-0 d-flex flex-row">
               <action-btn
+                text="转到"
+                :icon="mdiShare"
+                size="small"
+                color="primary"
+                variant="tonal"
+                @click.stop="router.push(`/media/${item.raw.id}`)"
+              ></action-btn>
+              <action-btn
+                class="ms-1"
                 text="编辑"
                 :icon="mdiPencil"
                 size="small"

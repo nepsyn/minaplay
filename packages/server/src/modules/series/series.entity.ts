@@ -49,14 +49,6 @@ export class Series {
   })
   poster?: File;
 
-  /** 横向海报图 */
-  @ManyToOne(() => File, {
-    onDelete: 'SET NULL',
-    eager: true,
-    nullable: true,
-  })
-  posterLandscape?: File;
-
   /** 标签 */
   @ManyToMany(() => SeriesTag, (tag) => tag.series, {
     eager: true,

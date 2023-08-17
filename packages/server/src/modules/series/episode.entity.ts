@@ -18,6 +18,12 @@ export class Episode {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
+  /** 本集标题 */
+  @Column({
+    nullable: true,
+  })
+  title?: string;
+
   /** 本集集数 */
   @Column({
     nullable: true,

@@ -29,7 +29,6 @@ export class SeriesService {
     for (const item of series) {
       const ids = []
         .concat(item.poster)
-        .concat(item.posterLandscape)
         .filter((v) => v != null)
         .map((v: File) => v.id);
       await this.fileService.delete({

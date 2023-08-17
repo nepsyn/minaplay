@@ -22,7 +22,7 @@ import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import ViewImg from '@/components/provider/ViewImg.vue';
-import MediaEditDialog from '@/components/edit/MediaEditDialog.vue';
+import MediaEditDialog from '@/components/dialogs/MediaEditDialog.vue';
 import { SeriesQueryDto } from '@/interfaces/series.interface';
 
 const app = useApp();

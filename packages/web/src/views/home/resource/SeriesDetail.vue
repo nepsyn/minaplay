@@ -9,7 +9,7 @@ import SingleItemProvider from '@/components/provider/SingleItemProvider.vue';
 import { VSkeletonLoader } from 'vuetify/labs/components';
 import SeriesCoverFallback from '@/assets/series_cover_fallback.jpg';
 import ViewImg from '@/components/provider/ViewImg.vue';
-import { mdiMotionPlayOutline, mdiPlay } from '@mdi/js';
+import { mdiMotionPlayOutline, mdiPlay, mdiViewComfy } from '@mdi/js';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import { ApiQueryDto } from '@/interfaces/common.interface';
 
@@ -92,11 +92,23 @@ const loadEpisodes = async (done: any) => {
                   ></v-chip>
                 </div>
                 <v-divider class="my-2"></v-divider>
-                <pre
-                  style="min-height: 100px"
-                  class="text-subtitle-1 text-pre-wrap text-break bg-transparent"
-                  v-text="series.description ?? '暂无剧集描述'"
-                ></pre>
+                <v-row>
+                  <v-col class="d-block d-sm-none" cols="4">
+                    <view-img
+                      class="rounded"
+                      :aspect-ratio="1 / 1.4"
+                      :src="series.poster ? Api.File.buildRawPath(series.poster.id) : SeriesCoverFallback"
+                      :placeholder="SeriesCoverFallback"
+                    ></view-img>
+                  </v-col>
+                  <v-col cols="8" sm="12">
+                    <pre
+                      style="min-height: 100px"
+                      class="text-subtitle-1 text-pre-wrap text-break bg-transparent"
+                      v-text="series.description ?? '暂无剧集描述'"
+                    ></pre>
+                  </v-col>
+                </v-row>
               </div>
               <div>
                 <v-divider class="my-2"></v-divider>
@@ -124,8 +136,11 @@ const loadEpisodes = async (done: any) => {
     </v-container>
     <v-container fluid class="mt-6 border rounded-lg">
       <items-provider :load-fn="loadEpisodes" :items="episodes" :hide-empty="episodes.length > 0">
-        <span class="text-h6">单集列表</span>
-        <v-container fluid class="mt-1 pa-0">
+        <v-container fluid class="pa-0 d-flex align-center">
+          <v-icon :icon="mdiViewComfy"></v-icon>
+          <span class="ms-2 text-h6">分集</span>
+        </v-container>
+        <v-container fluid class="mt-3 pa-0">
           <v-btn
             v-for="(episode, index) in episodes"
             :key="index"

@@ -17,7 +17,7 @@ import ActionBtn from '@/components/provider/ActionBtn.vue';
 import UserAvatar from '@/components/provider/UserAvatar.vue';
 import { PermissionEnum } from '@/api/enums/permission.enum';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
-import PermissionEditDialog from '@/components/edit/PermissionEditDialog.vue';
+import PermissionEditDialog from '@/components/dialogs/PermissionEditDialog.vue';
 
 const app = useApp();
 const router = useRouter();

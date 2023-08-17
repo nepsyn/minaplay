@@ -115,7 +115,7 @@ const selectAndUploadPoster = async () => {
               hide-details
               color="primary"
               density="compact"
-              rows="2"
+              rows="3"
               v-model="item.description"
             ></v-textarea>
           </v-container>
@@ -128,7 +128,7 @@ const selectAndUploadPoster = async () => {
           </v-container>
           <v-container class="mt-4 pa-0">
             <span class="text-body-1">封面图片</span>
-            <v-row class="mt-2">
+            <v-row class="mt-1">
               <v-col cols="12" md="8">
                 <v-img
                   class="rounded"
@@ -140,9 +140,8 @@ const selectAndUploadPoster = async () => {
                     <v-img :src="MediaCoverFallback"></v-img>
                   </template>
                 </v-img>
-              </v-col>
-              <v-col cols="12" md="4">
                 <v-btn
+                  class="mt-2"
                   :prepend-icon="mdiCloudUploadOutline"
                   color="warning"
                   text="上传图片"

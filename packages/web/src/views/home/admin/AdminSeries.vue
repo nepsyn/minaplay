@@ -18,11 +18,10 @@ import {
 import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
-import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
 import { useDisplay } from 'vuetify';
 import ViewImg from '@/components/provider/ViewImg.vue';
 import UserAvatar from '@/components/provider/UserAvatar.vue';
-import SeriesEditDialog from '@/components/edit/SeriesEditDialog.vue';
+import SeriesEditDialog from '@/components/dialogs/SeriesEditDialog.vue';
 import SeriesCoverFallback from '@/assets/series_cover_fallback.jpg';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 
@@ -51,11 +50,6 @@ const headers = ref([
   {
     title: '海报图',
     key: 'poster',
-    sortable: false,
-  },
-  {
-    title: '水平海报图',
-    key: 'posterLandscape',
     sortable: false,
   },
   {
@@ -341,17 +335,6 @@ const onEditError = (error: any) => {
                 min-width="32"
                 max-width="64"
                 :src="item.raw.poster ? Api.File.buildRawPath(item.raw.poster.id) : SeriesCoverFallback"
-              ></view-img>
-            </v-container>
-          </template>
-          <template #item.posterLandscape="{ item }">
-            <v-container class="pa-1">
-              <view-img
-                min-width="80"
-                max-width="120"
-                :src="
-                  item.raw.posterLandscape ? Api.File.buildRawPath(item.raw.posterLandscape.id) : MediaCoverFallback
-                "
               ></view-img>
             </v-container>
           </template>

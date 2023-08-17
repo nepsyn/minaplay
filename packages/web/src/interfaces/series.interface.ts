@@ -14,8 +14,6 @@ export interface SeriesEntity {
   user: UserEntity;
   /** 纵向海报图 */
   poster?: FileEntity;
-  /** 横向海报图 */
-  posterLandscape?: FileEntity;
   /** 标签 */
   tags: SeriesTagEntity[];
   /** 创建时间 */
@@ -28,7 +26,6 @@ export interface SeriesDto {
   name?: string;
   description?: string;
   posterFileId?: string;
-  posterLandscapeFileId?: string;
   tagIds?: number[];
 }
 
@@ -63,6 +60,8 @@ export interface SeriesTagQueryDto extends ApiQueryDto<SeriesTagEntity> {
 export interface EpisodeEntity {
   /** id */
   id: number;
+  /** 本集标题 */
+  title?: string;
   /** 本集集数 */
   no?: string;
   /** 媒体 */

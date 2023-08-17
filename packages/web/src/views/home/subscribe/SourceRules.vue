@@ -15,6 +15,8 @@ import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import LabelEditor from '@/components/provider/LabelEditor.vue';
 import { Codemirror } from 'vue-codemirror';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
+import SelectSeriesDialog from '@/components/dialogs/SelectSeriesDialog.vue';
+import { SeriesEntity } from '@/interfaces/series.interface';
 
 const app = useApp();
 const route = useRoute();
@@ -90,19 +92,6 @@ const deleteRule = async (id: number) => {
 };
 
 const newRuleCodeSample = `
-/**
- * Validator used to determine if the resource item is to be downloaded
- * @param {Object} entry - The entire feed entry
- * @param {String} entry.id - Entry guid
- * @param {String} entry.link - Entry link
- * @param {String} entry.title - Entry title
- * @param {String} entry.description - Entry description
- * @param {Date} entry.published - Entry publish time
- * @param {Object} entry.enclosure - Entry enclosure resource item
- * @param {String} entry.enclosure.url - Entry enclosure url
- * @param {String?} entry.enclosure.type - Entry enclosure type
- * @returns {Boolean} Boolean value used to determine if the resource item is to be downloaded
- */
 module.exports = function(entry) {
   return false;
 }
@@ -122,6 +111,27 @@ const createRule = async () => {
     app.toastError('创建规则失败');
   } finally {
     ruleCreating.value = false;
+  }
+};
+
+const dialog = ref(false);
+const editRule = ref<RuleEntity | undefined>(undefined);
+const openSelect = (rule: RuleEntity) => {
+  editRule.value = rule;
+  dialog.value = true;
+};
+const onSelected = async (series: SeriesEntity) => {
+  try {
+    const response = await Api.SubscribeRule.update(editRule.value!.id)({
+      seriesId: series.id,
+    });
+    const index = rules.value.findIndex((v) => v.id === response.data.id);
+    if (index > -1) {
+      rules.value[index] = response.data;
+    }
+    app.toastSuccess('设置剧集成功');
+  } catch {
+    app.toastError('设置剧集失败');
   }
 };
 
@@ -188,7 +198,11 @@ watch(
             style="cursor: text"
           ></codemirror>
           <v-divider></v-divider>
-          <v-container fluid class="px-4 py-2 d-flex flex-row justify-end">
+          <v-container fluid class="px-4 py-2 d-flex flex-row align-center">
+            <v-chip label :color="rule.series ? 'primary' : 'warning'" @click.stop="openSelect(rule)">
+              {{ rule.series?.name ?? '未选择剧集' }}
+            </v-chip>
+            <v-spacer></v-spacer>
             <v-menu location="left">
               <template #activator="{ props }">
                 <action-btn
@@ -212,7 +226,7 @@ watch(
               </v-card>
             </v-menu>
             <action-btn
-              class="ml-4"
+              class="ms-2"
               variant="tonal"
               color="info"
               :icon="mdiCheck"
@@ -226,6 +240,7 @@ watch(
         </v-container>
       </items-provider>
     </v-container>
+    <select-series-dialog v-model="dialog" @selected="onSelected"></select-series-dialog>
   </v-container>
 </template>
 

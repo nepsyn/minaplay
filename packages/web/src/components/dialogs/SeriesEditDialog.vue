@@ -5,7 +5,6 @@ import { Api } from '@/api/api';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useApp } from '@/store/app';
 import { mdiCheck, mdiClose, mdiCloudUploadOutline } from '@mdi/js';
-import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
 import SeriesCoverFallback from '@/assets/series_cover_fallback.jpg';
 import { useDisplay } from 'vuetify';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
@@ -53,7 +52,6 @@ const saveEdit = async () => {
       name: props.item.name,
       description: props.item.description,
       posterFileId: props.item.poster?.id,
-      posterLandscapeFileId: props.item.posterLandscape?.id,
       tagIds: props.item.tags?.map(({ id }) => id) ?? [],
     });
     emits('saved', response.data);
@@ -65,12 +63,12 @@ const saveEdit = async () => {
   }
 };
 const posterUploading = ref(false);
-const selectAndUploadPoster = (landscape = false) => {
+const selectAndUploadPoster = () => {
   app.selectFile('image/*', async (file) => {
     posterUploading.value = true;
     try {
       const response = await Api.File.uploadImage(file);
-      props.item[landscape ? 'posterLandscape' : 'poster'] = response.data;
+      props.item.poster = response.data;
     } catch (error: any) {
       if (error?.response?.data?.code === ErrorCodeEnum.INVALID_IMAGE_FILE_TYPE) {
         app.toastError('图片类型错误');
@@ -162,7 +160,7 @@ const queryTags = _.debounce(
               hide-details
               color="primary"
               density="compact"
-              rows="2"
+              rows="3"
               v-model="item.description"
             ></v-textarea>
           </v-container>
@@ -194,12 +192,12 @@ const queryTags = _.debounce(
             </v-autocomplete>
           </v-container>
           <v-container class="mt-4 pa-0">
-            <v-row>
+            <span class="text-body-1">海报图片</span>
+            <v-row class="mt-1">
               <v-col cols="12" md="4">
-                <span class="text-body-1">海报图片</span>
                 <v-img
                   :aspect-ratio="1 / 1.4"
-                  class="rounded mt-2"
+                  class="rounded"
                   cover
                   min-width="80"
                   :src="item.poster ? Api.File.buildRawPath(item.poster.id) : SeriesCoverFallback"
@@ -216,30 +214,7 @@ const queryTags = _.debounce(
                   variant="outlined"
                   block
                   :loading="posterUploading"
-                  @click="selectAndUploadPoster(false)"
-                ></v-btn>
-              </v-col>
-              <v-col cols="12" md="8">
-                <span class="text-body-1">水平海报图片</span>
-                <v-img
-                  class="rounded mt-2"
-                  cover
-                  min-width="80"
-                  :src="item.posterLandscape ? Api.File.buildRawPath(item.posterLandscape.id) : MediaCoverFallback"
-                >
-                  <template #placeholder>
-                    <v-img :src="MediaCoverFallback"></v-img>
-                  </template>
-                </v-img>
-                <v-btn
-                  class="mt-2"
-                  :prepend-icon="mdiCloudUploadOutline"
-                  color="warning"
-                  text="上传图片"
-                  variant="outlined"
-                  block
-                  :loading="posterUploading"
-                  @click="selectAndUploadPoster(true)"
+                  @click="selectAndUploadPoster"
                 ></v-btn>
               </v-col>
             </v-row>

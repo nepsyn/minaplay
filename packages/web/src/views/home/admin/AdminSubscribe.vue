@@ -9,9 +9,9 @@ import {
   mdiChevronUp,
   mdiClose,
   mdiContentCopy,
+  mdiPencil,
   mdiRefresh,
   mdiRssBox,
-  mdiShare,
 } from '@mdi/js';
 import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
@@ -311,7 +311,7 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
             <v-container fluid class="pa-0 d-flex flex-row">
               <action-btn
                 text="编辑"
-                :icon="mdiShare"
+                :icon="mdiPencil"
                 variant="tonal"
                 color="secondary"
                 size="small"

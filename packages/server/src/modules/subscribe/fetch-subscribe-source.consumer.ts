@@ -97,8 +97,9 @@ export class FetchSubscribeSourceConsumer {
               const task = await this.aria2Service.addTask(entry.enclosure.url);
               task.on('complete', async (files) => {
                 for (const file of files) {
-                  const copy = Object.freeze(Object.assign({}, file));
                   if (VALID_VIDEO_MIME.includes(file.mimetype)) {
+                    const copy = Object.freeze(Object.assign({}, file));
+
                     const { id } = await this.mediaService.save({
                       name: (await this.buildValue(descriptor.name, copy)) ?? file.name,
                       description: await this.buildValue(descriptor.description, copy),
@@ -111,6 +112,7 @@ export class FetchSubscribeSourceConsumer {
 
                     if (rule.series) {
                       await this.episodeService.save({
+                        title: await this.buildValue(descriptor.title, copy),
                         no: await this.buildValue(descriptor.no, copy),
                         media: { id: media.id },
                         series: { id: rule.series.id },

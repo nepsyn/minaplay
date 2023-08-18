@@ -60,7 +60,7 @@ export interface RuleDto {
   code?: string;
   remark?: string;
   sourceId?: number;
-  seriesId?: number;
+  seriesId?: number | null;
 }
 
 export interface RuleQueryDto extends ApiQueryDto<RuleEntity> {

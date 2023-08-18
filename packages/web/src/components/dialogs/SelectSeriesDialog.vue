@@ -35,6 +35,11 @@ const emits = defineEmits<{
   (e: 'update:modelValue', value: boolean): any;
 }>();
 
+const select = (item: SeriesEntity) => {
+  emits('selected', item);
+  dialog.value = false;
+};
+
 const query: Ref<SeriesQueryDto> = ref({
   keyword: '',
   page: 0,
@@ -100,10 +105,7 @@ const search = () => {
                 <series-overview
                   class="pa-2"
                   v-ripple
-                  @click:content="
-                    emits('selected', item);
-                    dialog = false;
-                  "
+                  @click:content="select(item)"
                   @click.right.prevent
                   :series="item"
                 ></series-overview>

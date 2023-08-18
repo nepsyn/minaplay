@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { mdiCheck, mdiDelete, mdiPlus, mdiRefresh } from '@mdi/js';
+import { mdiCheck, mdiDelete, mdiPencil, mdiPlus, mdiRefresh } from '@mdi/js';
 import { Api } from '@/api/api';
 import { computed, ref, Ref, watch } from 'vue';
 import { javascript } from '@codemirror/lang-javascript';
@@ -135,6 +135,21 @@ const onSelected = async (series: SeriesEntity) => {
   }
 };
 
+const clearBindSeries = async (rule: RuleEntity) => {
+  try {
+    const response = await Api.SubscribeRule.update(rule.id)({
+      seriesId: null,
+    });
+    const index = rules.value.findIndex((v) => v.id === response.data.id);
+    if (index > -1) {
+      rules.value[index] = response.data;
+    }
+    app.toastSuccess('清除绑定成功');
+  } catch {
+    app.toastError('清除绑定失败');
+  }
+};
+
 const providerRef: Ref<any> = ref(null);
 watch(
   () => route.params,
@@ -199,8 +214,19 @@ watch(
           ></codemirror>
           <v-divider></v-divider>
           <v-container fluid class="px-4 py-2 d-flex flex-row align-center">
-            <v-chip label :color="rule.series ? 'primary' : 'warning'" @click.stop="openSelect(rule)">
-              {{ rule.series?.name ?? '未选择剧集' }}
+            <v-chip
+              v-if="rule.series"
+              label
+              color="primary"
+              :prepend-icon="mdiPencil"
+              closable
+              @click:close.stop="clearBindSeries(rule)"
+              @click.stop="openSelect(rule)"
+            >
+              {{ rule.series?.name }}
+            </v-chip>
+            <v-chip v-else label color="warning" :prepend-icon="mdiPlus" @click.stop="openSelect(rule)">
+              绑定剧集
             </v-chip>
             <v-spacer></v-spacer>
             <v-menu location="left">

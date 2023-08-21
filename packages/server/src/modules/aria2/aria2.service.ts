@@ -116,6 +116,7 @@ export class Aria2Service implements OnModuleInit {
     const task = this.tasks.get(parentGid);
     if (task) {
       task.emit('error', status);
+      this.tasks.delete(parentGid);
     }
   }
 

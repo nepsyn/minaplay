@@ -129,9 +129,8 @@ const onSelected = async (series: SeriesEntity) => {
     if (index > -1) {
       rules.value[index] = response.data;
     }
-    app.toastSuccess('设置剧集成功');
   } catch {
-    app.toastError('设置剧集失败');
+    app.toastError('设置绑定剧集失败');
   }
 };
 
@@ -144,7 +143,6 @@ const clearBindSeries = async (rule: RuleEntity) => {
     if (index > -1) {
       rules.value[index] = response.data;
     }
-    app.toastSuccess('清除绑定成功');
   } catch {
     app.toastError('清除绑定失败');
   }

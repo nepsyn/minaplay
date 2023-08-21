@@ -78,7 +78,7 @@ const providerRef: Ref<any> = ref(null);
             v-for="index of Number(count)"
             :key="index"
           >
-            <v-skeleton-loader class="pa-3" type="image,image,list-item"></v-skeleton-loader>
+            <v-skeleton-loader class="pa-3" type="image,list-item"></v-skeleton-loader>
           </v-col>
         </v-row>
       </template>

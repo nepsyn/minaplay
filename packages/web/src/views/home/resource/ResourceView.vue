@@ -50,7 +50,7 @@ const seriesQuery: Ref<SeriesQueryDto> = ref({
     </series-plate>
     <media-plate
       class="py-0"
-      title="播放列表"
+      title="媒体列表"
       :query="latestUpdateMediaQuery"
       :icon="mdiPlaylistPlay"
       cols="12"

@@ -64,6 +64,8 @@ export interface EpisodeEntity {
   title?: string;
   /** 本集集数 */
   no?: string;
+  /** 剧集 */
+  series?: SeriesEntity;
   /** 媒体 */
   media: MediaEntity;
   /** 创建时间 */

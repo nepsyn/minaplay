@@ -118,7 +118,7 @@ const loadEpisodes = async (done: any) => {
                   :prepend-icon="mdiPlay"
                   color="secondary"
                   :disabled="episodes.length === 0"
-                  @click="router.push({ path: `/media/${episodes[0].media.id}`, query: { series: seriesId } })"
+                  @click="router.push({ path: `/ep/${episodes[0].id}` })"
                 ></v-btn>
                 <v-btn
                   class="ms-2"
@@ -147,7 +147,7 @@ const loadEpisodes = async (done: any) => {
             class="me-2 mt-1"
             variant="outlined"
             :text="episode.no || episode.media.name"
-            @click="router.push({ path: `/media/${episode.media.id}`, query: { series: seriesId } })"
+            @click="router.push({ path: `/ep/${episode.id}` })"
           ></v-btn>
         </v-container>
       </items-provider>

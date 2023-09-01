@@ -109,13 +109,15 @@ onMounted(async () => {
       </v-container>
     </v-toolbar>
     <to-top-container class="scrollable-container">
-      <router-view v-slot="{ Component }">
-        <v-scroll-x-reverse-transition leave-absolute>
-          <keep-alive>
-            <component :is="Component"></component>
-          </keep-alive>
-        </v-scroll-x-reverse-transition>
-      </router-view>
+      <v-container fluid class="pa-2">
+        <router-view v-slot="{ Component }">
+          <v-scroll-x-reverse-transition leave-absolute>
+            <keep-alive>
+              <component :is="Component"></component>
+            </keep-alive>
+          </v-scroll-x-reverse-transition>
+        </router-view>
+      </v-container>
     </to-top-container>
   </v-container>
 </template>

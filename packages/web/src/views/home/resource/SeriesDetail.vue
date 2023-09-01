@@ -35,7 +35,7 @@ const loadSeries = async (done: any) => {
 const episodesQuery: ApiQueryDto<EpisodeEntity> = {
   page: 0,
   size: 100,
-  sort: 'no',
+  sort: 'createAt',
   order: 'ASC',
 };
 const episodes = ref<EpisodeEntity[]>([]);

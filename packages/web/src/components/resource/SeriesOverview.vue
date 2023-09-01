@@ -5,13 +5,14 @@ import SeriesCoverFallback from '@/assets/series_cover_fallback.jpg';
 
 const props = defineProps<{
   series: SeriesEntity;
+  label?: string;
 }>();
 
 const emits = defineEmits(['click:content']);
 </script>
 
 <template>
-  <v-container v-bind="props" fluid class="pa-0 d-flex flex-column justify-center">
+  <v-container v-bind="props" fluid class="pa-0 d-flex flex-column justify-center position-relative">
     <v-img
       :aspect-ratio="1 / 1.4"
       cover
@@ -31,6 +32,15 @@ const emits = defineEmits(['click:content']);
     >
       {{ series.name }}
     </span>
+
+    <div
+      v-if="label"
+      @click.stop="(e) => emits('click:content', e)"
+      class="position-absolute d-flex justify-end ma-2 pa-1 text-caption bg-error rounded-te-lg rounded-bs clickable"
+      style="top: 0; right: 0"
+    >
+      {{ label }}
+    </div>
   </v-container>
 </template>
 

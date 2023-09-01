@@ -2,17 +2,26 @@
 import { useApp } from '@/store/app';
 import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
-import { computed, ref, watch } from 'vue';
+import { computed, Ref, ref, watch } from 'vue';
 import { Api } from '@/api/api';
-import { EpisodeEntity } from '@/interfaces/series.interface';
+import { EpisodeEntity, SeriesEntity } from '@/interfaces/series.interface';
 import { ApiQueryDto } from '@/interfaces/common.interface';
-import { mdiContentCopy, mdiDotsVertical, mdiMotionPlayOutline, mdiMultimedia, mdiViewComfy, mdiVlc } from '@mdi/js';
+import {
+  mdiContentCopy,
+  mdiDotsVertical,
+  mdiMotionPlayOutline,
+  mdiMultimedia,
+  mdiPlaylistPlay,
+  mdiViewComfy,
+  mdiVlc,
+} from '@mdi/js';
 import SeriesCoverFallback from '@/assets/series_cover_fallback.jpg';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import SingleItemProvider from '@/components/provider/SingleItemProvider.vue';
 import VideoProvider from '@/components/provider/VideoProvider.vue';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 import ViewImg from '@/components/provider/ViewImg.vue';
+import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 
 const app = useApp();
 const route = useRoute();
@@ -49,7 +58,7 @@ const loadEpisode = async (done: any) => {
 const episodesQuery: ApiQueryDto<EpisodeEntity> = {
   page: 0,
   size: 48,
-  sort: 'no',
+  sort: 'createAt',
   order: 'ASC',
 };
 const episodes = ref<EpisodeEntity[]>([]);
@@ -63,6 +72,23 @@ const loadEpisodes = async (done: any) => {
     done(episodes.value.length === episodesTotal.value ? 'empty' : 'ok');
   } catch {
     app.toastError('获取单集列表失败');
+    done('error');
+  }
+};
+
+const recommends = ref<SeriesEntity[]>([]);
+const recommendsQuery: Ref<ApiQueryDto<EpisodeEntity>> = ref({
+  page: 0,
+  size: 12,
+});
+const loadRecommends = async (done: any) => {
+  try {
+    const response = await Api.Episode.queryUpdate(recommendsQuery.value);
+    recommends.value.push(...response.data.items.map((episode) => episode.series!));
+    recommendsQuery.value.page!++;
+    done(recommends.value.length === response.data.total ? 'empty' : 'ok');
+  } catch {
+    app.toastError('获取推荐列表失败');
     done('error');
   }
 };
@@ -196,7 +222,12 @@ const actions = ref([
               </v-col>
               <v-col sm="8" class="d-flex flex-column">
                 <v-container fluid class="pa-0">
-                  <span class="py-0 text-h6 font-weight-bold text-break">{{ episode.series.name }}</span>
+                  <span
+                    class="py-0 text-h6 font-weight-bold text-break clickable series-title"
+                    @click="router.push(`/series/${episode.series?.id}`)"
+                  >
+                    {{ episode.series.name }}
+                  </span>
                   <div>
                     <v-chip
                       color="primary"
@@ -246,9 +277,36 @@ const actions = ref([
             </v-container>
           </items-provider>
         </v-container>
+        <v-container fluid class="pa-0 mt-2">
+          <items-provider ref="recommendProvider" class="pa-0" :load-fn="loadRecommends" :items="recommends">
+            <div class="pa-2 d-flex align-center">
+              <v-icon :icon="mdiPlaylistPlay" size="large"></v-icon>
+              <span class="ms-2 text-h6">播放列表</span>
+            </div>
+            <v-row no-gutters>
+              <template v-for="recommend in recommends" :key="recommend.id">
+                <v-col cols="4" v-if="episode.series?.id !== recommend.id">
+                  <series-overview
+                    class="pa-2"
+                    v-ripple
+                    @click:content="router.push(`/series/${recommend.id}`)"
+                    @click.right.prevent
+                    :series="recommend"
+                  ></series-overview>
+                </v-col>
+              </template>
+            </v-row>
+          </items-provider>
+        </v-container>
       </v-col>
     </v-row>
   </v-container>
 </template>
 
-<style scoped lang="sass"></style>
+<style scoped lang="sass">
+.series-title
+  transition: color 0.5s
+
+.series-title:hover
+  color: rgb(var(--v-theme-primary))
+</style>

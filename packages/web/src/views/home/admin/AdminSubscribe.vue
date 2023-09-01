@@ -132,7 +132,7 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
 </script>
 
 <template>
-  <v-container fluid class="py-4 px-6">
+  <v-container fluid class="pa-0">
     <v-container fluid class="d-flex align-center">
       <v-container fluid class="pa-0 d-flex align-center">
         <v-icon size="40" color="primary" :icon="mdiRssBox"></v-icon>

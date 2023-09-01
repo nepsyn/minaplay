@@ -1,42 +1,42 @@
 <script setup lang="ts">
-import MediaPlate from '@/components/resource/MediaPlate.vue';
 import { mdiMultimedia, mdiPlaylistPlay, mdiRefresh } from '@mdi/js';
 import { ref, Ref } from 'vue';
 import { MediaQueryDto } from '@/interfaces/media.interface';
 import { useRouter } from 'vue-router';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
-import SeriesPlate from '@/components/resource/SeriesPlate.vue';
 import { SeriesQueryDto } from '@/interfaces/series.interface';
+import ResourcePlate from '@/components/resource/ResourcePlate.vue';
+import { Api } from '@/api/api';
+import MediaOverview from '@/components/resource/MediaOverview.vue';
+import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 
 const router = useRouter();
 
 const latestUpdateMediaQuery: Ref<MediaQueryDto> = ref({
   page: 0,
-  size: 8,
-  sort: 'createAt',
-  order: 'DESC',
-});
-
-const seriesQuery: Ref<SeriesQueryDto> = ref({
-  page: 0,
   size: 12,
   sort: 'createAt',
   order: 'DESC',
 });
+
+const latestUpdateEpisodeQuery: Ref<SeriesQueryDto> = ref({
+  page: 0,
+  size: 12,
+});
 </script>
 
 <template>
-  <v-container fluid class="py-4 px-6">
-    <series-plate
+  <v-container fluid>
+    <resource-plate
       class="py-0"
-      title="剧集列表"
-      :query="seriesQuery"
+      title="剧集更新"
+      :query="latestUpdateEpisodeQuery"
+      :query-fn="Api.Episode.queryUpdate"
       :icon="mdiMultimedia"
-      cols="6"
+      cols="4"
       sm="3"
       md="2"
       icon-color="secondary-lighten-1"
-      @click:series="(item) => router.push(`/series/${item.id}`)"
     >
       <template #actions="{ load, reset, status }">
         <action-btn
@@ -47,18 +47,27 @@ const seriesQuery: Ref<SeriesQueryDto> = ref({
           :loading="status === 'loading'"
         ></action-btn>
       </template>
-    </series-plate>
-    <media-plate
+      <template #default="{ item: episode }">
+        <series-overview
+          class="pa-2"
+          v-ripple
+          @click:content="router.push(`/ep/${episode!.id}`)"
+          @click.right.prevent
+          :series="episode!.series"
+          :label="`${new Date(episode!.createAt).toLocaleDateString()} 更新`"
+        ></series-overview>
+      </template>
+    </resource-plate>
+    <resource-plate
       class="py-0"
-      title="媒体列表"
+      title="媒体更新"
       :query="latestUpdateMediaQuery"
+      :query-fn="Api.Media.query"
       :icon="mdiPlaylistPlay"
-      cols="12"
-      sm="6"
-      md="4"
-      lg="3"
+      cols="6"
+      sm="4"
+      md="3"
       icon-color="primary"
-      @click:media="(media) => router.push(`/media/${media.id}`)"
     >
       <template #actions="{ load, reset, status }">
         <action-btn
@@ -69,7 +78,16 @@ const seriesQuery: Ref<SeriesQueryDto> = ref({
           :loading="status === 'loading'"
         ></action-btn>
       </template>
-    </media-plate>
+      <template #default="{ item: media }">
+        <media-overview
+          class="pa-2"
+          v-ripple
+          @click:content="router.push(`/media/${media!.id}`)"
+          @click.right.prevent
+          :media="media"
+        ></media-overview>
+      </template>
+    </resource-plate>
   </v-container>
 </template>
 

@@ -138,6 +138,7 @@ class ApiHelper {
     getById: (id: number) => this.apiGet<EpisodeEntity>(`/series/-/episode/${id}`),
     update: (id: number) => this.apiPut<EpisodeEntity, EpisodeDto>(`/series/-/episode/${id}`),
     delete: (id: number) => this.apiDelete(`/series/-/episode/${id}`),
+    queryUpdate: this.apiGet<ApiQueryResult<EpisodeEntity>, ApiQueryDto<EpisodeEntity>>(`/series/-/episode/-/update`),
   };
 
   SeriesTag = {

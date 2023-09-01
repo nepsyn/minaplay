@@ -1,11 +1,9 @@
 <script setup lang="ts">
-import { VSkeletonLoader } from 'vuetify/labs/components';
-import MediaOverview from '@/components/resource/MediaOverview.vue';
-import { MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
-import { ref, Ref } from 'vue';
-import ItemsProvider from '@/components/provider/ItemsProvider.vue';
-import { Api } from '@/api/api';
 import { useApp } from '@/store/app';
+import { ApiQueryDto } from '@/interfaces/common.interface';
+import { Ref, ref } from 'vue';
+import { VSkeletonLoader } from 'vuetify/labs/components';
+import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 
 const app = useApp();
 
@@ -14,7 +12,8 @@ const props = withDefaults(
     iconColor?: string;
     icon: string;
     title: string;
-    query: MediaQueryDto;
+    query: ApiQueryDto<any>;
+    queryFn: Function;
     count?: string | number;
     cols?: string | number;
     sm?: string | number;
@@ -30,24 +29,20 @@ const props = withDefaults(
   },
 );
 
-const emits = defineEmits<{
-  (event: 'click:media', arg: MediaEntity): void;
-}>();
-
-const medias = ref<MediaEntity[]>([]);
+const items = ref<any[]>([]);
 const load = async (done: any) => {
   try {
-    const response = await Api.Media.query(props.query);
-    medias.value.push(...response.data.items);
+    const response = await props.queryFn(props.query);
+    items.value.push(...response.data.items);
     props.query.page!++;
-    done(medias.value.length === response.data.total ? 'empty' : 'ok');
+    done(items.value.length === response.data.total ? 'empty' : 'ok');
   } catch {
     done('error');
   }
 };
 const reset = () => {
   props.query.page = 0;
-  medias.value = [];
+  items.value = [];
 };
 
 defineExpose({ load, reset });
@@ -56,8 +51,8 @@ const providerRef: Ref<any> = ref(null);
 </script>
 
 <template>
-  <v-container fluid>
-    <v-container fluid class="px-3 d-flex align-center">
+  <v-container fluid class="pa-0">
+    <v-container fluid class="px-2 d-flex align-center">
       <v-container fluid class="pa-0 d-flex align-center">
         <v-icon size="40" :color="iconColor!" :icon="icon"></v-icon>
         <span class="ml-2 text-h5">{{ title }}</span>
@@ -65,7 +60,7 @@ const providerRef: Ref<any> = ref(null);
       <v-spacer></v-spacer>
       <slot name="actions" :load="providerRef?.load" :reset="reset" :status="providerRef?.status"></slot>
     </v-container>
-    <items-provider class="pa-0" ref="providerRef" :load-fn="load" :items="medias" :hide-empty="medias.length > 0">
+    <items-provider class="pa-0" ref="providerRef" :load-fn="load" :items="items" :hide-empty="items.length > 0">
       <template #loading>
         <v-row no-gutters>
           <v-col
@@ -90,16 +85,10 @@ const providerRef: Ref<any> = ref(null);
           :lg="lg!"
           :xl="xl!"
           :xxl="xxl!"
-          v-for="media in medias"
-          :key="media.id"
+          v-for="(item, index) in items"
+          :key="index"
         >
-          <media-overview
-            class="pa-3"
-            v-ripple
-            @click:content="emits('click:media', media)"
-            @click.right.prevent
-            :media="media"
-          ></media-overview>
+          <slot :item="item"></slot>
         </v-col>
       </v-row>
     </items-provider>

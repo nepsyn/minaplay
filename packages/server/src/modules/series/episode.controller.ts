@@ -8,6 +8,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { EpisodeService } from './episode.service';
@@ -19,6 +20,9 @@ import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { EpisodeDto } from './episode.dto';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { SeriesService } from './series.service';
+import { ApiQueryDto } from '../../utils/api.query.dto';
+import { Episode } from './episode.entity';
+import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 
 @Controller('series/-/episode')
 @UseGuards(AuthorizationGuard)
@@ -26,6 +30,18 @@ import { SeriesService } from './series.service';
 @ApiBearerAuth()
 export class EpisodeController {
   constructor(private seriesService: SeriesService, private episodeService: EpisodeService) {}
+
+  @Get('/-/update')
+  @ApiOperation({
+    description: '查看最近更新',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
+  async queryUpdateEpisodes(@Query() query: ApiQueryDto<Episode>) {
+    const [ids, total] = await this.episodeService.findLatestIds(query.page * query.size, query.size);
+    const result = await Promise.all(ids.map(({ id }) => this.episodeService.findOneBy({ id })));
+
+    return new ApiPaginationResultDto(result, total, query.page, query.size);
+  }
 
   @Get(':id')
   @ApiOperation({

@@ -19,6 +19,21 @@ export class EpisodeService {
     return await this.episodeRepository.findAndCount(options);
   }
 
+  async findLatestIds(skip?: number, take?: number): Promise<[{ id: number }[], number]> {
+    const query = this.episodeRepository.createQueryBuilder('episode');
+    query
+      .select('id')
+      .where(
+        '(episode.seriesId, episode.createAt) IN ' +
+          query.subQuery().select('seriesId, MAX(createAt)').from(Episode, 'ep').groupBy('ep.seriesId').getQuery(),
+      )
+      .orderBy('episode.createAt', 'DESC')
+      .skip(skip)
+      .take(take);
+
+    return [await query.getRawMany(), await query.getCount()];
+  }
+
   async delete(where: FindOptionsWhere<Episode>) {
     const result = await this.episodeRepository.softDelete(where);
     return result.affected > 0;

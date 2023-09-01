@@ -33,6 +33,7 @@
     "@codemirror/theme-one-dark": "^6.1.2",
     "axios": "^1.4.0",
     "codemirror": "^6.0.1",
+    "cron-parser": "^4.9.0",
     "filesize": "^10.0.8",
     "jassub": "^1.7.1",
     "lodash": "^4.17.21",

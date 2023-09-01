@@ -299,31 +299,28 @@ const onEditError = (error: any) => {
             <tr>
               <td :colspan="headers.length">
                 <v-container fluid>
-                  <v-row>
-                    <v-col cols="12" sm="6" class="d-flex rounded border">
-                      <span class="text-subtitle-2 font-weight-bold">单集列表</span>
-                    </v-col>
-                    <v-col cols="12" sm="6" class="d-flex flex-column">
-                      <span class="text-subtitle-2 font-weight-bold">剧集描述</span>
-                      <pre
-                        class="text-caption mt-1 text-pre-wrap text-break"
-                        v-text="item.raw.description || '暂无剧集描述'"
-                      ></pre>
-                      <span class="text-subtitle-2 font-weight-bold mt-2">剧集标签</span>
-                      <div>
-                        <span v-if="item.raw.tags?.length === 0" class="text-caption mt-1">无</span>
-                        <v-chip
-                          density="compact"
-                          v-for="tag in item.raw.tags ?? []"
-                          :key="tag!.id"
-                          label
-                          color="primary"
-                          class="me-2 my-1 text-caption"
-                          :text="tag.name"
-                        ></v-chip>
-                      </div>
-                    </v-col>
-                  </v-row>
+                  <div>
+                    <span class="text-subtitle-2 font-weight-bold">剧集描述</span>
+                    <pre
+                      class="text-caption mt-1 text-pre-wrap text-break"
+                      v-text="item.raw.description || '暂无剧集描述'"
+                    ></pre>
+                  </div>
+                  <div class="mt-2">
+                    <span class="text-subtitle-2 font-weight-bold">剧集标签</span>
+                    <div>
+                      <span v-if="item.raw.tags?.length === 0" class="text-caption mt-1">无</span>
+                      <v-chip
+                        density="compact"
+                        v-for="tag in item.raw.tags ?? []"
+                        :key="tag!.id"
+                        label
+                        color="primary"
+                        class="me-2 my-1 text-caption"
+                        :text="tag.name"
+                      ></v-chip>
+                    </div>
+                  </div>
                 </v-container>
               </td>
             </tr>

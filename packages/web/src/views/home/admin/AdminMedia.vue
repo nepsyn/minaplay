@@ -18,7 +18,6 @@ import {
   mdiShare,
 } from '@mdi/js';
 import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
-import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import ViewImg from '@/components/provider/ViewImg.vue';
@@ -283,33 +282,27 @@ const onEditError = (error: any) => {
             <tr>
               <td :colspan="headers.length">
                 <v-container fluid>
-                  <v-row>
-                    <v-col cols="12" sm="6" class="border rounded d-flex align-center justify-center">
-                      <media-overview-landscape
-                        :media="item.raw"
-                        @click:content="router.push(`/media/${item.raw.id}`)"
-                      ></media-overview-landscape>
-                    </v-col>
-                    <v-col cols="12" sm="6" class="d-flex flex-column">
-                      <span class="text-subtitle-2 font-weight-bold">媒体文件描述</span>
-                      <pre
-                        class="text-caption mt-1 text-pre-wrap text-break"
-                        v-text="item.raw.description || '暂无媒体文件描述'"
-                      ></pre>
-                      <span class="text-subtitle-2 font-weight-bold mt-2">文件列表</span>
-                      <div>
-                        <a
-                          v-for="file in getFiles(item.raw)"
-                          class="me-2 text-caption text-info text-decoration-underline text-break"
-                          :key="file!.id"
-                          :href="Api.File.buildDownloadPath(file!.id)"
-                          download
-                        >
-                          {{ file.name }}
-                        </a>
-                      </div>
-                    </v-col>
-                  </v-row>
+                  <div>
+                    <span class="text-subtitle-2 font-weight-bold">媒体文件描述</span>
+                    <pre
+                      class="text-caption mt-1 text-pre-wrap text-break"
+                      v-text="item.raw.description || '暂无媒体文件描述'"
+                    ></pre>
+                  </div>
+                  <div class="mt-2">
+                    <span class="text-subtitle-2 font-weight-bold">文件列表</span>
+                    <div>
+                      <a
+                        v-for="file in getFiles(item.raw)"
+                        class="me-2 text-caption text-info text-decoration-underline text-break"
+                        :key="file!.id"
+                        :href="Api.File.buildDownloadPath(file!.id)"
+                        download
+                      >
+                        {{ file.name }}
+                      </a>
+                    </div>
+                  </div>
                 </v-container>
               </td>
             </tr>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { mdiCheck, mdiPencilLock, mdiRefresh } from '@mdi/js';
+import { mdiCheck, mdiClockOutline, mdiPencilLock, mdiRefresh } from '@mdi/js';
 import { useApp } from '@/store/app';
 import { useSubscribeStore } from '@/store/subscribe';
 import { computed, Ref, ref, watch } from 'vue';
@@ -9,6 +9,7 @@ import _ from 'lodash';
 import { SourceEntity } from '@/interfaces/subscribe.interface';
 import SingleItemProvider from '@/components/provider/SingleItemProvider.vue';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
+import { parseExpression } from 'cron-parser';
 
 const app = useApp();
 const route = useRoute();
@@ -29,6 +30,22 @@ const loadSource = async (done: any) => {
     done('error');
   }
 };
+
+const nextTriggerTimes = computed(() => {
+  if (source.value) {
+    try {
+      const interval = parseExpression(source.value?.cron);
+      return (
+        '后续更新执行时间:\n' +
+        Array.from({ length: 3 })
+          .map(() => interval.next().toDate().toLocaleString())
+          .join('\n')
+      );
+    } catch {
+      return '错误的 CRON 表达式';
+    }
+  }
+});
 
 const runFetchJobLoading = ref(false);
 const runFetchJob = _.throttle(
@@ -154,7 +171,16 @@ watch(
           density="compact"
           v-model="source!.cron"
           maxlength="60"
-        ></v-text-field>
+        >
+          <template #append-inner>
+            <v-tooltip>
+              <pre class="text-caption">{{ nextTriggerTimes }}</pre>
+              <template #activator="{ props }">
+                <v-icon :icon="mdiClockOutline" v-bind="props"></v-icon>
+              </template>
+            </v-tooltip>
+          </template>
+        </v-text-field>
       </v-container>
       <v-container class="my-4 pa-0">
         <span class="text-subtitle-1">标题</span>
@@ -181,8 +207,8 @@ watch(
         ></v-text-field>
       </v-container>
       <v-container class="my-4 pa-0">
-        <v-btn block variant="tonal" color="info" :prepend-icon="mdiCheck" :loading="sourceSaving" @click="saveSource"
-          >保存修改
+        <v-btn block variant="tonal" color="info" :prepend-icon="mdiCheck" :loading="sourceSaving" @click="saveSource">
+          保存修改
         </v-btn>
       </v-container>
       <v-container class="pa-0 mt-12">
@@ -194,8 +220,8 @@ watch(
             <p class="text-subtitle-1">立即更新</p>
             <p class="text-caption">立即更新并解析当前订阅源的资源内容。</p>
           </v-container>
-          <v-btn class="ml-4" variant="tonal" color="warning" :loading="runFetchJobLoading" @click="runFetchJob"
-            >立即更新
+          <v-btn class="ml-4" variant="tonal" color="warning" :loading="runFetchJobLoading" @click="runFetchJob">
+            立即更新
           </v-btn>
         </v-container>
         <v-divider></v-divider>

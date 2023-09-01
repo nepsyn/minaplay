@@ -41,5 +41,5 @@ export class ApiQueryDto<T extends { createAt: Date }> {
     default: 'DESC',
   })
   @IsIn(['ASC', 'DESC'])
-  order: 'ASC' | 'DESC' = 'DESC';
+  order: 'ASC' | 'DESC' = 'ASC';
 }

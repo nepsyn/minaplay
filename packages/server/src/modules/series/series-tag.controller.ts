@@ -25,7 +25,7 @@ import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { SeriesTag } from './series-tag.entity';
 
-@Controller('series/-/tag')
+@Controller('series/tag')
 @UseGuards(AuthorizationGuard)
 @ApiTags('series')
 @ApiBearerAuth()

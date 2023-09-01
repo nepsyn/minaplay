@@ -14,7 +14,7 @@ import { FileModule } from '../file/file.module';
 @Module({
   imports: [TypeOrmModule.forFeature([Series, SeriesTag, Episode]), FileModule],
   providers: [SeriesService, SeriesTagService, EpisodeService],
-  controllers: [SeriesController, SeriesTagController, EpisodeController],
+  controllers: [SeriesTagController, EpisodeController, SeriesController],
   exports: [SeriesService, SeriesTagService, EpisodeService],
 })
 export class SeriesModule {}

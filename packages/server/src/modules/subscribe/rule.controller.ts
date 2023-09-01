@@ -35,7 +35,7 @@ import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { Rule } from './rule.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 
-@Controller('rule')
+@Controller('subscribe/rule')
 @UseGuards(AuthorizationGuard)
 @ApiTags('subscribe')
 @ApiBearerAuth()

@@ -38,7 +38,7 @@ export class ApiQueryDto<T extends { createAt: Date }> {
     description: '排序方式',
     type: String,
     required: false,
-    default: 'DESC',
+    default: 'ASC',
   })
   @IsIn(['ASC', 'DESC'])
   order: 'ASC' | 'DESC' = 'ASC';

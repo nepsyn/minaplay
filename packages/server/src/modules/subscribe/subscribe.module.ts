@@ -24,7 +24,7 @@ import { SubscribeConfigurableModule } from './subscribe.module-definition';
     SeriesModule,
   ],
   providers: [SourceService, RuleService, FetchLogService, DownloadItemService, FetchSubscribeSourceConsumer],
-  controllers: [SourceController, RuleController],
+  controllers: [RuleController, SourceController],
   exports: [SourceService, RuleService, FetchLogService, DownloadItemService],
 })
 export class SubscribeModule extends SubscribeConfigurableModule {

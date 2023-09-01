@@ -28,8 +28,6 @@ import { PermissionEnum } from '../../enums/permission.enum';
 import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { Between } from 'typeorm';
 import { EpisodeService } from './episode.service';
-import { ApiQueryDto } from '../../utils/api.query.dto';
-import { Episode } from './episode.entity';
 
 @Controller('series')
 @UseGuards(AuthorizationGuard)
@@ -133,28 +131,5 @@ export class SeriesController {
   async deleteSeries(@Param('id', ParseIntPipe) id: number) {
     await this.seriesService.delete({ id });
     return {};
-  }
-
-  @Get(':id/episode')
-  @ApiOperation({
-    description: '获取单集',
-  })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
-  async getEpisodesBySeriesId(@Param('id', ParseIntPipe) id: number, @Query() query: ApiQueryDto<Episode>) {
-    const series = await this.seriesService.findOneBy({ id });
-    if (!series) {
-      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-    }
-
-    const [result, total] = await this.episodeService.findAndCount({
-      where: {
-        series: { id },
-      },
-      skip: query.page * query.size,
-      take: query.size,
-      order: { [query.sort]: query.order },
-    });
-
-    return new ApiPaginationResultDto(result, total, query.page, query.size);
   }
 }

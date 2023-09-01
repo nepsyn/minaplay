@@ -20,18 +20,46 @@ import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { EpisodeDto } from './episode.dto';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { SeriesService } from './series.service';
-import { ApiQueryDto } from '../../utils/api.query.dto';
 import { Episode } from './episode.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
+import { buildQueryOptions } from '../../utils/build-query-options.util';
+import { Between } from 'typeorm';
+import { EpisodeQueryDto } from './episode-query.dto';
+import { ApiQueryDto } from '../../utils/api.query.dto';
 
-@Controller('series/-/episode')
+@Controller('series/episode')
 @UseGuards(AuthorizationGuard)
 @ApiTags('series')
 @ApiBearerAuth()
 export class EpisodeController {
   constructor(private seriesService: SeriesService, private episodeService: EpisodeService) {}
 
-  @Get('/-/update')
+  @Get()
+  @ApiOperation({
+    description: '查询单集',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
+  async queryEpisodes(@Query() query: EpisodeQueryDto) {
+    const { keyword, id, seriesId, start, end } = query;
+    const [result, total] = await this.episodeService.findAndCount({
+      where: buildQueryOptions<Episode>({
+        keyword,
+        keywordProperties: (entity) => [entity.title],
+        exact: {
+          id,
+          series: { id: seriesId },
+          createAt: start != null ? Between(new Date(start), end ? new Date(end) : new Date()) : undefined,
+        },
+      }),
+      skip: query.page * query.size,
+      take: query.size,
+      order: { [query.sort]: query.order },
+    });
+
+    return new ApiPaginationResultDto(result, total, query.page, query.size);
+  }
+
+  @Get('update')
   @ApiOperation({
     description: '查看最近更新',
   })

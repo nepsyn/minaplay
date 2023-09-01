@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useApp } from '@/store/app';
 import { useDisplay } from 'vuetify';
-import { SeriesEntity, SeriesQueryDto } from '@/interfaces/series.interface';
-import { computed, Ref, ref } from 'vue';
-import { mdiClose, mdiMagnify } from '@mdi/js';
-import ActionBtn from '@/components/provider/ActionBtn.vue';
-import ItemsProvider from '@/components/provider/ItemsProvider.vue';
+import { computed, ref, Ref } from 'vue';
 import { Api } from '@/api/api';
-import SeriesOverview from '@/components/resource/SeriesOverview.vue';
+import { MediaEntity, MediaQueryDto } from '@/interfaces/media.interface';
+import { mdiClose, mdiMagnify } from '@mdi/js';
+import ItemsProvider from '@/components/provider/ItemsProvider.vue';
+import ActionBtn from '@/components/provider/ActionBtn.vue';
+import MediaOverview from '@/components/resource/MediaOverview.vue';
 
 const app = useApp();
 const display = useDisplay();
@@ -31,36 +31,36 @@ const dialog = computed({
 });
 
 const emits = defineEmits<{
-  (e: 'selected', item: SeriesEntity): any;
+  (e: 'selected', item: MediaEntity): any;
   (e: 'update:modelValue', value: boolean): any;
 }>();
 
-const select = (item: SeriesEntity) => {
+const select = (item: MediaEntity) => {
   emits('selected', item);
   dialog.value = false;
 };
 
-const query: Ref<SeriesQueryDto> = ref({
+const query: Ref<MediaQueryDto> = ref({
   keyword: '',
   page: 0,
   size: 12,
   sort: 'createAt',
   order: 'DESC',
 });
-const series = ref<SeriesEntity[]>([]);
-const loadSeries = async (done: any) => {
+const medias = ref<MediaEntity[]>([]);
+const loadMedias = async (done: any) => {
   try {
-    const response = await Api.Series.query(query.value);
-    series.value.push(...response.data.items);
+    const response = await Api.Media.query(query.value);
+    medias.value.push(...response.data.items);
     query.value.page!++;
-    done(series.value.length === response.data.total ? 'empty' : 'ok');
+    done(medias.value.length === response.data.total ? 'empty' : 'ok');
   } catch {
     done('error');
   }
 };
 const seriesProvider = ref(null as any);
 const search = () => {
-  series.value = [];
+  medias.value = [];
   query.value.page = 0;
   if (seriesProvider.value) {
     seriesProvider.value.load();
@@ -78,13 +78,13 @@ const search = () => {
     <v-card>
       <v-toolbar color="primary">
         <v-btn :icon="mdiClose" @click="dialog = false"></v-btn>
-        <v-toolbar-title>选择剧集</v-toolbar-title>
+        <v-toolbar-title>选择媒体文件</v-toolbar-title>
       </v-toolbar>
       <v-card-text>
         <v-container class="d-flex flex-column">
           <v-text-field
             class="px-2"
-            label="剧集关键字"
+            label="媒体文件关键字"
             variant="outlined"
             hide-details
             color="primary"
@@ -100,16 +100,16 @@ const search = () => {
           </v-text-field>
         </v-container>
         <v-container class="mt-2 d-flex flex-column">
-          <items-provider class="pa-0" ref="seriesProvider" :load-fn="loadSeries" :items="series">
+          <items-provider class="pa-0" ref="seriesProvider" :load-fn="loadMedias" :items="medias">
             <v-row no-gutters>
-              <v-col cols="4" sm="3" md="2" v-for="item in series" :key="item.id">
-                <series-overview
+              <v-col cols="6" sm="4" md="3" v-for="item in medias" :key="item.id">
+                <media-overview
                   class="pa-2"
                   v-ripple
                   @click:content="select(item)"
                   @click.right.prevent
-                  :series="item"
-                ></series-overview>
+                  :media="item"
+                ></media-overview>
               </v-col>
             </v-row>
           </items-provider>

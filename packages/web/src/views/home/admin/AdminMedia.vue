@@ -93,10 +93,13 @@ const expand = ref(false);
 const edit = ref<SeriesQueryDto>({});
 watch(
   () => [route.path, route.query],
-  (newValue, oldValue) => {
+  async (newValue, oldValue) => {
     if (newValue[0] !== oldValue?.[0] && route.name === 'admin-media') {
       edit.value = Object.assign({}, route.query);
       options.value.page = 1;
+      if (oldValue?.[0]) {
+        await loadItems(options.value);
+      }
     }
   },
   { immediate: true },
@@ -158,7 +161,7 @@ const onEditError = (error: any) => {
     <v-container fluid class="d-flex align-center">
       <v-container fluid class="pa-0 d-flex align-center">
         <v-icon size="40" color="primary" :icon="mdiFileVideo"></v-icon>
-        <span class="ml-4 text-h5">媒体文件管理</span>
+        <span class="ml-4 text-h5">媒体文件</span>
       </v-container>
       <v-spacer></v-spacer>
       <action-btn

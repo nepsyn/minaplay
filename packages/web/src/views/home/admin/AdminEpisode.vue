@@ -1,28 +1,34 @@
 <script setup lang="ts">
 import { useApp } from '@/store/app';
+import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
 import { ref, watch } from 'vue';
 import { Api } from '@/api/api';
-import { SourceEntity, SourceQueryDto } from '@/interfaces/subscribe.interface';
+import { EpisodeEntity, EpisodeQueryDto } from '@/interfaces/series.interface';
 import {
   mdiCheck,
   mdiChevronDown,
   mdiChevronUp,
   mdiClose,
-  mdiContentCopy,
+  mdiDelete,
   mdiPencil,
+  mdiPlus,
   mdiRefresh,
-  mdiRssBox,
+  mdiShare,
+  mdiViewComfy,
 } from '@mdi/js';
-import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
-import UserAvatar from '@/components/provider/UserAvatar.vue';
-import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+import { VDataTableServer } from 'vuetify/labs/components';
+import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
+import ViewImg from '@/components/provider/ViewImg.vue';
+import EpisodeEditDialog from '@/components/dialogs/EpisodeEditDialog.vue';
 
 const app = useApp();
 const route = useRoute();
 const router = useRouter();
+const display = useDisplay();
 
-const items = ref<SourceEntity[]>([]);
+const items = ref<EpisodeEntity[]>([]);
 const options = ref({
   page: 1,
   itemsPerPage: 10,
@@ -36,33 +42,26 @@ const headers = ref([
     key: 'id',
   },
   {
+    title: '集数',
+    key: 'no',
+  },
+  {
     title: '标题',
     key: 'title',
   },
   {
-    title: '备注',
-    key: 'remark',
+    title: '剧集',
+    key: 'series',
+    sortable: false,
   },
   {
-    title: '链接',
-    key: 'url',
-  },
-  {
-    title: 'CRON',
-    key: 'cron',
+    title: '媒体文件',
+    key: 'media',
+    sortable: false,
   },
   {
     title: '创建时间',
     key: 'createAt',
-  },
-  {
-    title: '启用状态',
-    key: 'enabled',
-  },
-  {
-    title: '创建用户',
-    key: 'user',
-    sortable: false,
   },
   {
     title: '操作',
@@ -74,7 +73,7 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
   items.value = [];
   loading.value = true;
   try {
-    const response = await Api.SubscribeSource.query({
+    const response = await Api.Episode.query({
       ...Object.fromEntries(
         Object.entries(edit.value)
           .filter(([_, value]) => value !== undefined && String(value).length > 0)
@@ -88,18 +87,18 @@ const loadItems = async ({ page, itemsPerPage, sortBy }: any) => {
     items.value = response.data.items;
     total.value = response.data.total;
   } catch {
-    app.toastError('获取用户列表失败');
+    app.toastError('获取媒体文件列表失败');
   } finally {
     loading.value = false;
   }
 };
 
 const expand = ref(false);
-const edit = ref<SourceQueryDto>({});
+const edit = ref<EpisodeQueryDto>({});
 watch(
   () => [route.path, route.query],
   async (newValue, oldValue) => {
-    if (newValue[0] !== oldValue?.[0] && route.name === 'admin-subscribe') {
+    if (newValue[0] !== oldValue?.[0] && route.name === 'admin-episode') {
       edit.value = Object.assign({}, route.query);
       options.value.page = 1;
       if (oldValue?.[0]) {
@@ -110,7 +109,7 @@ watch(
   { immediate: true },
 );
 onBeforeRouteUpdate(async (to, from, next) => {
-  if (to.name === 'admin-subscribe') {
+  if (to.name === 'admin-episode') {
     edit.value = Object.assign({}, to.query);
     options.value.page = 1;
     await loadItems(options.value);
@@ -121,16 +120,35 @@ const reset = async () => {
   edit.value = {};
 };
 
-const toggleEnabledId = ref<number | undefined>(undefined);
-const toggleEnabled = async (id: number, enabled: boolean) => {
-  toggleEnabledId.value = id;
+const deleteItem = async (id: number) => {
+  loading.value = true;
   try {
-    await Api.SubscribeSource.update(id)({ enabled });
+    await Api.Episode.delete(id)();
+    items.value = items.value.filter(({ id: val }) => val !== id);
+    app.toastSuccess('删除单集成功');
   } catch {
-    app.toastError('切换启用状态失败');
+    app.toastError('删除单集失败');
   } finally {
-    toggleEnabledId.value = undefined;
+    loading.value = false;
   }
+};
+
+const editDialog = ref(false);
+const editItem = ref<EpisodeEntity>({} as any);
+const openEdit = (item: EpisodeEntity) => {
+  editItem.value = Object.assign({}, item);
+  editDialog.value = true;
+};
+const onEditSaved = (data: EpisodeEntity) => {
+  const index = items.value.findIndex(({ id }) => id === editItem.value!.id);
+  if (index > -1) {
+    items.value[index] = data;
+  }
+  editDialog.value = false;
+  app.toastSuccess('保存单集信息成功');
+};
+const onEditError = (error: any) => {
+  app.toastError('保存单集信息失败');
 };
 </script>
 
@@ -138,10 +156,11 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
   <v-container fluid class="pa-0">
     <v-container fluid class="d-flex align-center">
       <v-container fluid class="pa-0 d-flex align-center">
-        <v-icon size="40" color="primary" :icon="mdiRssBox"></v-icon>
-        <span class="ml-4 text-h5">订阅</span>
+        <v-icon size="40" color="primary" :icon="mdiViewComfy"></v-icon>
+        <span class="ml-4 text-h5">单集</span>
       </v-container>
       <v-spacer></v-spacer>
+      <action-btn color="warning" :icon="mdiPlus" text="新建" @click="openEdit"></action-btn>
       <action-btn
         color="primary"
         class="ms-2"
@@ -167,50 +186,42 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model.number="edit.id"
-                type="number"
+                v-model.trim="edit.id"
                 variant="outlined"
                 density="compact"
                 color="primary"
                 hide-details
-                label="订阅源ID(精确查询)"
+                label="单集ID(精确查询)"
               ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model.trim="edit.url"
+                v-model.trim="edit.seriesId"
                 variant="outlined"
                 density="compact"
                 color="primary"
                 hide-details
-                label="订阅源链接(精确查询)"
+                label="剧集ID(精确查询)"
               ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6">
-              <v-select
-                v-model="edit.enabled"
-                :items="[
-                  { title: '是', value: '1' },
-                  { title: '否', value: '0' },
-                ]"
-                item-title="title"
-                item-value="value"
+              <v-text-field
+                v-model="edit.start"
                 variant="outlined"
                 density="compact"
                 color="primary"
                 hide-details
-                label="是否启用(精确查询)"
-              ></v-select>
+                label="创建起始时间范围(精确查询)"
+              ></v-text-field>
             </v-col>
             <v-col cols="12" sm="6">
               <v-text-field
-                v-model.number="edit.userId"
-                type="number"
+                v-model="edit.end"
                 variant="outlined"
                 density="compact"
                 color="primary"
                 hide-details
-                label="订阅源创建用户ID(精确查询)"
+                label="创建结束时间范围(精确查询)"
               ></v-text-field>
             </v-col>
           </v-row>
@@ -270,42 +281,24 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
               ></v-pagination>
             </v-container>
           </template>
-          <template #item.url="{ item }">
-            <v-tooltip :text="item.raw.url ?? '未设置'">
-              <template #activator="{ props }">
-                <action-btn
-                  color="primary"
-                  text="复制链接"
-                  :icon="mdiContentCopy"
-                  size="small"
-                  v-bind="props"
-                  variant="tonal"
-                  @click="app.copyContent(item.raw.url)"
-                ></action-btn>
-              </template>
-            </v-tooltip>
+          <template #item.series="{ item }">
+            <v-container class="pa-1">
+              <view-img
+                :aspect-ratio="3 / 4"
+                min-width="32"
+                max-width="64"
+                :src="item.raw.series.poster ? Api.File.buildRawPath(item.raw.series.poster.id) : MediaCoverFallback"
+              ></view-img>
+            </v-container>
           </template>
-          <template #item.enabled="{ item }">
-            <v-switch
-              density="compact"
-              color="secondary"
-              hide-details
-              v-model="item.raw.enabled"
-              :loading="toggleEnabledId === item.raw.id"
-              :disabled="toggleEnabledId === item.raw.id"
-              @change="toggleEnabled(item.raw.id, item.raw.enabled)"
-            ></v-switch>
-          </template>
-          <template #item.user="{ item }">
-            <v-tooltip :text="item.raw.user?.username ?? '未设置'">
-              <template #activator="{ props }">
-                <user-avatar
-                  v-bind="props"
-                  size="40"
-                  :src="item.raw.user?.avatar && Api.File.buildRawPath(item.raw.user.avatar.id)"
-                ></user-avatar>
-              </template>
-            </v-tooltip>
+          <template #item.media="{ item }">
+            <v-container class="pa-1">
+              <view-img
+                min-width="80"
+                max-width="120"
+                :src="item.raw.media.poster ? Api.File.buildRawPath(item.raw.media.poster.id) : MediaCoverFallback"
+              ></view-img>
+            </v-container>
           </template>
           <template #item.createAt="{ item }">
             {{ new Date(item.raw.createAt).toLocaleString() }}
@@ -313,18 +306,55 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
           <template #item.actions="{ item }">
             <v-container fluid class="pa-0 d-flex flex-row">
               <action-btn
+                text="转到"
+                :icon="mdiShare"
+                size="small"
+                color="primary"
+                variant="tonal"
+                @click.stop="router.push(`/ep/${item.raw.id}`)"
+              ></action-btn>
+              <action-btn
+                class="ms-1"
                 text="编辑"
                 :icon="mdiPencil"
-                variant="tonal"
-                color="secondary"
                 size="small"
-                @click.stop="router.push(`/subscribe/${item.raw.id}`)"
+                color="secondary"
+                variant="tonal"
+                @click.stop="openEdit(item.raw)"
               ></action-btn>
+              <v-menu>
+                <template #activator="{ props }">
+                  <action-btn
+                    class="ms-1"
+                    v-bind="props"
+                    text="删除"
+                    :icon="mdiDelete"
+                    size="small"
+                    color="error"
+                    variant="tonal"
+                  ></action-btn>
+                </template>
+                <v-card>
+                  <v-card-title>删除确认</v-card-title>
+                  <v-card-text>确定要删除该剧集吗？该操作不可撤销！</v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" variant="text">取消</v-btn>
+                    <v-btn color="error" variant="plain" @click="deleteItem(item.raw.id)">确定</v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-menu>
             </v-container>
           </template>
         </v-data-table-server>
       </v-sheet>
     </v-container>
+    <episode-edit-dialog
+      v-model="editDialog"
+      :item="editItem"
+      @saved="onEditSaved"
+      @error="onEditError"
+    ></episode-edit-dialog>
   </v-container>
 </template>
 

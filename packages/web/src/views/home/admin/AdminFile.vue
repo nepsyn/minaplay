@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useApp } from '@/store/app';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { Api } from '@/api/api';
 import {
   mdiCheck,
@@ -97,6 +97,19 @@ const getSourceText = (source: FileSourceEnum) => {
 
 const expand = ref(false);
 const edit = ref<FileQueryDto>({});
+watch(
+  () => [route.path, route.query],
+  async (newValue, oldValue) => {
+    if (newValue[0] !== oldValue?.[0] && route.name === 'admin-file') {
+      edit.value = Object.assign({}, route.query);
+      options.value.page = 1;
+      if (oldValue?.[0]) {
+        await loadItems(options.value);
+      }
+    }
+  },
+  { immediate: true },
+);
 onBeforeRouteUpdate(async (to, from, next) => {
   if (to.name === 'admin-file') {
     edit.value = Object.assign({}, to.query);
@@ -128,7 +141,7 @@ const deleteItem = async (id: string) => {
     <v-container fluid class="d-flex align-center">
       <v-container fluid class="pa-0 d-flex align-center">
         <v-icon size="40" color="primary" :icon="mdiFileMultiple"></v-icon>
-        <span class="ml-4 text-h5">文件管理</span>
+        <span class="ml-4 text-h5">系统文件</span>
       </v-container>
       <v-spacer></v-spacer>
 

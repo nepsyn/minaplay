@@ -20,6 +20,7 @@ import { UserDto, UserEntity, UserQueryDto } from '@/interfaces/user.interface';
 import {
   EpisodeDto,
   EpisodeEntity,
+  EpisodeQueryDto,
   SeriesDto,
   SeriesEntity,
   SeriesQueryDto,
@@ -129,23 +130,22 @@ class ApiHelper {
     update: (id: number) => this.apiPut<SeriesEntity, SeriesDto>(`/series/${id}`),
     delete: (id: number) => this.apiDelete(`/series/${id}`),
     query: this.apiGet<ApiQueryResult<SeriesEntity>, SeriesQueryDto>('/series'),
-    getEpisodesById: (id: number) =>
-      this.apiGet<ApiQueryResult<EpisodeEntity>, ApiQueryDto<EpisodeEntity>>(`/series/${id}/episode`),
   };
 
   Episode = {
-    create: this.apiPost<EpisodeEntity, EpisodeDto>('/series/-/episode'),
-    getById: (id: number) => this.apiGet<EpisodeEntity>(`/series/-/episode/${id}`),
-    update: (id: number) => this.apiPut<EpisodeEntity, EpisodeDto>(`/series/-/episode/${id}`),
-    delete: (id: number) => this.apiDelete(`/series/-/episode/${id}`),
-    queryUpdate: this.apiGet<ApiQueryResult<EpisodeEntity>, ApiQueryDto<EpisodeEntity>>(`/series/-/episode/-/update`),
+    create: this.apiPost<EpisodeEntity, EpisodeDto>('/series/episode'),
+    getById: (id: number) => this.apiGet<EpisodeEntity>(`/series/episode/${id}`),
+    update: (id: number) => this.apiPut<EpisodeEntity, EpisodeDto>(`/series/episode/${id}`),
+    delete: (id: number) => this.apiDelete(`/series/episode/${id}`),
+    query: this.apiGet<ApiQueryResult<EpisodeEntity>, EpisodeQueryDto>(`/series/episode`),
+    queryUpdate: this.apiGet<ApiQueryResult<EpisodeEntity>, ApiQueryDto<EpisodeEntity>>(`/series/episode/update`),
   };
 
   SeriesTag = {
-    create: this.apiPost<SeriesTagEntity, SeriesTagDto>('/series/-/tag'),
-    update: (id: number) => this.apiPut<SeriesTagEntity, SeriesTagDto>(`/series/-/tag/${id}`),
-    delete: (id: number) => this.apiDelete(`/series/-/tag/${id}`),
-    query: this.apiGet<ApiQueryResult<SeriesTagEntity>, SeriesTagQueryDto>('/series/-/tag'),
+    create: this.apiPost<SeriesTagEntity, SeriesTagDto>('/series/tag'),
+    update: (id: number) => this.apiPut<SeriesTagEntity, SeriesTagDto>(`/series/tag/${id}`),
+    delete: (id: number) => this.apiDelete(`/series/tag/${id}`),
+    query: this.apiGet<ApiQueryResult<SeriesTagEntity>, SeriesTagQueryDto>('/series/tag'),
   };
 
   User = {
@@ -155,10 +155,10 @@ class ApiHelper {
   };
 
   SubscribeRule = {
-    create: this.apiPost<RuleEntity, RuleDto>(`/rule`),
-    query: this.apiGet<ApiQueryResult<RuleEntity>, RuleQueryDto>('/rule'),
-    update: (id: number) => this.apiPut<RuleEntity, RuleDto>(`/rule/${id}`),
-    delete: (id: number) => this.apiDelete(`/rule/${id}`),
+    create: this.apiPost<RuleEntity, RuleDto>(`/subscribe/rule`),
+    query: this.apiGet<ApiQueryResult<RuleEntity>, RuleQueryDto>('/subscribe/rule'),
+    update: (id: number) => this.apiPut<RuleEntity, RuleDto>(`/subscribe/rule/${id}`),
+    delete: (id: number) => this.apiDelete(`/subscribe/rule/${id}`),
   };
 
   Media = {

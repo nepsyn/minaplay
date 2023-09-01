@@ -23,6 +23,7 @@ import AdminFile from '@/views/home/admin/AdminFile.vue';
 import MediaPlay from '@/views/home/resource/MediaPlay.vue';
 import SeriesDetail from '@/views/home/resource/SeriesDetail.vue';
 import EpisodePlay from '@/views/home/resource/EpisodePlay.vue';
+import AdminEpisode from '@/views/home/admin/AdminEpisode.vue';
 
 const LoginGuard: NavigationGuard = (to, from, next) => {
   if (Api.isLogin) {
@@ -143,6 +144,11 @@ const routes: RouteRecordRaw[] = [
             name: 'admin-series',
             path: '/admin/series',
             component: AdminSeries,
+          },
+          {
+            name: 'admin-episode',
+            path: '/admin/episode',
+            component: AdminEpisode,
           },
           {
             name: 'admin-file',

@@ -42,7 +42,10 @@ const episodes = ref<EpisodeEntity[]>([]);
 const episodesTotal = ref(0);
 const loadEpisodes = async (done: any) => {
   try {
-    const response = await Api.Series.getEpisodesById(seriesId.value)(episodesQuery);
+    const response = await Api.Episode.query({
+      ...episodesQuery,
+      seriesId: seriesId.value,
+    });
     episodes.value.push(...response.data.items);
     episodesTotal.value = response.data.total;
     episodesQuery.page!++;

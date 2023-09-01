@@ -9,6 +9,7 @@ import {
   mdiGaugeFull,
   mdiMultimedia,
   mdiRssBox,
+  mdiViewComfy,
 } from '@mdi/js';
 import ToTopContainer from '@/components/provider/ToTopContainer.vue';
 import { useRoute, useRouter } from 'vue-router';
@@ -48,6 +49,12 @@ const tabs = ref([
     text: '剧集',
     route: '/admin/series',
     icon: mdiMultimedia,
+    permission: [PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP],
+  },
+  {
+    text: '单集',
+    route: '/admin/episode',
+    icon: mdiViewComfy,
     permission: [PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP],
   },
   {

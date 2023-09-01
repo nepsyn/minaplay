@@ -65,7 +65,7 @@ export interface EpisodeEntity {
   /** 本集集数 */
   no?: string;
   /** 剧集 */
-  series?: SeriesEntity;
+  series: SeriesEntity;
   /** 媒体 */
   media: MediaEntity;
   /** 创建时间 */
@@ -79,4 +79,12 @@ export interface EpisodeDto {
   no?: string;
   seriesId?: number;
   mediaId?: string;
+}
+
+export interface EpisodeQueryDto extends ApiQueryDto<EpisodeEntity> {
+  keyword?: string;
+  id?: number;
+  seriesId?: number;
+  start?: string;
+  end?: string;
 }

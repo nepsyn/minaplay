@@ -4,7 +4,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { computed, Ref, ref, watch } from 'vue';
 import { Api } from '@/api/api';
-import { EpisodeEntity, SeriesEntity } from '@/interfaces/series.interface';
+import { EpisodeEntity, EpisodeQueryDto, SeriesEntity } from '@/interfaces/series.interface';
 import { ApiQueryDto } from '@/interfaces/common.interface';
 import {
   mdiContentCopy,
@@ -55,7 +55,7 @@ const loadEpisode = async (done: any) => {
   }
 };
 
-const episodesQuery: ApiQueryDto<EpisodeEntity> = {
+const episodesQuery: EpisodeQueryDto = {
   page: 0,
   size: 48,
   sort: 'createAt',
@@ -65,7 +65,10 @@ const episodes = ref<EpisodeEntity[]>([]);
 const episodesTotal = ref(0);
 const loadEpisodes = async (done: any) => {
   try {
-    const response = await Api.Series.getEpisodesById(episode.value.series!.id)(episodesQuery);
+    const response = await Api.Episode.query({
+      ...episodesQuery,
+      seriesId: episode.value.series!.id,
+    });
     episodes.value.push(...response.data.items);
     episodesTotal.value = response.data.total;
     episodesQuery.page!++;

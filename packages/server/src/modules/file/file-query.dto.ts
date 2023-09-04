@@ -3,6 +3,7 @@ import { File } from './file.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsInt, IsOptional, IsString, IsUUID } from 'class-validator';
 import { FileSourceEnum } from '../../enums/file-source.enum';
+import { Transform } from 'class-transformer';
 
 export class FileQueryDto extends ApiQueryDto<File> {
   @ApiProperty({
@@ -41,6 +42,7 @@ export class FileQueryDto extends ApiQueryDto<File> {
     description: '上传用户id',
     required: false,
   })
+  @Transform(({ value }) => Number(value))
   @IsOptional()
   @IsInt()
   userId?: number;

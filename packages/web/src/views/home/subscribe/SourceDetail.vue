@@ -212,7 +212,7 @@ watch(
         </v-btn>
       </v-container>
       <v-container class="pa-0 mt-12">
-        <span class="text-h6">其它操作</span>
+        <span class="text-h6">订阅源操作</span>
       </v-container>
       <v-sheet class="my-4" border rounded>
         <v-container class="pa-4 d-flex flex-row align-center justify-space-between">

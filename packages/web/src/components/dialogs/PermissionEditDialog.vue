@@ -34,14 +34,14 @@ const groups = [
   {
     name: '用户',
     items: [
-      { name: '全部操作', value: PermissionEnum.USER_OP },
+      { name: '管理', value: PermissionEnum.USER_OP },
       { name: '查看', value: PermissionEnum.USER_VIEW },
     ],
   },
   {
     name: '文件',
     items: [
-      { name: '全部操作', value: PermissionEnum.FILE_OP },
+      { name: '管理', value: PermissionEnum.FILE_OP },
       { name: '视频上传', value: PermissionEnum.FILE_UPLOAD_VIDEO },
       { name: '图片上传', value: PermissionEnum.FILE_UPLOAD_IMAGE },
     ],
@@ -49,28 +49,28 @@ const groups = [
   {
     name: '媒体',
     items: [
-      { name: '全部操作', value: PermissionEnum.MEDIA_OP },
+      { name: '管理', value: PermissionEnum.MEDIA_OP },
       { name: '查看', value: PermissionEnum.MEDIA_VIEW },
     ],
   },
   {
     name: '剧集',
     items: [
-      { name: '全部操作', value: PermissionEnum.SERIES_OP },
+      { name: '管理', value: PermissionEnum.SERIES_OP },
       { name: '查看', value: PermissionEnum.SERIES_VIEW },
     ],
   },
   {
     name: '订阅',
     items: [
-      { name: '全部操作', value: PermissionEnum.SUBSCRIBE_OP },
+      { name: '管理', value: PermissionEnum.SUBSCRIBE_OP },
       { name: '查看', value: PermissionEnum.SUBSCRIBE_VIEW },
     ],
   },
   {
     name: '放映室',
     items: [
-      { name: '全部操作', value: PermissionEnum.LIVE_OP },
+      { name: '管理', value: PermissionEnum.LIVE_OP },
       { name: '查看', value: PermissionEnum.LIVE_VIEW },
     ],
   },

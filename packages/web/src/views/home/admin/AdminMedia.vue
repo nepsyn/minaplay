@@ -23,6 +23,7 @@ import { useDisplay } from 'vuetify';
 import ViewImg from '@/components/provider/ViewImg.vue';
 import MediaEditDialog from '@/components/dialogs/MediaEditDialog.vue';
 import { SeriesQueryDto } from '@/interfaces/series.interface';
+import MenuProvider from '@/components/provider/MenuProvider.vue';
 
 const app = useApp();
 const route = useRoute();
@@ -115,6 +116,36 @@ onBeforeRouteUpdate(async (to, from, next) => {
 const reset = async () => {
   edit.value = {};
 };
+
+const actions = [
+  {
+    text: '转到',
+    icon: mdiShare,
+    color: 'primary',
+    menu: undefined,
+    show: (item: any) => true,
+    click: (item: any) => router.push(`/media/${item.raw.id}`),
+  },
+  {
+    text: '编辑',
+    icon: mdiPencil,
+    color: 'secondary',
+    menu: undefined,
+    show: (item: any) => true,
+    click: (item: any) => openEdit(item.raw),
+  },
+  {
+    text: '删除',
+    icon: mdiDelete,
+    color: 'error',
+    menu: {
+      title: '删除确认',
+      text: '确定要删除该媒体文件吗？该操作不可撤销！',
+    },
+    show: (item: any) => true,
+    click: (item: any) => deleteItem(item.raw.id),
+  },
+];
 
 const deleteItem = async (id: string) => {
   loading.value = true;
@@ -327,47 +358,7 @@ const onEditError = (error: any) => {
             {{ new Date(item.raw.createAt).toLocaleString() }}
           </template>
           <template #item.actions="{ item }">
-            <v-container fluid class="pa-0 d-flex flex-row">
-              <action-btn
-                text="转到"
-                :icon="mdiShare"
-                size="small"
-                color="primary"
-                variant="tonal"
-                @click.stop="router.push(`/media/${item.raw.id}`)"
-              ></action-btn>
-              <action-btn
-                class="ms-1"
-                text="编辑"
-                :icon="mdiPencil"
-                size="small"
-                color="secondary"
-                variant="tonal"
-                @click.stop="openEdit(item.raw)"
-              ></action-btn>
-              <v-menu>
-                <template #activator="{ props }">
-                  <action-btn
-                    class="ms-1"
-                    v-bind="props"
-                    text="删除"
-                    :icon="mdiDelete"
-                    size="small"
-                    color="error"
-                    variant="tonal"
-                  ></action-btn>
-                </template>
-                <v-card>
-                  <v-card-title>删除确认</v-card-title>
-                  <v-card-text>确定要删除该媒体文件吗？该操作不可撤销！</v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" variant="text">取消</v-btn>
-                    <v-btn color="error" variant="plain" @click="deleteItem(item.raw.id)">确定</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-menu>
-            </v-container>
+            <menu-provider :actions="actions" :item="item" :boxed="display.smAndDown.value"></menu-provider>
           </template>
         </v-data-table-server>
       </v-sheet>

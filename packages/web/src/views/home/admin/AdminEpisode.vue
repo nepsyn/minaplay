@@ -22,6 +22,7 @@ import { VDataTableServer } from 'vuetify/labs/components';
 import MediaCoverFallback from '@/assets/media_cover_fallback.jpg';
 import ViewImg from '@/components/provider/ViewImg.vue';
 import EpisodeEditDialog from '@/components/dialogs/EpisodeEditDialog.vue';
+import MenuProvider from '@/components/provider/MenuProvider.vue';
 
 const app = useApp();
 const route = useRoute();
@@ -133,6 +134,36 @@ const deleteItem = async (id: number) => {
   }
 };
 
+const actions = [
+  {
+    text: '转到',
+    icon: mdiShare,
+    color: 'primary',
+    menu: undefined,
+    show: (item: any) => true,
+    click: (item: any) => router.push(`/ep/${item.raw.id}`),
+  },
+  {
+    text: '编辑',
+    icon: mdiPencil,
+    color: 'secondary',
+    menu: undefined,
+    show: (item: any) => true,
+    click: (item: any) => openEdit(item.raw),
+  },
+  {
+    text: '删除',
+    icon: mdiDelete,
+    color: 'error',
+    menu: {
+      title: '删除确认',
+      text: '确定要删除该单集吗？该操作不可撤销！',
+    },
+    show: (item: any) => true,
+    click: (item: any) => deleteItem(item.raw.id),
+  },
+];
+
 const editDialog = ref(false);
 const editItem = ref<EpisodeEntity>({} as any);
 const openEdit = (item: EpisodeEntity) => {
@@ -143,6 +174,8 @@ const onEditSaved = (data: EpisodeEntity) => {
   const index = items.value.findIndex(({ id }) => id === editItem.value!.id);
   if (index > -1) {
     items.value[index] = data;
+  } else {
+    items.value.unshift(data);
   }
   editDialog.value = false;
   app.toastSuccess('保存单集信息成功');
@@ -304,47 +337,7 @@ const onEditError = (error: any) => {
             {{ new Date(item.raw.createAt).toLocaleString() }}
           </template>
           <template #item.actions="{ item }">
-            <v-container fluid class="pa-0 d-flex flex-row">
-              <action-btn
-                text="转到"
-                :icon="mdiShare"
-                size="small"
-                color="primary"
-                variant="tonal"
-                @click.stop="router.push(`/ep/${item.raw.id}`)"
-              ></action-btn>
-              <action-btn
-                class="ms-1"
-                text="编辑"
-                :icon="mdiPencil"
-                size="small"
-                color="secondary"
-                variant="tonal"
-                @click.stop="openEdit(item.raw)"
-              ></action-btn>
-              <v-menu>
-                <template #activator="{ props }">
-                  <action-btn
-                    class="ms-1"
-                    v-bind="props"
-                    text="删除"
-                    :icon="mdiDelete"
-                    size="small"
-                    color="error"
-                    variant="tonal"
-                  ></action-btn>
-                </template>
-                <v-card>
-                  <v-card-title>删除确认</v-card-title>
-                  <v-card-text>确定要删除该剧集吗？该操作不可撤销！</v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" variant="text">取消</v-btn>
-                    <v-btn color="error" variant="plain" @click="deleteItem(item.raw.id)">确定</v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-menu>
-            </v-container>
+            <menu-provider :actions="actions" :item="item" :boxed="display.smAndDown.value"></menu-provider>
           </template>
         </v-data-table-server>
       </v-sheet>

@@ -81,7 +81,7 @@ const search = () => {
         <v-toolbar-title>选择媒体文件</v-toolbar-title>
       </v-toolbar>
       <v-card-text>
-        <v-container class="d-flex flex-column">
+        <v-container class="d-flex flex-column pa-0">
           <v-text-field
             class="px-2"
             label="媒体文件关键字"
@@ -99,7 +99,7 @@ const search = () => {
             </template>
           </v-text-field>
         </v-container>
-        <v-container class="mt-2 d-flex flex-column">
+        <v-container class="mt-2 d-flex flex-column pa-0">
           <items-provider class="pa-0" ref="seriesProvider" :load-fn="loadMedias" :items="medias">
             <v-row no-gutters>
               <v-col cols="6" sm="4" md="3" v-for="item in medias" :key="item.id">

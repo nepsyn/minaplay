@@ -147,7 +147,7 @@ const loadEpisodes = async (done: any) => {
           <v-btn
             v-for="(episode, index) in episodes"
             :key="index"
-            class="me-2 mt-1"
+            class="me-2 mt-1 text-truncate"
             variant="outlined"
             :text="episode.no || episode.media.name"
             @click="router.push({ path: `/ep/${episode.id}` })"

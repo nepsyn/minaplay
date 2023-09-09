@@ -17,8 +17,11 @@ import { VDataTableServer } from 'vuetify/labs/components';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
 import UserAvatar from '@/components/provider/UserAvatar.vue';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+import MenuProvider from '@/components/provider/MenuProvider.vue';
+import { useDisplay } from 'vuetify';
 
 const app = useApp();
+const display = useDisplay();
 const route = useRoute();
 const router = useRouter();
 
@@ -120,6 +123,17 @@ onBeforeRouteUpdate(async (to, from, next) => {
 const reset = async () => {
   edit.value = {};
 };
+
+const actions = [
+  {
+    text: '编辑',
+    icon: mdiPencil,
+    color: 'secondary',
+    menu: undefined,
+    show: (item: any) => true,
+    click: (item: any) => router.push(`/subscribe/${item.raw.id}`),
+  },
+];
 
 const toggleEnabledId = ref<number | undefined>(undefined);
 const toggleEnabled = async (id: number, enabled: boolean) => {
@@ -311,16 +325,7 @@ const toggleEnabled = async (id: number, enabled: boolean) => {
             {{ new Date(item.raw.createAt).toLocaleString() }}
           </template>
           <template #item.actions="{ item }">
-            <v-container fluid class="pa-0 d-flex flex-row">
-              <action-btn
-                text="编辑"
-                :icon="mdiPencil"
-                variant="tonal"
-                color="secondary"
-                size="small"
-                @click.stop="router.push(`/subscribe/${item.raw.id}`)"
-              ></action-btn>
-            </v-container>
+            <menu-provider :actions="actions" :item="item" :boxed="display.smAndDown.value"></menu-provider>
           </template>
         </v-data-table-server>
       </v-sheet>

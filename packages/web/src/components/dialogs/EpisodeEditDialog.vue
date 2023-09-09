@@ -86,7 +86,7 @@ const mediaDialog = ref(false);
         <action-btn :icon="mdiCheck" text="保存" variant="text" :loading="editLoading" @click="saveEdit"></action-btn>
       </v-toolbar>
       <v-card-text>
-        <v-container class="d-flex flex-column">
+        <v-container class="d-flex flex-column pa-0">
           <v-container class="pa-0">
             <span class="text-body-1">集数</span>
             <v-text-field

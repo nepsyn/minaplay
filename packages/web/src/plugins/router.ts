@@ -24,18 +24,18 @@ import MediaPlay from '@/views/home/resource/MediaPlay.vue';
 import SeriesDetail from '@/views/home/resource/SeriesDetail.vue';
 import EpisodePlay from '@/views/home/resource/EpisodePlay.vue';
 import AdminEpisode from '@/views/home/admin/AdminEpisode.vue';
+import LiveView from '@/views/home/live/LiveView.vue';
+import LiveRoom from '@/views/home/live/LiveRoom.vue';
 
-const LoginGuard: NavigationGuard = (to, from, next) => {
-  if (Api.isLogin) {
-    next();
-  } else {
-    next({
+const LoginGuard: NavigationGuard = (to) => {
+  return (
+    Api.isLogin || {
       path: '/login',
       query: {
         redirect_url: to.fullPath,
       },
-    });
-  }
+    }
+  );
 };
 
 const routes: RouteRecordRaw[] = [
@@ -72,9 +72,20 @@ const routes: RouteRecordRaw[] = [
         ],
       },
       {
-        name: 'live',
         path: '/live',
         component: Live,
+        children: [
+          {
+            name: 'live',
+            path: '/live',
+            component: LiveView,
+          },
+          {
+            name: 'room',
+            path: '/live/:id',
+            component: LiveRoom
+          }
+        ],
       },
       {
         name: 'subscribe',

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import {
+  mdiAccountCircleOutline,
   mdiAccountMultiple,
   mdiAccountTagOutline,
   mdiCheck,
@@ -18,8 +19,11 @@ import UserAvatar from '@/components/provider/UserAvatar.vue';
 import { PermissionEnum } from '@/api/enums/permission.enum';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
 import PermissionEditDialog from '@/components/dialogs/PermissionEditDialog.vue';
+import MenuProvider from '@/components/provider/MenuProvider.vue';
+import { useDisplay } from 'vuetify';
 
 const app = useApp();
+const display = useDisplay();
 const router = useRouter();
 const route = useRoute();
 
@@ -105,6 +109,28 @@ onBeforeRouteUpdate(async (to, from, next) => {
 const reset = async () => {
   edit.value = {};
 };
+
+const actions = [
+  {
+    text: '个人资料',
+    icon: mdiAccountCircleOutline,
+    color: 'info',
+    menu: undefined,
+    show: (item: any) => true,
+    click: (item: any) => undefined,
+  },
+  {
+    text: '修改权限',
+    icon: mdiAccountTagOutline,
+    color: 'secondary',
+    menu: undefined,
+    show: (item: any) =>
+      item.raw.id !== app.user?.id &&
+      app.hasPermission(PermissionEnum.ROOT_OP) &&
+      !item.raw.permissionNames?.includes(PermissionEnum.ROOT_OP),
+    click: (item: any) => openEdit(item.raw),
+  },
+];
 
 const editDialog = ref(false);
 const editItem = ref<UserEntity>({} as any);
@@ -242,21 +268,7 @@ const onEditError = (error: any) => {
             {{ new Date(item.raw.createAt).toLocaleString() }}
           </template>
           <template #item.actions="{ item }">
-            <v-container fluid class="pa-0 d-flex flex-row">
-              <action-btn
-                v-if="
-                  item.raw.id !== app.user?.id &&
-                  app.hasPermission(PermissionEnum.ROOT_OP) &&
-                  !item.raw.permissionNames?.includes(PermissionEnum.ROOT_OP)
-                "
-                text="修改权限"
-                :icon="mdiAccountTagOutline"
-                size="small"
-                color="warning"
-                variant="tonal"
-                @click.stop="openEdit(item.raw)"
-              ></action-btn>
-            </v-container>
+            <menu-provider :actions="actions" :item="item" :boxed="display.smAndDown.value"></menu-provider>
           </template>
         </v-data-table-server>
       </v-sheet>

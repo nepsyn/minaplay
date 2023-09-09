@@ -35,7 +35,7 @@ const emits = defineEmits(['click:content']);
       @click="(e) => emits('click:content', e)"
     >
       <template #placeholder>
-        <v-img :src="MediaCoverFallback"></v-img>
+        <v-img :src="MediaCoverFallback" cover></v-img>
       </template>
     </v-img>
 

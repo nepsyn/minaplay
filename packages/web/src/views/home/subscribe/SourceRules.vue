@@ -215,18 +215,18 @@ watch(
             <v-chip
               v-if="rule.series"
               label
-              color="primary"
+              color="secondary"
               :prepend-icon="mdiPencil"
               closable
               @click:close.stop="clearBindSeries(rule)"
               @click.stop="openSelect(rule)"
             >
-              {{ rule.series?.name }}
+              <span class="text-truncate">{{ rule.series?.name }}</span>
             </v-chip>
             <v-chip v-else label color="warning" :prepend-icon="mdiPlus" @click.stop="openSelect(rule)">
-              绑定剧集
+              <span class="text-truncate">绑定剧集</span>
             </v-chip>
-            <v-spacer></v-spacer>
+            <v-spacer class="mx-1"></v-spacer>
             <v-menu location="left">
               <template #activator="{ props }">
                 <action-btn
@@ -268,4 +268,7 @@ watch(
   </v-container>
 </template>
 
-<style scoped lang="sass"></style>
+<style scoped lang="sass">
+:deep(.v-chip__content)
+  overflow: hidden
+</style>

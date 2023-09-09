@@ -1,7 +1,13 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import ToTopContainer from '@/components/provider/ToTopContainer.vue';
+</script>
 
 <template>
-  <div>live page</div>
+  <v-container fluid class="pa-0 main-content d-flex flex-column">
+    <to-top-container class="scrollable-container">
+      <router-view></router-view>
+    </to-top-container>
+  </v-container>
 </template>
 
 <style scoped></style>

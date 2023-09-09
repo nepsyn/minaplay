@@ -95,7 +95,7 @@ const selectAndUploadPoster = async () => {
         <action-btn :icon="mdiCheck" text="保存" variant="text" :loading="editLoading" @click="saveEdit"></action-btn>
       </v-toolbar>
       <v-card-text>
-        <v-container class="d-flex flex-column">
+        <v-container class="d-flex flex-column pa-0">
           <v-container class="pa-0">
             <span class="text-body-1">标题</span>
             <v-text-field

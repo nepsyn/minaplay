@@ -37,6 +37,7 @@ const latestUpdateEpisodeQuery: Ref<SeriesQueryDto> = ref({
       sm="3"
       md="2"
       icon-color="secondary-lighten-1"
+      count="12"
     >
       <template #actions="{ load, reset, status }">
         <action-btn
@@ -55,6 +56,7 @@ const latestUpdateEpisodeQuery: Ref<SeriesQueryDto> = ref({
           @click.right.prevent
           :series="episode!.series"
           :label="`${new Date(episode!.createAt).toLocaleDateString()} 更新`"
+          :note="episode!.no"
         ></series-overview>
       </template>
     </resource-plate>
@@ -68,6 +70,7 @@ const latestUpdateEpisodeQuery: Ref<SeriesQueryDto> = ref({
       sm="4"
       md="3"
       icon-color="primary"
+      count="12"
     >
       <template #actions="{ load, reset, status }">
         <action-btn

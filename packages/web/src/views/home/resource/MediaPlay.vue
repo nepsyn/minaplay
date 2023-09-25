@@ -76,7 +76,7 @@ const actions = [
     icon: mdiContentCopy,
     color: 'primary',
     menu: undefined,
-    show: (item: any) => true,
+    show: () => true,
     click: () => {
       let path = Api.File.buildRawPath(media.value.file!.id);
       if (path.startsWith('/')) {
@@ -90,7 +90,7 @@ const actions = [
     icon: mdiVlc,
     color: 'warning',
     menu: undefined,
-    show: (item: any) => true,
+    show: () => true,
     click: () => {
       let path = Api.File.buildRawPath(media.value.file!.id);
       if (path.startsWith('/')) {
@@ -106,7 +106,7 @@ const actions = [
     icon: mdiMotionPlayOutline,
     color: 'secondary',
     menu: undefined,
-    show: (item: any) => true,
+    show: () => true,
     click: undefined,
   },
 ];
@@ -121,9 +121,9 @@ const actions = [
             <video-provider :media="media" :options="playerOptions"></video-provider>
           </v-responsive>
           <v-container fluid class="pa-0 mt-4 d-flex flex-column">
-            <span class="text-h5 text-wrap">{{ media.name }}</span>
-            <v-container fluid class="pa-0 mt-1 d-flex flex-row align-center">
-              <span class="mt-1 text-caption">上传于 {{ new Date(media.createAt).toLocaleString() }}</span>
+            <span class="text-h6 text-wrap">{{ media.name }}</span>
+            <v-container fluid class="pa-0 mt-2 d-flex flex-row align-center">
+              <span class="text-caption">上传于 {{ new Date(media.createAt).toLocaleString() }}</span>
               <v-spacer></v-spacer>
               <menu-provider :actions="actions" :item="media" :boxed="display.smAndDown.value"></menu-provider>
             </v-container>

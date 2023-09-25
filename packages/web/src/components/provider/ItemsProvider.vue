@@ -77,7 +77,4 @@ onMounted(async () => {
   </v-container>
 </template>
 
-<style lang="sass" scoped>
-.clickable
-  cursor: pointer
-</style>
+<style lang="sass" scoped></style>

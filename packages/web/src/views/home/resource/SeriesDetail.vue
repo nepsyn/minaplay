@@ -12,6 +12,7 @@ import ViewImg from '@/components/provider/ViewImg.vue';
 import { mdiMotionPlayOutline, mdiPlay, mdiViewComfy } from '@mdi/js';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import { ApiQueryDto } from '@/interfaces/common.interface';
+import ExpandableProvider from '@/components/provider/ExpandableProvider.vue';
 
 const app = useApp();
 const route = useRoute();
@@ -105,11 +106,13 @@ const loadEpisodes = async (done: any) => {
                     ></view-img>
                   </v-col>
                   <v-col cols="8" sm="12">
-                    <pre
+                    <expandable-provider
+                      class="text-subtitle-1"
+                      :content="series.description ?? '暂无剧集描述'"
                       style="min-height: 100px"
-                      class="text-subtitle-1 text-pre-wrap text-break bg-transparent"
-                      v-text="series.description ?? '暂无剧集描述'"
-                    ></pre>
+                      content-class="text-subtitle-1 text-pre-wrap text-break"
+                      label-class="text-subtitle-1"
+                    ></expandable-provider>
                   </v-col>
                 </v-row>
               </div>
@@ -144,14 +147,17 @@ const loadEpisodes = async (done: any) => {
           <span class="ms-2 text-h6">分集</span>
         </v-container>
         <v-container fluid class="mt-3 pa-0">
-          <v-btn
-            v-for="(episode, index) in episodes"
-            :key="index"
-            class="me-2 mt-1 text-truncate"
-            variant="outlined"
-            :text="episode.no || episode.media.name"
-            @click="router.push({ path: `/ep/${episode.id}` })"
-          ></v-btn>
+          <v-row no-gutters>
+            <v-col v-for="(episode, index) in episodes" :key="index" class="pa-1" cols="4" md="2" lg="1">
+              <v-btn
+                block
+                class="text-truncate"
+                variant="outlined"
+                :text="episode.no || episode.title || episode.media.name"
+                @click="router.push({ path: `/ep/${episode.id}` })"
+              ></v-btn>
+            </v-col>
+          </v-row>
         </v-container>
       </items-provider>
     </v-container>

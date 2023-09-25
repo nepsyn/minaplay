@@ -6,7 +6,16 @@ import { computed, Ref, ref, watch } from 'vue';
 import { Api } from '@/api/api';
 import { EpisodeEntity, EpisodeQueryDto, SeriesEntity } from '@/interfaces/series.interface';
 import { ApiQueryDto } from '@/interfaces/common.interface';
-import { mdiContentCopy, mdiMotionPlayOutline, mdiMultimedia, mdiPlaylistPlay, mdiViewComfy, mdiVlc } from '@mdi/js';
+import {
+  mdiArrowLeft,
+  mdiArrowRight,
+  mdiContentCopy,
+  mdiMotionPlayOutline,
+  mdiMultimedia,
+  mdiPlaylistPlay,
+  mdiViewComfy,
+  mdiVlc,
+} from '@mdi/js';
 import SeriesCoverFallback from '@/assets/series_cover_fallback.jpg';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import SingleItemProvider from '@/components/provider/SingleItemProvider.vue';
@@ -14,6 +23,7 @@ import VideoProvider from '@/components/provider/VideoProvider.vue';
 import ViewImg from '@/components/provider/ViewImg.vue';
 import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 import MenuProvider from '@/components/provider/MenuProvider.vue';
+import ExpandableProvider from '@/components/provider/ExpandableProvider.vue';
 
 const app = useApp();
 const route = useRoute();
@@ -101,13 +111,24 @@ watch(
   },
 );
 
+const hasEpisode = (step = 1) => {
+  const currentIndex = episodes.value.findIndex((value) => value.id === episode.value?.id);
+  return currentIndex === -1 ? false : currentIndex + step in episodes.value;
+};
+const redirectEpisode = async (step = 1) => {
+  const currentIndex = episodes.value.findIndex((value) => value.id === episode.value?.id);
+  if (currentIndex + step in episodes.value) {
+    await router.push({ path: `/ep/${episodes.value[currentIndex + step].id}` });
+  }
+};
+
 const actions = [
   {
     text: '复制链接',
     icon: mdiContentCopy,
     color: 'primary',
     menu: undefined,
-    show: (item: any) => true,
+    show: () => true,
     click: () => {
       let path = Api.File.buildRawPath(episode.value.media.file!.id);
       if (path.startsWith('/')) {
@@ -121,7 +142,7 @@ const actions = [
     icon: mdiVlc,
     color: 'warning',
     menu: undefined,
-    show: (item: any) => true,
+    show: () => true,
     click: () => {
       let path = Api.File.buildRawPath(episode.value.media.file!.id);
       if (path.startsWith('/')) {
@@ -137,7 +158,7 @@ const actions = [
     icon: mdiMotionPlayOutline,
     color: 'secondary',
     menu: undefined,
-    show: (item: any) => true,
+    show: () => true,
     click: undefined,
   },
 ];
@@ -152,9 +173,30 @@ const actions = [
             <video-provider :media="episode.media" :options="playerOptions"></video-provider>
           </v-responsive>
           <v-container fluid class="pa-0 mt-4 d-flex flex-column">
-            <span class="text-h5 text-wrap">{{ episode.title ?? episode.media.name }}</span>
-            <v-container fluid class="pa-0 mt-1 d-flex flex-row align-center">
-              <span class="mt-1 text-caption">上传于 {{ new Date(episode.createAt).toLocaleString() }}</span>
+            <v-container fluid class="pa-0 d-flex justify-space-between align-center">
+              <v-btn
+                variant="flat"
+                text="上一集"
+                size="small"
+                :prepend-icon="mdiArrowLeft"
+                @click.stop="redirectEpisode(-1)"
+                :disabled="!hasEpisode(-1)"
+              ></v-btn>
+              <span class="text-h6 px-2 text-truncate">
+                {{ episode.title ?? episode.no ?? episode.media.name }}
+              </span>
+              <v-btn
+                variant="flat"
+                text="下一集"
+                size="small"
+                :append-icon="mdiArrowRight"
+                @click.stop="redirectEpisode(1)"
+                :disabled="!hasEpisode(1)"
+              >
+              </v-btn>
+            </v-container>
+            <v-container fluid class="pa-0 mt-2 d-flex flex-row align-center">
+              <span class="text-caption">上传于 {{ new Date(episode.createAt).toLocaleString() }}</span>
               <v-spacer></v-spacer>
               <menu-provider :actions="actions" :item="episode" :boxed="display.smAndDown.value"></menu-provider>
             </v-container>
@@ -203,11 +245,12 @@ const actions = [
                     ></v-chip>
                   </div>
                   <v-divider class="my-1"></v-divider>
-                  <pre
+                  <expandable-provider
+                    :content="episode.series?.description ?? '暂无剧集描述'"
                     style="min-height: 100px"
-                    class="text-caption text-pre-wrap text-break bg-transparent"
-                    v-text="episode.series?.description ?? '暂无剧集描述'"
-                  ></pre>
+                    content-class="text-caption text-pre-wrap text-break"
+                    label-class="text-caption"
+                  ></expandable-provider>
                 </v-container>
               </v-col>
             </v-row>
@@ -227,16 +270,19 @@ const actions = [
               <span class="ms-2 text-h6">分集</span>
             </div>
             <v-container fluid class="pa-0 px-2">
-              <v-btn
-                v-for="(item, index) in episodes"
-                :key="index"
-                class="me-2 mt-1 text-truncate"
-                variant="outlined"
-                :color="episodeId === item.id ? 'primary' : (undefined as any)"
-                :active="episodeId === item.id"
-                :text="item.no || item.media.name"
-                @click="router.push({ path: `/ep/${item.id}` })"
-              ></v-btn>
+              <v-row no-gutters>
+                <v-col v-for="(item, index) in episodes" class="pa-1" :key="index" cols="4" md="3">
+                  <v-btn
+                    block
+                    class="text-truncate"
+                    variant="outlined"
+                    :color="episodeId === item.id ? 'primary' : (undefined as any)"
+                    :active="episodeId === item.id"
+                    :text="item.no || item.title || item.media.name"
+                    @click="router.push({ path: `/ep/${item.id}` })"
+                  ></v-btn>
+                </v-col>
+              </v-row>
             </v-container>
           </items-provider>
         </v-container>

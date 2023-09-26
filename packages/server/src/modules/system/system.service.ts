@@ -22,14 +22,14 @@ export class SystemService implements OnModuleInit {
   }
 
   async getDiskUsage() {
-    const getFolderSize = (await importESM<typeof import('get-folder-size')>('get-folder-size')).default.loose;
+    const { default: GetFolderSize } = await importESM<typeof import('get-folder-size')>('get-folder-size');
 
     const diskSpace = await checkDiskSpace(RESOURCE_DIR);
     return {
       disk: diskSpace.diskPath,
       total: diskSpace.size,
       free: diskSpace.free,
-      used: await getFolderSize(RESOURCE_DIR),
+      used: await GetFolderSize.loose(RESOURCE_DIR),
     };
   }
 }

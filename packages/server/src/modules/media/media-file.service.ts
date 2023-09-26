@@ -24,7 +24,7 @@ export class MediaFileService {
   ) {}
 
   async generateMediaPosterFile(media: Media) {
-    const execa = (await importESM<typeof import('execa')>('execa')).execa;
+    const { execa } = await importESM<typeof import('execa')>('execa');
 
     // 计算缩略图路径
     const posterFileName = 'poster.png';
@@ -68,7 +68,7 @@ export class MediaFileService {
   }
 
   async generateMediaMetadataFile(media: Media) {
-    const execa = (await importESM<typeof import('execa')>('execa')).execa;
+    const { execa } = await importESM<typeof import('execa')>('execa');
 
     // 计算缩略图路径
     const metadataFileName = 'metadata.json';
@@ -104,7 +104,7 @@ export class MediaFileService {
   }
 
   async generateMediaSubtitleFiles(media: Media, metadata: MediaMetadata) {
-    const execa = (await importESM<typeof import('execa')>('execa')).execa;
+    const { execa } = await importESM<typeof import('execa')>('execa');
 
     const subtitles = metadata.streams.filter((s) => s.codec_type === 'subtitle');
     const files: File[] = [];
@@ -143,7 +143,7 @@ export class MediaFileService {
   }
 
   async generateMediaAttachmentFiles(media: Media, metadata: MediaMetadata) {
-    const execa = (await importESM<typeof import('execa')>('execa')).execa;
+    const { execa } = await importESM<typeof import('execa')>('execa');
 
     const attachments = metadata.streams.filter((s) => s.codec_type === 'attachment');
     const files: File[] = [];

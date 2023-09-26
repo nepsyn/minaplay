@@ -50,7 +50,8 @@ export class SourceService implements OnModuleInit {
   }
 
   async readSource(url: string) {
-    const extract = (await importESM<typeof import('@extractus/feed-extractor')>('@extractus/feed-extractor')).extract;
+    const { extract } = await importESM<typeof import('@extractus/feed-extractor')>('@extractus/feed-extractor');
+
     return await extract(
       url,
       {

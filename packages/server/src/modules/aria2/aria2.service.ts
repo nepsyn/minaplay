@@ -72,7 +72,7 @@ export class Aria2Service implements OnModuleInit {
   }
 
   private async onDownloadComplete({ gid }: { gid: string }) {
-    const fileTypeFromFile = (await importESM<typeof import('file-type')>('file-type')).fileTypeFromFile;
+    const { fileTypeFromFile } = await importESM<typeof import('file-type')>('file-type');
 
     const status = await this.client.tellStatus(gid);
     const parentGid = typeof status.following === 'string' ? status.following : gid;
@@ -133,7 +133,7 @@ export class Aria2Service implements OnModuleInit {
   }
 
   private async updateBtTrackers() {
-    const fetch = (await importESM<typeof import('node-fetch')>('node-fetch')).default;
+    const { default: fetch } = await importESM<typeof import('node-fetch')>('node-fetch');
     try {
       const response = await fetch(this.options.trackerListUrl, {
         agent: this.options.httpProxy && new HttpsProxyAgent(this.options.httpProxy),

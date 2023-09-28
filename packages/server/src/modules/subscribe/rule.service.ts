@@ -5,6 +5,7 @@ import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'type
 import { FileService } from '../file/file.service';
 import { Isolate, Reference } from 'isolated-vm';
 import { RuleHooks } from './rule.interface';
+import { ScriptTarget, transpileModule } from 'typescript';
 
 @Injectable()
 export class RuleService {
@@ -31,7 +32,13 @@ export class RuleService {
   async createRuleVm(code: string) {
     const vm = new Isolate();
     const context = await vm.createContext();
-    const module = await vm.compileModule(code);
+    const module = await vm.compileModule(
+      transpileModule(code, {
+        compilerOptions: {
+          target: ScriptTarget.ES2022,
+        },
+      }).outputText,
+    );
     await module.instantiate(context, () => undefined);
     await module.evaluate({ timeout: 1000, reference: true });
     const exports = await module.namespace.get('default', { reference: true });

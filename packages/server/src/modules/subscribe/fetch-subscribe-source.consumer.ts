@@ -104,7 +104,7 @@ export class FetchSubscribeSourceConsumer {
             rule: { id: rule.id },
             error: error.toString(),
           });
-          continue;
+          break;
         }
 
         const props: DeepPartial<DownloadItem> = {

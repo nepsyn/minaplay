@@ -36,7 +36,7 @@ import { DownloadItemService } from './download-item.service';
 import { DownloadItem } from './download-item.entity';
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { Rule } from './rule.entity';
-import { SubscribeDownloadItemStatusEnum } from '../../enums/subscribe-download-item-status.enum';
+import { StatusEnum } from '../../enums/status.enum';
 
 @Controller('subscribe')
 @UseGuards(AuthorizationGuard)
@@ -292,7 +292,7 @@ export class SourceController {
 
     await this.downloadItemService.delete({
       source: { id },
-      status: Not(SubscribeDownloadItemStatusEnum.DOWNLOADING),
+      status: Not(StatusEnum.SUCCESS),
     });
     return {};
   }

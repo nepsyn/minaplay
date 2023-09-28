@@ -15,15 +15,24 @@ import { FileModule } from '../file/file.module';
 import { SeriesModule } from '../series/series.module';
 import { RuleController } from './rule.controller';
 import { SubscribeConfigurableModule } from './subscribe.module-definition';
+import { RuleErrorLogService } from './rule-error-log.service';
+import { RuleErrorLog } from './rule-error-log.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Source, Rule, FetchLog, DownloadItem]),
+    TypeOrmModule.forFeature([Source, Rule, RuleErrorLog, FetchLog, DownloadItem]),
     BullModule.registerQueue({ name: 'fetch-subscribe-source' }),
     FileModule,
     SeriesModule,
   ],
-  providers: [SourceService, RuleService, FetchLogService, DownloadItemService, FetchSubscribeSourceConsumer],
+  providers: [
+    SourceService,
+    RuleService,
+    RuleErrorLogService,
+    FetchLogService,
+    DownloadItemService,
+    FetchSubscribeSourceConsumer,
+  ],
   controllers: [RuleController, SourceController],
   exports: [SourceService, RuleService, FetchLogService, DownloadItemService],
 })

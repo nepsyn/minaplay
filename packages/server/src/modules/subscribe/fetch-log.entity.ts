@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGenerate
 import { Source } from './source.entity';
 import { Exclude } from 'class-transformer';
 import { DownloadItem } from './download-item.entity';
+import { StatusEnum } from '../../enums/status.enum';
 
 /** 订阅解析日志 */
 @Entity()
@@ -22,9 +23,12 @@ export class FetchLog {
   @OneToMany(() => DownloadItem, (download) => download.log)
   downloads: DownloadItem[];
 
-  /** 是否成功 */
-  @Column()
-  success: boolean;
+  /** 状态 */
+  @Column({
+    type: 'enum',
+    enum: StatusEnum,
+  })
+  status: StatusEnum;
 
   /** 错误内容 */
   @Column({

@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Rule } from './rule.entity';
-import { SubscribeDownloadItemStatusEnum } from '../../enums/subscribe-download-item-status.enum';
+import { StatusEnum } from '../../enums/status.enum';
 import { Source } from './source.entity';
 import { FetchLog } from './fetch-log.entity';
 import { Media } from '../media/media.entity';
@@ -55,9 +55,9 @@ export class DownloadItem {
   /** 下载状态 */
   @Column({
     type: 'enum',
-    enum: SubscribeDownloadItemStatusEnum,
+    enum: StatusEnum,
   })
-  status: SubscribeDownloadItemStatusEnum;
+  status: StatusEnum;
 
   /** 错误内容 */
   @Column({

@@ -61,7 +61,8 @@ import { SystemModule } from './modules/system/system.module';
         entities: ['dist/**/*.entity{.ts,.js}'],
         migrations: ['dist/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations_minaplay',
-        migrationsRun: true,
+        synchronize: configService.get('APP_ENV') === 'development',
+        migrationsRun: configService.get('APP_ENV') !== 'development',
         cli: {
           migrationsDir: 'src/migrations',
         },

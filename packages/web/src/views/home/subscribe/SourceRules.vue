@@ -92,8 +92,13 @@ const deleteRule = async (id: number) => {
 };
 
 const newRuleCodeSample = `
-module.exports = function(entry) {
-  return false;
+export default {
+  validate(entry) {
+    return false;
+  },
+  describe(entry, file) {
+    return {};
+  }
 }
 `.trim();
 const ruleCreating = ref(false);

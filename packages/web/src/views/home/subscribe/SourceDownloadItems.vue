@@ -8,7 +8,7 @@ import { Api } from '@/api/api';
 import { mdiAlertCircle, mdiCheckCircle, mdiContentCopy, mdiDelete, mdiDownloadCircle, mdiRefresh } from '@mdi/js';
 import ItemsProvider from '@/components/provider/ItemsProvider.vue';
 import ActionBtn from '@/components/provider/ActionBtn.vue';
-import { SubscribeDownloadItemStatusEnum } from '@/api/enums/subscribe-download-item-status.enum';
+import { StatusEnum } from '@/api/enums/status.enum';
 
 const app = useApp();
 const route = useRoute();
@@ -40,33 +40,33 @@ const resetDownloads = () => {
   downloadsQuery.page = 0;
 };
 
-const getDownloadItemColor = (status: SubscribeDownloadItemStatusEnum) => {
+const getDownloadItemColor = (status: StatusEnum) => {
   switch (status) {
-    case SubscribeDownloadItemStatusEnum.DOWNLOADED:
+    case StatusEnum.SUCCESS:
       return 'success';
-    case SubscribeDownloadItemStatusEnum.DOWNLOADING:
+    case StatusEnum.PENDING:
       return 'secondary-lighten-1';
-    case SubscribeDownloadItemStatusEnum.FAILED:
+    case StatusEnum.FAILED:
       return 'error';
   }
 };
-const getDownloadItemIcon = (status: SubscribeDownloadItemStatusEnum) => {
+const getDownloadItemIcon = (status: StatusEnum) => {
   switch (status) {
-    case SubscribeDownloadItemStatusEnum.DOWNLOADED:
+    case StatusEnum.SUCCESS:
       return mdiCheckCircle;
-    case SubscribeDownloadItemStatusEnum.DOWNLOADING:
+    case StatusEnum.PENDING:
       return mdiDownloadCircle;
-    case SubscribeDownloadItemStatusEnum.FAILED:
+    case StatusEnum.FAILED:
       return mdiAlertCircle;
   }
 };
-const getDownloadItemStatusText = (status: SubscribeDownloadItemStatusEnum) => {
+const getDownloadItemStatusText = (status: StatusEnum) => {
   switch (status) {
-    case SubscribeDownloadItemStatusEnum.DOWNLOADED:
+    case StatusEnum.SUCCESS:
       return '下载完成';
-    case SubscribeDownloadItemStatusEnum.DOWNLOADING:
+    case StatusEnum.PENDING:
       return '正在下载';
-    case SubscribeDownloadItemStatusEnum.FAILED:
+    case StatusEnum.FAILED:
       return '下载失败';
   }
 };

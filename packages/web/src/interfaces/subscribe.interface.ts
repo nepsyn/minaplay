@@ -1,7 +1,7 @@
 import { UserEntity } from './user.interface';
 import { SeriesEntity } from './series.interface';
 import { ApiQueryDto } from './common.interface';
-import { SubscribeDownloadItemStatusEnum } from '@/api/enums/subscribe-download-item-status.enum';
+import { StatusEnum } from '@/api/enums/status.enum';
 
 export interface SourceEntity {
   /** id */
@@ -102,7 +102,7 @@ export interface DownloadItemEntity {
   /** 解析记录 */
   log?: FetchLogEntity;
   /** 下载状态 */
-  status: SubscribeDownloadItemStatusEnum;
+  status: StatusEnum;
   /** 错误内容 */
   error?: string;
   /** 创建时间 */
@@ -113,7 +113,7 @@ export interface DownloadItemQueryDto extends ApiQueryDto<DownloadItemEntity> {
   keyword?: string;
   start?: Date;
   end?: Date;
-  status?: SubscribeDownloadItemStatusEnum;
+  status?: StatusEnum;
 }
 
 export interface FeedEntry {

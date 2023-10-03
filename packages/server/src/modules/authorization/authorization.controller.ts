@@ -23,18 +23,25 @@ import { PermissionDto } from './permission.dto';
 import { buildException } from '../../utils/build-exception.util';
 import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { PermissionEnum } from '../../enums/permission.enum';
+import { ActionLogService } from './action-log.service';
+import { AuthActionEnum } from '../../enums/auth-action.enum';
+import { RequestIp } from '../../utils/request.ip.decorator';
 
 @Controller('auth')
 @ApiTags('auth')
 export class AuthorizationController {
-  constructor(private userService: UserService, private authService: AuthorizationService) {}
+  constructor(
+    private userService: UserService,
+    private authService: AuthorizationService,
+    private actionLogService: ActionLogService,
+  ) {}
 
   @Post('login')
   @ApiOperation({
     description: '用户登录',
   })
   @HttpCode(200)
-  async login(@Body() data: LoginDto) {
+  async login(@Body() data: LoginDto, @RequestIp() ip: string) {
     const { username, password } = data;
     const user = await this.userService.findOneBy({ username });
     if (!user) {
@@ -47,6 +54,13 @@ export class AuthorizationController {
       throw buildException(UnauthorizedException, ErrorCodeEnum.WRONG_USERNAME_OR_PASSWORD);
     }
 
+    await this.actionLogService.save({
+      action: AuthActionEnum.LOGIN,
+      ip,
+      operator: { id: user.id },
+      target: { id: user.id },
+    });
+
     return await this.authService.login(user);
   }
 
@@ -57,7 +71,14 @@ export class AuthorizationController {
   @UseGuards(AuthorizationGuard)
   @ApiBearerAuth()
   @HttpCode(200)
-  async refreshToken(@RequestUser() user: User) {
+  async refreshToken(@RequestUser() user: User, @RequestIp() ip: string) {
+    await this.actionLogService.save({
+      action: AuthActionEnum.REFRESH,
+      ip,
+      operator: { id: user.id },
+      target: { id: user.id },
+    });
+
     return await this.authService.login(user);
   }
 
@@ -68,7 +89,14 @@ export class AuthorizationController {
   @ApiBearerAuth()
   @HttpCode(200)
   @UseGuards(AuthorizationGuard)
-  async logout(@RequestUser() user: User) {
+  async logout(@RequestUser() user: User, @RequestIp() ip: string) {
+    await this.actionLogService.save({
+      action: AuthActionEnum.LOGOUT,
+      ip,
+      operator: { id: user.id },
+      target: { id: user.id },
+    });
+
     await this.authService.revokeTicket(user.id);
     return {};
   }
@@ -80,8 +108,15 @@ export class AuthorizationController {
   @ApiBearerAuth()
   @HttpCode(200)
   @UseGuards(AuthorizationGuard)
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.USER_OP)
-  async logoutUser(@Param('userId') userId: number) {
+  @RequirePermissions(PermissionEnum.ROOT_OP)
+  async logoutUser(@RequestUser() operator: User, @Param('userId') userId: number, @RequestIp() ip: string) {
+    await this.actionLogService.save({
+      action: AuthActionEnum.LOGOUT,
+      ip,
+      operator: { id: operator.id },
+      target: { id: userId },
+    });
+
     await this.authService.revokeTicket(userId);
     return {};
   }
@@ -94,7 +129,12 @@ export class AuthorizationController {
   @HttpCode(200)
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP)
-  async grantPermissions(@RequestUser() operator: User, @Param('userId') userId: number, @Body() data: PermissionDto) {
+  async grantPermissions(
+    @RequestUser() operator: User,
+    @Param('userId') userId: number,
+    @Body() data: PermissionDto,
+    @RequestIp() ip: string,
+  ) {
     if (operator.id === userId || data.permissionNames.includes(PermissionEnum.ROOT_OP)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
@@ -103,6 +143,14 @@ export class AuthorizationController {
     if (!user) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
+
+    await this.actionLogService.save({
+      action: AuthActionEnum.GRANT,
+      ip,
+      operator: { id: operator.id },
+      target: { id: userId },
+      extra: JSON.stringify(data.permissionNames),
+    });
 
     await this.authService.grantPermissions(user, data.permissionNames);
 

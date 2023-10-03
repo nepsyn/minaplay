@@ -8,6 +8,8 @@ import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { UserModule } from '../user/user.module';
+import { ActionLog } from './action-log.entity';
+import { ActionLogService } from './action-log.service';
 
 @Module({
   imports: [
@@ -24,9 +26,9 @@ import { UserModule } from '../user/user.module';
       },
     }),
     PassportModule,
-    TypeOrmModule.forFeature([Permission]),
+    TypeOrmModule.forFeature([Permission, ActionLog]),
   ],
-  providers: [AuthorizationService, JwtStrategy],
+  providers: [AuthorizationService, ActionLogService, JwtStrategy],
   controllers: [AuthorizationController],
   exports: [AuthorizationService],
 })

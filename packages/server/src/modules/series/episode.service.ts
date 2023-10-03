@@ -24,8 +24,8 @@ export class EpisodeService {
     query
       .select('id')
       .where(
-        '(episode.seriesId, episode.createAt) IN ' +
-          query.subQuery().select('seriesId, MAX(createAt)').from(Episode, 'ep').groupBy('ep.seriesId').getQuery(),
+        '(episode.seriesId, episode.no) IN ' +
+          query.subQuery().select('seriesId, MAX(no)').from(Episode, 'ep').groupBy('ep.seriesId').getQuery(),
       )
       .orderBy('episode.createAt', 'DESC')
       .skip(skip)

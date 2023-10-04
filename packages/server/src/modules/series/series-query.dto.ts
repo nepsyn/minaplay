@@ -1,7 +1,7 @@
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { Series } from './series.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 export class SeriesQueryDto extends ApiQueryDto<Series> {
@@ -21,6 +21,15 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   @IsOptional()
   @IsInt()
   id?: number;
+
+  @ApiProperty({
+    description: '是否完结',
+    required: false,
+  })
+  @Transform(({ value }) => Boolean(Number(value)))
+  @IsOptional()
+  @IsBoolean()
+  finished?: boolean;
 
   @ApiProperty({
     description: '剧集名称',

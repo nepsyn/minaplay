@@ -28,6 +28,19 @@ export class Series {
   @Column()
   name: string;
 
+  /** 剧集是否已完结 */
+  @Column({
+    default: false,
+    nullable: true,
+  })
+  finished?: boolean;
+
+  /** 完整剧集单集数量 */
+  @Column({
+    nullable: true,
+  })
+  count: number;
+
   /** 剧描述称 */
   @Column({
     type: 'text',

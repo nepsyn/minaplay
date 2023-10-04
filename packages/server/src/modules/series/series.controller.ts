@@ -27,14 +27,13 @@ import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { PermissionEnum } from '../../enums/permission.enum';
 import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { Between } from 'typeorm';
-import { EpisodeService } from './episode.service';
 
 @Controller('series')
 @UseGuards(AuthorizationGuard)
 @ApiTags('series')
 @ApiBearerAuth()
 export class SeriesController {
-  constructor(private seriesService: SeriesService, private episodeService: EpisodeService) {}
+  constructor(private seriesService: SeriesService) {}
 
   @Get(':id')
   @ApiOperation({
@@ -77,7 +76,7 @@ export class SeriesController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
   async querySeries(@Query() query: SeriesQueryDto) {
-    const { keyword, id, name, userId, start, end } = query;
+    const { keyword, id, name, finished, userId, start, end } = query;
     const [result, total] = await this.seriesService.findAndCount({
       where: buildQueryOptions<Series>({
         keyword,
@@ -85,6 +84,7 @@ export class SeriesController {
         exact: {
           id,
           name,
+          finished,
           user: { id: userId },
           createAt: start != null ? Between(new Date(start), end ? new Date(end) : new Date()) : undefined,
         },

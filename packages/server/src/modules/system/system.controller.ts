@@ -4,7 +4,6 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from '../authorization/require-permissions.decorator';
 import { PermissionEnum } from '../../enums/permission.enum';
 import { SystemService } from './system.service';
-import { ConfigService } from '@nestjs/config';
 
 @Controller('system')
 @UseGuards(AuthorizationGuard)
@@ -12,7 +11,7 @@ import { ConfigService } from '@nestjs/config';
 @ApiBearerAuth()
 @RequirePermissions(PermissionEnum.ROOT_OP)
 export class SystemController {
-  constructor(private configService: ConfigService, private systemService: SystemService) {}
+  constructor(private systemService: SystemService) {}
 
   @Get('status')
   @ApiOperation({

@@ -15,7 +15,7 @@ export class DownloadItemService implements OnModuleInit {
   async onModuleInit() {
     await this.downloadItemRepository.update(
       {
-        status: StatusEnum.SUCCESS,
+        status: StatusEnum.PENDING,
       },
       {
         status: StatusEnum.FAILED,
@@ -24,28 +24,27 @@ export class DownloadItemService implements OnModuleInit {
   }
 
   async addDownloadItemTask(url: string, props: DeepPartial<DownloadItem>) {
+    const task = await this.aria2Service.addTask(url);
     const item = await this.save({
       ...props,
-      status: StatusEnum.SUCCESS,
+      gid: task.gid,
+      status: StatusEnum.PENDING,
     });
-    const task = await this.aria2Service.addTask(url);
     task.on('complete', async () => {
       await this.save({
         id: item.id,
-        ...props,
-        status: StatusEnum.PENDING,
+        status: StatusEnum.SUCCESS,
       });
     });
     task.on('error', async (status) => {
       await this.save({
         id: item.id,
-        ...props,
         status: StatusEnum.FAILED,
         error: status.errorMessage,
       });
     });
 
-    return [task, item.id] as const;
+    return [task, item] as const;
   }
 
   async save(item: DeepPartial<DownloadItem>) {

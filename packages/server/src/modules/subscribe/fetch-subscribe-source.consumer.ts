@@ -10,8 +10,6 @@ import { VALID_VIDEO_MIME } from '../../constants';
 import { EpisodeService } from '../series/episode.service';
 import { MediaService } from '../media/media.service';
 import { MediaFileService } from '../media/media-file.service';
-import { DownloadItem } from './download-item.entity';
-import { DeepPartial } from 'typeorm';
 import { StatusEnum } from '../../enums/status.enum';
 import { FeedData } from '@extractus/feed-extractor';
 import { RuleErrorLogService } from './rule-error-log.service';
@@ -89,8 +87,8 @@ export class FetchSubscribeSourceConsumer {
       }
 
       for (const entry of validEntries) {
-        const sameTitleItem = await this.downloadItemService.findOneBy({ title: entry.title });
-        if (sameTitleItem) {
+        const sameUrlItem = await this.downloadItemService.findOneBy({ url: entry.enclosure.url });
+        if (sameUrlItem) {
           continue;
         }
 
@@ -107,14 +105,14 @@ export class FetchSubscribeSourceConsumer {
           break;
         }
 
-        const props: DeepPartial<DownloadItem> = {
+        const [task, item] = await this.downloadItemService.addDownloadItemTask(entry.enclosure.url, {
           title: entry.title,
           url: entry.enclosure.url,
           source: { id: source.id },
           rule: { id: rule.id },
           log: { id: log.id },
-        };
-        const [task, itemId] = await this.downloadItemService.addDownloadItemTask(entry.enclosure.url, props);
+          entry: JSON.stringify(entry),
+        });
         task.on('complete', async (files) => {
           for (const file of files) {
             if (VALID_VIDEO_MIME.includes(file.mimetype)) {
@@ -134,7 +132,7 @@ export class FetchSubscribeSourceConsumer {
               const { id } = await this.mediaService.save({
                 name: descriptor.name ?? file.name,
                 description: descriptor.description,
-                download: { id: itemId },
+                download: { id: item.id },
                 isPublic: descriptor.isPublic ?? true,
                 file: { id: file.id },
               });

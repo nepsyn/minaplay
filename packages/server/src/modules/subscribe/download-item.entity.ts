@@ -4,6 +4,7 @@ import { StatusEnum } from '../../enums/status.enum';
 import { Source } from './source.entity';
 import { FetchLog } from './fetch-log.entity';
 import { Media } from '../media/media.entity';
+import { Exclude } from 'class-transformer';
 
 /** 订阅解析元素 */
 @Entity()
@@ -14,15 +15,21 @@ export class DownloadItem {
 
   /** 项目标题 */
   @Column({
-    unique: true,
+    nullable: true,
   })
-  title: string;
+  title?: string;
 
   /** 下载链接 */
   @Column({
     type: 'text',
   })
   url: string;
+
+  /** Aria2 GID */
+  @Column({
+    nullable: true,
+  })
+  gid: string;
 
   /** 所属订阅源 */
   @ManyToOne(() => Source, (source) => source.downloads, {
@@ -65,6 +72,14 @@ export class DownloadItem {
     nullable: true,
   })
   error?: string;
+
+  /** entry数据 */
+  @Exclude()
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  entry?: string;
 
   /** 创建时间 */
   @CreateDateColumn()

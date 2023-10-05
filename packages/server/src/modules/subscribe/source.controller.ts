@@ -260,13 +260,16 @@ export class SourceController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    const { keyword, start, end, status } = query;
+    const { keyword, url, ruleId, logId, start, end, status } = query;
     const [result, total] = await this.downloadItemService.findAndCount({
       where: buildQueryOptions<DownloadItem>({
         keyword,
         keywordProperties: (entity) => [entity.title, entity.url],
         exact: {
+          url,
           source: { id },
+          rule: { id: ruleId },
+          log: { id: logId },
           status,
           createAt: start != null ? Between(new Date(start), end != null ? new Date(end) : new Date()) : undefined,
         },

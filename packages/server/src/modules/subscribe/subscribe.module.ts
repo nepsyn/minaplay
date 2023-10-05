@@ -17,6 +17,7 @@ import { RuleController } from './rule.controller';
 import { SubscribeConfigurableModule } from './subscribe.module-definition';
 import { RuleErrorLogService } from './rule-error-log.service';
 import { RuleErrorLog } from './rule-error-log.entity';
+import { DownloadItemController } from './download-item.controller';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { RuleErrorLog } from './rule-error-log.entity';
     DownloadItemService,
     FetchSubscribeSourceConsumer,
   ],
-  controllers: [RuleController, SourceController],
+  controllers: [RuleController, DownloadItemController, SourceController],
   exports: [SourceService, RuleService, FetchLogService, DownloadItemService],
 })
 export class SubscribeModule extends SubscribeConfigurableModule {

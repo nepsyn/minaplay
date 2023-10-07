@@ -76,7 +76,7 @@ export class SeriesController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
   async querySeries(@Query() query: SeriesQueryDto) {
-    const { keyword, id, name, finished, userId, start, end } = query;
+    const { keyword, id, name, season, finished, userId, start, end } = query;
     const [result, total] = await this.seriesService.findAndCount({
       where: buildQueryOptions<Series>({
         keyword,
@@ -84,6 +84,7 @@ export class SeriesController {
         exact: {
           id,
           name,
+          season,
           finished,
           user: { id: userId },
           createAt: start != null ? Between(new Date(start), end ? new Date(end) : new Date()) : undefined,

@@ -23,6 +23,22 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   id?: number;
 
   @ApiProperty({
+    description: '剧集名称',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @ApiProperty({
+    description: '剧集季度',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  season?: string;
+
+  @ApiProperty({
     description: '是否完结',
     required: false,
   })
@@ -30,14 +46,6 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   @IsOptional()
   @IsBoolean()
   finished?: boolean;
-
-  @ApiProperty({
-    description: '剧集名称',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  name?: string;
 
   @ApiProperty({
     description: '创建用户id',

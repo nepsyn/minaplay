@@ -28,6 +28,12 @@ export class Series {
   @Column()
   name: string;
 
+  /** 剧集季度 */
+  @Column({
+    nullable: true,
+  })
+  season?: string;
+
   /** 剧集是否已完结 */
   @Column({
     default: false,

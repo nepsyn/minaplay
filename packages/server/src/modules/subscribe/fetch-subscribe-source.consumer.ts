@@ -143,6 +143,7 @@ export class FetchSubscribeSourceConsumer {
                 await this.episodeService.save({
                   title: descriptor.title,
                   no: descriptor.no,
+                  pubAt: descriptor.pubAt ?? entry.published ?? new Date(),
                   media: { id: media.id },
                   series: { id: rule.series.id },
                 });

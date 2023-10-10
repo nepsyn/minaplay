@@ -14,6 +14,7 @@ export interface RuleMediaDescriptor {
 export interface RuleEpisodeDescriptor {
   title?: string;
   no?: string;
+  pubAt?: Date;
 }
 
 export type RuleFileDescriptor = RuleMediaDescriptor & RuleEpisodeDescriptor;

@@ -44,6 +44,12 @@ export class Episode {
   })
   series: Series;
 
+  @Column({
+    type: 'datetime',
+    nullable: true,
+  })
+  pubAt: Date;
+
   /** 创建时间 */
   @CreateDateColumn()
   createAt: Date;

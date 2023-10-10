@@ -32,6 +32,7 @@ import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { DownloadItem } from './download-item.entity';
 import { Between } from 'typeorm';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
+import { FeedEntry } from '@extractus/feed-extractor';
 
 @Controller('subscribe/download')
 @UseGuards(AuthorizationGuard)
@@ -104,7 +105,7 @@ export class DownloadItemController {
       id: item.id,
     });
     task.on('complete', async (files) => {
-      const entry = Object.freeze(JSON.parse(item.entry));
+      const entry: FeedEntry = Object.freeze(JSON.parse(item.entry));
       for (const file of files) {
         if (VALID_VIDEO_MIME.includes(file.mimetype)) {
           const copy = Object.freeze(Object.assign({}, file));
@@ -134,6 +135,7 @@ export class DownloadItemController {
             await this.episodeService.save({
               title: descriptor.title,
               no: descriptor.no,
+              pubAt: descriptor.pubAt ?? entry.published ?? new Date(),
               media: { id: media.id },
               series: { id: item.rule.series.id },
             });

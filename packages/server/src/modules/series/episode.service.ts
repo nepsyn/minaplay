@@ -24,10 +24,10 @@ export class EpisodeService {
     query
       .select('id')
       .where(
-        '(episode.seriesId, episode.no) IN ' +
-          query.subQuery().select('seriesId, MAX(no)').from(Episode, 'ep').groupBy('ep.seriesId').getQuery(),
+        '(episode.seriesId, episode.pubAt) IN ' +
+          query.subQuery().select('seriesId, MAX(pubAt)').from(Episode, 'ep').groupBy('ep.seriesId').getQuery(),
       )
-      .orderBy('episode.createAt', 'DESC')
+      .orderBy('episode.pubAt', 'DESC')
       .skip(skip)
       .take(take);
 

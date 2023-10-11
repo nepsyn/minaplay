@@ -8,12 +8,15 @@ import { MediaConfigurableModule } from './media.module-definition';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import { UserModule } from '../user/user.module';
 import { MediaFileService } from './media-file.service';
+import { ViewHistory } from './view-history.entity';
+import { ViewHistoryService } from './view-history.service';
+import { ViewHistoryController } from './view-history.controller';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Media]), FileModule, AuthorizationModule, UserModule],
-  providers: [MediaService, MediaFileService],
-  controllers: [MediaController],
-  exports: [MediaService, MediaFileService],
+  imports: [TypeOrmModule.forFeature([Media, ViewHistory]), FileModule, AuthorizationModule, UserModule],
+  providers: [MediaService, MediaFileService, ViewHistoryService],
+  controllers: [ViewHistoryController, MediaController],
+  exports: [MediaService, MediaFileService, ViewHistoryService],
 })
 export class MediaModule extends MediaConfigurableModule {
   declare static register: typeof MediaConfigurableModule.register;

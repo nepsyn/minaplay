@@ -27,13 +27,19 @@ import { MediaDto } from './media.dto';
 import { MediaFileService } from './media-file.service';
 import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
+import { ViewHistoryDto } from './view-history.dto';
+import { ViewHistoryService } from './view-history.service';
 
 @Controller('media')
 @UseGuards(AuthorizationGuard)
 @ApiTags('media')
 @ApiBearerAuth()
 export class MediaController {
-  constructor(private mediaService: MediaService, private mediaFileService: MediaFileService) {}
+  constructor(
+    private mediaService: MediaService,
+    private viewHistoryService: ViewHistoryService,
+    private mediaFileService: MediaFileService,
+  ) {}
 
   private hasOpPermission(user: User) {
     const permissions = user.permissions.map(({ name }) => name);
@@ -134,6 +140,41 @@ export class MediaController {
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
   async deleteMedia(@Param('id') id: string) {
     await this.mediaService.delete({ id });
+    return {};
+  }
+
+  @Post(':id/history')
+  @ApiOperation({
+    description: '添加历史记录',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
+  async createMediaHistory(@RequestUser() user: User, @Param('id') id: string, @Body() data: ViewHistoryDto) {
+    const media = await this.mediaService.findOneBy({ id });
+    if (!media) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    const history = await this.viewHistoryService.findOneBy({
+      media: { id },
+    });
+    return await this.viewHistoryService.save({
+      id: history?.id,
+      ...data,
+      media: { id },
+      user: { id: user.id },
+    });
+  }
+
+  @Delete(':id/history')
+  @ApiOperation({
+    description: '删除历史记录',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
+  async deleteMediaHistory(@RequestUser() user: User, @Param('id') id: string) {
+    await this.viewHistoryService.delete({
+      media: { id },
+      user: { id: user.id },
+    });
     return {};
   }
 }

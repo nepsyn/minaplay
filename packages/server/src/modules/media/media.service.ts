@@ -1,19 +1,13 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, In, Repository } from 'typeorm';
 import { Media } from './media.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { MEDIA_MODULE_OPTIONS_TOKEN } from './media.module-definition';
-import { MediaModuleOptions } from './media.module.interface';
 import { FileService } from '../file/file.service';
 import { File } from '../file/file.entity';
 
 @Injectable()
 export class MediaService {
-  constructor(
-    @Inject(MEDIA_MODULE_OPTIONS_TOKEN) private options: MediaModuleOptions,
-    @InjectRepository(Media) private mediaRepository: Repository<Media>,
-    private fileService: FileService,
-  ) {}
+  constructor(@InjectRepository(Media) private mediaRepository: Repository<Media>, private fileService: FileService) {}
 
   async save(media: DeepPartial<Media>) {
     return await this.mediaRepository.save(media);

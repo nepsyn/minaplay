@@ -12,7 +12,7 @@ export enum PermissionEnum {
   /** 上传图片 */
   FILE_UPLOAD_IMAGE = 'FILE:UPLOAD:IMAGE',
   /** 上传视频 */
-  FILE_UPLOAD_VIDEO = 'FILE_UPLOAD:VIDEO',
+  FILE_UPLOAD_VIDEO = 'FILE:UPLOAD:VIDEO',
 
   /** 媒体管理 */
   MEDIA_OP = 'MEDIA:*',

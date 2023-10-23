@@ -33,7 +33,9 @@ import { VALID_VIDEO_MIME } from '../../constants';
 import { ApplicationGatewayExceptionFilter } from '../../utils/application.gateway.exception.filter';
 import { MediaService } from '../media/media.service';
 
-@WebSocketGateway()
+@WebSocketGateway({
+  namespace: 'live',
+})
 @UseGuards(AuthorizationWsGuard)
 @UseFilters(ApplicationGatewayExceptionFilter)
 @UseInterceptors(ApplicationGatewayInterceptor, ClassSerializerInterceptor, LiveStateWsInterceptor)
@@ -200,7 +202,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('quit')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
   @UseGuards(LiveAudienceWsGuard)
-  async handleQuit(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState) {
+  async handleQuit(@ConnectedSocket() socket: Socket) {
     this.server.to(socket.data.live.id).emit('member-quit', {
       user: instanceToPlain(socket.data.user),
     });
@@ -212,7 +214,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
   @CreatorOnly()
-  async handleKick(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState, @MessageBody('id') id: number) {
+  async handleKick(@ConnectedSocket() socket: Socket, @MessageBody('id') id: number) {
     if (id == null || id === socket.data.user.id) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
@@ -220,7 +222,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     const sockets = await this.server.to(socket.data.live.id).fetchSockets();
     const client = sockets.find((client) => client.data.user.id === id);
     if (client) {
-      this.server.to(socket.data.roomId).emit('member-kick', {
+      this.server.to(socket.data.live.id).emit('member-kick', {
         user: instanceToPlain(client.data.user),
       });
       await this.makeClientLeaveCurrentRoom(client);
@@ -312,7 +314,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     @MessageBody('transportId') transportId: string,
     @MessageBody('dtlsParameters') dtlsParameters: MediasoupTypes.DtlsParameters,
   ) {
-    await this.liveVoiceService.connectTransport(socket.data.roomId, socket.data.user.id, transportId, dtlsParameters);
+    await this.liveVoiceService.connectTransport(socket.data.live.id, socket.data.user.id, transportId, dtlsParameters);
   }
 
   @SubscribeMessage('voice-create-producer')
@@ -324,7 +326,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     @MessageBody('rtpParameters') rtpParameters: MediasoupTypes.RtpParameters,
   ) {
     const producer = await this.liveVoiceService.createProducer(
-      socket.data.roomId,
+      socket.data.live.id,
       socket.data.user.id,
       transportId,
       rtpParameters,
@@ -335,14 +337,14 @@ export class LiveGateway implements OnGatewayDisconnect {
     }
 
     producer.on('transportclose', () => {
-      this.server.to(socket.data.roomId).emit('voice-closed-producer', {
+      this.server.to(socket.data.live.id).emit('voice-closed-producer', {
         userId: socket.data.user.id,
         producerId: producer.id,
       });
     });
 
     // 通知
-    this.server.to(socket.data.roomId).emit('voice-new-producer', {
+    this.server.to(socket.data.live.id).emit('voice-new-producer', {
       userId: socket.data.user.id,
       producerId: producer.id,
     });
@@ -362,7 +364,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     @MessageBody('rtpCapabilities') rtpCapabilities: MediasoupTypes.RtpCapabilities,
   ) {
     const consumer = await this.liveVoiceService.createConsumer(
-      socket.data.roomId,
+      socket.data.live.id,
       socket.data.user.id,
       transportId,
       producerId,
@@ -374,7 +376,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     }
 
     consumer.on('transportclose', () => {
-      this.server.to(socket.data.roomId).emit('voice-closed-consumer', {
+      this.server.to(socket.data.live.id).emit('voice-closed-consumer', {
         userId: socket.data.user.id,
         consumer: consumer.id,
       });
@@ -411,7 +413,7 @@ export class LiveGateway implements OnGatewayDisconnect {
       // 退出房间
       socket.leave(socket.data.live.id);
       // 更新房间用户
-      socket.data.state.users = socket.data.state.users.filter((user) => user.id !== socket.data.user.id);
+      socket.data.state.users = socket.data.state.users.filter((user: User) => user.id !== socket.data.user.id);
       await this.liveService.updateLiveState(socket.data.state);
       // 清除数据
       socket.data.live = undefined;

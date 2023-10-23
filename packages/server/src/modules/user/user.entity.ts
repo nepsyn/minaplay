@@ -35,6 +35,23 @@ export class User {
   })
   username: string;
 
+  /** 邮箱 */
+  @Exclude()
+  @Index({
+    unique: true,
+  })
+  @Column({
+    nullable: true,
+  })
+  email: string;
+
+  /** 允许邮件通知 */
+  @Exclude()
+  @Column({
+    default: false,
+  })
+  enableEmailNotify: boolean;
+
   /** Token */
   @Exclude()
   @Column()

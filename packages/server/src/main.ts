@@ -18,7 +18,7 @@ async function bootstrap() {
   app.enableCors();
 
   // swagger settings
-  if (configService.get('APP_ENV') === 'development') {
+  if (configService.get('APP_ENV') === 'dev') {
     const docOptions = new DocumentBuilder()
       .setTitle('MinaPlay')
       .setDescription('MinaPlay api document')

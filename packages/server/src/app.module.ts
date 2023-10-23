@@ -20,6 +20,7 @@ import { SeriesModule } from './modules/series/series.module';
 import { MediaModule } from './modules/media/media.module';
 import { SubscribeModule } from './modules/subscribe/subscribe.module';
 import { SystemModule } from './modules/system/system.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -61,11 +62,8 @@ import { SystemModule } from './modules/system/system.module';
         entities: ['dist/**/*.entity{.ts,.js}'],
         migrations: ['dist/migrations/*{.ts,.js}'],
         migrationsTableName: 'migrations_minaplay',
-        synchronize: configService.get('APP_ENV') === 'development',
-        migrationsRun: configService.get('APP_ENV') !== 'development',
-        cli: {
-          migrationsDir: 'src/migrations',
-        },
+        synchronize: configService.get('APP_ENV') === 'dev',
+        migrationsRun: configService.get('APP_ENV') !== 'dev',
       }),
     }),
     Aria2Module.registerAsync({
@@ -79,7 +77,7 @@ import { SystemModule } from './modules/system/system.module';
         autoUpdateTracker: Number(configService.get('ARIA2_AUTO_UPDATE_TRACKER', 0)) === 1,
         trackerListUrl: configService.get('ARIA2_TRACKER_LIST_URL'),
         expireHours: Number(configService.get('ARIA2_EXPIRE_HOURS', 0)) || 0,
-        httpProxy: configService.get('APP_FETCH_HTTP_PROXY', undefined, undefined),
+        httpProxy: configService.get('APP_FETCH_HTTP_PROXY', undefined),
       }),
     }),
     LiveModule.registerAsync({
@@ -109,7 +107,21 @@ import { SystemModule } from './modules/system/system.module';
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
-        httpProxy: configService.get('APP_FETCH_HTTP_PROXY', undefined, undefined),
+        httpProxy: configService.get('APP_FETCH_HTTP_PROXY', undefined),
+      }),
+    }),
+    NotificationModule.registerAsync({
+      inject: [ConfigService],
+      isGlobal: true,
+      useFactory: (configService: ConfigService) => ({
+        smtpHost: configService.get('SMTP_HOST'),
+        smtpPort: Number(configService.get('SMTP_PORT')),
+        smtpSecure: Number(configService.get('SMTP_SECURE', 0)) === 1,
+        smtpUser: configService.get('SMTP_USER'),
+        smtpPassword: configService.get('SMTP_PASSWORD'),
+        emailOrigin: configService.get('EMAIL_ORIGIN'),
+        emailSubject: configService.get('EMAIL_SUBJECT'),
+        appEnv: configService.get('APP_ENV', 'dev'),
       }),
     }),
     FileModule,

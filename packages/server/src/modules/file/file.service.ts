@@ -61,10 +61,10 @@ export class FileService implements OnModuleInit {
     return affected > 0;
   }
 
-  async compressImage(path: string) {
+  async compressImage(path: string, quality: number = 40) {
     const sp = sharp(path);
     const metadata = await sp.metadata();
-    const buffer = await sp[metadata.format]({ quality: 50 }).toBuffer(path);
+    const buffer = await sp[metadata.format]({ quality }).toBuffer(path);
     await fs.writeFile(path, buffer);
   }
 }

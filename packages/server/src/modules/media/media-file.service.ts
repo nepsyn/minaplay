@@ -50,6 +50,7 @@ export class MediaFileService {
       },
     );
     if (await fs.exists(posterFilePath)) {
+      await this.fileService.compressImage(posterFilePath);
       const fileStat = await fs.stat(posterFilePath);
       return await this.fileService.save({
         filename: posterFileName,

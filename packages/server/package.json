@@ -52,6 +52,7 @@
     "redis": "^4.6.10",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
+    "sharp": "^0.32.6",
     "swagger-ui-express": "^5.0.0",
     "typeorm": "^0.3.17",
     "typescript": "^5.2.2",

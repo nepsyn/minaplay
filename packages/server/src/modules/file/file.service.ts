@@ -4,7 +4,8 @@ import { DeepPartial, FindManyOptions, FindOptionsWhere, LessThanOrEqual, Reposi
 import { File } from './file.entity';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
-import { unlink } from 'fs-extra';
+import fs, { unlink } from 'fs-extra';
+import sharp from 'sharp';
 
 @Injectable()
 export class FileService implements OnModuleInit {
@@ -58,5 +59,12 @@ export class FileService implements OnModuleInit {
     }
 
     return affected > 0;
+  }
+
+  async compressImage(path: string) {
+    const sp = sharp(path);
+    const metadata = await sp.metadata();
+    const buffer = await sp[metadata.format]({ quality: 50 }).toBuffer(path);
+    await fs.writeFile(path, buffer);
   }
 }

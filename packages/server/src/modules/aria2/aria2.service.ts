@@ -37,9 +37,11 @@ export class Aria2Service implements OnModuleInit {
     await this.connectWs();
 
     if (this.options.autoUpdateTracker) {
-      const job = new CronJob({
+      const job = CronJob.from({
         cronTime: CronExpression.EVERY_12_HOURS,
-        onTick: async () => await this.updateBtTrackers(),
+        onTick: async () => {
+          await this.updateBtTrackers();
+        },
         runOnInit: true,
       });
       this.scheduleRegistry.addCronJob('auto-update-trackers', job);

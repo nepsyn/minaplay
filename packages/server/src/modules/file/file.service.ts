@@ -16,9 +16,11 @@ export class FileService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    const job = new CronJob({
+    const job = CronJob.from({
       cronTime: CronExpression.EVERY_HOUR,
-      onTick: async () => await this.cleanExpiredFiles(),
+      onTick: async () => {
+        await this.cleanExpiredFiles();
+      },
       runOnInit: true,
     });
     this.scheduleRegistry.addCronJob('auto-clean-files', job);

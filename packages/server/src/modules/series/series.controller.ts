@@ -26,7 +26,7 @@ import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { PermissionEnum } from '../../enums/permission.enum';
 import { ErrorCodeEnum } from '../../enums/error-code.enum';
-import { Between } from 'typeorm';
+import { Between, IsNull } from 'typeorm';
 import { SeriesSubscribeDto } from './series-subscribe.dto';
 import { SeriesSubscribeService } from './series-subscribe.service';
 
@@ -42,8 +42,16 @@ export class SeriesController {
     description: '查看剧集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
-  async getSeriesById(@Param('id', ParseIntPipe) id: number) {
-    const series = await this.seriesService.findOneBy({ id });
+  async getSeriesById(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
+    const series = await this.seriesService.findOne({
+      where: {
+        id,
+        subscribes: [{ userId: user.id }, { userId: IsNull() }],
+      },
+      relations: {
+        subscribes: true,
+      },
+    });
     if (!series) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
@@ -69,7 +77,15 @@ export class SeriesController {
       tags: data.tagIds?.map((id) => ({ id })),
     });
 
-    return await this.seriesService.findOneBy({ id });
+    return this.seriesService.findOne({
+      where: {
+        id,
+        subscribes: [{ userId: user.id }, { userId: IsNull() }],
+      },
+      relations: {
+        subscribes: true,
+      },
+    });
   }
 
   @Get()
@@ -77,7 +93,7 @@ export class SeriesController {
     description: '查询剧集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
-  async querySeries(@Query() query: SeriesQueryDto) {
+  async querySeries(@RequestUser() user: User, @Query() query: SeriesQueryDto) {
     const { keyword, id, name, season, finished, userId, start, end } = query;
     const [result, total] = await this.seriesService.findAndCount({
       where: buildQueryOptions<Series>({
@@ -90,11 +106,15 @@ export class SeriesController {
           finished,
           user: { id: userId },
           createAt: start != null ? Between(new Date(start), end ? new Date(end) : new Date()) : undefined,
+          subscribes: [{ userId: user.id }, { userId: IsNull() }],
         },
       }),
       skip: query.page * query.size,
       take: query.size,
       order: { [query.sort]: query.order },
+      relations: {
+        subscribes: true,
+      },
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
@@ -105,7 +125,7 @@ export class SeriesController {
     description: '修改剧集信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
-  async updateSeries(@Param('id', ParseIntPipe) id: number, @Body() data: SeriesDto) {
+  async updateSeries(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number, @Body() data: SeriesDto) {
     const series = await this.seriesService.findOneBy({ id });
     if (!series) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -123,7 +143,15 @@ export class SeriesController {
       tags: data.tagIds?.map((id) => ({ id })),
     });
 
-    return await this.seriesService.findOneBy({ id });
+    return this.seriesService.findOne({
+      where: {
+        id,
+        subscribes: [{ userId: user.id }, { userId: IsNull() }],
+      },
+      relations: {
+        subscribes: true,
+      },
+    });
   }
 
   @Delete(':id')

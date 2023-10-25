@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Series } from './series.entity';
+import { Exclude } from 'class-transformer';
 
 /** 剧集订阅 */
 @Entity()
@@ -11,6 +12,7 @@ export class SeriesSubscribe {
   })
   user: User;
 
+  @Exclude()
   @PrimaryColumn()
   userId: number;
 
@@ -21,6 +23,7 @@ export class SeriesSubscribe {
   })
   series: Series;
 
+  @Exclude()
   @PrimaryColumn()
   seriesId: number;
 

@@ -10,12 +10,13 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { Rule } from '../subscribe/rule.entity';
 import { SeriesTag } from './series-tag.entity';
 import { File } from '../file/file.entity';
 import { User } from '../user/user.entity';
 import { Episode } from './episode.entity';
+import { SeriesSubscribe } from './series-subscribe.entity';
 
 /** 剧集 */
 @Entity()
@@ -74,6 +75,16 @@ export class Series {
   })
   @JoinTable()
   tags: SeriesTag[];
+
+  /** 订阅 */
+  @Exclude()
+  @OneToMany(() => SeriesSubscribe, (subscribe) => subscribe.series)
+  subscribes: SeriesSubscribe[];
+
+  @Expose()
+  get subscribe() {
+    return this.subscribes?.[0];
+  }
 
   /** 单集 */
   @OneToMany(() => Episode, (episode) => episode.series)

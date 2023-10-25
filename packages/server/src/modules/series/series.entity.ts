@@ -45,7 +45,7 @@ export class Series {
   @Column({
     nullable: true,
   })
-  count: number;
+  count?: number;
 
   /** 剧描述称 */
   @Column({

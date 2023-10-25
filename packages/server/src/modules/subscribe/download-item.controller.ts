@@ -33,6 +33,7 @@ import { DownloadItem } from './download-item.entity';
 import { Between } from 'typeorm';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { FeedEntry } from '@extractus/feed-extractor';
+import { SeriesSubscribeService } from '../series/series-subscribe.service';
 
 @Controller('subscribe/download')
 @UseGuards(AuthorizationGuard)
@@ -43,6 +44,7 @@ export class DownloadItemController {
     private mediaService: MediaService,
     private mediaFileService: MediaFileService,
     private episodeService: EpisodeService,
+    private seriesSubscribeService: SeriesSubscribeService,
     private downloadItemService: DownloadItemService,
     private ruleService: RuleService,
     private ruleErrorLogService: RuleErrorLogService,
@@ -133,7 +135,7 @@ export class DownloadItemController {
 
           if (item.rule.series) {
             await this.episodeService.save({
-              title: descriptor.title,
+              title: descriptor.title ?? file.name,
               no: descriptor.no,
               pubAt: descriptor.pubAt ?? entry.published ?? new Date(),
               media: { id: media.id },
@@ -141,6 +143,10 @@ export class DownloadItemController {
             });
           }
         }
+      }
+
+      if (item.rule.series) {
+        await this.seriesSubscribeService.notifyUpdate(item.rule.series);
       }
     });
 

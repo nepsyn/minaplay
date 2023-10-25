@@ -44,6 +44,7 @@ export class Episode {
   })
   series: Series;
 
+  /** 发布时间 */
   @Column({
     type: 'datetime',
     nullable: true,

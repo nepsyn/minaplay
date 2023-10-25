@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsBoolean, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsArray, IsBoolean, IsNumber, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class SeriesDto {
   @ApiProperty({
@@ -18,6 +18,23 @@ export class SeriesDto {
   @IsOptional()
   @IsBoolean()
   finished?: boolean;
+
+  @ApiProperty({
+    description: '季度',
+    required: false,
+  })
+  @IsOptional()
+  @IsString()
+  @MaxLength(20)
+  season?: string;
+
+  @ApiProperty({
+    description: '完整单集数量',
+    required: false,
+  })
+  @IsOptional()
+  @IsNumber()
+  count?: number;
 
   @ApiProperty({
     description: '剧集描述',

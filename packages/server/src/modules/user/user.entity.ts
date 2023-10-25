@@ -45,12 +45,12 @@ export class User {
   })
   email: string;
 
-  /** 允许邮件通知 */
+  /** 允许通知 */
   @Exclude()
   @Column({
     default: false,
   })
-  enableEmailNotify: boolean;
+  notify: boolean;
 
   /** Token */
   @Exclude()

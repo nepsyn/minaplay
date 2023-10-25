@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Episode } from './episode.entity';
-import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOneOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
 export class EpisodeService {
@@ -9,6 +9,10 @@ export class EpisodeService {
 
   async save(episode: DeepPartial<Episode>) {
     return await this.episodeRepository.save(episode);
+  }
+
+  async findOne(options: FindOneOptions<Episode>) {
+    return await this.episodeRepository.findOne(options);
   }
 
   async findOneBy(where: FindOptionsWhere<Episode>) {

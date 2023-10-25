@@ -27,13 +27,15 @@ import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { PermissionEnum } from '../../enums/permission.enum';
 import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { Between } from 'typeorm';
+import { SeriesSubscribeDto } from './series-subscribe.dto';
+import { SeriesSubscribeService } from './series-subscribe.service';
 
 @Controller('series')
 @UseGuards(AuthorizationGuard)
 @ApiTags('series')
 @ApiBearerAuth()
 export class SeriesController {
-  constructor(private seriesService: SeriesService) {}
+  constructor(private seriesService: SeriesService, private seriesSubscribeService: SeriesSubscribeService) {}
 
   @Get(':id')
   @ApiOperation({
@@ -131,6 +133,49 @@ export class SeriesController {
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async deleteSeries(@Param('id', ParseIntPipe) id: number) {
     await this.seriesService.delete({ id });
+    return {};
+  }
+
+  @Post(':id/subscribe')
+  @ApiOperation({
+    description: '订阅剧集',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
+  async subscribeSeries(
+    @RequestUser() user: User,
+    @Param('id', ParseIntPipe) id: number,
+    @Body() data: SeriesSubscribeDto,
+  ) {
+    const series = await this.seriesService.findOneBy({ id });
+    if (!series) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    const subscribe = await this.seriesSubscribeService.save({
+      ...data,
+      user: { id: user.id },
+      series: { id },
+    });
+
+    return { notify: subscribe.notify };
+  }
+
+  @Delete(':id/subscribe')
+  @ApiOperation({
+    description: '取消订阅剧集',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
+  async unsubscribeSeries(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
+    const series = await this.seriesService.findOneBy({ id });
+    if (!series) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    await this.seriesSubscribeService.delete({
+      user: { id: user.id },
+      series: { id },
+    });
+
     return {};
   }
 }

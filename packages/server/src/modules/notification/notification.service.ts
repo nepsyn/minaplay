@@ -10,15 +10,17 @@ export class NotificationService {
 
   async notify<T extends NotificationEventType>(event: T, data: NotificationEventMap[T], to: User | User[]) {
     const users: User[] = [].concat(to);
-    await this.emailService.notify(
-      event,
-      data,
-      users.filter((user) => user.email && user.enableEmailNotify).map((user) => user.email),
-    );
-    await this.notificationGateway.notify(
-      event,
-      data,
-      users.map((user) => user.id.toString()),
-    );
+    if (users.length > 0) {
+      await this.emailService.notify(
+        event,
+        data,
+        users.filter((user) => user.email && user.notify).map((user) => user.email),
+      );
+      await this.notificationGateway.notify(
+        event,
+        data,
+        users.map((user) => user.id.toString()),
+      );
+    }
   }
 }

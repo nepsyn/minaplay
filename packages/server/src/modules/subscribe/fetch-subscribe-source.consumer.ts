@@ -14,6 +14,7 @@ import { StatusEnum } from '../../enums/status.enum';
 import { FeedData } from '@extractus/feed-extractor';
 import { RuleErrorLogService } from './rule-error-log.service';
 import { RuleFileDescriptor, RuleHooks } from './rule.interface';
+import { SeriesSubscribeService } from '../series/series-subscribe.service';
 
 @Injectable()
 @Processor('fetch-subscribe-source')
@@ -25,6 +26,7 @@ export class FetchSubscribeSourceConsumer {
     private ruleErrorLogService: RuleErrorLogService,
     private downloadItemService: DownloadItemService,
     private episodeService: EpisodeService,
+    private seriesSubscribeService: SeriesSubscribeService,
     private mediaService: MediaService,
     private mediaFileService: MediaFileService,
   ) {}
@@ -141,7 +143,7 @@ export class FetchSubscribeSourceConsumer {
 
               if (rule.series) {
                 await this.episodeService.save({
-                  title: descriptor.title,
+                  title: descriptor.title ?? file.name,
                   no: descriptor.no,
                   pubAt: descriptor.pubAt ?? entry.published ?? new Date(),
                   media: { id: media.id },
@@ -149,6 +151,10 @@ export class FetchSubscribeSourceConsumer {
                 });
               }
             }
+          }
+
+          if (rule.series) {
+            await this.seriesSubscribeService.notifyUpdate(rule.series);
           }
         });
       }

@@ -33,6 +33,7 @@ export class SourceQueryDto extends ApiQueryDto<Source> {
   @ApiProperty({
     description: '是否启用',
     required: false,
+    enum: [0, 1],
   })
   @Transform(({ value }) => Boolean(Number(value)))
   @IsOptional()

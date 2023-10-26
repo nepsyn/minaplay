@@ -41,6 +41,7 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   @ApiProperty({
     description: '是否完结',
     required: false,
+    enum: [0, 1],
   })
   @Transform(({ value }) => Boolean(Number(value)))
   @IsOptional()

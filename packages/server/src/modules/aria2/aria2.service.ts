@@ -214,6 +214,10 @@ export class Aria2Service implements OnModuleInit {
     }
   }
 
+  async purgeDownloadResult() {
+    await this.client.purgeDownloadResult();
+  }
+
   private async updateBtTrackers() {
     const { default: fetch } = await importESM<typeof import('node-fetch')>('node-fetch');
     try {

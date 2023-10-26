@@ -4,6 +4,7 @@ import { DownloadItem } from './download-item.entity';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { StatusEnum } from '../../enums/status.enum';
 import { Aria2Service } from '../aria2/aria2.service';
+import { Cron, CronExpression } from '@nestjs/schedule';
 
 @Injectable()
 export class DownloadItemService implements OnModuleInit {
@@ -22,6 +23,11 @@ export class DownloadItemService implements OnModuleInit {
         error: 'Application restart',
       },
     );
+  }
+
+  @Cron(CronExpression.EVERY_12_HOURS)
+  async handleAutoClean() {
+    await this.aria2Service.purgeDownloadResult();
   }
 
   async addDownloadItemTask(url: string, props: DeepPartial<DownloadItem>) {

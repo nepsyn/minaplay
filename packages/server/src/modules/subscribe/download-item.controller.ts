@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   InternalServerErrorException,
   NotFoundException,
   Param,
@@ -30,10 +31,11 @@ import { RuleErrorLogService } from './rule-error-log.service';
 import { DownloadItemQueryDto } from './download-item-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { DownloadItem } from './download-item.entity';
-import { Between } from 'typeorm';
+import { Between, IsNull, Not } from 'typeorm';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { FeedEntry } from '@extractus/feed-extractor';
 import { SeriesSubscribeService } from '../series/series-subscribe.service';
+import { Aria2Service } from '../aria2/aria2.service';
 
 @Controller('subscribe/download')
 @UseGuards(AuthorizationGuard)
@@ -48,6 +50,7 @@ export class DownloadItemController {
     private downloadItemService: DownloadItemService,
     private ruleService: RuleService,
     private ruleErrorLogService: RuleErrorLogService,
+    private aria2Service: Aria2Service,
   ) {}
 
   @Post()
@@ -81,6 +84,7 @@ export class DownloadItemController {
   @ApiOperation({
     description: '重试下载任务',
   })
+  @HttpCode(200)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async retryDownloadTask(@Param('id') id: string) {
     const item = await this.downloadItemService.findOneBy({ id });
@@ -151,6 +155,82 @@ export class DownloadItemController {
     });
 
     return item;
+  }
+
+  @Post(':id/pause')
+  @ApiOperation({
+    description: '暂停下载任务',
+  })
+  @HttpCode(200)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  async pauseDownloadTask(@Param('id') id: string) {
+    const item = await this.downloadItemService.findOneBy({
+      id,
+      gid: Not(IsNull()),
+      status: StatusEnum.PENDING,
+    });
+    if (!item) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    await this.downloadItemService.save({
+      id: item.id,
+      status: StatusEnum.PAUSED,
+    });
+
+    await this.aria2Service.pauseBy(item.gid);
+    return { id: item.id, gid: item.gid, status: StatusEnum.PAUSED };
+  }
+
+  @Post(':id/unpause')
+  @ApiOperation({
+    description: '继续下载任务',
+  })
+  @HttpCode(200)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  async unpauseDownloadTask(@Param('id') id: string) {
+    const item = await this.downloadItemService.findOneBy({
+      id,
+      gid: Not(IsNull()),
+      status: StatusEnum.PAUSED,
+    });
+    if (!item) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    await this.downloadItemService.save({
+      id: item.id,
+      status: StatusEnum.PENDING,
+    });
+
+    await this.aria2Service.unpauseBy(item.gid);
+    return { id: item.id, gid: item.gid, status: StatusEnum.PENDING };
+  }
+
+  @Post(':id/cancel')
+  @ApiOperation({
+    description: '取消下载任务',
+  })
+  @HttpCode(200)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  async cancelDownloadTask(@Param('id') id: string) {
+    const item = await this.downloadItemService.findOneBy({
+      id,
+      gid: Not(IsNull()),
+      status: StatusEnum.PENDING,
+    });
+    if (!item) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    await this.downloadItemService.save({
+      id: item.id,
+      status: StatusEnum.FAILED,
+      error: 'User canceled',
+    });
+
+    await this.aria2Service.removeBy(item.gid);
+    return { id: item.id, gid: item.gid, status: StatusEnum.FAILED };
   }
 
   @Get()

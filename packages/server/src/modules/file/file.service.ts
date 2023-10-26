@@ -47,18 +47,16 @@ export class FileService implements OnModuleInit {
 
   async delete(where: FindOptionsWhere<File>) {
     const files = await this.fileRepository.find({ where });
-    let affected = 0;
     for (const file of files) {
+      await this.fileRepository.softDelete({ id: file.id });
       try {
         await unlink(file.path);
-        await this.fileRepository.softDelete({ id: file.id });
-        affected++;
       } catch (error) {
         this.logger.error(`Delete file '${file.id}' error`, error.stack);
       }
     }
 
-    return affected > 0;
+    return files.length > 0;
   }
 
   async compressImage(path: string, quality: number = 40) {

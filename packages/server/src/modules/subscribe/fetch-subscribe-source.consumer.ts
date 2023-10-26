@@ -89,8 +89,8 @@ export class FetchSubscribeSourceConsumer {
       }
 
       for (const entry of validEntries) {
-        const sameUrlItem = await this.downloadItemService.findOneBy({ url: entry.enclosure.url });
-        if (sameUrlItem) {
+        const sameItem = await this.downloadItemService.findOneBy({ title: entry.title });
+        if (sameItem) {
           continue;
         }
 

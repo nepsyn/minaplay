@@ -38,7 +38,6 @@ export class Rule {
   /** 订阅源 */
   @ManyToOne(() => Source, (source) => source.rules, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   source: Source;
 

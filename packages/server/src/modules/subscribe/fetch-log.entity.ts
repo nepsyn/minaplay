@@ -14,7 +14,6 @@ export class FetchLog {
   /** 订阅源 */
   @ManyToOne(() => Source, (source) => source.logs, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   source: Source;
 

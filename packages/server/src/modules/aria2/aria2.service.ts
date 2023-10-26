@@ -134,6 +134,86 @@ export class Aria2Service implements OnModuleInit {
     return task;
   }
 
+  async tellStatus(gid: string): ReturnType<Aria2WsClient['tellStatus']> {
+    const {
+      completedLength,
+      connections,
+      dir,
+      downloadSpeed,
+      errorCode,
+      errorMessage,
+      files,
+      followedBy,
+      following,
+      infoHash,
+      status,
+      totalLength,
+      belongsTo,
+    } = await this.client.tellStatus(gid);
+
+    return JSON.parse(
+      JSON.stringify(
+        {
+          gid,
+          completedLength,
+          connections,
+          dir,
+          downloadSpeed,
+          errorCode,
+          errorMessage,
+          files,
+          followedBy,
+          following,
+          infoHash,
+          status,
+          totalLength,
+          belongsTo,
+        },
+        (_, value) => {
+          return typeof value === 'bigint' ? value.toString() : value;
+        },
+      ),
+    );
+  }
+
+  async tellActive(): ReturnType<Aria2WsClient['tellActive']> {
+    return await this.client.tellActive();
+  }
+
+  async tellWaiting(): ReturnType<Aria2WsClient['tellWaiting']> {
+    return await this.client.tellWaiting(0, 1024);
+  }
+
+  async pauseBy(gid: string) {
+    const tasks = await this.tellActive();
+    const group = tasks.filter((task) => task.gid === gid || task.following === gid || task.following?.includes(gid));
+    for (const task of group) {
+      try {
+        await this.client.pause(task.gid);
+      } catch {}
+    }
+  }
+
+  async unpauseBy(gid: string) {
+    const tasks = await this.tellWaiting();
+    const group = tasks.filter((task) => task.gid === gid || task.following === gid || task.following?.includes(gid));
+    for (const task of group) {
+      try {
+        await this.client.unpause(task.gid);
+      } catch {}
+    }
+  }
+
+  async removeBy(gid: string) {
+    const tasks = [...(await this.tellActive()), ...(await this.tellWaiting())];
+    const group = tasks.filter((task) => task.gid === gid || task.following === gid || task.following?.includes(gid));
+    for (const task of group) {
+      try {
+        await this.client.remove(task.gid);
+      } catch {}
+    }
+  }
+
   private async updateBtTrackers() {
     const { default: fetch } = await importESM<typeof import('node-fetch')>('node-fetch');
     try {

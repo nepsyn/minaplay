@@ -75,6 +75,7 @@ export class DownloadItemQueryDto extends ApiQueryDto<FetchLog> {
   @ApiProperty({
     description: '状态',
     required: false,
+    enum: StatusEnum,
   })
   @IsOptional()
   @IsEnum(StatusEnum)

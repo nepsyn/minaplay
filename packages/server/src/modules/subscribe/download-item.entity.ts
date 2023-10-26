@@ -1,10 +1,10 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Rule } from './rule.entity';
 import { StatusEnum } from '../../enums/status.enum';
 import { Source } from './source.entity';
 import { FetchLog } from './fetch-log.entity';
 import { Media } from '../media/media.entity';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 
 /** 订阅解析元素 */
 @Entity()
@@ -14,6 +14,7 @@ export class DownloadItem {
   id: string;
 
   /** 项目标题 */
+  @Index()
   @Column({
     nullable: true,
   })
@@ -80,6 +81,10 @@ export class DownloadItem {
     nullable: true,
   })
   entry?: string;
+
+  /** Aria2 详细状态 */
+  @Expose()
+  info?: object;
 
   /** 创建时间 */
   @CreateDateColumn()

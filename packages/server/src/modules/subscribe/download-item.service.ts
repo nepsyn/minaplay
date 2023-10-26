@@ -19,6 +19,7 @@ export class DownloadItemService implements OnModuleInit {
       },
       {
         status: StatusEnum.FAILED,
+        error: 'Application restart',
       },
     );
   }
@@ -52,14 +53,38 @@ export class DownloadItemService implements OnModuleInit {
   }
 
   async findOneBy(where: FindOptionsWhere<DownloadItem>) {
-    return await this.downloadItemRepository.findOneBy(where);
+    const item = await this.downloadItemRepository.findOneBy(where);
+    if (item?.gid) {
+      try {
+        item.info = await this.aria2Service.tellStatus(item.gid);
+      } catch {}
+    }
+    return item;
   }
 
   async findAndCount(options?: FindManyOptions<DownloadItem>) {
-    return await this.downloadItemRepository.findAndCount(options);
+    const [result, total] = await this.downloadItemRepository.findAndCount(options);
+    for (const item of result) {
+      if (item.gid) {
+        try {
+          item.info = await this.aria2Service.tellStatus(item.gid);
+        } catch (error) {}
+      }
+    }
+    return [result, total] as const;
   }
 
   async delete(where: FindOptionsWhere<DownloadItem>) {
-    return await this.downloadItemRepository.delete(where);
+    const items = await this.downloadItemRepository.find({ where });
+    for (const item of items) {
+      await this.downloadItemRepository.delete({ id: item.id });
+      if (item.gid) {
+        try {
+          await this.aria2Service.removeBy(item.gid);
+        } catch {}
+      }
+    }
+
+    return items.length > 0;
   }
 }

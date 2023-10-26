@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Series } from './series.entity';
-import { DeepPartial, FindManyOptions, FindOneOptions, FindOptionsWhere, In, Repository } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOptionsWhere, In, Repository } from 'typeorm';
 import { File } from '../file/file.entity';
 import { FileService } from '../file/file.service';
 
@@ -16,16 +16,28 @@ export class SeriesService {
     return await this.seriesRepository.save(series);
   }
 
-  async findOne(options: FindOneOptions<Series>) {
-    return await this.seriesRepository.findOne(options);
-  }
-
   async findOneBy(where: FindOptionsWhere<Series>) {
     return await this.seriesRepository.findOneBy(where);
   }
 
   async findAndCount(options?: FindManyOptions<Series>) {
     return await this.seriesRepository.findAndCount(options);
+  }
+
+  buildCompositeQuery(userId: number, where?: FindOptionsWhere<Series> | FindOptionsWhere<Series>[]) {
+    return this.seriesRepository
+      .createQueryBuilder('series')
+      .leftJoinAndSelect('series.user', 'user')
+      .leftJoinAndSelect('series.poster', 'poster')
+      .leftJoinAndSelect('series.tags', 'tags')
+      .leftJoinAndSelect('user.avatar', 'avatar')
+      .leftJoinAndSelect(
+        'series.subscribes',
+        'subscribe',
+        'series.id = subscribe.seriesId AND subscribe.userId = :userId',
+        { userId },
+      )
+      .where(where);
   }
 
   async delete(where: FindOptionsWhere<Series>) {

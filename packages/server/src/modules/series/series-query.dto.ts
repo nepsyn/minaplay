@@ -49,6 +49,16 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   finished?: boolean;
 
   @ApiProperty({
+    description: '是否订阅',
+    required: false,
+    enum: [0, 1],
+  })
+  @Transform(({ value }) => Boolean(Number(value)))
+  @IsOptional()
+  @IsBoolean()
+  subscribed?: boolean;
+
+  @ApiProperty({
     description: '创建用户id',
     required: false,
   })

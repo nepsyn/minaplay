@@ -6,6 +6,8 @@ import { NotificationService } from '../notification/notification.service';
 import { User } from '../user/user.entity';
 import { Series } from './series.entity';
 import { EpisodeService } from './episode.service';
+import { instanceToPlain } from 'class-transformer';
+import { Episode } from './episode.entity';
 
 @Injectable()
 export class SeriesSubscribeService {
@@ -55,7 +57,7 @@ export class SeriesSubscribeService {
       await this.notificationService.notify(
         'new-episode',
         {
-          episode,
+          episode: instanceToPlain(episode) as Episode,
           time: new Date(),
         },
         subscribeUsers,

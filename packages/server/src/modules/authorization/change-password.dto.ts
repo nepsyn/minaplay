@@ -1,14 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString, MaxLength, MinLength } from 'class-validator';
 
-export class SeriesTagDto {
+export class ChangePasswordDto {
   @ApiProperty({
-    description: '剧集标签名称',
+    description: '原密码',
     required: false,
   })
-  @IsOptional()
   @IsString()
-  @MinLength(1)
+  @IsOptional()
+  @MinLength(6)
   @MaxLength(40)
-  name?: string;
+  old?: string;
+
+  @ApiProperty({
+    description: '新密码',
+  })
+  @IsString()
+  @MinLength(6)
+  @MaxLength(40)
+  current: string;
 }

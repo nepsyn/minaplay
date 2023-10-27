@@ -125,7 +125,7 @@ export class AuthorizationService {
 
   async grantPermissions(user: DeepPartial<User>, permissionNames: PermissionEnum[]) {
     return await this.userService.save({
-      ...user,
+      id: user.id,
       permissions: permissionNames.map((name) => ({ name })),
     });
   }

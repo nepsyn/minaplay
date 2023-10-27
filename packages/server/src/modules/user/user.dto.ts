@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsUUID } from 'class-validator';
+import { IsBoolean, IsOptional, IsUUID } from 'class-validator';
 
 export class UserDto {
   @ApiProperty({
@@ -9,4 +9,12 @@ export class UserDto {
   @IsOptional()
   @IsUUID()
   avatarFileId?: string;
+
+  @ApiProperty({
+    description: '是否允许通知',
+    required: false,
+  })
+  @IsOptional()
+  @IsBoolean()
+  notify?: boolean;
 }

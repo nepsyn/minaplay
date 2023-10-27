@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 
 export class LiveDto {
   @ApiProperty({
@@ -8,6 +8,7 @@ export class LiveDto {
   })
   @IsOptional()
   @IsString()
+  @MinLength(1)
   @MaxLength(40)
   title?: string;
 
@@ -17,6 +18,7 @@ export class LiveDto {
   })
   @IsOptional()
   @IsString()
+  @MinLength(4)
   @MaxLength(16)
   password?: string;
 

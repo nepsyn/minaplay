@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsBoolean, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsBoolean, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
 
 export class MediaDto {
   @ApiProperty({
@@ -8,6 +8,7 @@ export class MediaDto {
   })
   @IsOptional()
   @IsString()
+  @MinLength(1)
   @MaxLength(100)
   name?: string;
 

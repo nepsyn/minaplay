@@ -1,5 +1,4 @@
 import {
-  BeforeInsert,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -14,7 +13,6 @@ import {
 } from 'typeorm';
 import { Permission } from '../authorization/permission.entity';
 import { Exclude, Expose } from 'class-transformer';
-import { hash } from 'bcrypt';
 import { File } from '../file/file.entity';
 import { Series } from '../series/series.entity';
 import { Source } from '../subscribe/source.entity';
@@ -106,10 +104,5 @@ export class User {
   @Expose()
   get permissionNames() {
     return this.permissions?.map((permission) => permission.name) ?? [];
-  }
-
-  @BeforeInsert()
-  async genPassword() {
-    this.password = await hash(this.password, 10);
   }
 }

@@ -1,4 +1,16 @@
-import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
@@ -11,6 +23,8 @@ import { UserQueryDto } from './user-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { User } from './user.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
+import { CreateUserDto } from './create-user.dto';
+import { encryptPassword } from '../../utils/encrypt-password.util';
 
 @Controller('user')
 @UseGuards(AuthorizationGuard)
@@ -55,6 +69,26 @@ export class UserController {
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
+  }
+
+  @Post()
+  @ApiOperation({
+    description: '创建用户',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP)
+  async createUser(@Body() data: CreateUserDto) {
+    const sameNameUser = await this.userService.findOneBy({ username: data.username });
+    if (sameNameUser) {
+      throw buildException(BadRequestException, ErrorCodeEnum.USERNAME_ALREADY_OCCUPIED);
+    }
+
+    const { id } = await this.userService.save({
+      username: data.username,
+      password: await encryptPassword(data.password),
+      permissions: data.permissionNames.map((name) => ({ name })),
+    });
+
+    return await this.userService.findOneBy({ id });
   }
 
   @Put(':id')

@@ -7,6 +7,7 @@ import {
   NotFoundException,
   Param,
   Post,
+  Put,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -28,6 +29,8 @@ import { AuthActionEnum } from '../../enums/auth-action.enum';
 import { RequestIp } from '../../utils/request.ip.decorator';
 import { EmailBindDto } from './email-bind.dto';
 import { EmailVerifyDto } from './email-verify.dto';
+import { ChangePasswordDto } from './change-password.dto';
+import { encryptPassword } from '../../utils/encrypt-password.util';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -159,6 +162,34 @@ export class AuthorizationController {
     return {};
   }
 
+  @Put('password')
+  @ApiOperation({
+    description: '更改密码',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthorizationGuard)
+  async changePassword(@RequestUser() user: User, @RequestIp() ip: string, @Body() data: ChangePasswordDto) {
+    const valid = data.old != null ? await compare(data.old, user.password) : false;
+    if (!valid) {
+      throw buildException(BadRequestException, ErrorCodeEnum.WRONG_USERNAME_OR_PASSWORD);
+    }
+
+    await this.actionLogService.save({
+      action: AuthActionEnum.CHANGE_PASSWORD,
+      ip,
+      operator: { id: user.id },
+      target: { id: user.id },
+      extra: JSON.stringify(data),
+    });
+
+    await this.userService.save({
+      id: user.id,
+      password: await encryptPassword(data.current),
+    });
+
+    return data;
+  }
+
   @Post(':userId/logout')
   @ApiOperation({
     description: '注销指定用户',
@@ -176,7 +207,42 @@ export class AuthorizationController {
     });
 
     await this.authService.revokeTicket(userId);
+
     return {};
+  }
+
+  @Put(':userId/password')
+  @ApiOperation({
+    description: '更改指定用户密码',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthorizationGuard)
+  @RequirePermissions(PermissionEnum.ROOT_OP)
+  async changeUserPassword(
+    @RequestUser() operator: User,
+    @Param('userId') userId: number,
+    @RequestIp() ip: string,
+    @Body() data: ChangePasswordDto,
+  ) {
+    const user = await this.userService.findOneBy({ id: userId });
+    if (!user) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    await this.actionLogService.save({
+      action: AuthActionEnum.CHANGE_PASSWORD,
+      ip,
+      operator: { id: operator.id },
+      target: { id: user.id },
+      extra: JSON.stringify(data),
+    });
+
+    await this.userService.save({
+      id: user.id,
+      password: await encryptPassword(data.current),
+    });
+
+    return { current: data.current };
   }
 
   @Post(':userId/grant')
@@ -194,12 +260,15 @@ export class AuthorizationController {
     @RequestIp() ip: string,
   ) {
     if (operator.id === userId || data.permissionNames.includes(PermissionEnum.ROOT_OP)) {
-      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+      throw buildException(BadRequestException, ErrorCodeEnum.NO_PERMISSION);
     }
 
     const user = await this.userService.findOneBy({ id: userId });
     if (!user) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+    if (user.permissionNames.includes(PermissionEnum.ROOT_OP)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.NO_PERMISSION);
     }
 
     await this.actionLogService.save({

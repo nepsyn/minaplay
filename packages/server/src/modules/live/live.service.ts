@@ -48,7 +48,7 @@ export class LiveService {
         stream: undefined,
         updateAt: new Date(),
       };
-      await this.cacheStore.set(cacheKey, state);
+      await this.cacheStore.set(cacheKey, state, { ttl: 0 });
       return state;
     }
 

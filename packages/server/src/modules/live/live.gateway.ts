@@ -32,6 +32,8 @@ import { LiveStreamService } from './live-stream.service';
 import { VALID_VIDEO_MIME } from '../../constants';
 import { ApplicationGatewayExceptionFilter } from '../../utils/application.gateway.exception.filter';
 import { MediaService } from '../media/media.service';
+import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
+import { compare } from 'bcrypt';
 
 @WebSocketGateway({
   namespace: 'live',
@@ -53,10 +55,21 @@ export class LiveGateway implements OnGatewayDisconnect {
 
   @SubscribeMessage('join')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
-  async handleJoin(@ConnectedSocket() socket: Socket, @MessageBody('id') id: string) {
+  async handleJoin(
+    @ConnectedSocket() socket: Socket,
+    @MessageBody('id') id: string,
+    @MessageBody('password') password: string,
+  ) {
     const live = await this.liveService.findOneBy({ id });
     if (!live) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    if (live.password) {
+      const valid = password != null ? await compare(password, live.password) : false;
+      if (!valid) {
+        throw buildException(ForbiddenException, ErrorCodeEnum.WRONG_LIVE_PASSWORD);
+      }
     }
 
     await this.makeClientLeaveCurrentRoom(socket);

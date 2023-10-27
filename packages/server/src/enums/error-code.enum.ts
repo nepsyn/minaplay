@@ -51,4 +51,6 @@ export enum ErrorCodeEnum {
   USER_VOICE_MUTED = 0x0602,
   /** 直播语音连接建立失败 */
   VOICE_SERVICE_ESTABLISH_FAILED = 0x0603,
+  /** 直播房间密码错误 */
+  WRONG_LIVE_PASSWORD = 0x0604,
 }

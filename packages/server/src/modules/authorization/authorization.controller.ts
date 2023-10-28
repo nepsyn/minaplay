@@ -31,6 +31,7 @@ import { EmailBindDto } from './email-bind.dto';
 import { EmailVerifyDto } from './email-verify.dto';
 import { ChangePasswordDto } from './change-password.dto';
 import { encryptPassword } from '../../utils/encrypt-password.util';
+import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -260,15 +261,15 @@ export class AuthorizationController {
     @RequestIp() ip: string,
   ) {
     if (operator.id === userId || data.permissionNames.includes(PermissionEnum.ROOT_OP)) {
-      throw buildException(BadRequestException, ErrorCodeEnum.NO_PERMISSION);
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
     }
 
     const user = await this.userService.findOneBy({ id: userId });
     if (!user) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
-    if (user.permissionNames.includes(PermissionEnum.ROOT_OP)) {
-      throw buildException(BadRequestException, ErrorCodeEnum.NO_PERMISSION);
+    if (user.isRoot) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
     }
 
     await this.actionLogService.save({

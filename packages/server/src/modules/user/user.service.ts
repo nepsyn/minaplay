@@ -18,4 +18,9 @@ export class UserService {
   async findAndCount(options?: FindManyOptions<User>) {
     return await this.userRepository.findAndCount(options);
   }
+
+  async delete(where: FindOptionsWhere<User>) {
+    const result = await this.userRepository.delete(where);
+    return result.affected > 0;
+  }
 }

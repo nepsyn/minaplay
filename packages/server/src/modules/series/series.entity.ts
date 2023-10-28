@@ -57,9 +57,11 @@ export class Series {
 
   /** 创建用户 */
   @ManyToOne(() => User, (user) => user.series, {
+    onDelete: 'SET NULL',
     eager: true,
+    nullable: true,
   })
-  user: User;
+  user?: User;
 
   /** 纵向海报图 */
   @ManyToOne(() => File, {

@@ -64,6 +64,7 @@ export class File {
   /** 上传用户 */
   @Exclude()
   @ManyToOne(() => User, {
+    onDelete: 'SET NULL',
     nullable: true,
   })
   user?: User;

@@ -1,5 +1,4 @@
 import {
-  BeforeInsert,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -11,7 +10,6 @@ import {
 import { File } from '../file/file.entity';
 import { Exclude } from 'class-transformer';
 import { User } from '../user/user.entity';
-import { hash } from 'bcrypt';
 
 /** 直播房间 */
 @Entity()
@@ -43,9 +41,11 @@ export class Live {
 
   /** 创建用户 */
   @ManyToOne(() => User, {
+    onDelete: 'SET NULL',
     eager: true,
+    nullable: true,
   })
-  user: User;
+  user?: User;
 
   /** 创建时间 */
   @CreateDateColumn()
@@ -59,9 +59,4 @@ export class Live {
   @Exclude()
   @DeleteDateColumn()
   deleteAt: Date;
-
-  @BeforeInsert()
-  async genPassword() {
-    this.password = await hash(this.password, 10);
-  }
 }

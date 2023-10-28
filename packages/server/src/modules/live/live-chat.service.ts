@@ -17,7 +17,7 @@ export class LiveChatService {
   }
 
   async delete(where: FindOptionsWhere<Live>) {
-    const result = await this.chatRepository.softDelete(where);
+    const result = await this.chatRepository.delete(where);
     return result.affected > 0;
   }
 }

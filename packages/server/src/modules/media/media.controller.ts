@@ -41,11 +41,6 @@ export class MediaController {
     private mediaFileService: MediaFileService,
   ) {}
 
-  private hasOpPermission(user: User) {
-    const permissions = user.permissions.map(({ name }) => name);
-    return [PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP].some((v) => permissions.includes(v));
-  }
-
   @Get(':id')
   @ApiOperation({
     description: '查看媒体',
@@ -54,7 +49,7 @@ export class MediaController {
   async getMediaById(@Param('id') id: string, @RequestUser() user: User) {
     const media = await this.mediaService.findOneBy({
       id,
-      ...(!this.hasOpPermission(user) ? { isPublic: true } : {}),
+      ...(user.hasOneOf(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP) ? {} : { isPublic: true }),
     });
     if (!media) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -77,7 +72,7 @@ export class MediaController {
         exact: {
           id,
           createAt: start != null ? Between(new Date(start), end != null ? new Date(end) : new Date()) : undefined,
-          isPublic: !this.hasOpPermission(user) ? true : undefined,
+          isPublic: user.hasOneOf(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP) ? undefined : true,
         },
       }),
       skip: query.page * query.size,

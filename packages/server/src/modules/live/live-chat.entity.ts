@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
 import { Live } from './live.entity';
 import { User } from '../user/user.entity';
@@ -18,6 +18,7 @@ export class LiveChat {
 
   /** 发送用户 */
   @ManyToOne(() => User, {
+    onDelete: 'CASCADE',
     eager: true,
   })
   user: User;
@@ -41,9 +42,4 @@ export class LiveChat {
   /** 创建时间 */
   @CreateDateColumn()
   createAt: Date;
-
-  /** 删除时间 */
-  @Exclude()
-  @DeleteDateColumn()
-  deleteAt: Date;
 }

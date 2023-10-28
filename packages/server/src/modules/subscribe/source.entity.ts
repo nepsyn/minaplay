@@ -68,9 +68,11 @@ export class Source {
 
   /** 创建用户 */
   @ManyToOne(() => User, (user) => user.sources, {
+    onDelete: 'SET NULL',
     eager: true,
+    nullable: true,
   })
-  user: User;
+  user?: User;
 
   /** 创建时间 */
   @CreateDateColumn()

@@ -1,7 +1,6 @@
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   Index,
   JoinTable,
@@ -16,6 +15,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { File } from '../file/file.entity';
 import { Series } from '../series/series.entity';
 import { Source } from '../subscribe/source.entity';
+import { PermissionEnum } from '../../enums/permission.enum';
 
 /** 用户 */
 @Entity()
@@ -34,7 +34,6 @@ export class User {
   username: string;
 
   /** 邮箱 */
-  @Exclude()
   @Index({
     unique: true,
   })
@@ -44,13 +43,12 @@ export class User {
   email: string;
 
   /** 允许通知 */
-  @Exclude()
   @Column({
     default: false,
   })
   notify: boolean;
 
-  /** Token */
+  /** 密码 */
   @Exclude()
   @Column()
   password: string;
@@ -95,14 +93,19 @@ export class User {
   @UpdateDateColumn()
   updateAt: Date;
 
-  /** 删除时间 */
-  @Exclude()
-  @DeleteDateColumn()
-  deleteAt: Date;
-
   /** 权限名称列表 */
   @Expose()
   get permissionNames() {
     return this.permissions?.map((permission) => permission.name) ?? [];
+  }
+
+  /** 是否为ROOT用户 */
+  @Exclude()
+  get isRoot() {
+    return this.permissionNames.includes(PermissionEnum.ROOT_OP);
+  }
+
+  hasOneOf(...permissions: PermissionEnum[]) {
+    return permissions.some((v) => this.permissionNames.includes(v));
   }
 }

@@ -2,11 +2,6 @@ export enum PermissionEnum {
   /** 最高权限 */
   ROOT_OP = '*:*',
 
-  /** 用户管理 */
-  USER_OP = 'USER:*',
-  /* 用户查看 */
-  USER_VIEW = 'USER:VIEW',
-
   /** 文件管理 */
   FILE_OP = 'FILE:*',
   /** 上传图片 */

@@ -10,6 +10,7 @@ import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { LiveGateway } from './live.gateway';
+import { encryptPassword } from '../../utils/encrypt-password.util';
 
 @Controller('live')
 @UseGuards(AuthorizationGuard)
@@ -40,6 +41,7 @@ export class LiveController {
   async createLive(@Body() data: LiveDto, @RequestUser() user: User) {
     const { id } = await this.liveService.save({
       ...data,
+      password: data.password != null ? await encryptPassword(data.password) : undefined,
       poster: { id: data.posterFileId },
       user: { id: user.id },
     });
@@ -62,6 +64,7 @@ export class LiveController {
     await this.liveService.save({
       id,
       ...data,
+      password: data.password != null ? await encryptPassword(data.password) : undefined,
       poster: { id: data.posterFileId },
     });
     await this.liveService.createLiveState(id, true);

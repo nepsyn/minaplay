@@ -41,8 +41,8 @@ export class ViewHistory {
 
   /** 用户 */
   @ManyToOne(() => User, {
-    eager: true,
     onDelete: 'CASCADE',
+    eager: true,
   })
   user: User;
 

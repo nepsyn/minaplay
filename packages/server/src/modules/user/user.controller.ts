@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   NotFoundException,
   Param,
@@ -25,6 +26,8 @@ import { User } from './user.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { CreateUserDto } from './create-user.dto';
 import { encryptPassword } from '../../utils/encrypt-password.util';
+import { RequestUser } from '../authorization/request.user.decorator';
+import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 
 @Controller('user')
 @UseGuards(AuthorizationGuard)
@@ -33,25 +36,53 @@ import { encryptPassword } from '../../utils/encrypt-password.util';
 export class UserController {
   constructor(private userService: UserService) {}
 
-  @Get(':id')
+  @Get(':id/profile')
   @ApiOperation({
     description: '查看用户信息',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.USER_OP, PermissionEnum.USER_VIEW)
-  async getUserById(@Param('id', ParseIntPipe) id: number) {
-    const user = await this.userService.findOneBy({ id });
-    if (!user) {
+  async getUserProfileById(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
+    const targetUser = await this.userService.findOneBy({ id });
+    if (!targetUser) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    return user;
+    const valid = user.isRoot || user.id === targetUser.id;
+    if (!valid) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
+    }
+
+    return targetUser;
+  }
+
+  @Put(':id/profile')
+  @ApiOperation({
+    description: '修改用户信息',
+  })
+  async updateUserProfile(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number, @Body() data: UserDto) {
+    const targetUser = await this.userService.findOneBy({ id });
+    if (!targetUser) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    const valid = user.isRoot || user.id === targetUser.id;
+    if (!valid) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
+    }
+
+    await this.userService.save({
+      id,
+      ...data,
+      avatar: { id: data.avatarFileId },
+    });
+
+    return await this.userService.findOneBy({ id });
   }
 
   @Get()
   @ApiOperation({
     description: '查询用户',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.USER_OP, PermissionEnum.USER_VIEW)
+  @RequirePermissions(PermissionEnum.ROOT_OP)
   async queryUser(@Query() query: UserQueryDto) {
     const { keyword, id, username } = query;
     const [result, total] = await this.userService.findAndCount({
@@ -82,6 +113,10 @@ export class UserController {
       throw buildException(BadRequestException, ErrorCodeEnum.USERNAME_ALREADY_OCCUPIED);
     }
 
+    if (data.permissionNames.includes(PermissionEnum.ROOT_OP)) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
+    }
+
     const { id } = await this.userService.save({
       username: data.username,
       password: await encryptPassword(data.password),
@@ -91,23 +126,23 @@ export class UserController {
     return await this.userService.findOneBy({ id });
   }
 
-  @Put(':id')
+  @Delete(':id')
   @ApiOperation({
-    description: '修改用户信息',
+    description: '删除用户',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.USER_OP)
-  async updateUser(@Param('id', ParseIntPipe) id: number, @Body() data: UserDto) {
+  @RequirePermissions(PermissionEnum.ROOT_OP)
+  async deleteUser(@Param('id') id: number) {
     const user = await this.userService.findOneBy({ id });
     if (!user) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    await this.userService.save({
-      id,
-      ...data,
-      avatar: { id: data.avatarFileId },
-    });
+    if (user.isRoot) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
+    }
 
-    return await this.userService.findOneBy({ id });
+    await this.userService.delete({ id });
+
+    return {};
   }
 }

@@ -11,7 +11,9 @@ export class Permission {
 
   /** 用户 */
   @Exclude()
-  @ManyToMany(() => User, (user) => user.permissions)
+  @ManyToMany(() => User, (user) => user.permissions, {
+    onDelete: 'CASCADE',
+  })
   users: User[];
 
   /** 描述 */

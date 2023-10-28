@@ -34,6 +34,7 @@ export class User {
   username: string;
 
   /** 邮箱 */
+  @Expose({ groups: ['profile'] })
   @Index({
     unique: true,
   })
@@ -43,6 +44,7 @@ export class User {
   email: string;
 
   /** 允许通知 */
+  @Expose({ groups: ['profile'] })
   @Column({
     default: false,
   })

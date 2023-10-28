@@ -28,6 +28,7 @@ import { CreateUserDto } from './create-user.dto';
 import { encryptPassword } from '../../utils/encrypt-password.util';
 import { RequestUser } from '../authorization/request.user.decorator';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
+import { instanceToPlain } from 'class-transformer';
 
 @Controller('user')
 @UseGuards(AuthorizationGuard)
@@ -51,7 +52,7 @@ export class UserController {
       throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
     }
 
-    return targetUser;
+    return instanceToPlain(targetUser, { groups: ['profile'] });
   }
 
   @Put(':id/profile')
@@ -75,7 +76,7 @@ export class UserController {
       avatar: { id: data.avatarFileId },
     });
 
-    return await this.userService.findOneBy({ id });
+    return instanceToPlain(await this.userService.findOneBy({ id }), { groups: ['profile'] });
   }
 
   @Get()
@@ -99,7 +100,12 @@ export class UserController {
       order: { [query.sort]: query.order },
     });
 
-    return new ApiPaginationResultDto(result, total, query.page, query.size);
+    return new ApiPaginationResultDto(
+      result.map((v) => instanceToPlain(v, { groups: ['profile'] })),
+      total,
+      query.page,
+      query.size,
+    );
   }
 
   @Post()

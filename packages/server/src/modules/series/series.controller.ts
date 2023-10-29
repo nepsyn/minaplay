@@ -66,7 +66,7 @@ export class SeriesController {
       ...data,
       user: { id: user.id },
       poster: { id: data.posterFileId },
-      tags: data.tagIds?.map((id) => ({ id })),
+      tags: data.tags?.map((name) => ({ name })),
     });
 
     return await this.seriesService.buildCompositeQuery(user.id, { id }).getOne();
@@ -78,8 +78,8 @@ export class SeriesController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
   async querySeries(@RequestUser() user: User, @Query() query: SeriesQueryDto) {
-    const { keyword, id, name, season, finished, subscribed, userId, start, end } = query;
-    const [result, total] = await this.seriesService
+    const { keyword, id, name, season, finished, subscribed, userId, tags, start, end } = query;
+    const qb = this.seriesService
       .buildCompositeQuery(
         user.id,
         buildQueryOptions<Series>({
@@ -91,11 +91,28 @@ export class SeriesController {
             season,
             finished,
             user: { id: userId },
-            createAt: start != null ? Between(new Date(start), end ? new Date(end) : new Date()) : undefined,
+            createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
           },
         }),
       )
-      .andWhere(subscribed != null ? `subscribe.seriesId IS ${subscribed ? 'NOT NULL' : 'NULL'}` : {})
+      .andWhere(subscribed ? `subscribe.seriesId IS ${subscribed ? 'NOT NULL' : 'NULL'}` : {});
+
+    if (tags && tags.length > 0) {
+      qb.andWhere(
+        'series.id IN ' +
+          qb
+            .subQuery()
+            .from(Series, 's1')
+            .leftJoinAndSelect('s1.tags', 't1')
+            .where('t1.name IN (:tags)', { tags })
+            .select('s1.id')
+            .groupBy('s1.id')
+            .having('COUNT(DISTINCT t1.name) = :tagsCount', { tagsCount: tags.length })
+            .getQuery(),
+      );
+    }
+
+    const [result, total] = await qb
       .skip(query.page * query.size)
       .take(query.size)
       .orderBy(`series.${query.sort}`, query.order)
@@ -124,7 +141,7 @@ export class SeriesController {
       id,
       ...data,
       poster: { id: data.posterFileId },
-      tags: data.tagIds?.map((id) => ({ id })),
+      tags: data.tags?.map((name) => ({ name })),
     });
 
     return await this.seriesService.buildCompositeQuery(user.id, { id }).getOne();

@@ -57,9 +57,12 @@ export class SeriesDto {
   @ApiProperty({
     description: '剧集标签',
     required: false,
-    type: [Number],
+    type: [String],
   })
   @IsOptional()
   @IsArray()
-  tagIds?: number[];
+  @IsString({
+    each: true,
+  })
+  tags?: string[];
 }

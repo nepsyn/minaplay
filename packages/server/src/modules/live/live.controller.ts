@@ -41,7 +41,7 @@ export class LiveController {
   async createLive(@Body() data: LiveDto, @RequestUser() user: User) {
     const { id } = await this.liveService.save({
       ...data,
-      password: data.password != null ? await encryptPassword(data.password) : undefined,
+      password: data.password && (await encryptPassword(data.password)),
       poster: { id: data.posterFileId },
       user: { id: user.id },
     });
@@ -64,7 +64,7 @@ export class LiveController {
     await this.liveService.save({
       id,
       ...data,
-      password: data.password != null ? await encryptPassword(data.password) : undefined,
+      password: data.password && (await encryptPassword(data.password)),
       poster: { id: data.posterFileId },
     });
     await this.liveService.createLiveState(id, true);

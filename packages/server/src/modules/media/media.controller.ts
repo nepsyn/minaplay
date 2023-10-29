@@ -71,7 +71,7 @@ export class MediaController {
         keywordProperties: (entity) => [entity.name, entity.description],
         exact: {
           id,
-          createAt: start != null ? Between(new Date(start), end != null ? new Date(end) : new Date()) : undefined,
+          createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
           isPublic: user.hasOneOf(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP) ? undefined : true,
         },
       }),

@@ -170,7 +170,7 @@ export class AuthorizationController {
   @ApiBearerAuth()
   @UseGuards(AuthorizationGuard)
   async changePassword(@RequestUser() user: User, @RequestIp() ip: string, @Body() data: ChangePasswordDto) {
-    const valid = data.old != null ? await compare(data.old, user.password) : false;
+    const valid = data.old && (await compare(data.old, user.password));
     if (!valid) {
       throw buildException(BadRequestException, ErrorCodeEnum.WRONG_USERNAME_OR_PASSWORD);
     }

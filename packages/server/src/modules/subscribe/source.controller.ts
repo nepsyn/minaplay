@@ -221,7 +221,7 @@ export class SourceController {
       where: buildQueryOptions<FetchLog>({
         exact: {
           source: { id },
-          createAt: start != null ? Between(new Date(start), end != null ? new Date(end) : new Date()) : undefined,
+          createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
         },
       }),
       skip: query.page * query.size,
@@ -271,7 +271,7 @@ export class SourceController {
           rule: { id: ruleId },
           log: { id: logId },
           status,
-          createAt: start != null ? Between(new Date(start), end != null ? new Date(end) : new Date()) : undefined,
+          createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
         },
       }),
       skip: query.page * query.size,

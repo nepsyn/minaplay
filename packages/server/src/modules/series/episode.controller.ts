@@ -25,7 +25,6 @@ import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { Between } from 'typeorm';
 import { EpisodeQueryDto } from './episode-query.dto';
-import { ApiQueryDto } from '../../utils/api.query.dto';
 import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
 import { ViewHistoryDto } from '../media/view-history.dto';
@@ -56,25 +55,13 @@ export class EpisodeController {
         exact: {
           id,
           series: { id: seriesId },
-          createAt: start != null ? Between(new Date(start), end ? new Date(end) : new Date()) : undefined,
+          createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
         },
       }),
       skip: query.page * query.size,
       take: query.size,
       order: { [query.sort]: query.order },
     });
-
-    return new ApiPaginationResultDto(result, total, query.page, query.size);
-  }
-
-  @Get('update')
-  @ApiOperation({
-    description: '查看最近更新',
-  })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
-  async queryUpdateEpisodes(@Query() query: ApiQueryDto<Episode>) {
-    const [ids, total] = await this.episodeService.findLatestIds(query.page * query.size, query.size);
-    const result = await Promise.all(ids.map(({ id }) => this.episodeService.findOneBy({ id })));
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
   }

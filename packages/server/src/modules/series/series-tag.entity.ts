@@ -1,26 +1,12 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  ManyToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { Series } from './series.entity';
 
 /** 剧集标签 */
 @Entity()
 export class SeriesTag {
-  /** id */
-  @PrimaryGeneratedColumn('increment')
-  id: number;
-
   /** 剧集标签名称 */
-  @Column({
-    unique: true,
-  })
+  @PrimaryColumn()
   name: string;
 
   /** 剧集 */

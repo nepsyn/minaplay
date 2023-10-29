@@ -68,6 +68,18 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   userId?: number;
 
   @ApiProperty({
+    description: '剧集标签',
+    required: false,
+    type: [String],
+  })
+  @Transform(({ value }) => (value ? [].concat(value) : undefined))
+  @IsOptional()
+  @IsString({
+    each: true,
+  })
+  tags?: string[];
+
+  @ApiProperty({
     description: '开始时间',
     required: false,
   })

@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Permission } from './permission.entity';
-import { DeepPartial, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/user.entity';
 import { instanceToPlain } from 'class-transformer';
@@ -119,14 +119,13 @@ export class AuthorizationService {
     }
   }
 
-  async findAllPermissions() {
-    return await this.permissionRepository.find();
-  }
-
-  async grantPermissions(user: DeepPartial<User>, permissionNames: PermissionEnum[]) {
-    return await this.userService.save({
-      id: user.id,
-      permissions: permissionNames.map((name) => ({ name })),
-    });
+  async grantPermissions(userId: number, permissionNames: PermissionEnum[]) {
+    await this.permissionRepository.delete({ userId });
+    await this.permissionRepository.save(
+      permissionNames.map((name) => ({
+        userId,
+        name,
+      })),
+    );
   }
 }

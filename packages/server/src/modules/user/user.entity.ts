@@ -3,8 +3,6 @@ import {
   CreateDateColumn,
   Entity,
   Index,
-  JoinTable,
-  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -64,10 +62,9 @@ export class User {
 
   /** 权限 */
   @Exclude()
-  @ManyToMany(() => Permission, (permission) => permission.users, {
+  @OneToMany(() => Permission, (permission) => permission.user, {
     eager: true,
   })
-  @JoinTable()
   permissions: Permission[];
 
   /** 创建的剧集 */

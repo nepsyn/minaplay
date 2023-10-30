@@ -22,6 +22,7 @@ export class CreateUserDto {
   @ApiProperty({
     description: '权限列表',
     enum: PermissionEnum,
+    isArray: true,
   })
   @IsArray()
   @IsEnum(PermissionEnum, {

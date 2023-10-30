@@ -5,7 +5,6 @@ import { createTransport, SendMailOptions, Transporter } from 'nodemailer';
 import { NotificationEventMap, NotificationEventType } from './notification-events.interface';
 import Handlebars from 'handlebars';
 import path from 'path';
-import process from 'process';
 import fs from 'fs-extra';
 
 @Injectable()
@@ -38,8 +37,8 @@ export class EmailService implements OnModuleInit {
   }
 
   private async compileTemplate(event: NotificationEventType | string) {
-    const candidates = [`${event}.handlebars`, `${event}.${this.options.appEnv}.handlebars`].map((name) =>
-      path.join(process.cwd(), 'templates', name),
+    const candidates = [`${event}.${this.options.appEnv}.handlebars`, `${event}.handlebars`].map((name) =>
+      path.join(__dirname, '../../../templates', name),
     );
 
     for (const candidate of candidates) {

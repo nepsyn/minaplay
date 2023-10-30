@@ -2,6 +2,7 @@ import {
   BadRequestException,
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   NotFoundException,
@@ -32,6 +33,7 @@ import { EmailVerifyDto } from './email-verify.dto';
 import { ChangePasswordDto } from './change-password.dto';
 import { encryptPassword } from '../../utils/encrypt-password.util';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
+import { CreateUserDto } from './create-user.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -191,7 +193,34 @@ export class AuthorizationController {
     return data;
   }
 
-  @Post(':userId/logout')
+  @Post('user/create')
+  @ApiOperation({
+    description: '创建用户',
+  })
+  @ApiBearerAuth()
+  @HttpCode(200)
+  @UseGuards(AuthorizationGuard)
+  @RequirePermissions(PermissionEnum.ROOT_OP)
+  async createUser(@Body() data: CreateUserDto) {
+    const sameNameUser = await this.userService.findOneBy({ username: data.username });
+    if (sameNameUser) {
+      throw buildException(BadRequestException, ErrorCodeEnum.USERNAME_ALREADY_OCCUPIED);
+    }
+
+    if (data.permissionNames.includes(PermissionEnum.ROOT_OP)) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
+    }
+
+    const { id } = await this.userService.save({
+      username: data.username,
+      password: await encryptPassword(data.password),
+    });
+    await this.authService.grantPermissions(id, data.permissionNames);
+
+    return await this.userService.findOneBy({ id });
+  }
+
+  @Post('user/:userId/logout')
   @ApiOperation({
     description: '注销指定用户',
   })
@@ -212,7 +241,7 @@ export class AuthorizationController {
     return {};
   }
 
-  @Put(':userId/password')
+  @Put('user/:userId/password')
   @ApiOperation({
     description: '更改指定用户密码',
   })
@@ -235,7 +264,7 @@ export class AuthorizationController {
       ip,
       operator: { id: operator.id },
       target: { id: user.id },
-      extra: JSON.stringify(data),
+      extra: JSON.stringify({ current: data.current }),
     });
 
     await this.userService.save({
@@ -246,7 +275,7 @@ export class AuthorizationController {
     return { current: data.current };
   }
 
-  @Post(':userId/grant')
+  @Put('user/:userId/permission')
   @ApiOperation({
     description: '设置用户权限',
   })
@@ -280,9 +309,31 @@ export class AuthorizationController {
       extra: JSON.stringify(data.permissionNames),
     });
 
-    await this.authService.grantPermissions(user, data.permissionNames);
+    await this.authService.grantPermissions(user.id, data.permissionNames);
 
     return await this.userService.findOneBy({ id: userId });
+  }
+
+  @Delete('user/:userId')
+  @ApiOperation({
+    description: '删除用户',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthorizationGuard)
+  @RequirePermissions(PermissionEnum.ROOT_OP)
+  async deleteUser(@Param('id') id: number) {
+    const user = await this.userService.findOneBy({ id });
+    if (!user) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    if (user.isRoot) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
+    }
+
+    await this.userService.delete({ id });
+
+    return {};
   }
 
   @Get('permission')
@@ -293,6 +344,6 @@ export class AuthorizationController {
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP)
   async fetchAllPermissions() {
-    return await this.authService.findAllPermissions();
+    return Object.keys(PermissionEnum).map((key) => PermissionEnum[key]);
   }
 }

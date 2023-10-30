@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToMany, PrimaryColumn } from 'typeorm';
+import { Entity, ManyToOne, PrimaryColumn } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Exclude } from 'class-transformer';
 import { PermissionEnum } from '../../enums/permission.enum';
@@ -6,19 +6,19 @@ import { PermissionEnum } from '../../enums/permission.enum';
 @Entity()
 export class Permission {
   /** 名称 */
-  @PrimaryColumn()
+  @PrimaryColumn({
+    type: 'enum',
+    enum: PermissionEnum,
+  })
   name: PermissionEnum;
 
   /** 用户 */
   @Exclude()
-  @ManyToMany(() => User, (user) => user.permissions, {
+  @ManyToOne(() => User, (user) => user.permissions, {
     onDelete: 'CASCADE',
   })
-  users: User[];
+  user: User;
 
-  /** 描述 */
-  @Column({
-    nullable: true,
-  })
-  description: string;
+  @PrimaryColumn()
+  userId: number;
 }

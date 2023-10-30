@@ -4,7 +4,6 @@
     "node_modules",
     "test",
     "dist",
-    "scripts",
     "resources",
     "**/*spec.ts"
   ]

@@ -22,14 +22,8 @@ export class ViewHistoryController {
   @ApiOperation({
     description: '查询历史记录',
   })
-  @RequirePermissions(
-    PermissionEnum.ROOT_OP,
-    PermissionEnum.MEDIA_OP,
-    PermissionEnum.MEDIA_VIEW,
-    PermissionEnum.SERIES_OP,
-    PermissionEnum.SERIES_VIEW,
-  )
-  async queryUserHistory(@RequestUser() user: User, @Query() query: ApiQueryDto<ViewHistory>) {
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
+  async queryUserViewHistory(@RequestUser() user: User, @Query() query: ApiQueryDto<ViewHistory>) {
     const [result, total] = await this.viewHistoryService.findAndCount({
       where: buildQueryOptions<ViewHistory>({
         exact: {
@@ -48,14 +42,8 @@ export class ViewHistoryController {
   @ApiOperation({
     description: '清空历史记录',
   })
-  @RequirePermissions(
-    PermissionEnum.ROOT_OP,
-    PermissionEnum.MEDIA_OP,
-    PermissionEnum.MEDIA_VIEW,
-    PermissionEnum.SERIES_OP,
-    PermissionEnum.SERIES_VIEW,
-  )
-  async deleteUserHistories(@RequestUser() user: User) {
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
+  async deleteUserViewHistories(@RequestUser() user: User) {
     await this.viewHistoryService.delete({
       user: { id: user.id },
     });

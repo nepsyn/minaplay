@@ -138,12 +138,29 @@ export class MediaController {
     return {};
   }
 
-  @Post(':id/history')
+  @Get(':id/history')
   @ApiOperation({
-    description: '添加历史记录',
+    description: '获取播放记录',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
-  async createMediaHistory(@RequestUser() user: User, @Param('id') id: string, @Body() data: ViewHistoryDto) {
+  async getViewHistoryByMediaId(@RequestUser() user: User, @Param('id') id: string) {
+    const history = await this.viewHistoryService.findOneBy({
+      user: { id: user.id },
+      media: { id },
+    });
+    if (!history) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    return history;
+  }
+
+  @Post(':id/history')
+  @ApiOperation({
+    description: '添加播放记录',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
+  async createViewHistory(@RequestUser() user: User, @Param('id') id: string, @Body() data: ViewHistoryDto) {
     const media = await this.mediaService.findOneBy({ id });
     if (!media) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -162,10 +179,10 @@ export class MediaController {
 
   @Delete(':id/history')
   @ApiOperation({
-    description: '删除历史记录',
+    description: '删除播放记录',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
-  async deleteMediaHistory(@RequestUser() user: User, @Param('id') id: string) {
+  async deleteViewHistory(@RequestUser() user: User, @Param('id') id: string) {
     await this.viewHistoryService.delete({
       media: { id },
       user: { id: user.id },

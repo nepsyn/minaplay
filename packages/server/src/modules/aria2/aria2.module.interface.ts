@@ -5,6 +5,5 @@ export interface Aria2ModuleOptions {
   rpcSecret?: string;
   autoUpdateTracker?: boolean;
   trackerListUrl?: string;
-  expireHours?: number;
   httpProxy?: string;
 }

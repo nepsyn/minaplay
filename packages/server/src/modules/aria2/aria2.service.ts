@@ -81,13 +81,6 @@ export class Aria2Service implements OnModuleInit {
     const task = this.tasks.get(parentGid);
     if (task) {
       const files: File[] = [];
-      let expireAt = new Date();
-      if (this.options.expireHours > 0) {
-        expireAt.setHours(expireAt.getHours() + this.options.expireHours);
-      } else {
-        expireAt = null;
-      }
-
       for (const file of status.files) {
         const fileStat = await stat(file.path);
         const fileType = await fileTypeFromFile(file.path);
@@ -100,7 +93,6 @@ export class Aria2Service implements OnModuleInit {
           mimetype: fileType && fileType.mime,
           source: FileSourceEnum.ARIA2_DOWNLOAD,
           path: file.path,
-          expireAt,
         });
         files.push(record);
       }

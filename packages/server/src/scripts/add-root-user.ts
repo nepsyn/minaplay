@@ -44,8 +44,8 @@ export async function addRootUser() {
   const permissionRepo: Repository<Permission> = app.get(getRepositoryToken(Permission));
 
   const username = await input({
-    message: 'Please input username:',
-    validate: (v) => isString(v) && v.length >= 1,
+    message: 'Input root user username:',
+    validate: (v) => isString(v) && v.length >= 2 && v.length <= 40,
     transformer: (v) => v.trim(),
   });
   const sameNameUser = await userRepo.findOneBy({ username });
@@ -55,17 +55,17 @@ export async function addRootUser() {
   }
 
   const pass = await password({
-    message: 'Please input password:',
-    validate: (v) => isString(v) && v.length >= 6 && v.length <= 20,
+    message: 'Input root user password:',
+    validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
     mask: '*',
   });
   const passConfirm = await password({
-    message: 'Please confirm password again:',
-    validate: (v) => isString(v) && v.length >= 6 && v.length <= 20,
+    message: 'Confirm root user password:',
+    validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
     mask: '*',
   });
   if (pass !== passConfirm) {
-    process.stderr.write('The two passwords do not match.\n');
+    process.stderr.write('Passwords do not match.\n');
     process.exit();
   }
 
@@ -73,7 +73,6 @@ export async function addRootUser() {
     const { id } = await userRepo.save({
       username,
       password: await encryptPassword(pass),
-      permissions: [{ name: PermissionEnum.ROOT_OP }],
     });
     await permissionRepo.save({
       userId: id,

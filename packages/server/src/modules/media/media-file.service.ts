@@ -111,7 +111,7 @@ export class MediaFileService {
     const files: File[] = [];
 
     for (const [index, subtitle] of subtitles.entries()) {
-      const subtitleFileName = `${subtitle.tags.title ?? index}.ass`;
+      const subtitleFileName = `${subtitle.tags.title ?? index}.${subtitle.codec_name}`;
       const subtitleFilePath = path.join(GENERATED_DIR, media.id, subtitleFileName);
       await fs.ensureDir(path.join(GENERATED_DIR, media.id));
 

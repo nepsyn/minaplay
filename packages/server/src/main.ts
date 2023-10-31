@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import { MINAPLAY_VERSION } from './constants';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -15,7 +16,9 @@ async function bootstrap() {
   app.useStaticAssets('public');
 
   // enable cors
-  app.enableCors();
+  if (Number(configService.get('APP_ENABLE_CORS', 0)) === 1) {
+    app.enableCors();
+  }
 
   // swagger settings
   if (configService.get('APP_ENV') === 'dev') {
@@ -23,7 +26,7 @@ async function bootstrap() {
       .setTitle('MinaPlay')
       .setDescription('MinaPlay api document')
       .addBearerAuth()
-      .setVersion('1.0.0')
+      .setVersion(MINAPLAY_VERSION)
       .build();
     const doc = SwaggerModule.createDocument(app, docOptions);
     SwaggerModule.setup('doc', app, doc);

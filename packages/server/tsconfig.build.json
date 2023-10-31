@@ -4,6 +4,7 @@
     "node_modules",
     "test",
     "dist",
+    "public",
     "resources",
     "**/*spec.ts"
   ]

@@ -29,6 +29,7 @@ import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
 import { ViewHistoryDto } from './view-history.dto';
 import { ViewHistoryService } from './view-history.service';
+import { PluginService } from '../plugin/plugin.service';
 
 @Controller('media')
 @UseGuards(AuthorizationGuard)
@@ -39,6 +40,7 @@ export class MediaController {
     private mediaService: MediaService,
     private viewHistoryService: ViewHistoryService,
     private mediaFileService: MediaFileService,
+    private pluginService: PluginService,
   ) {}
 
   @Get(':id')
@@ -96,15 +98,15 @@ export class MediaController {
     const { id } = await this.mediaService.save({
       ...data,
       file: { id: data.fileId },
-      poster: { id: data.posterFileId },
     });
 
     const media = await this.mediaService.findOneBy({ id });
     if (media.file?.isExist && !media.metadata) {
       await this.mediaFileService.generateMediaFiles(media);
     }
+    await this.pluginService.emitAllEnabled('onNewMedia', id);
 
-    return media;
+    return await this.mediaService.findOneBy({ id });
   }
 
   @Put(':id')

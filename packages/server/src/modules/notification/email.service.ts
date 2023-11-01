@@ -62,7 +62,7 @@ export class EmailService implements OnModuleInit {
         (error, info) => {
           if (error) {
             reject(error);
-            this.logger.error('Send mail error: ', error.stack);
+            this.logger.error('Send mail error', error.stack);
           }
           resolve(info);
         },

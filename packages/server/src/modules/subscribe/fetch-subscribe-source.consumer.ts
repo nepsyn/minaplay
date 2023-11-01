@@ -1,34 +1,27 @@
 import { Process, Processor } from '@nestjs/bull';
-import { Injectable } from '@nestjs/common';
+import { ConsoleLogger, Injectable } from '@nestjs/common';
 import { SourceService } from './source.service';
 import { Job } from 'bull';
 import { Source } from './source.entity';
 import { FetchLogService } from './fetch-log.service';
 import { RuleService } from './rule.service';
 import { DownloadItemService } from './download-item.service';
-import { VALID_VIDEO_MIME } from '../../constants';
-import { EpisodeService } from '../series/episode.service';
-import { MediaService } from '../media/media.service';
-import { MediaFileService } from '../media/media-file.service';
 import { StatusEnum } from '../../enums/status.enum';
 import { FeedData } from '@extractus/feed-extractor';
 import { RuleErrorLogService } from './rule-error-log.service';
-import { RuleFileDescriptor, RuleHooks } from './rule.interface';
-import { SeriesSubscribeService } from '../series/series-subscribe.service';
+import { RuleHooks } from './rule.interface';
 
 @Injectable()
 @Processor('fetch-subscribe-source')
 export class FetchSubscribeSourceConsumer {
+  private logger = new ConsoleLogger(FetchSubscribeSourceConsumer.name);
+
   constructor(
     private sourceService: SourceService,
     private fetchLogService: FetchLogService,
     private ruleService: RuleService,
     private ruleErrorLogService: RuleErrorLogService,
     private downloadItemService: DownloadItemService,
-    private episodeService: EpisodeService,
-    private seriesSubscribeService: SeriesSubscribeService,
-    private mediaService: MediaService,
-    private mediaFileService: MediaFileService,
   ) {}
 
   @Process()
@@ -71,6 +64,7 @@ export class FetchSubscribeSourceConsumer {
     const validEntries = data.entries.filter((entry) => entry.enclosure?.url);
     const validRules = rules.filter((rule) => rule.codeFile.isExist);
 
+    let count = 0;
     for (const rule of validRules) {
       let hooks: RuleHooks;
       try {
@@ -107,57 +101,13 @@ export class FetchSubscribeSourceConsumer {
           break;
         }
 
-        const [task, item] = await this.downloadItemService.addDownloadItemTask(entry.enclosure.url, {
-          title: entry.title,
-          url: entry.enclosure.url,
-          source: { id: source.id },
-          rule: { id: rule.id },
-          log: { id: log.id },
-          entry: JSON.stringify(entry),
-        });
-        task.on('complete', async (files) => {
-          for (const file of files) {
-            if (VALID_VIDEO_MIME.includes(file.mimetype)) {
-              const copy = Object.freeze(Object.assign({}, file));
-
-              let descriptor: RuleFileDescriptor;
-              try {
-                descriptor = (await hooks.describe?.(entry, copy)) ?? {};
-              } catch (error) {
-                await this.ruleErrorLogService.save({
-                  rule: { id: rule.id },
-                  error: error.toString(),
-                });
-                continue;
-              }
-
-              const { id } = await this.mediaService.save({
-                name: descriptor.name ?? file.name,
-                description: descriptor.description,
-                download: { id: item.id },
-                isPublic: descriptor.isPublic ?? true,
-                file: { id: file.id },
-              });
-              const media = await this.mediaService.findOneBy({ id });
-              await this.mediaFileService.generateMediaFiles(media);
-
-              if (rule.series) {
-                await this.episodeService.save({
-                  title: descriptor.title ?? file.name,
-                  no: descriptor.no,
-                  pubAt: descriptor.pubAt ?? entry.published ?? new Date(),
-                  media: { id: media.id },
-                  series: { id: rule.series.id },
-                });
-              }
-            }
-          }
-
-          if (rule.series) {
-            await this.seriesSubscribeService.notifyUpdate(rule.series);
-          }
-        });
+        await this.downloadItemService.addAutoDownloadItemTask(Object.freeze(entry), rule, log, hooks.describe);
+        this.logger.log(`Starting download entry: ${entry.title}`);
+        count++;
       }
     }
+    this.logger.log(
+      `Fetch subscribe source ${source.title ?? source.remark ?? source.url} done, ${count} entries downloading`,
+    );
   }
 }

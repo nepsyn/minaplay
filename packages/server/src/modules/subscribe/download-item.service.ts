@@ -5,12 +5,29 @@ import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'type
 import { StatusEnum } from '../../enums/status.enum';
 import { Aria2Service } from '../aria2/aria2.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { RuleFileDescriber, RuleFileDescriptor } from './rule.interface';
+import { VALID_VIDEO_MIME } from '../../constants';
+import { RuleErrorLogService } from './rule-error-log.service';
+import { MediaService } from '../media/media.service';
+import { EpisodeService } from '../series/episode.service';
+import { MediaFileService } from '../media/media-file.service';
+import { SeriesSubscribeService } from '../series/series-subscribe.service';
+import { PluginService } from '../plugin/plugin.service';
+import { FeedEntry } from '@extractus/feed-extractor';
+import { Rule } from './rule.entity';
+import { FetchLog } from './fetch-log.entity';
 
 @Injectable()
 export class DownloadItemService implements OnModuleInit {
   constructor(
     @InjectRepository(DownloadItem) private downloadItemRepository: Repository<DownloadItem>,
     private aria2Service: Aria2Service,
+    private ruleErrorLogService: RuleErrorLogService,
+    private mediaService: MediaService,
+    private episodeService: EpisodeService,
+    private mediaFileService: MediaFileService,
+    private seriesSubscribeService: SeriesSubscribeService,
+    private pluginService: PluginService,
   ) {}
 
   async onModuleInit() {
@@ -49,6 +66,63 @@ export class DownloadItemService implements OnModuleInit {
         status: StatusEnum.FAILED,
         error: status.errorMessage,
       });
+    });
+
+    return [task, item] as const;
+  }
+
+  async addAutoDownloadItemTask(entry: FeedEntry, rule: Rule, log: FetchLog, describeFn: RuleFileDescriber) {
+    const [task, item] = await this.addDownloadItemTask(entry.enclosure.url, {
+      title: entry.title,
+      url: entry.enclosure.url,
+      source: { id: rule.sourceId },
+      rule: { id: rule.id },
+      log: { id: log.id },
+      entry: JSON.stringify(entry),
+    });
+    task.on('complete', async (files) => {
+      for (const file of files) {
+        if (VALID_VIDEO_MIME.includes(file.mimetype)) {
+          const copy = Object.freeze(Object.assign({}, file));
+
+          let descriptor: RuleFileDescriptor;
+          try {
+            descriptor = (await describeFn?.(entry, copy)) ?? {};
+          } catch (error) {
+            await this.ruleErrorLogService.save({
+              rule: { id: rule.id },
+              error: error.toString(),
+            });
+            continue;
+          }
+
+          const { id } = await this.mediaService.save({
+            name: descriptor.name ?? file.name,
+            description: descriptor.description,
+            download: { id: item.id },
+            isPublic: descriptor.isPublic ?? true,
+            file: { id: file.id },
+          });
+          const media = await this.mediaService.findOneBy({ id });
+          await this.mediaFileService.generateMediaFiles(media);
+          await this.pluginService.emitAllEnabled('onNewMedia', id);
+
+          if (rule.series) {
+            const { id } = await this.episodeService.save({
+              title: descriptor.title ?? file.name,
+              no: descriptor.no,
+              pubAt: descriptor.pubAt ?? entry.published ?? new Date(),
+              media: { id: media.id },
+              series: { id: rule.series.id },
+            });
+            await this.pluginService.emitAllEnabled('onNewEpisode', id);
+          }
+        }
+      }
+
+      if (rule.series) {
+        await this.seriesSubscribeService.notifyUpdate(rule.series);
+      }
     });
 
     return [task, item] as const;

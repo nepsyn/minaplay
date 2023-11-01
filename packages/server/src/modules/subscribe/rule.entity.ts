@@ -41,6 +41,9 @@ export class Rule {
   })
   source: Source;
 
+  @Column()
+  sourceId: number;
+
   /** 下载内容 */
   @Exclude()
   @OneToMany(() => DownloadItem, (download) => download.rule)

@@ -29,6 +29,7 @@ import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
 import { ViewHistoryDto } from '../media/view-history.dto';
 import { ViewHistoryService } from '../media/view-history.service';
+import { PluginService } from '../plugin/plugin.service';
 
 @Controller('series/episode')
 @UseGuards(AuthorizationGuard)
@@ -39,6 +40,7 @@ export class EpisodeController {
     private seriesService: SeriesService,
     private viewHistoryService: ViewHistoryService,
     private episodeService: EpisodeService,
+    private pluginService: PluginService,
   ) {}
 
   @Get()
@@ -96,6 +98,7 @@ export class EpisodeController {
       series: { id: data.seriesId },
       media: { id: data.mediaId },
     });
+    await this.pluginService.emitAllEnabled('onNewEpisode', id);
 
     return await this.episodeService.findOneBy({ id });
   }

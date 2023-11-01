@@ -21,6 +21,7 @@ import { MediaModule } from './modules/media/media.module';
 import { SubscribeModule } from './modules/subscribe/subscribe.module';
 import { SystemModule } from './modules/system/system.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { PluginModule } from './modules/plugin/plugin.module';
 
 @Module({
   imports: [
@@ -129,6 +130,7 @@ import { NotificationModule } from './modules/notification/notification.module';
     SeriesModule,
     UserModule,
     SystemModule,
+    PluginModule.registerAsync(),
   ],
   providers: [
     {

@@ -21,11 +21,10 @@ import { DownloadTaskDto } from './download-task.dto';
 import { VALID_VIDEO_MIME } from '../../constants';
 import { MediaService } from '../media/media.service';
 import { MediaFileService } from '../media/media-file.service';
-import { EpisodeService } from '../series/episode.service';
 import { buildException } from '../../utils/build-exception.util';
 import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { StatusEnum } from '../../enums/status.enum';
-import { RuleFileDescriber, RuleFileDescriptor } from './rule.interface';
+import { RuleFileDescriber } from './rule.interface';
 import { RuleService } from './rule.service';
 import { RuleErrorLogService } from './rule-error-log.service';
 import { DownloadItemQueryDto } from './download-item-query.dto';
@@ -33,9 +32,8 @@ import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { DownloadItem } from './download-item.entity';
 import { Between, IsNull, Not } from 'typeorm';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
-import { FeedEntry } from '@extractus/feed-extractor';
-import { SeriesSubscribeService } from '../series/series-subscribe.service';
 import { Aria2Service } from '../aria2/aria2.service';
+import { PluginService } from '../plugin/plugin.service';
 
 @Controller('subscribe/download')
 @UseGuards(AuthorizationGuard)
@@ -45,12 +43,11 @@ export class DownloadItemController {
   constructor(
     private mediaService: MediaService,
     private mediaFileService: MediaFileService,
-    private episodeService: EpisodeService,
-    private seriesSubscribeService: SeriesSubscribeService,
     private downloadItemService: DownloadItemService,
     private ruleService: RuleService,
     private ruleErrorLogService: RuleErrorLogService,
     private aria2Service: Aria2Service,
+    private pluginService: PluginService,
   ) {}
 
   @Post()
@@ -73,6 +70,7 @@ export class DownloadItemController {
           });
           const media = await this.mediaService.findOneBy({ id });
           await this.mediaFileService.generateMediaFiles(media);
+          await this.pluginService.emitAllEnabled('onNewMedia', media.id);
         }
       }
     });
@@ -107,52 +105,12 @@ export class DownloadItemController {
       throw buildException(InternalServerErrorException, ErrorCodeEnum.UNKNOWN_ERROR);
     }
 
-    const [task] = await this.downloadItemService.addDownloadItemTask(item.url, {
-      id: item.id,
-    });
-    task.on('complete', async (files) => {
-      const entry: FeedEntry = Object.freeze(JSON.parse(item.entry));
-      for (const file of files) {
-        if (VALID_VIDEO_MIME.includes(file.mimetype)) {
-          const copy = Object.freeze(Object.assign({}, file));
-
-          let descriptor: RuleFileDescriptor;
-          try {
-            descriptor = (await describe?.(entry, copy)) ?? {};
-          } catch (error) {
-            await this.ruleErrorLogService.save({
-              rule: { id: item.rule.id },
-              error: error.toString(),
-            });
-            continue;
-          }
-
-          const { id } = await this.mediaService.save({
-            name: descriptor.name ?? file.name,
-            description: descriptor.description,
-            download: { id: item.id },
-            isPublic: descriptor.isPublic ?? true,
-            file: { id: file.id },
-          });
-          const media = await this.mediaService.findOneBy({ id });
-          await this.mediaFileService.generateMediaFiles(media);
-
-          if (item.rule.series) {
-            await this.episodeService.save({
-              title: descriptor.title ?? file.name,
-              no: descriptor.no,
-              pubAt: descriptor.pubAt ?? entry.published ?? new Date(),
-              media: { id: media.id },
-              series: { id: item.rule.series.id },
-            });
-          }
-        }
-      }
-
-      if (item.rule.series) {
-        await this.seriesSubscribeService.notifyUpdate(item.rule.series);
-      }
-    });
+    await this.downloadItemService.addAutoDownloadItemTask(
+      Object.freeze(JSON.parse(item.entry)),
+      item.rule,
+      item.log,
+      describe,
+    );
 
     return item;
   }

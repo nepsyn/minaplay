@@ -14,6 +14,8 @@ export class PluginModule {
 
   static async registerAsync(): Promise<DynamicModule> {
     const base = path.join(__dirname, '../../plugins');
+    await fs.ensureDir(base);
+
     const files = fs
       .readdirSync(base)
       .filter((file) => path.extname(file) === '.js')

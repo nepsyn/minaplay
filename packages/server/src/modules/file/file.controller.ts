@@ -10,6 +10,7 @@ import {
   Post,
   Query,
   Res,
+  StreamableFile,
   UploadedFile,
   UseGuards,
   UseInterceptors,
@@ -17,7 +18,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { randomUUID } from 'crypto';
-import { createReadStream, ensureDirSync } from 'fs-extra';
+import fs, { createReadStream, ensureDirSync } from 'fs-extra';
 import { diskStorage } from 'multer';
 import * as path from 'path';
 import { ApiFile } from '../../utils/api.file.decorator';
@@ -177,26 +178,37 @@ export class FileController {
   @ApiOperation({
     description: '原始文件数据',
   })
-  async getRawFileById(@Param('id') id: string, @Res() res: Response) {
+  async getRawFileById(@Param('id') id: string, @Res({ passthrough: true }) res: Response) {
     const file = await this.fileService.findOneBy({ id });
     if (!file || !file.isExist) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    res.sendFile(file.path);
+    if (file.mimetype) {
+      res.setHeader('Content-Type', file.mimetype);
+    }
+    return new StreamableFile(fs.createReadStream(file.path));
   }
 
   @Get([':id/download', ':id/download/:name'])
   @ApiOperation({
     description: '下载文件',
   })
-  async downloadFileById(@Param('id') id: string, @Res() res: Response, @Param('name') name?: string) {
+  async downloadFileById(
+    @Param('id') id: string,
+    @Res({ passthrough: true }) res: Response,
+    @Param('name') name?: string,
+  ) {
     const file = await this.fileService.findOneBy({ id });
     if (!file || !file.isExist) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    res.download(file.path, name ?? file.name);
+    if (file.mimetype) {
+      res.setHeader('Content-Type', file.mimetype);
+    }
+    res.setHeader('Content-Disposition', `attachment; filename="${name ?? file.name}"`);
+    return new StreamableFile(fs.createReadStream(file.path));
   }
 
   @Get()

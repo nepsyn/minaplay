@@ -21,7 +21,7 @@ export class ApplicationGatewayExceptionFilter extends BaseWsExceptionFilter {
         socket.emit('exception', {
           sync: syncId,
           code: ErrorCodeEnum.UNKNOWN_ERROR,
-          error: exception.message,
+          message: exception.message,
         });
       }
     } else if (exception instanceof HttpException) {
@@ -35,14 +35,14 @@ export class ApplicationGatewayExceptionFilter extends BaseWsExceptionFilter {
         socket.emit('exception', {
           sync: syncId,
           code: ErrorCodeEnum.UNKNOWN_ERROR,
-          error: exception.message,
+          message: exception.message,
         });
       }
     } else {
       socket.emit('exception', {
         sync: syncId,
         code: ErrorCodeEnum.INTERNAL_SERVER_ERROR,
-        error: 'INTERNAL SERVER ERROR',
+        message: 'INTERNAL SERVER ERROR',
       });
       this.logger.error(exception.stack);
     }

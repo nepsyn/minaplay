@@ -66,6 +66,7 @@ export class FileController {
         fileSize: 10485760, // 10MB
       },
       fileFilter(req, file, callback) {
+        file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8');
         if (VALID_IMAGE_MIME.includes(file.mimetype)) {
           callback(null, true);
         } else {
@@ -117,6 +118,7 @@ export class FileController {
         fileSize: 4294967296, // 10GB
       },
       fileFilter(req, file, callback) {
+        file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8');
         if (VALID_VIDEO_MIME.includes(file.mimetype)) {
           callback(null, true);
         } else {

@@ -34,8 +34,6 @@ import { Between, Not } from 'typeorm';
 import { DownloadItemQueryDto } from './download-item-query.dto';
 import { DownloadItemService } from './download-item.service';
 import { DownloadItem } from './download-item.entity';
-import { ApiQueryDto } from '../../utils/api.query.dto';
-import { Rule } from './rule.entity';
 import { StatusEnum } from '../../enums/status.enum';
 
 @Controller('subscribe')
@@ -180,29 +178,6 @@ export class SourceController {
 
     await this.sourceService.runFetchSubscribeDataJob(source);
     return source;
-  }
-
-  @Get(':id/rule')
-  @ApiOperation({
-    description: '获取订阅源规则列表',
-  })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async getRulesBySourceId(@Param('id', ParseIntPipe) id: number, @Query() query: ApiQueryDto<Rule>) {
-    const source = await this.sourceService.findOneBy({ id });
-    if (!source) {
-      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-    }
-
-    const [result, total] = await this.ruleService.findAndCount({
-      where: {
-        source: { id },
-      },
-      skip: query.page * query.size,
-      take: query.size,
-      order: { [query.sort]: query.order },
-    });
-
-    return new ApiPaginationResultDto(result, total, query.page, query.size);
   }
 
   @Get(':id/log')

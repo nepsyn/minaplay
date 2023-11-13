@@ -42,9 +42,6 @@ export class FetchSubscribeSourceConsumer {
         source: { id: source.id },
         status: StatusEnum.SUCCESS,
       });
-      if (data.entries.length <= 0) {
-        return;
-      }
     } catch (error) {
       await this.fetchLogService.save({
         id: log.id,
@@ -54,12 +51,11 @@ export class FetchSubscribeSourceConsumer {
       });
       return;
     }
+    if (data.entries.length <= 0) {
+      return;
+    }
 
-    const [rules] = await this.ruleService.findAndCount({
-      where: {
-        source: { id: source.id },
-      },
-    });
+    const [rules] = await this.ruleService.findAndCount();
 
     const validEntries = data.entries.filter((entry) => entry.enclosure?.url);
     const validRules = rules.filter((rule) => rule.codeFile.isExist);
@@ -101,13 +97,13 @@ export class FetchSubscribeSourceConsumer {
           break;
         }
 
-        await this.downloadItemService.addAutoDownloadItemTask(Object.freeze(entry), rule, log, hooks.describe);
+        await this.downloadItemService.addAutoDownloadItemTask(Object.freeze(entry), hooks.describe, rule, source, log);
         this.logger.log(`Starting download entry: ${entry.title}`);
         count++;
       }
     }
     this.logger.log(
-      `Fetch subscribe source ${source.title ?? source.remark ?? source.url} done, ${count} entries downloading`,
+      `Fetch subscribe source ${source.title ?? source.remark ?? source.url} done, ${count} entry(s) downloading`,
     );
   }
 }

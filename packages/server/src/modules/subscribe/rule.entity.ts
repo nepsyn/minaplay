@@ -9,7 +9,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
-import { Source } from './source.entity';
 import { Series } from '../series/series.entity';
 import { File } from '../file/file.entity';
 import { DownloadItem } from './download-item.entity';
@@ -34,15 +33,6 @@ export class Rule {
     eager: true,
   })
   codeFile: File;
-
-  /** 订阅源 */
-  @ManyToOne(() => Source, (source) => source.rules, {
-    onDelete: 'CASCADE',
-  })
-  source: Source;
-
-  @Column()
-  sourceId: number;
 
   /** 下载内容 */
   @Exclude()

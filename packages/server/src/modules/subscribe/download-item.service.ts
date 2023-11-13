@@ -16,6 +16,7 @@ import { PluginService } from '../plugin/plugin.service';
 import { FeedEntry } from '@extractus/feed-extractor';
 import { Rule } from './rule.entity';
 import { FetchLog } from './fetch-log.entity';
+import { Source } from './source.entity';
 
 @Injectable()
 export class DownloadItemService implements OnModuleInit {
@@ -71,11 +72,17 @@ export class DownloadItemService implements OnModuleInit {
     return [task, item] as const;
   }
 
-  async addAutoDownloadItemTask(entry: FeedEntry, rule: Rule, log: FetchLog, describeFn: RuleFileDescriber) {
+  async addAutoDownloadItemTask(
+    entry: FeedEntry,
+    describeFn: RuleFileDescriber,
+    rule: Rule,
+    source: Source,
+    log: FetchLog,
+  ) {
     const [task, item] = await this.addDownloadItemTask(entry.enclosure.url, {
       title: entry.title,
       url: entry.enclosure.url,
-      source: { id: rule.sourceId },
+      source: { id: source.id },
       rule: { id: rule.id },
       log: { id: log.id },
       entry: JSON.stringify(entry),

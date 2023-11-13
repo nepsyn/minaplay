@@ -107,9 +107,10 @@ export class DownloadItemController {
 
     await this.downloadItemService.addAutoDownloadItemTask(
       Object.freeze(JSON.parse(item.entry)),
-      item.rule,
-      item.log,
       describe,
+      item.rule,
+      item.source,
+      item.log,
     );
 
     return item;

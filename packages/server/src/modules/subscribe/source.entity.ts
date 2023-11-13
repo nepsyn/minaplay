@@ -9,7 +9,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { Rule } from './rule.entity';
 import { User } from '../user/user.entity';
 import { FetchLog } from './fetch-log.entity';
 import { DownloadItem } from './download-item.entity';
@@ -50,11 +49,6 @@ export class Source {
     default: true,
   })
   enabled: boolean;
-
-  /** 订阅规则 */
-  @Exclude()
-  @OneToMany(() => Rule, (rule) => rule.source)
-  rules: Rule[];
 
   /** 更新记录 */
   @Exclude()

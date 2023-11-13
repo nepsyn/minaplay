@@ -22,5 +22,4 @@ export const VALID_VIDEO_MIME = [
   'video/h265',
   'video/x-matroska',
   'video/webm',
-  'video/x-flv',
 ];

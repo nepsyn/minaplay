@@ -52,16 +52,11 @@ export class RuleController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createSubscribeRule(@RequestUser() user: User, @Body() data: RuleDto) {
-    if (data.sourceId == null || data.code == null) {
+    if (data.code == null) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    const source = await this.sourceService.findOneBy({ id: data.sourceId });
-    if (!source) {
-      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-    }
-
-    const filename = randomUUID().replace(/-/g, '') + '.js';
+    const filename = randomUUID().replace(/-/g, '') + '.ts';
     const filepath = path.join(SUBSCRIBE_RULE_SOURCE_DIR, filename);
     await ensureDir(SUBSCRIBE_RULE_SOURCE_DIR);
     await writeFile(filepath, data.code);
@@ -78,7 +73,6 @@ export class RuleController {
 
     const { id } = await this.ruleService.save({
       ...data,
-      source: { id: data.sourceId },
       series: { id: data.seriesId },
       codeFile: file,
     });
@@ -91,12 +85,12 @@ export class RuleController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async querySubscribeRule(@Query() query: RuleQueryDto) {
-    const { keyword, id, sourceId, seriesId } = query;
+    const { keyword, id, seriesId } = query;
     const [result, total] = await this.ruleService.findAndCount({
       where: buildQueryOptions<Rule>({
         keyword,
         keywordProperties: (entity) => [entity.remark],
-        exact: { id, source: { id: sourceId }, series: { id: seriesId } },
+        exact: { id, series: { id: seriesId } },
       }),
       skip: query.page * query.size,
       take: query.size,
@@ -132,7 +126,6 @@ export class RuleController {
     await this.ruleService.save({
       id,
       ...data,
-      source: { id: data.sourceId },
       series: { id: data.seriesId },
     });
 

@@ -21,14 +21,6 @@ export class RuleDto {
   remark?: string;
 
   @ApiProperty({
-    description: '订阅源id',
-    required: false,
-  })
-  @IsOptional()
-  @IsInt()
-  sourceId?: number;
-
-  @ApiProperty({
     description: '剧集id',
     required: false,
   })

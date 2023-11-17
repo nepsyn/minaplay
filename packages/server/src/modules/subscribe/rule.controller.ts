@@ -29,7 +29,6 @@ import { ensureDir, stat, writeFile } from 'fs-extra';
 import { generateMD5 } from '../../utils/generate-md5.util';
 import { FileSourceEnum } from '../../enums/file-source.enum';
 import { FileService } from '../file/file.service';
-import { SourceService } from './source.service';
 import { RuleQueryDto } from './rule-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { Rule } from './rule.entity';
@@ -40,11 +39,7 @@ import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 @ApiTags('subscribe')
 @ApiBearerAuth()
 export class RuleController {
-  constructor(
-    private sourceService: SourceService,
-    private ruleService: RuleService,
-    private fileService: FileService,
-  ) {}
+  constructor(private ruleService: RuleService, private fileService: FileService) {}
 
   @Post()
   @ApiOperation({

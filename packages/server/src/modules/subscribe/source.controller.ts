@@ -26,7 +26,6 @@ import { SourceQueryDto } from './source-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { Source } from './source.entity';
-import { RuleService } from './rule.service';
 import { FetchLogService } from './fetch-log.service';
 import { FetchLogQueryDto } from './fetch-log-query.dto';
 import { FetchLog } from './fetch-log.entity';
@@ -36,14 +35,13 @@ import { DownloadItemService } from './download-item.service';
 import { DownloadItem } from './download-item.entity';
 import { StatusEnum } from '../../enums/status.enum';
 
-@Controller('subscribe')
+@Controller('subscribe/source')
 @UseGuards(AuthorizationGuard)
 @ApiTags('subscribe')
 @ApiBearerAuth()
 export class SourceController {
   constructor(
     private sourceService: SourceService,
-    private ruleService: RuleService,
     private fetchLogService: FetchLogService,
     private downloadItemService: DownloadItemService,
   ) {}

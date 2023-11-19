@@ -20,7 +20,7 @@ export class ViewHistoryService {
   }
 
   async delete(where: FindOptionsWhere<ViewHistory>) {
-    const result = await this.viewHistoryRepository.softDelete(where);
+    const result = await this.viewHistoryRepository.delete(where);
     return result.affected > 0;
   }
 }

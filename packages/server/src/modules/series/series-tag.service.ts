@@ -20,7 +20,7 @@ export class SeriesTagService {
   }
 
   async delete(where: FindOptionsWhere<SeriesTag>) {
-    const result = await this.seriesTagRepository.softDelete(where);
+    const result = await this.seriesTagRepository.delete(where);
     return result.affected > 0;
   }
 }

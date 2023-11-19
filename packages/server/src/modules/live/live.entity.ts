@@ -1,12 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { File } from '../file/file.entity';
 import { Exclude } from 'class-transformer';
 import { User } from '../user/user.entity';
@@ -54,9 +46,4 @@ export class Live {
   /** 修改时间 */
   @UpdateDateColumn()
   updateAt: Date;
-
-  /** 删除时间 */
-  @Exclude()
-  @DeleteDateColumn()
-  deleteAt: Date;
 }

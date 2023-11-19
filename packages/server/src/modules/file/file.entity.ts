@@ -1,14 +1,6 @@
 import { Exclude } from 'class-transformer';
-import { pathExistsSync } from 'fs-extra';
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import fs from 'fs-extra';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { User } from '../user/user.entity';
 import { FileSourceEnum } from '../../enums/file-source.enum';
 
@@ -77,14 +69,9 @@ export class File {
   @UpdateDateColumn()
   updateAt: Date;
 
-  /** 删除时间 */
-  @Exclude()
-  @DeleteDateColumn()
-  deleteAt: Date;
-
   /** 本地文件是否存在 */
   @Exclude()
   get isExist() {
-    return pathExistsSync(this.path);
+    return fs.pathExistsSync(this.path);
   }
 }

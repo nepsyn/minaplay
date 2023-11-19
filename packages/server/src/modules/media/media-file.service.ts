@@ -23,6 +23,27 @@ export class MediaFileService {
     private mediaService: MediaService,
   ) {}
 
+  async generateMediaMetadata(media: Media) {
+    const { execa } = await importESM<typeof import('execa')>('execa');
+
+    const cp = await execa(
+      this.options.ffprobePath,
+      ['-v quiet', '-i', `"${media.file.path}"`, '-print_format json', '-show_streams'],
+      {
+        shell: true,
+        timeout: 60000,
+        reject: false,
+      },
+    );
+
+    try {
+      return JSON.parse(cp.stdout) as MediaMetadata;
+    } catch {
+      this.logger.error(cp.stderr);
+      return undefined;
+    }
+  }
+
   async generateMediaPosterFile(media: Media) {
     const { execa } = await importESM<typeof import('execa')>('execa');
 
@@ -68,71 +89,34 @@ export class MediaFileService {
     return undefined;
   }
 
-  async generateMediaMetadataFile(media: Media) {
+  async extractMediaFiles(media: Media, metadata: MediaMetadata) {
     const { execa } = await importESM<typeof import('execa')>('execa');
 
-    // 计算缩略图路径
-    const metadataFileName = 'metadata.json';
-    const metadataFilePath = path.join(GENERATED_DIR, media.id, metadataFileName);
+    const files: File[] = [];
     await fs.ensureDir(path.join(GENERATED_DIR, media.id));
 
-    const cp = await execa(
-      this.options.ffprobePath,
-      ['-v quiet', '-i', `"${media.file.path}"`, '-print_format json', '-show_streams'],
-      {
-        shell: true,
-        timeout: 60000,
-        reject: false,
-      },
-    );
-    await fs.writeFile(metadataFilePath, cp.stdout);
-    if (await fs.exists(metadataFilePath)) {
-      const fileStat = await fs.stat(metadataFilePath);
-      return await this.fileService.save({
-        filename: metadataFileName,
-        name: metadataFileName,
-        size: fileStat.size,
-        md5: await generateMD5(fs.createReadStream(metadataFilePath)),
-        mimetype: 'application/json',
-        source: FileSourceEnum.AUTO_GENERATED,
-        path: metadataFilePath,
-      });
-    } else {
-      this.logger.error(cp.stderr);
-    }
-
-    return undefined;
-  }
-
-  async generateMediaSubtitleFiles(media: Media, metadata: MediaMetadata) {
-    const { execa } = await importESM<typeof import('execa')>('execa');
-
     const subtitles = metadata.streams.filter((s) => s.codec_type === 'subtitle');
-    const files: File[] = [];
-
     for (const [index, subtitle] of subtitles.entries()) {
-      const subtitleFileName = `${subtitle.tags.title ?? index}.${subtitle.codec_name}`;
-      const subtitleFilePath = path.join(GENERATED_DIR, media.id, subtitleFileName);
-      await fs.ensureDir(path.join(GENERATED_DIR, media.id));
-
+      const filename = `${subtitle.tags?.title ?? subtitle.index}.${subtitle.codec_name}`;
+      const filepath = path.join(GENERATED_DIR, media.id, filename);
       const cp = await execa(
         this.options.ffmpegPath,
-        ['-y', '-v quiet', '-i', `"${media.file.path}"`, '-map', `0:s:${index}`, `"${subtitleFilePath}"`],
+        ['-y', '-v quiet', '-i', `"${media.file.path}"`, '-map', `0:s:${index}`, `"${filepath}"`],
         {
           shell: true,
           timeout: 60000,
           reject: false,
         },
       );
-      if (await fs.exists(subtitleFilePath)) {
-        const fileStat = await fs.stat(subtitleFilePath);
+      if (await fs.exists(filepath)) {
+        const stat = await fs.stat(filepath);
         const file = await this.fileService.save({
-          filename: subtitleFileName,
-          name: subtitleFileName,
-          size: fileStat.size,
-          md5: await generateMD5(fs.createReadStream(subtitleFilePath)),
+          filename: filename,
+          name: filename,
+          size: stat.size,
+          md5: await generateMD5(fs.createReadStream(filepath)),
           source: FileSourceEnum.AUTO_GENERATED,
-          path: subtitleFilePath,
+          path: filepath,
         });
         files.push(file);
       } else {
@@ -140,39 +124,30 @@ export class MediaFileService {
       }
     }
 
-    return files;
-  }
-
-  async generateMediaAttachmentFiles(media: Media, metadata: MediaMetadata) {
-    const { execa } = await importESM<typeof import('execa')>('execa');
-
     const attachments = metadata.streams.filter((s) => s.codec_type === 'attachment');
-    const files: File[] = [];
-
     for (const [index, attachment] of attachments.entries()) {
-      const attachmentFileName = attachment.tags?.filename ?? `${index}.font`;
-      const attachmentFilePath = path.join(GENERATED_DIR, media.id, attachmentFileName);
-      await fs.ensureDir(path.join(GENERATED_DIR, media.id));
+      const filename = attachment.tags?.filename ?? `${attachment.index}.attachment`;
+      const filepath = path.join(GENERATED_DIR, media.id, filename);
 
       const cp = await execa(
         this.options.ffmpegPath,
-        ['-y', '-v quiet', `-dump_attachment:t:${index}`, `"${attachmentFilePath}"`, '-i', `"${media.file.path}"`],
+        ['-y', '-v quiet', `-dump_attachment:t:${index}`, `"${filepath}"`, '-i', `"${media.file.path}"`],
         {
           shell: true,
           timeout: 60000,
           reject: false,
         },
       );
-      if (await fs.exists(attachmentFilePath)) {
-        const fileStat = await fs.stat(attachmentFilePath);
+      if (await fs.exists(filepath)) {
+        const stat = await fs.stat(filepath);
         const file = await this.fileService.save({
-          filename: attachmentFileName,
-          name: attachmentFileName,
-          size: fileStat.size,
-          md5: await generateMD5(fs.createReadStream(attachmentFilePath)),
+          filename: filename,
+          name: filename,
+          size: stat.size,
+          md5: await generateMD5(fs.createReadStream(filepath)),
           mimetype: attachment.tags?.mimetype,
           source: FileSourceEnum.AUTO_GENERATED,
-          path: attachmentFilePath,
+          path: filepath,
         });
         files.push(file);
       } else {
@@ -192,22 +167,14 @@ export class MediaFileService {
       });
     }
 
-    const metadataFile = await this.generateMediaMetadataFile(media);
-    if (metadataFile) {
+    const metadata = await this.generateMediaMetadata(media);
+    if (metadata) {
       await this.mediaService.save({
         id: media.id,
-        metadata: { id: metadataFile.id },
+        metadata: JSON.stringify(metadata),
       });
 
-      const metadata: MediaMetadata = await fs.readJson(metadataFile.path);
-
-      const subtitleFiles = await this.generateMediaSubtitleFiles(media, metadata);
-      await this.mediaService.save({
-        id: media.id,
-        subtitles: subtitleFiles.filter(({ id }) => ({ id })),
-      });
-
-      const attachmentFiles = await this.generateMediaAttachmentFiles(media, metadata);
+      const attachmentFiles = await this.extractMediaFiles(media, metadata);
       await this.mediaService.save({
         id: media.id,
         attachments: attachmentFiles.map(({ id }) => ({ id })),

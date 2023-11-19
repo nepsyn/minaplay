@@ -1,7 +1,6 @@
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
@@ -12,7 +11,7 @@ import { Exclude, Expose } from 'class-transformer';
 import { Series } from '../series/series.entity';
 import { File } from '../file/file.entity';
 import { DownloadItem } from './download-item.entity';
-import { readFileSync } from 'fs-extra';
+import fs from 'fs-extra';
 
 /** 订阅规则 */
 @Entity()
@@ -49,7 +48,7 @@ export class Rule {
 
   @Expose()
   get code() {
-    return this.codeFile.isExist ? readFileSync(this.codeFile.path).toString() : undefined;
+    return this.codeFile.isExist ? fs.readFileSync(this.codeFile.path).toString() : undefined;
   }
 
   /** 创建时间 */
@@ -59,9 +58,4 @@ export class Rule {
   /** 更新时间 */
   @UpdateDateColumn()
   updateAt: Date;
-
-  /** 删除时间 */
-  @Exclude()
-  @DeleteDateColumn()
-  deleteAt: Date;
 }

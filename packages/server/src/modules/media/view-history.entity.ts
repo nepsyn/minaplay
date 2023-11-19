@@ -1,14 +1,12 @@
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
 import { Media } from './media.entity';
 import { User } from '../user/user.entity';
 import { Episode } from '../series/episode.entity';
@@ -59,9 +57,4 @@ export class ViewHistory {
   /** 更新时间 */
   @UpdateDateColumn()
   updateAt: Date;
-
-  /** 删除时间 */
-  @Exclude()
-  @DeleteDateColumn()
-  deleteAt: Date;
 }

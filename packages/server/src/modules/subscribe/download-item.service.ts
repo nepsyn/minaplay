@@ -17,6 +17,8 @@ import { FeedEntry } from '@extractus/feed-extractor';
 import { Rule } from './rule.entity';
 import { FetchLog } from './fetch-log.entity';
 import { Source } from './source.entity';
+import { Media } from '../media/media.entity';
+import path from 'path';
 
 @Injectable()
 export class DownloadItemService implements OnModuleInit {
@@ -88,47 +90,67 @@ export class DownloadItemService implements OnModuleInit {
       entry: JSON.stringify(entry),
     });
     task.on('complete', async (files) => {
-      for (const file of files) {
-        if (VALID_VIDEO_MIME.includes(file.mimetype)) {
-          const copy = Object.freeze(Object.assign({}, file));
+      const medias: Media[] = [];
 
-          let descriptor: RuleFileDescriptor;
-          try {
-            descriptor = (await describeFn?.(entry, copy)) ?? {};
-          } catch (error) {
-            await this.ruleErrorLogService.save({
-              rule: { id: rule.id },
-              error: error.toString(),
-            });
-            continue;
-          }
+      // media files
+      for (const file of files.filter((file) => VALID_VIDEO_MIME.includes(file.mimetype))) {
+        const copy = Object.freeze(Object.assign({}, file));
 
-          const { id } = await this.mediaService.save({
-            name: descriptor.name ?? file.name,
-            description: descriptor.description,
-            download: { id: item.id },
-            isPublic: descriptor.isPublic ?? true,
-            file: { id: file.id },
+        let descriptor: RuleFileDescriptor;
+        try {
+          descriptor = (await describeFn?.(entry, copy)) ?? {};
+        } catch (error) {
+          await this.ruleErrorLogService.save({
+            rule: { id: rule.id },
+            error: error.toString(),
           });
-          const media = await this.mediaService.findOneBy({ id });
-          await this.mediaFileService.generateMediaFiles(media);
-          await this.pluginService.emitAllEnabled('onNewMedia', id);
+          continue;
+        }
 
-          if (rule.series) {
-            const { id } = await this.episodeService.save({
-              title: descriptor.title ?? file.name,
-              no: descriptor.no,
-              pubAt: descriptor.pubAt ?? entry.published ?? new Date(),
-              media: { id: media.id },
-              series: { id: rule.series.id },
-            });
-            await this.pluginService.emitAllEnabled('onNewEpisode', id);
-          }
+        const { id } = await this.mediaService.save({
+          name: descriptor.name ?? file.name,
+          description: descriptor.description,
+          download: { id: item.id },
+          isPublic: descriptor.isPublic ?? true,
+          file: { id: file.id },
+        });
+        const media = await this.mediaService.findOneBy({ id });
+        medias.push(media);
+        await this.mediaFileService.generateMediaFiles(media);
+
+        if (rule.series) {
+          await this.episodeService.save({
+            title: descriptor.title ?? file.name,
+            no: descriptor.no,
+            pubAt: descriptor.pubAt ?? entry.published ?? new Date(),
+            media: { id: media.id },
+            series: { id: rule.series.id },
+          });
         }
       }
 
-      if (rule.series) {
+      // attachment files
+      for (const media of medias) {
+        const attachments = files
+          .filter((file) => !VALID_VIDEO_MIME.includes(file.mimetype))
+          .filter((file) => path.dirname(media.file.path) === path.dirname(file.path));
+        if (attachments.length > 0) {
+          await this.mediaService.save({
+            id: media.id,
+            attachments: attachments.map(({ id }) => ({ id })),
+          });
+        }
+      }
+
+      // notify media update
+      for (const media of medias) {
+        await this.pluginService.emitAllEnabled('onNewMedia', media.id);
+      }
+
+      // notify series update
+      if (medias.length > 0 && rule.series) {
         await this.seriesSubscribeService.notifyUpdate(rule.series);
+        await this.pluginService.emitAllEnabled('onNewEpisode', rule.series.id);
       }
     });
 

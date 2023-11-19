@@ -52,7 +52,7 @@ export class SeriesService {
       });
     }
 
-    const result = await this.seriesRepository.softDelete(where);
+    const result = await this.seriesRepository.delete(where);
     return result.affected > 0;
   }
 }

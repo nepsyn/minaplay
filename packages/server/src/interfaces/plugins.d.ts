@@ -13,8 +13,8 @@ export interface MinaPlayPluginHooks {
   onEnabled?();
   onDisabled?();
 
-  onNewMedia?(id: string);
-  onNewEpisode?(id: number);
+  onNewMedia?(mediaId: string);
+  onNewEpisode?(seriesId: number);
 }
 
 export type MinaPlayPluginConstructor = new (...args: any) => MinaPlayPluginHooks;

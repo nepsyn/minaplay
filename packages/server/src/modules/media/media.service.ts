@@ -26,9 +26,7 @@ export class MediaService {
     for (const media of medias) {
       const ids = []
         .concat(media.file)
-        .concat(media.metadata)
         .concat(media.poster)
-        .concat(media.subtitles)
         .concat(media.attachments)
         .filter((v) => v != null)
         .map((v: File) => v.id);
@@ -37,7 +35,7 @@ export class MediaService {
       });
     }
 
-    const result = await this.mediaRepository.softDelete(where);
+    const result = await this.mediaRepository.delete(where);
     return result.affected > 0;
   }
 }

@@ -22,7 +22,7 @@ export class LiveService {
   }
 
   async delete(where: FindOptionsWhere<Live>) {
-    const result = await this.liveRepository.softDelete(where);
+    const result = await this.liveRepository.delete(where);
     return result.affected > 0;
   }
 

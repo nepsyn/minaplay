@@ -4,8 +4,9 @@ import { DeepPartial, FindManyOptions, FindOptionsWhere, LessThanOrEqual, Reposi
 import { File } from './file.entity';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
-import fs, { unlink } from 'fs-extra';
+import fs from 'fs-extra';
 import sharp from 'sharp';
+import path from 'path';
 
 @Injectable()
 export class FileService implements OnModuleInit {
@@ -48,11 +49,20 @@ export class FileService implements OnModuleInit {
   async delete(where: FindOptionsWhere<File>) {
     const files = await this.fileRepository.find({ where });
     for (const file of files) {
-      await this.fileRepository.softDelete({ id: file.id });
+      await this.fileRepository.delete({ id: file.id });
       try {
-        await unlink(file.path);
+        await fs.unlink(file.path);
       } catch (error) {
         this.logger.error(`Delete file '${file.id}' error`, error.stack);
+      }
+
+      try {
+        const files = await fs.readdir(path.dirname(file.path));
+        if (files.length === 0) {
+          await fs.rmdir(path.dirname(file.path));
+        }
+      } catch (error) {
+        this.logger.error(`Delete empty dir '${path.dirname(file.path)}' error`, error.stack);
       }
     }
 

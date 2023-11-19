@@ -1,13 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  DeleteDateColumn,
-  Entity,
-  ManyToOne,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Series } from './series.entity';
 import { Media } from '../media/media.entity';
 
@@ -58,9 +49,4 @@ export class Episode {
   /** 更新时间 */
   @UpdateDateColumn()
   updateAt: Date;
-
-  /** 删除时间 */
-  @Exclude()
-  @DeleteDateColumn()
-  deleteAt: Date;
 }

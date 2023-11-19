@@ -1,5 +1,4 @@
-import { CreateDateColumn, DeleteDateColumn, Entity, ManyToMany, PrimaryColumn, UpdateDateColumn } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { CreateDateColumn, Entity, ManyToMany, PrimaryColumn, UpdateDateColumn } from 'typeorm';
 import { Series } from './series.entity';
 
 /** 剧集标签 */
@@ -20,9 +19,4 @@ export class SeriesTag {
   /** 修改时间 */
   @UpdateDateColumn()
   updateAt: Date;
-
-  /** 删除时间 */
-  @Exclude()
-  @DeleteDateColumn()
-  deleteAt: Date;
 }

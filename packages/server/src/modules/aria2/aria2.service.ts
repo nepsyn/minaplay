@@ -6,7 +6,7 @@ import { CronJob } from 'cron';
 import { ARIA2_MODULE_OPTIONS_TOKEN } from './aria2.module-definition';
 import { Aria2ModuleOptions } from './aria2.module.interface';
 import { ARIA2_DOWNLOAD_DIR } from '../../constants';
-import { createReadStream, stat } from 'fs-extra';
+import fs from 'fs-extra';
 import { FileService } from '../file/file.service';
 import { generateMD5 } from '../../utils/generate-md5.util';
 import path from 'path';
@@ -82,14 +82,14 @@ export class Aria2Service implements OnModuleInit {
     if (task) {
       const files: File[] = [];
       for (const file of status.files) {
-        const fileStat = await stat(file.path);
+        const fileStat = await fs.stat(file.path);
         const fileType = await fileTypeFromFile(file.path);
         const filename = path.basename(file.path);
         const record = await this.fileService.save({
           size: fileStat.size,
           filename: filename,
           name: filename,
-          md5: await generateMD5(createReadStream(file.path)),
+          md5: await generateMD5(fs.createReadStream(file.path)),
           mimetype: fileType && fileType.mime,
           source: FileSourceEnum.ARIA2_DOWNLOAD,
           path: file.path,

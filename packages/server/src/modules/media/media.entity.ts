@@ -1,7 +1,6 @@
 import {
   Column,
   CreateDateColumn,
-  DeleteDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
@@ -53,14 +52,6 @@ export class Media {
   })
   poster?: File;
 
-  /**元数据文件 */
-  @ManyToOne(() => File, {
-    onDelete: 'SET NULL',
-    nullable: true,
-    eager: true,
-  })
-  metadata?: File;
-
   /**对应文件 */
   @ManyToOne(() => File, {
     onDelete: 'SET NULL',
@@ -69,15 +60,13 @@ export class Media {
   })
   file?: File;
 
-  /** 字幕文件 */
-  @ManyToMany(() => File, {
-    onDelete: 'CASCADE',
-    eager: true,
+  /** 元数据 */
+  @Exclude()
+  @Column({
+    nullable: true,
+    type: 'text',
   })
-  @JoinTable({
-    name: 'media_subtitle_files',
-  })
-  subtitles: File[];
+  metadata?: string;
 
   /** 附件 */
   @ManyToMany(() => File, {
@@ -96,9 +85,4 @@ export class Media {
   /** 更新时间 */
   @UpdateDateColumn()
   updateAt: Date;
-
-  /** 删除时间 */
-  @Exclude()
-  @DeleteDateColumn()
-  deleteAt: Date;
 }

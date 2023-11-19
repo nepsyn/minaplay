@@ -75,7 +75,7 @@ export class RuleService {
       }
     }
 
-    const result = await this.ruleRepository.softDelete(where);
+    const result = await this.ruleRepository.delete(where);
     return result.affected > 0;
   }
 }

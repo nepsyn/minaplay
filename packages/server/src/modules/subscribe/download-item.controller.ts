@@ -34,6 +34,8 @@ import { Between, IsNull, Not } from 'typeorm';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { Aria2Service } from '../aria2/aria2.service';
 import { PluginService } from '../plugin/plugin.service';
+import { Media } from '../media/media.entity';
+import path from 'path';
 
 @Controller('subscribe/download')
 @UseGuards(AuthorizationGuard)
@@ -60,18 +62,38 @@ export class DownloadItemController {
       url: data.url,
     });
     task.on('complete', async (files) => {
-      for (const file of files) {
-        if (VALID_VIDEO_MIME.includes(file.mimetype)) {
-          const { id } = await this.mediaService.save({
-            name: file.name,
-            download: { id: item.id },
-            isPublic: true,
-            file: { id: file.id },
+      const medias: Media[] = [];
+
+      // media files
+      for (const file of files.filter((file) => VALID_VIDEO_MIME.includes(file.mimetype))) {
+        const { id } = await this.mediaService.save({
+          name: file.name,
+          download: { id: item.id },
+          isPublic: true,
+          file: { id: file.id },
+        });
+        const media = await this.mediaService.findOneBy({ id });
+        medias.push(media);
+        await this.mediaFileService.generateMediaFiles(media);
+        await this.pluginService.emitAllEnabled('onNewMedia', media.id);
+      }
+
+      // attachment files
+      for (const media of medias) {
+        const attachments = files
+          .filter((file) => !VALID_VIDEO_MIME.includes(file.mimetype))
+          .filter((file) => path.dirname(media.file.path) === path.dirname(file.path));
+        if (attachments.length > 0) {
+          await this.mediaService.save({
+            id: media.id,
+            attachments: attachments.map(({ id }) => ({ id })),
           });
-          const media = await this.mediaService.findOneBy({ id });
-          await this.mediaFileService.generateMediaFiles(media);
-          await this.pluginService.emitAllEnabled('onNewMedia', media.id);
         }
+      }
+
+      // notify media update
+      for (const media of medias) {
+        await this.pluginService.emitAllEnabled('onNewMedia', media.id);
       }
     });
 

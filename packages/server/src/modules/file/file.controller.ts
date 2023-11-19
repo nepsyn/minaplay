@@ -18,9 +18,9 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { randomUUID } from 'crypto';
-import fs, { createReadStream, ensureDirSync } from 'fs-extra';
+import fs from 'fs-extra';
 import { diskStorage } from 'multer';
-import * as path from 'path';
+import path from 'path';
 import { ApiFile } from '../../utils/api.file.decorator';
 import { User } from '../user/user.entity';
 import { FileService } from './file.service';
@@ -55,7 +55,7 @@ export class FileController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination(req, file, callback) {
-          ensureDirSync(USER_UPLOAD_IMAGE_DIR);
+          fs.ensureDirSync(USER_UPLOAD_IMAGE_DIR);
           callback(null, USER_UPLOAD_IMAGE_DIR);
         },
         filename(req, file, callback) {
@@ -88,7 +88,7 @@ export class FileController {
         filename: file.filename,
         name: file.originalname,
         size: file.size,
-        md5: await generateMD5(createReadStream(file.path)),
+        md5: await generateMD5(fs.createReadStream(file.path)),
         mimetype: file.mimetype,
         source: FileSourceEnum.USER_UPLOAD,
         path: file.path,
@@ -107,7 +107,7 @@ export class FileController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination(req, file, callback) {
-          ensureDirSync(USER_UPLOAD_VIDEO_DIR);
+          fs.ensureDirSync(USER_UPLOAD_VIDEO_DIR);
           callback(null, USER_UPLOAD_VIDEO_DIR);
         },
         filename(req, file, callback) {
@@ -137,7 +137,7 @@ export class FileController {
     if (file) {
       try {
         // 计算视频文件 md5
-        const md5 = await generateMD5(createReadStream(file.path));
+        const md5 = await generateMD5(fs.createReadStream(file.path));
         const { id } = await this.fileService.save({
           user: { id: user.id },
           filename: file.filename,

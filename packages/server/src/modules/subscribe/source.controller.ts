@@ -189,11 +189,12 @@ export class SourceController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    const { start, end } = query;
+    const { status, start, end } = query;
     const [result, total] = await this.fetchLogService.findAndCount({
       where: buildQueryOptions<FetchLog>({
         exact: {
           source: { id },
+          status,
           createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
         },
       }),

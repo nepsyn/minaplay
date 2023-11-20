@@ -1,8 +1,9 @@
 import { FeedEntry } from '@extractus/feed-extractor';
 import { File } from '../file/file.entity';
+import { Source } from './source.entity';
 
 export interface RuleEntryValidator {
-  (entry: FeedEntry): boolean | Promise<boolean>;
+  (entry: FeedEntry, source: Omit<Source, 'user' | 'downloads' | 'logs'>): boolean | Promise<boolean>;
 }
 
 export interface RuleMediaDescriptor {

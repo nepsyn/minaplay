@@ -29,11 +29,10 @@ import { Source } from './source.entity';
 import { FetchLogService } from './fetch-log.service';
 import { FetchLogQueryDto } from './fetch-log-query.dto';
 import { FetchLog } from './fetch-log.entity';
-import { Between, Not } from 'typeorm';
+import { Between } from 'typeorm';
 import { DownloadItemQueryDto } from './download-item-query.dto';
 import { DownloadItemService } from './download-item.service';
 import { DownloadItem } from './download-item.entity';
-import { StatusEnum } from '../../enums/status.enum';
 
 @Controller('subscribe/source')
 @UseGuards(AuthorizationGuard)
@@ -254,23 +253,5 @@ export class SourceController {
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
-  }
-
-  @Delete(':id/download')
-  @ApiOperation({
-    description: '删除所有订阅源已停止下载项目',
-  })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async deleteDownloadItemsBySourceId(@Param('id', ParseIntPipe) id: number) {
-    const source = await this.sourceService.findOneBy({ id });
-    if (!source) {
-      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-    }
-
-    await this.downloadItemService.delete({
-      source: { id },
-      status: Not(StatusEnum.SUCCESS),
-    });
-    return {};
   }
 }

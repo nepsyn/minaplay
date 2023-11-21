@@ -98,7 +98,12 @@ export class FetchSubscribeSourceConsumer {
           break;
         }
 
-        await this.downloadItemService.addAutoDownloadItemTask(Object.freeze(entry), hooks.describe, rule, source, log);
+        await this.downloadItemService.addAutoDownloadItemTask(entry, {
+          describeFn: hooks.describe,
+          rule,
+          source,
+          log,
+        });
         this.logger.log(`Starting download entry: ${entry.title}`);
         count++;
       }

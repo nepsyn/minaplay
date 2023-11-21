@@ -38,7 +38,7 @@ export class DownloadItem {
     nullable: true,
     eager: true,
   })
-  source: Source;
+  source?: Source;
 
   /** 命中规则 */
   @ManyToOne(() => Rule, (rule) => rule.downloads, {
@@ -46,7 +46,7 @@ export class DownloadItem {
     nullable: true,
     eager: true,
   })
-  rule: Rule;
+  rule?: Rule;
 
   /** 解析记录 */
   @ManyToOne(() => FetchLog, {

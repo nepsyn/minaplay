@@ -18,9 +18,6 @@ import { DownloadItemService } from './download-item.service';
 import { RequirePermissions } from '../authorization/require-permissions.decorator';
 import { PermissionEnum } from '../../enums/permission.enum';
 import { DownloadTaskDto } from './download-task.dto';
-import { VALID_VIDEO_MIME } from '../../constants';
-import { MediaService } from '../media/media.service';
-import { MediaFileService } from '../media/media-file.service';
 import { buildException } from '../../utils/build-exception.util';
 import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { StatusEnum } from '../../enums/status.enum';
@@ -30,12 +27,10 @@ import { RuleErrorLogService } from './rule-error-log.service';
 import { DownloadItemQueryDto } from './download-item-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { DownloadItem } from './download-item.entity';
-import { Between, IsNull, Not } from 'typeorm';
+import { Between, In, IsNull, Not } from 'typeorm';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { Aria2Service } from '../aria2/aria2.service';
-import { PluginService } from '../plugin/plugin.service';
-import { Media } from '../media/media.entity';
-import path from 'path';
+import { SourceService } from './source.service';
 
 @Controller('subscribe/download')
 @UseGuards(AuthorizationGuard)
@@ -43,13 +38,11 @@ import path from 'path';
 @ApiBearerAuth()
 export class DownloadItemController {
   constructor(
-    private mediaService: MediaService,
-    private mediaFileService: MediaFileService,
     private downloadItemService: DownloadItemService,
+    private sourceService: SourceService,
     private ruleService: RuleService,
     private ruleErrorLogService: RuleErrorLogService,
     private aria2Service: Aria2Service,
-    private pluginService: PluginService,
   ) {}
 
   @Post()
@@ -58,44 +51,39 @@ export class DownloadItemController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createDownloadTask(@Body() data: DownloadTaskDto) {
-    const [task, item] = await this.downloadItemService.addDownloadItemTask(data.url, {
-      url: data.url,
-    });
-    task.on('complete', async (files) => {
-      const medias: Media[] = [];
-
-      // media files
-      for (const file of files.filter((file) => VALID_VIDEO_MIME.includes(file.mimetype))) {
-        const { id } = await this.mediaService.save({
-          name: file.name,
-          download: { id: item.id },
-          isPublic: true,
-          file: { id: file.id },
-        });
-        const media = await this.mediaService.findOneBy({ id });
-        medias.push(media);
-        await this.mediaFileService.generateMediaFiles(media);
-        await this.pluginService.emitAllEnabled('onNewMedia', media.id);
+    if (data.sourceId) {
+      const source = await this.sourceService.findOneBy({ id: data.sourceId });
+      if (!source) {
+        throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
       }
+    }
 
-      // attachment files
-      for (const media of medias) {
-        const attachments = files
-          .filter((file) => !VALID_VIDEO_MIME.includes(file.mimetype))
-          .filter((file) => path.dirname(media.file.path) === path.dirname(file.path));
-        if (attachments.length > 0) {
-          await this.mediaService.save({
-            id: media.id,
-            attachments: attachments.map(({ id }) => ({ id })),
-          });
-        }
-      }
+    const [, item] = await this.downloadItemService.addAutoDownloadItemTask(
+      {
+        id: data.title,
+        title: data.title ?? data.url,
+        enclosure: {
+          url: data.url,
+        },
+      },
+      {
+        source: data.sourceId && { id: data.sourceId },
+      },
+    );
 
-      // notify media update
-      for (const media of medias) {
-        await this.pluginService.emitAllEnabled('onNewMedia', media.id);
-      }
-    });
+    return item;
+  }
+
+  @Get(':id')
+  @ApiOperation({
+    description: '获取下载任务信息',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
+  async getDownloadItemById(@Param('id') id: string) {
+    const item = await this.downloadItemService.findOneBy({ id });
+    if (!item) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
 
     return item;
   }
@@ -111,7 +99,7 @@ export class DownloadItemController {
     if (!item) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
-    if (item.status !== StatusEnum.FAILED || !item.rule || !item.rule.codeFile.isExist) {
+    if (item.status !== StatusEnum.FAILED || !item.entry) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -127,13 +115,12 @@ export class DownloadItemController {
       throw buildException(InternalServerErrorException, ErrorCodeEnum.UNKNOWN_ERROR);
     }
 
-    await this.downloadItemService.addAutoDownloadItemTask(
-      Object.freeze(JSON.parse(item.entry)),
-      describe,
-      item.rule,
-      item.source,
-      item.log,
-    );
+    await this.downloadItemService.addAutoDownloadItemTask(JSON.parse(item.entry), {
+      describeFn: describe,
+      rule: item.rule,
+      source: item.source,
+      log: item.log,
+    });
 
     return item;
   }
@@ -198,7 +185,7 @@ export class DownloadItemController {
     const item = await this.downloadItemService.findOneBy({
       id,
       gid: Not(IsNull()),
-      status: StatusEnum.PENDING,
+      status: In([StatusEnum.PENDING, StatusEnum.PAUSED]),
     });
     if (!item) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);

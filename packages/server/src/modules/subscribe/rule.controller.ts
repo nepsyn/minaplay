@@ -74,6 +74,20 @@ export class RuleController {
     return await this.ruleService.findOneBy({ id });
   }
 
+  @Get(':id')
+  @ApiOperation({
+    description: '获取规则信息',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP, PermissionEnum.SUBSCRIBE_VIEW)
+  async getSubscribeRuleById(@Param('id', ParseIntPipe) id: number) {
+    const rule = await this.ruleService.findOneBy({ id });
+    if (!rule) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    return rule;
+  }
+
   @Get()
   @ApiOperation({
     description: '查询订阅规则',

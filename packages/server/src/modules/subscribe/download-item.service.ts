@@ -1,10 +1,9 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DownloadItem } from './download-item.entity';
-import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOptionsWhere, In, IsNull, Not, Repository } from 'typeorm';
 import { StatusEnum } from '../../enums/status.enum';
 import { Aria2Service } from '../aria2/aria2.service';
-import { Cron, CronExpression } from '@nestjs/schedule';
 import { RuleFileDescriber, RuleFileDescriptor } from './rule.interface';
 import { VALID_VIDEO_MIME } from '../../constants';
 import { RuleErrorLogService } from './rule-error-log.service';
@@ -34,23 +33,13 @@ export class DownloadItemService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
-    await this.downloadItemRepository.update(
-      {
-        status: StatusEnum.PENDING,
-      },
-      {
-        status: StatusEnum.FAILED,
-        error: 'Application restart',
-      },
-    );
+    await this.delete({
+      gid: Not(IsNull()),
+      status: In([StatusEnum.PENDING, StatusEnum.PAUSED]),
+    });
   }
 
-  @Cron(CronExpression.EVERY_12_HOURS)
-  async handleAutoClean() {
-    await this.aria2Service.purgeDownloadResult();
-  }
-
-  async addDownloadItemTask(url: string, props: DeepPartial<DownloadItem>) {
+  async addDownloadItemTask(url: string, props: DeepPartial<DownloadItem> = {}) {
     const task = await this.aria2Service.addTask(url);
     const item = await this.save({
       ...props,
@@ -60,6 +49,7 @@ export class DownloadItemService implements OnModuleInit {
     task.on('complete', async () => {
       await this.save({
         id: item.id,
+        gid: null,
         status: StatusEnum.SUCCESS,
       });
     });
@@ -76,17 +66,19 @@ export class DownloadItemService implements OnModuleInit {
 
   async addAutoDownloadItemTask(
     entry: FeedEntry,
-    describeFn: RuleFileDescriber,
-    rule: Rule,
-    source: Source,
-    log: FetchLog,
+    props: {
+      describeFn?: RuleFileDescriber;
+      rule?: Rule;
+      source?: Partial<Source>;
+      log?: Partial<FetchLog>;
+    } = {},
   ) {
     const [task, item] = await this.addDownloadItemTask(entry.enclosure.url, {
       title: entry.title,
       url: entry.enclosure.url,
-      source: { id: source.id },
-      rule: { id: rule.id },
-      log: { id: log.id },
+      source: props.source && { id: props.source.id },
+      rule: props.rule && { id: props.rule.id },
+      log: props.log && { id: props.log.id },
       entry: JSON.stringify(entry),
     });
     task.on('complete', async (files) => {
@@ -98,12 +90,15 @@ export class DownloadItemService implements OnModuleInit {
 
         let descriptor: RuleFileDescriptor;
         try {
-          descriptor = (await describeFn?.(entry, copy)) ?? {};
+          descriptor = (await props.describeFn?.(entry, copy)) ?? {};
         } catch (error) {
-          await this.ruleErrorLogService.save({
-            rule: { id: rule.id },
-            error: error.toString(),
-          });
+          if (props.rule && props.describeFn) {
+            await this.ruleErrorLogService.save({
+              rule: { id: props.rule.id },
+              error: error.toString(),
+            });
+          }
+
           continue;
         }
 
@@ -118,13 +113,13 @@ export class DownloadItemService implements OnModuleInit {
         medias.push(media);
         await this.mediaFileService.generateMediaFiles(media);
 
-        if (rule.series) {
+        if (props.rule?.series) {
           await this.episodeService.save({
             title: descriptor.title ?? file.name,
             no: descriptor.no,
             pubAt: descriptor.pubAt ?? entry.published ?? new Date(),
             media: { id: media.id },
-            series: { id: rule.series.id },
+            series: { id: props.rule.series.id },
           });
         }
       }
@@ -148,9 +143,9 @@ export class DownloadItemService implements OnModuleInit {
       }
 
       // notify series update
-      if (medias.length > 0 && rule.series) {
-        await this.seriesSubscribeService.notifyUpdate(rule.series);
-        await this.pluginService.emitAllEnabled('onNewEpisode', rule.series.id);
+      if (props.rule?.series && medias.length > 0) {
+        await this.seriesSubscribeService.notifyUpdate(props.rule.series);
+        await this.pluginService.emitAllEnabled('onNewEpisode', props.rule.series.id);
       }
     });
 

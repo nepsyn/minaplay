@@ -1,7 +1,7 @@
 import { ConsoleLogger, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { Aria2DownloadTask } from './aria2-download-task';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
-import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
+import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { ARIA2_MODULE_OPTIONS_TOKEN } from './aria2.module-definition';
 import { Aria2ModuleOptions } from './aria2.module.interface';
@@ -46,6 +46,17 @@ export class Aria2Service implements OnModuleInit {
       });
       this.scheduleRegistry.addCronJob('auto-update-trackers', job);
     }
+  }
+
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async autoClean() {
+    if (this.isActive) {
+      await this.purgeDownloadResult();
+    }
+  }
+
+  get isActive() {
+    return this.client !== undefined && this.client.conn.readyState === this.client.conn.OPEN;
   }
 
   private async connectWs() {
@@ -130,11 +141,9 @@ export class Aria2Service implements OnModuleInit {
     const {
       completedLength,
       connections,
-      dir,
       downloadSpeed,
       errorCode,
       errorMessage,
-      files,
       followedBy,
       following,
       infoHash,
@@ -149,11 +158,9 @@ export class Aria2Service implements OnModuleInit {
           gid,
           completedLength,
           connections,
-          dir,
           downloadSpeed,
           errorCode,
           errorMessage,
-          files,
           followedBy,
           following,
           infoHash,

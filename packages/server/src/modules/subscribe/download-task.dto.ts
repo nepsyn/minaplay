@@ -13,7 +13,7 @@ export class DownloadTaskDto {
   })
   @IsOptional()
   @IsString()
-  @MaxLength(100)
+  @MaxLength(255)
   title?: string;
 
   @ApiProperty({

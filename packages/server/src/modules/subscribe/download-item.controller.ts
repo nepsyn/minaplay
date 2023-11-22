@@ -71,7 +71,7 @@ export class DownloadItemController {
       },
     );
 
-    return item;
+    return await this.downloadItemService.findOneBy({ id: item.id });
   }
 
   @Get(':id')
@@ -115,14 +115,14 @@ export class DownloadItemController {
       throw buildException(InternalServerErrorException, ErrorCodeEnum.UNKNOWN_ERROR);
     }
 
-    await this.downloadItemService.addAutoDownloadItemTask(JSON.parse(item.entry), {
+    const [, { id: itemId }] = await this.downloadItemService.addAutoDownloadItemTask(JSON.parse(item.entry), {
       describeFn: describe,
       rule: item.rule,
       source: item.source,
       log: item.log,
     });
 
-    return item;
+    return await this.downloadItemService.findOneBy({ id: itemId });
   }
 
   @Post(':id/pause')
@@ -145,9 +145,9 @@ export class DownloadItemController {
       id: item.id,
       status: StatusEnum.PAUSED,
     });
-
     await this.aria2Service.pauseBy(item.gid);
-    return { id: item.id, gid: item.gid, status: StatusEnum.PAUSED };
+
+    return await this.downloadItemService.findOneBy({ id: item.id });
   }
 
   @Post(':id/unpause')
@@ -170,9 +170,9 @@ export class DownloadItemController {
       id: item.id,
       status: StatusEnum.PENDING,
     });
-
     await this.aria2Service.unpauseBy(item.gid);
-    return { id: item.id, gid: item.gid, status: StatusEnum.PENDING };
+
+    return await this.downloadItemService.findOneBy({ id: item.id });
   }
 
   @Post(':id/cancel')
@@ -196,9 +196,9 @@ export class DownloadItemController {
       status: StatusEnum.FAILED,
       error: 'User canceled',
     });
-
     await this.aria2Service.removeBy(item.gid);
-    return { id: item.id, gid: item.gid, status: StatusEnum.FAILED };
+
+    return await this.downloadItemService.findOneBy({ id: item.id });
   }
 
   @Get()

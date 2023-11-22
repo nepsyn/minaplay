@@ -67,6 +67,7 @@ export class DownloadItemService implements OnModuleInit {
   async addAutoDownloadItemTask(
     entry: FeedEntry,
     props: {
+      item?: DownloadItem;
       describeFn?: RuleFileDescriber;
       rule?: Rule;
       source?: Partial<Source>;
@@ -74,12 +75,14 @@ export class DownloadItemService implements OnModuleInit {
     } = {},
   ) {
     const [task, item] = await this.addDownloadItemTask(entry.enclosure.url, {
+      id: props.item?.id,
       title: entry.title,
       url: entry.enclosure.url,
       source: props.source && { id: props.source.id },
       rule: props.rule && { id: props.rule.id },
       log: props.log && { id: props.log.id },
       entry: JSON.stringify(entry),
+      error: null,
     });
     task.on('complete', async (files) => {
       const medias: Media[] = [];

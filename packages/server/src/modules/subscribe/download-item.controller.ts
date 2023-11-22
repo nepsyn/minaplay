@@ -103,19 +103,22 @@ export class DownloadItemController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    let describe: RuleFileDescriber;
-    try {
-      const vm = await this.ruleService.createRuleVm(item.rule.code);
-      describe = vm.hooks?.describe;
-    } catch (error) {
-      await this.ruleErrorLogService.save({
-        rule: { id: item.rule.id },
-        error: error.toString(),
-      });
-      throw buildException(InternalServerErrorException, ErrorCodeEnum.UNKNOWN_ERROR);
+    let describe: RuleFileDescriber | undefined = undefined;
+    if (item.rule) {
+      try {
+        const vm = await this.ruleService.createRuleVm(item.rule.code);
+        describe = vm.hooks?.describe;
+      } catch (error) {
+        await this.ruleErrorLogService.save({
+          rule: { id: item.rule.id },
+          error: error.toString(),
+        });
+        throw buildException(InternalServerErrorException, ErrorCodeEnum.UNKNOWN_ERROR);
+      }
     }
 
     const [, { id: itemId }] = await this.downloadItemService.addAutoDownloadItemTask(JSON.parse(item.entry), {
+      item,
       describeFn: describe,
       rule: item.rule,
       source: item.source,

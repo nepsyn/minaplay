@@ -1,22 +1,8 @@
+import { registerPlugins } from '@/plugins';
 import { createApp } from 'vue';
 import App from './App.vue';
-import Router from './plugins/router';
-import Vuetify from './plugins/vuetify';
-import Pinia from './plugins/pinia';
-import { Api } from '@/api/api';
-import { registerSW } from 'virtual:pwa-register';
-import '@/scss/main.scss';
+import '@/css/main.sass';
 
-Api.setToken(localStorage.getItem('minaplay-token'));
-
-export const app = createApp(App);
-export const router = Router();
-export const vuetify = Vuetify();
-export const pinia = Pinia();
-
-app.use(router).use(vuetify).use(pinia);
+const app = createApp(App);
+registerPlugins(app);
 app.mount('#app');
-
-if ('serviceWorker' in navigator) {
-  registerSW();
-}

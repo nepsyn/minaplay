@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useApp } from '@/store/app';
+import { useToastStore } from '@/store/toast';
 
-const app = useApp();
+const toast = useToastStore();
 </script>
 
 <template>
@@ -16,13 +16,13 @@ const app = useApp();
       <v-slide-x-reverse-transition group>
         <v-alert
           class="pointer-events-initial mt-2"
-          v-for="message in app.messages"
+          v-for="message in toast.messages"
           density="compact"
           :key="message.id"
           :type="message.type"
           :text="message.content"
           closable
-          @click:close="app.closeToast(message.id)"
+          @click:close="toast.closeToast(message.id)"
         >
         </v-alert>
       </v-slide-x-reverse-transition>

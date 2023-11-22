@@ -1,3 +1,6 @@
+import '@mdi/font/css/materialdesignicons.css';
+import 'vuetify/styles';
+
 import { createVuetify } from 'vuetify';
 import { aliases, mdi } from 'vuetify/iconsets/mdi-svg';
 
@@ -18,8 +21,8 @@ const light = {
 const dark = {
   dark: true,
   colors: {
-    background: '#121212',
-    surface: '#121212',
+    background: '#000000',
+    surface: '#000000',
     primary: '#1976d2',
     secondary: '#f50057',
     error: '#d32f2f',
@@ -29,23 +32,22 @@ const dark = {
   },
 };
 
-export default () =>
-  createVuetify({
-    icons: {
-      sets: { mdi },
-      aliases,
-      defaultSet: 'mdi',
+export default createVuetify({
+  icons: {
+    sets: { mdi },
+    aliases,
+    defaultSet: 'mdi',
+  },
+  theme: {
+    defaultTheme: 'light',
+    themes: {
+      light,
+      dark,
     },
-    theme: {
-      defaultTheme: 'light',
-      themes: {
-        light,
-        dark,
-      },
-      variations: {
-        colors: ['primary', 'secondary', 'error', 'warning', 'success', 'info'],
-        lighten: 2,
-        darken: 2,
-      },
+    variations: {
+      colors: ['primary', 'secondary', 'error', 'warning', 'success', 'info'],
+      lighten: 2,
+      darken: 2,
     },
-  });
+  },
+});

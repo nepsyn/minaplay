@@ -2,17 +2,12 @@ export enum PermissionEnum {
   /** 最高权限 */
   ROOT_OP = '*:*',
 
-  /** 用户管理 */
-  USER_OP = 'USER:*',
-  /* 用户查看 */
-  USER_VIEW = 'USER:VIEW',
-
   /** 文件管理 */
   FILE_OP = 'FILE:*',
   /** 上传图片 */
   FILE_UPLOAD_IMAGE = 'FILE:UPLOAD:IMAGE',
   /** 上传视频 */
-  FILE_UPLOAD_VIDEO = 'FILE_UPLOAD:VIDEO',
+  FILE_UPLOAD_VIDEO = 'FILE:UPLOAD:VIDEO',
 
   /** 媒体管理 */
   MEDIA_OP = 'MEDIA:*',

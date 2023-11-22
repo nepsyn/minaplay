@@ -1,47 +1,53 @@
-<script lang="ts" setup>
-import { useApp } from '@/store/app';
-import { Api } from '@/api/api';
-import axios from 'axios';
-import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
-import { useRouter } from 'vue-router';
-import UploadDrawer from '@/components/app/UploadDrawer.vue';
-import MessagesContainer from '@/components/app/MessagesContainer.vue';
-import { onBeforeMount } from 'vue';
-import { useTheme } from 'vuetify';
+<template>
+  <router-view />
+  <v-layout>
+    <messages-container></messages-container>
+  </v-layout>
+</template>
 
-const app = useApp();
+<script setup lang="ts">
+import MessagesContainer from '@/components/app/MessagesContainer.vue';
+import { useLayoutStore } from '@/store/layout';
+import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
+import { useI18n } from 'vue-i18n';
+import { useToastStore } from '@/store/toast';
+import { useApiStore } from '@/store/api';
+import { onBeforeMount } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
+
+const toast = useToastStore();
+const { t } = useI18n();
+const layout = useLayoutStore();
+const api = useApiStore();
 const router = useRouter();
-const theme = useTheme();
 
 try {
   const themeMedia = matchMedia('(prefers-color-scheme: dark)');
-  theme.global.name.value = themeMedia.matches ? 'dark' : 'light';
-  app.darkMode = themeMedia.matches;
+  layout.toggleDarkMode(themeMedia.matches);
 } catch {}
 
 onBeforeMount(async () => {
-  if (Api.isLogin) {
+  if (api.isLogin) {
     try {
-      const response = await Api.User.getById(Number(localStorage.getItem('minaplay-user')))();
-      app.setUser(response.data);
+      const response = await api.User.getProfileById(Number(localStorage.getItem('minaplay-user')))();
+      api.user = response.data;
     } catch {
-      Api.setToken(null);
-      app.setUser(undefined);
-      app.toastWarning('登录验证已过期，请重新登录');
-      await router.replace('/login');
+      toast.toastWarning(t(`error.${ErrorCodeEnum.INVALID_TOKEN}`));
+      api.setToken(undefined);
+      api.user = undefined;
+      await router.replace({ path: '/login' });
     } finally {
       axios.interceptors.response.use(
-        (response) => {
-          return response;
-        },
+        (response) => response,
         (error) => {
           if (error.response?.data?.code === ErrorCodeEnum.INVALID_TOKEN) {
-            Api.setToken(null);
-            app.setUser(undefined);
-            app.toastWarning('登录验证已过期，请重新登录');
+            api.setToken(undefined);
+            api.user = undefined;
+            toast.toastWarning(t(`error.${ErrorCodeEnum.INVALID_TOKEN}`));
             router.replace('/login');
           } else if (error.response?.data?.code === ErrorCodeEnum.NO_PERMISSION) {
-            app.toastError('没有权限执行该操作');
+            toast.toastError(t(`error.${ErrorCodeEnum.NO_PERMISSION}`));
           } else {
             return Promise.reject(error);
           }
@@ -51,15 +57,3 @@ onBeforeMount(async () => {
   }
 });
 </script>
-
-<template>
-  <v-layout>
-    <upload-drawer></upload-drawer>
-    <router-view />
-  </v-layout>
-  <v-layout>
-    <messages-container></messages-container>
-  </v-layout>
-</template>
-
-<style lang="sass" scoped></style>

@@ -21,6 +21,12 @@ export enum ErrorCodeEnum {
   NO_PERMISSION = 0x0103,
   /** 未经授权的 Token */
   INVALID_TOKEN = 0x0104,
+  /** 用户名已被使用 */
+  USERNAME_ALREADY_OCCUPIED = 0x0105,
+  /** 邮箱已被使用 */
+  EMAIL_ALREADY_OCCUPIED = 0x0106,
+  /** 邮箱验证码错误 */
+  WRONG_EMAIL_VERIFY_CODE = 0x0107,
 
   /** 错误的文件内容 */
   INVALID_FILE = 0x0301,
@@ -45,4 +51,6 @@ export enum ErrorCodeEnum {
   USER_VOICE_MUTED = 0x0602,
   /** 直播语音连接建立失败 */
   VOICE_SERVICE_ESTABLISH_FAILED = 0x0603,
+  /** 直播房间密码错误 */
+  WRONG_LIVE_PASSWORD = 0x0604,
 }

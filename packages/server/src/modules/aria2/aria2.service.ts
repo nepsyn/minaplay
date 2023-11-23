@@ -205,12 +205,15 @@ export class Aria2Service implements OnModuleInit {
 
   async removeBy(gid: string) {
     const tasks = [...(await this.tellActive()), ...(await this.tellWaiting())];
-    const group = tasks.filter((task) => task.gid === gid || task.following === gid || task.following?.includes(gid));
+    const group = tasks.filter(
+      (task) => task.gid === gid || task.following === gid || [].concat(task.following).includes(gid),
+    );
     for (const task of group) {
       try {
         await this.client.remove(task.gid);
       } catch {}
     }
+    this.tasks.delete(gid);
   }
 
   async purgeDownloadResult() {

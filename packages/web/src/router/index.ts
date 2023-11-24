@@ -59,9 +59,9 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/source/SourceParseLog.vue'),
               },
               {
-                path: '/source/:id/downloads',
-                name: 'source-downloads',
-                component: () => import('@/views/source/SourceDownloads.vue'),
+                path: '/source/:id/download',
+                name: 'source-download',
+                component: () => import('@/views/source/SourceDownload.vue'),
               },
             ],
           },
@@ -70,7 +70,34 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/rule',
         name: 'rule',
-        component: () => import('@/views/Rule.vue'),
+        children: [
+          {
+            path: '/rule',
+            component: () => import('@/views/Rule.vue'),
+          },
+          {
+            path: '/rule/:id',
+            component: () => import('@/views/rule/RuleDetail.vue'),
+            redirect: (to) => `/rule/${to.params.id}/info`,
+            children: [
+              {
+                path: '/rule/:id/info',
+                name: 'rule-info',
+                component: () => import('@/views/rule/RuleInfo.vue'),
+              },
+              {
+                path: '/rule/:id/code',
+                name: 'rule-code',
+                component: () => import('@/views/rule/RuleCode.vue'),
+              },
+              {
+                path: '/rule/:id/error',
+                name: 'rule-error',
+                component: () => import('@/views/rule/RuleErrorLog.vue'),
+              },
+            ],
+          },
+        ],
       },
       {
         path: '/dashboard',

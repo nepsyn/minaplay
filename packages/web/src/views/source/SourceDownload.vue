@@ -1,6 +1,6 @@
 <template>
   <v-container class="pa-0">
-    <span class="text-h4">{{ t('source.sections.downloads') }}</span>
+    <span class="text-h4">{{ t('source.sections.download') }}</span>
     <v-row class="py-2 mt-3" dense>
       <v-col cols="12" sm="4">
         <v-text-field

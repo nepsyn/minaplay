@@ -25,10 +25,10 @@
 <script setup lang="ts">
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
-import { mdiDownloadCircleOutline, mdiInformationOutline, mdiRss, mdiTimelineClockOutline } from '@mdi/js';
 import { useRoute } from 'vue-router';
 import { useDisplay } from 'vuetify';
+import { computed } from 'vue';
+import { mdiCodeBraces, mdiInformationOutline, mdiProgressClose } from '@mdi/js';
 import NavSections from '@/components/app/NavSections.vue';
 import NavTabs from '@/components/app/NavTabs.vue';
 
@@ -38,24 +38,19 @@ const display = useDisplay();
 
 const tabs = computed(() => [
   {
-    to: `/source/${route.params.id}/info`,
+    to: `/rule/${route.params.id}/info`,
     icon: mdiInformationOutline,
-    text: t('source.sections.info'),
+    text: t('rule.sections.info'),
   },
   {
-    to: `/source/${route.params.id}/raw`,
-    icon: mdiRss,
-    text: t('source.sections.raw'),
+    to: `/rule/${route.params.id}/code`,
+    icon: mdiCodeBraces,
+    text: t('rule.sections.code'),
   },
   {
-    to: `/source/${route.params.id}/log`,
-    icon: mdiTimelineClockOutline,
-    text: t('source.sections.log'),
-  },
-  {
-    to: `/source/${route.params.id}/download`,
-    icon: mdiDownloadCircleOutline,
-    text: t('source.sections.download'),
+    to: `/rule/${route.params.id}/error`,
+    icon: mdiProgressClose,
+    text: t('rule.sections.error'),
   },
 ]);
 </script>

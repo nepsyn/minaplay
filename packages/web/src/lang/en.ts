@@ -51,6 +51,7 @@ export default {
     },
   },
   layout: {
+    sections: 'Sections',
     actions: {
       dark: 'Dark Mode',
       light: 'Light Mode',
@@ -89,15 +90,14 @@ export default {
       url: 'URL',
     },
     sections: {
-      title: 'Sections',
       info: 'Information',
       raw: 'Raw Data',
       log: 'Parse Log',
-      downloads: 'Downloads',
+      download: 'Download',
     },
     info: {
       actions: 'Actions',
-      update: 'Run Update Instantly',
+      update: 'Run Update',
       updateDescription:
         'Run update task instantly, MinaPlay will automatically parse content and download items match your `Rules`.',
       updateBtn: 'Run Update',
@@ -144,6 +144,11 @@ export default {
   },
   rule: {
     title: 'Rules',
+    sections: {
+      info: 'Information',
+      code: 'Code',
+      error: 'Error Log',
+    },
   },
   login: {
     username: 'Username',

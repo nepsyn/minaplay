@@ -133,7 +133,7 @@ import {
 import { MessageSchema } from '@/lang';
 import { openUrl } from '@/utils/utils';
 import { useApiStore } from '@/store/api';
-import UserAvatar from '@/components/app/UserAvatar.vue';
+import UserAvatar from '@/components/user/UserAvatar.vue';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useRoute, useRouter } from 'vue-router';
 import { useToastStore } from '@/store/toast';

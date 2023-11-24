@@ -16,6 +16,18 @@
             @update:model-value="useQuery"
           ></v-text-field>
         </v-col>
+        <v-col cols="12" sm="3">
+          <v-select
+            variant="outlined"
+            :label="t('app.input.order')"
+            density="compact"
+            v-model="filters.order"
+            :items="[t('app.input.desc'), t('app.input.asc')]"
+            hide-details
+            clearable
+            @update:model-value="query"
+          ></v-select>
+        </v-col>
         <v-col cols="12" sm="auto" class="flex-grow-0">
           <v-btn height="40" color="success" variant="flat" :prepend-icon="mdiPlus" block>
             {{ t('app.actions.add') }}
@@ -23,6 +35,13 @@
         </v-col>
       </v-row>
       <v-divider class="my-2"></v-divider>
+      <multi-items-loader :loader="rulesLoader" class="px-0 py-2 mt-2" auto>
+        <v-row>
+          <v-col v-for="rule in rules" :key="rule.id" cols="12" sm="6" md="4">
+            <div>{{ rule }}</div>
+          </v-col>
+        </v-row>
+      </multi-items-loader>
     </v-container>
   </to-top-container>
 </template>
@@ -31,11 +50,12 @@
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import { useI18n } from 'vue-i18n';
 import { mdiPlus } from '@mdi/js';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { debounce } from '@/utils/utils';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { RuleQueryDto } from '@/api/interfaces/subscribe.interface';
 import { useApiStore } from '@/store/api';
+import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -49,9 +69,11 @@ const rulesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 120 },
 );
+const rules = computed(() => rulesLoader.items.value);
 
 const filters = ref<Partial<RuleQueryDto>>({
   keyword: '',
+  order: 'DESC',
 });
 const query = () => {
   rulesLoader.reset();

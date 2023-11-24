@@ -33,13 +33,20 @@ import { RuleQueryDto } from './rule-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { Rule } from './rule.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
+import { ApiQueryDto } from '../../utils/api.query.dto';
+import { RuleErrorLog } from './rule-error-log.entity';
+import { RuleErrorLogService } from './rule-error-log.service';
 
 @Controller('subscribe/rule')
 @UseGuards(AuthorizationGuard)
 @ApiTags('subscribe')
 @ApiBearerAuth()
 export class RuleController {
-  constructor(private ruleService: RuleService, private fileService: FileService) {}
+  constructor(
+    private ruleService: RuleService,
+    private ruleErrorLogService: RuleErrorLogService,
+    private fileService: FileService,
+  ) {}
 
   @Post()
   @ApiOperation({
@@ -148,6 +155,46 @@ export class RuleController {
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async deleteSubscribeRule(@Param('id', ParseIntPipe) id: number) {
     await this.ruleService.delete({ id });
+    return {};
+  }
+
+  @Get(':id/log')
+  @ApiOperation({
+    description: '查询订阅规则错误日志',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  async getErrorLogsByRuleId(@Param('id', ParseIntPipe) id: number, @Query() query: ApiQueryDto<RuleErrorLog>) {
+    const rule = await this.ruleService.findOneBy({ id });
+    if (!rule) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    const [result, total] = await this.ruleErrorLogService.findAndCount({
+      where: buildQueryOptions<RuleErrorLog>({
+        exact: { rule: { id } },
+      }),
+      skip: query.page * query.size,
+      take: query.size,
+      order: { [query.sort]: query.order },
+    });
+
+    return new ApiPaginationResultDto(result, total, query.page, query.size);
+  }
+
+  @Delete(':id/log')
+  @ApiOperation({
+    description: '删除所有订阅规则错误日志',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
+  async deleteErrorLogsByRuleId(@Param('id', ParseIntPipe) id: number) {
+    const rule = await this.ruleService.findOneBy({ id });
+    if (!rule) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    await this.ruleErrorLogService.delete({
+      rule: { id },
+    });
     return {};
   }
 }

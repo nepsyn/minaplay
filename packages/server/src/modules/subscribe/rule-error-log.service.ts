@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Rule } from './rule.entity';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { RuleErrorLog } from './rule-error-log.entity';
 
@@ -20,7 +19,7 @@ export class RuleErrorLogService {
     return await this.ruleErrorLogRepository.findAndCount(options);
   }
 
-  async delete(where: FindOptionsWhere<Rule>) {
+  async delete(where: FindOptionsWhere<RuleErrorLog>) {
     const result = await this.ruleErrorLogRepository.delete(where);
     return result.affected > 0;
   }

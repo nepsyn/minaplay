@@ -7,9 +7,15 @@ export class RuleErrorLog {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
+  /** 原始Entry */
+  @Column({
+    type: 'text',
+    nullable: true,
+  })
+  entry?: string;
+
   /** 错误内容 */
   @Column({
-    nullable: true,
     type: 'text',
   })
   error: string;

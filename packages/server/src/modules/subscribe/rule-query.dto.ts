@@ -30,4 +30,13 @@ export class RuleQueryDto extends ApiQueryDto<Rule> {
   @IsOptional()
   @IsInt()
   seriesId?: number;
+
+  @ApiProperty({
+    description: '订阅源id',
+    required: false,
+  })
+  @Transform(({ value }) => Number(value))
+  @IsOptional()
+  @IsInt()
+  sourceId?: number;
 }

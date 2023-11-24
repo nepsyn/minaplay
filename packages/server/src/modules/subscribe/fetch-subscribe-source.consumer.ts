@@ -10,6 +10,7 @@ import { StatusEnum } from '../../enums/status.enum';
 import { FeedData } from '@extractus/feed-extractor';
 import { RuleErrorLogService } from './rule-error-log.service';
 import { RuleHooks } from './rule.interface';
+import { IsNull } from 'typeorm';
 
 @Injectable()
 @Processor('fetch-subscribe-source')
@@ -55,10 +56,12 @@ export class FetchSubscribeSourceConsumer {
       return;
     }
 
-    const [rules] = await this.ruleService.findAndCount();
+    const [rules] = await this.ruleService.findAndCount({
+      where: [{ source: IsNull() }, { source: { id: source.id } }],
+    });
 
     const validEntries = data.entries.filter((entry) => entry.enclosure?.url);
-    const validRules = rules.filter((rule) => rule.codeFile.isExist);
+    const validRules = rules.filter((rule) => rule.file.isExist);
 
     let count = 0;
     for (const rule of validRules) {

@@ -125,29 +125,20 @@
             </v-container>
             <v-btn class="ml-4" variant="tonal" color="error" :loading="sourceDeleting">
               {{ t('app.actions.delete') }}
-              <v-dialog width="auto" activator="parent">
-                <template #default="{ isActive }">
-                  <v-card>
-                    <v-card-title>{{ t('app.actions.deleteTitle') }}</v-card-title>
-                    <v-card-text>{{ t('app.actions.deleteConfirm', { item: t('app.entities.source') }) }}</v-card-text>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn color="primary" variant="text" @click="isActive.value = false">
-                        {{ t('app.cancel') }}
-                      </v-btn>
-                      <v-btn
-                        color="error"
-                        variant="plain"
-                        @click="
-                          isActive.value = false;
-                          deleteSource();
-                        "
-                      >
-                        {{ t('app.ok') }}
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </template>
+              <v-dialog width="auto" activator="parent" close-on-content-click>
+                <v-card>
+                  <v-card-title>{{ t('app.actions.deleteTitle') }}</v-card-title>
+                  <v-card-text>{{ t('app.actions.deleteConfirm', { item: t('app.entities.source') }) }}</v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" variant="text">
+                      {{ t('app.cancel') }}
+                    </v-btn>
+                    <v-btn color="error" variant="plain" @click="deleteSource">
+                      {{ t('app.ok') }}
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
               </v-dialog>
             </v-btn>
           </v-container>
@@ -260,7 +251,9 @@ const {
   request: deleteSource,
   onResolved: onSourceDeleted,
   onRejected: onSourceDeleteFailed,
-} = useAxiosRequest(api.Source.delete(Number(route.params.id)));
+} = useAxiosRequest(async () => {
+  return await api.Source.delete(Number(route.params.id))();
+});
 onSourceDeleted(async () => {
   toast.toastSuccess(t('app.actions.deleteToast'));
   await router.replace({ path: '/source' });

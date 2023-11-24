@@ -29,7 +29,15 @@
           ></v-select>
         </v-col>
         <v-col cols="12" sm="auto" class="flex-grow-0">
-          <v-btn height="40" color="success" variant="flat" :prepend-icon="mdiPlus" block>
+          <v-btn
+            height="40"
+            color="success"
+            variant="flat"
+            :prepend-icon="mdiPlus"
+            block
+            :loading="creating"
+            @click="createRule"
+          >
             {{ t('app.actions.add') }}
           </v-btn>
         </v-col>
@@ -38,7 +46,7 @@
       <multi-items-loader :loader="rulesLoader" class="px-0 py-2 mt-2" auto>
         <v-row>
           <v-col v-for="rule in rules" :key="rule.id" cols="12" sm="6" md="4">
-            <div>{{ rule }}</div>
+            <div @click="router.push(`/rule/${rule.id}`)">{{ rule }}</div>
           </v-col>
         </v-row>
       </multi-items-loader>
@@ -56,9 +64,14 @@ import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { RuleQueryDto } from '@/api/interfaces/subscribe.interface';
 import { useApiStore } from '@/store/api';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
+import { useAxiosRequest } from '@/composables/use-axios-request';
+import { useRouter } from 'vue-router';
+import { useToastStore } from '@/store/toast';
 
 const { t } = useI18n();
 const api = useApiStore();
+const router = useRouter();
+const toast = useToastStore();
 
 const rulesLoader = useAxiosPageLoader(
   async (query?: RuleQueryDto) => {
@@ -80,6 +93,24 @@ const query = () => {
   rulesLoader.request();
 };
 const useQuery = debounce(query, 1000);
+
+const {
+  pending: creating,
+  request: createRule,
+  onResolved: onCreated,
+  onRejected: onCreateFailed,
+} = useAxiosRequest(async () => {
+  return await api.Rule.create({
+    remark: t('rule.unnamed'),
+    code: '',
+  });
+});
+onCreated(async (data) => {
+  await router.push({ path: `/rule/${data.id}` });
+});
+onCreateFailed(() => {
+  toast.toastError(t('error.other'));
+});
 </script>
 
 <style scoped lang="sass"></style>

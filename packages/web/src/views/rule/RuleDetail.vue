@@ -10,11 +10,14 @@
         ></nav-sections>
         <div :style="{ marginLeft: display.mdAndUp.value ? '300px' : '0' }" class="h-100 d-flex flex-column">
           <router-view v-slot="{ Component }">
-            <v-scroll-y-reverse-transition leave-absolute>
+            <component
+              :is="display.mdAndUp.value ? VScrollYReverseTransition : VScrollXReverseTransition"
+              leave-absolute
+            >
               <keep-alive>
                 <component :is="Component" />
               </keep-alive>
-            </v-scroll-y-reverse-transition>
+            </component>
           </router-view>
         </div>
       </v-container>
@@ -28,9 +31,10 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { computed } from 'vue';
-import { mdiCodeBraces, mdiInformationOutline, mdiProgressClose } from '@mdi/js';
+import { mdiInformationOutline, mdiProgressClose } from '@mdi/js';
 import NavSections from '@/components/app/NavSections.vue';
 import NavTabs from '@/components/app/NavTabs.vue';
+import { VScrollXReverseTransition, VScrollYReverseTransition } from 'vuetify/components/transitions';
 
 const { t } = useI18n();
 const route = useRoute();
@@ -41,11 +45,6 @@ const tabs = computed(() => [
     to: `/rule/${route.params.id}/info`,
     icon: mdiInformationOutline,
     text: t('rule.sections.info'),
-  },
-  {
-    to: `/rule/${route.params.id}/code`,
-    icon: mdiCodeBraces,
-    text: t('rule.sections.code'),
   },
   {
     to: `/rule/${route.params.id}/error`,

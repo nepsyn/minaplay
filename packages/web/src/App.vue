@@ -13,7 +13,7 @@ import { useI18n } from 'vue-i18n';
 import { useToastStore } from '@/store/toast';
 import { useApiStore } from '@/store/api';
 import { onBeforeMount } from 'vue';
-import { useRouter } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 
 const toast = useToastStore();
@@ -21,6 +21,7 @@ const { t } = useI18n();
 const layout = useLayoutStore();
 const api = useApiStore();
 const router = useRouter();
+const route = useRoute();
 
 try {
   const themeMedia = matchMedia('(prefers-color-scheme: dark)');
@@ -45,7 +46,7 @@ onBeforeMount(async () => {
             api.setToken(undefined);
             api.user = undefined;
             toast.toastWarning(t(`error.${ErrorCodeEnum.INVALID_TOKEN}`));
-            router.replace('/login');
+            router.replace({ path: '/login', query: { redirectUrl: route.fullPath } });
           } else if (error.response?.data?.code === ErrorCodeEnum.NO_PERMISSION) {
             toast.toastError(t(`error.${ErrorCodeEnum.NO_PERMISSION}`));
           } else {

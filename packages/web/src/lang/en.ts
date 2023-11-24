@@ -144,10 +144,19 @@ export default {
   },
   rule: {
     title: 'Rules',
+    unnamed: 'Unnamed Subscribe Rule',
+    entity: {
+      id: 'ID',
+      remark: 'Remark',
+    },
     sections: {
       info: 'Information',
-      code: 'Code',
       error: 'Error Log',
+    },
+    info: {
+      actions: 'Actions',
+      delete: 'Delete Subscribe Rule',
+      deleteDescription: 'Delete this subscribe rule. Note that this action is irreversible!',
     },
   },
   login: {

@@ -88,7 +88,7 @@ const routes: RouteRecordRaw[] = [
               {
                 path: '/rule/:id/code',
                 name: 'rule-code',
-                component: () => import('@/views/rule/RuleCode.vue'),
+                component: () => import('@/views/rule/RuleCodeEdit.vue'),
               },
               {
                 path: '/rule/:id/error',

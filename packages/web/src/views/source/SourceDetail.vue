@@ -10,11 +10,14 @@
         ></nav-sections>
         <div :style="{ marginLeft: display.mdAndUp.value ? '300px' : '0' }" class="h-100 d-flex flex-column">
           <router-view v-slot="{ Component }">
-            <v-scroll-y-reverse-transition leave-absolute>
+            <component
+              :is="display.mdAndUp.value ? VScrollYReverseTransition : VScrollXReverseTransition"
+              leave-absolute
+            >
               <keep-alive>
                 <component :is="Component" />
               </keep-alive>
-            </v-scroll-y-reverse-transition>
+            </component>
           </router-view>
         </div>
       </v-container>
@@ -31,6 +34,7 @@ import { useRoute } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import NavSections from '@/components/app/NavSections.vue';
 import NavTabs from '@/components/app/NavTabs.vue';
+import { VScrollXReverseTransition, VScrollYReverseTransition } from 'vuetify/components/transitions';
 
 const { t } = useI18n();
 const route = useRoute();

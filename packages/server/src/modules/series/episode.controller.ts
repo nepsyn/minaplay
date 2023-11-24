@@ -114,13 +114,6 @@ export class EpisodeController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    if (data.seriesId !== undefined) {
-      const series = await this.seriesService.findOneBy({ id: data.seriesId });
-      if (!series) {
-        throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-      }
-    }
-
     await this.episodeService.save({
       id,
       ...data,

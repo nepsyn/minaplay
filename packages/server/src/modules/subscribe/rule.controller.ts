@@ -76,7 +76,8 @@ export class RuleController {
     const { id } = await this.ruleService.save({
       ...data,
       series: { id: data.seriesId },
-      codeFile: file,
+      source: { id: data.sourceId },
+      file,
     });
     return await this.ruleService.findOneBy({ id });
   }
@@ -101,12 +102,16 @@ export class RuleController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async querySubscribeRule(@Query() query: RuleQueryDto) {
-    const { keyword, id, seriesId } = query;
+    const { keyword, id, seriesId, sourceId } = query;
     const [result, total] = await this.ruleService.findAndCount({
       where: buildQueryOptions<Rule>({
         keyword,
         keywordProperties: (entity) => [entity.remark],
-        exact: { id, series: { id: seriesId } },
+        exact: {
+          id,
+          series: { id: seriesId },
+          source: { id: sourceId },
+        },
       }),
       skip: query.page * query.size,
       take: query.size,
@@ -128,12 +133,11 @@ export class RuleController {
     }
 
     if (data.code) {
-      const file = rule.codeFile;
       await fs.ensureDir(SUBSCRIBE_RULE_SOURCE_DIR);
-      await fs.writeFile(file.path, data.code);
-      const fileStat = await fs.stat(file.path);
+      await fs.writeFile(rule.file.path, data.code);
+      const fileStat = await fs.stat(rule.file.path);
       await this.fileService.save({
-        id: file.id,
+        id: rule.file.id,
         size: fileStat.size,
         md5: await generateMD5(data.code),
       });
@@ -143,6 +147,7 @@ export class RuleController {
       id,
       ...data,
       series: { id: data.seriesId },
+      source: { id: data.sourceId },
     });
 
     return await this.ruleService.findOneBy({ id });

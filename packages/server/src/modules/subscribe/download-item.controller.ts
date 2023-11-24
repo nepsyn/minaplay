@@ -51,13 +51,6 @@ export class DownloadItemController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createDownloadTask(@Body() data: DownloadTaskDto) {
-    if (data.sourceId) {
-      const source = await this.sourceService.findOneBy({ id: data.sourceId });
-      if (!source) {
-        throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-      }
-    }
-
     const [, item] = await this.downloadItemService.addAutoDownloadItemTask(
       {
         id: data.title,

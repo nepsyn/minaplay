@@ -12,6 +12,7 @@ import { Series } from '../series/series.entity';
 import { File } from '../file/file.entity';
 import { DownloadItem } from './download-item.entity';
 import fs from 'fs-extra';
+import { Source } from './source.entity';
 
 /** 订阅规则 */
 @Entity()
@@ -26,12 +27,12 @@ export class Rule {
   })
   remark?: string;
 
-  /** 验证代码文件 */
+  /** 规则代码文件 */
   @Exclude()
   @ManyToOne(() => File, {
     eager: true,
   })
-  codeFile: File;
+  file: File;
 
   /** 下载内容 */
   @Exclude()
@@ -44,11 +45,19 @@ export class Rule {
     eager: true,
     nullable: true,
   })
-  series: Series;
+  series?: Series;
+
+  /** 专用订阅源 */
+  @ManyToOne(() => Source, {
+    onDelete: 'SET NULL',
+    eager: true,
+    nullable: true,
+  })
+  source?: Source;
 
   @Expose()
   get code() {
-    return this.codeFile.isExist ? fs.readFileSync(this.codeFile.path).toString() : undefined;
+    return this.file?.isExist ? fs.readFileSync(this.file.path).toString() : undefined;
   }
 
   /** 创建时间 */

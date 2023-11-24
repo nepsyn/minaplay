@@ -27,4 +27,12 @@ export class RuleDto {
   @IsOptional()
   @IsInt()
   seriesId?: number;
+
+  @ApiProperty({
+    description: '订阅源id',
+    required: false,
+  })
+  @IsOptional()
+  @IsInt()
+  sourceId?: number;
 }

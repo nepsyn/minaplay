@@ -102,6 +102,7 @@ export class DownloadItemService implements OnModuleInit {
           if (props.rule && props.describeFn) {
             await this.ruleErrorLogService.save({
               rule: { id: props.rule.id },
+              entry: JSON.stringify(entry),
               error: error.toString(),
             });
           }

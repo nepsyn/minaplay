@@ -93,6 +93,7 @@ export class FetchSubscribeSourceConsumer {
         } catch (error) {
           await this.ruleErrorLogService.save({
             rule: { id: rule.id },
+            entry: JSON.stringify(entry),
             error: error.toString(),
           });
           break;

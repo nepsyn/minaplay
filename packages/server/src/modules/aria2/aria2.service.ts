@@ -125,16 +125,28 @@ export class Aria2Service implements OnModuleInit {
     }
   }
 
-  async addTask(url: string) {
-    const tracker = await this.cacheStore.get<string>(Aria2Service.TRACKER_CACHE_KEY);
-    const gid = await this.client.addUri([url], {
-      'bt-tracker': tracker ?? '',
-      dir: path.join(ARIA2_DOWNLOAD_DIR, randomUUID().replace(/-/g, '')),
-    });
-    const task = new Aria2DownloadTask(gid);
-    this.tasks.set(gid, task);
+  async createTask(url: string) {
+    const hash = await generateMD5(String(Date.now()));
+    const gid = hash.slice(0, 16);
+    const task = new Aria2DownloadTask(gid, url);
+    this.tasks.set(task.gid, task);
 
     return task;
+  }
+
+  async startTask(task: Aria2DownloadTask) {
+    const tracker = await this.cacheStore.get<string>(Aria2Service.TRACKER_CACHE_KEY);
+    try {
+      await this.client.addUri([task.url], {
+        'bt-tracker': tracker ?? '',
+        dir: path.join(ARIA2_DOWNLOAD_DIR, randomUUID().replace(/-/g, '')),
+        gid: task.gid,
+      });
+
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   async tellStatus(gid: string): ReturnType<Aria2WsClient['tellStatus']> {

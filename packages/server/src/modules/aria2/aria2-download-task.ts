@@ -8,7 +8,7 @@ export type Aria2DownloadItemEventMap = {
 };
 
 export class Aria2DownloadTask extends TypedEventEmitter<Aria2DownloadItemEventMap> {
-  constructor(public readonly gid: string) {
+  constructor(public readonly gid: string, public readonly url: string) {
     super();
   }
 }

@@ -40,12 +40,14 @@ export class DownloadItemService implements OnModuleInit {
   }
 
   async addDownloadItemTask(url: string, props: DeepPartial<DownloadItem> = {}) {
-    const task = await this.aria2Service.addTask(url);
+    const task = await this.aria2Service.createTask(url);
     const item = await this.save({
-      ...props,
       gid: task.gid,
       status: StatusEnum.PENDING,
+      createAt: new Date(),
+      ...props,
     });
+
     task.on('complete', async () => {
       await this.save({
         id: item.id,
@@ -60,6 +62,8 @@ export class DownloadItemService implements OnModuleInit {
         error: status.errorMessage,
       });
     });
+
+    await this.aria2Service.startTask(task);
 
     return [task, item] as const;
   }

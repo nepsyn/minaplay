@@ -1,17 +1,17 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class Schema1700826821107 implements MigrationInterface {
-    name = 'Schema1700826821107'
+export class Schema1700897622216 implements MigrationInterface {
+    name = 'Schema1700897622216'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE \`permission\` (\`name\` enum ('*:*', 'FILE:*', 'FILE:UPLOAD:IMAGE', 'FILE:UPLOAD:VIDEO', 'MEDIA:*', 'MEDIA:VIEW', 'SERIES:*', 'SERIES:VIEW', 'SUBSCRIBE:*', 'SUBSCRIBE:VIEW', 'LIVE:*', 'LIVE:VIEW') NOT NULL, \`userId\` int NOT NULL, PRIMARY KEY (\`name\`, \`userId\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`file\` (\`id\` varchar(36) NOT NULL, \`filename\` varchar(255) NOT NULL, \`name\` varchar(255) NOT NULL, \`size\` int NOT NULL, \`md5\` varchar(255) NOT NULL, \`mimetype\` varchar(255) NULL, \`source\` enum ('USER_UPLOAD', 'ARIA2_DOWNLOAD', 'AUTO_GENERATED') NOT NULL, \`path\` varchar(255) NOT NULL, \`expireAt\` datetime NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`userId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`series_tag\` (\`name\` varchar(255) NOT NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), PRIMARY KEY (\`name\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`fetch_log\` (\`id\` varchar(36) NOT NULL, \`status\` enum ('PENDING', 'PAUSED', 'SUCCESS', 'FAILED') NOT NULL, \`error\` text NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`sourceId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`source\` (\`id\` int NOT NULL AUTO_INCREMENT, \`url\` text NOT NULL, \`remark\` varchar(255) NULL, \`title\` varchar(255) NULL, \`cron\` varchar(255) NOT NULL DEFAULT '0 */30 * * * *', \`enabled\` tinyint NOT NULL DEFAULT 1, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`userId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`media\` (\`id\` varchar(36) NOT NULL, \`name\` varchar(255) NOT NULL, \`description\` text NULL, \`isPublic\` tinyint NOT NULL DEFAULT 1, \`metadata\` text NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`downloadId\` varchar(36) NULL, \`posterId\` varchar(36) NULL, \`fileId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`rule\` (\`id\` int NOT NULL AUTO_INCREMENT, \`remark\` varchar(255) NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`fileId\` varchar(36) NULL, \`sourceId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`download_item\` (\`id\` varchar(36) NOT NULL, \`title\` varchar(255) NULL, \`url\` text NOT NULL, \`gid\` varchar(255) NULL, \`status\` enum ('PENDING', 'PAUSED', 'SUCCESS', 'FAILED') NOT NULL, \`error\` text NULL, \`entry\` text NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`sourceId\` int NULL, \`ruleId\` int NULL, \`logId\` varchar(36) NULL, INDEX \`IDX_900be723d0d64b162ce682cc9d\` (\`title\`), PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`rule\` (\`id\` int NOT NULL AUTO_INCREMENT, \`remark\` varchar(255) NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`fileId\` varchar(36) NULL, \`seriesId\` int NULL, \`sourceId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
-        await queryRunner.query(`CREATE TABLE \`series_tag\` (\`name\` varchar(255) NOT NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), PRIMARY KEY (\`name\`)) ENGINE=InnoDB`);
+        await queryRunner.query(`CREATE TABLE \`media\` (\`id\` varchar(36) NOT NULL, \`name\` varchar(255) NOT NULL, \`description\` text NULL, \`isPublic\` tinyint NOT NULL DEFAULT 1, \`metadata\` text NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`downloadId\` varchar(36) NULL, \`posterId\` varchar(36) NULL, \`fileId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`episode\` (\`id\` int NOT NULL AUTO_INCREMENT, \`title\` varchar(255) NULL, \`no\` varchar(255) NULL, \`pubAt\` datetime NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`mediaId\` varchar(36) NULL, \`seriesId\` int NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`series_subscribe\` (\`userId\` int NOT NULL, \`seriesId\` int NOT NULL, \`notify\` tinyint NULL DEFAULT 1, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), PRIMARY KEY (\`userId\`, \`seriesId\`)) ENGINE=InnoDB`);
         await queryRunner.query(`CREATE TABLE \`series\` (\`id\` int NOT NULL AUTO_INCREMENT, \`name\` varchar(255) NOT NULL, \`season\` varchar(255) NULL, \`finished\` tinyint NULL DEFAULT 0, \`count\` int NULL, \`description\` text NULL, \`createAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6), \`updateAt\` datetime(6) NOT NULL DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6), \`userId\` int NULL, \`posterId\` varchar(36) NULL, PRIMARY KEY (\`id\`)) ENGINE=InnoDB`);
@@ -27,15 +27,14 @@ export class Schema1700826821107 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`file\` ADD CONSTRAINT \`FK_b2d8e683f020f61115edea206b3\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`fetch_log\` ADD CONSTRAINT \`FK_4f282fdbf618217bd3f224854b0\` FOREIGN KEY (\`sourceId\`) REFERENCES \`source\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`source\` ADD CONSTRAINT \`FK_ee6c36f54891cc9dc488a778a2b\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`media\` ADD CONSTRAINT \`FK_4841bb1d4497db26e56a9edabd9\` FOREIGN KEY (\`downloadId\`) REFERENCES \`download_item\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`media\` ADD CONSTRAINT \`FK_fd7e95f0dae1b10d20cb375be6d\` FOREIGN KEY (\`posterId\`) REFERENCES \`file\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`media\` ADD CONSTRAINT \`FK_4e8cb463576d90330b25a8534c7\` FOREIGN KEY (\`fileId\`) REFERENCES \`file\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`rule\` ADD CONSTRAINT \`FK_2952a30d05d90b805c055aa7886\` FOREIGN KEY (\`fileId\`) REFERENCES \`file\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`rule\` ADD CONSTRAINT \`FK_0fba34c0f0e23f53e5058650a35\` FOREIGN KEY (\`sourceId\`) REFERENCES \`source\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`download_item\` ADD CONSTRAINT \`FK_23a017bba43457003da2bfbc559\` FOREIGN KEY (\`sourceId\`) REFERENCES \`source\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`download_item\` ADD CONSTRAINT \`FK_f00a12e0bf2ae742fb8b7a8b7ef\` FOREIGN KEY (\`ruleId\`) REFERENCES \`rule\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`download_item\` ADD CONSTRAINT \`FK_3c8cc71dc253a8bda6525d1661e\` FOREIGN KEY (\`logId\`) REFERENCES \`fetch_log\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`rule\` ADD CONSTRAINT \`FK_2952a30d05d90b805c055aa7886\` FOREIGN KEY (\`fileId\`) REFERENCES \`file\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`rule\` ADD CONSTRAINT \`FK_01d624a99fe247221b050083b73\` FOREIGN KEY (\`seriesId\`) REFERENCES \`series\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`rule\` ADD CONSTRAINT \`FK_0fba34c0f0e23f53e5058650a35\` FOREIGN KEY (\`sourceId\`) REFERENCES \`source\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`media\` ADD CONSTRAINT \`FK_4841bb1d4497db26e56a9edabd9\` FOREIGN KEY (\`downloadId\`) REFERENCES \`download_item\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`media\` ADD CONSTRAINT \`FK_fd7e95f0dae1b10d20cb375be6d\` FOREIGN KEY (\`posterId\`) REFERENCES \`file\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`media\` ADD CONSTRAINT \`FK_4e8cb463576d90330b25a8534c7\` FOREIGN KEY (\`fileId\`) REFERENCES \`file\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`episode\` ADD CONSTRAINT \`FK_08dcd3bf79a0b2c406967f64ad1\` FOREIGN KEY (\`mediaId\`) REFERENCES \`media\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`episode\` ADD CONSTRAINT \`FK_6664832a677738a53b1e29a07e7\` FOREIGN KEY (\`seriesId\`) REFERENCES \`series\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`series_subscribe\` ADD CONSTRAINT \`FK_f1e6afc14333ee0846359b19793\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
@@ -81,15 +80,14 @@ export class Schema1700826821107 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`series_subscribe\` DROP FOREIGN KEY \`FK_f1e6afc14333ee0846359b19793\``);
         await queryRunner.query(`ALTER TABLE \`episode\` DROP FOREIGN KEY \`FK_6664832a677738a53b1e29a07e7\``);
         await queryRunner.query(`ALTER TABLE \`episode\` DROP FOREIGN KEY \`FK_08dcd3bf79a0b2c406967f64ad1\``);
-        await queryRunner.query(`ALTER TABLE \`rule\` DROP FOREIGN KEY \`FK_0fba34c0f0e23f53e5058650a35\``);
-        await queryRunner.query(`ALTER TABLE \`rule\` DROP FOREIGN KEY \`FK_01d624a99fe247221b050083b73\``);
-        await queryRunner.query(`ALTER TABLE \`rule\` DROP FOREIGN KEY \`FK_2952a30d05d90b805c055aa7886\``);
-        await queryRunner.query(`ALTER TABLE \`download_item\` DROP FOREIGN KEY \`FK_3c8cc71dc253a8bda6525d1661e\``);
-        await queryRunner.query(`ALTER TABLE \`download_item\` DROP FOREIGN KEY \`FK_f00a12e0bf2ae742fb8b7a8b7ef\``);
-        await queryRunner.query(`ALTER TABLE \`download_item\` DROP FOREIGN KEY \`FK_23a017bba43457003da2bfbc559\``);
         await queryRunner.query(`ALTER TABLE \`media\` DROP FOREIGN KEY \`FK_4e8cb463576d90330b25a8534c7\``);
         await queryRunner.query(`ALTER TABLE \`media\` DROP FOREIGN KEY \`FK_fd7e95f0dae1b10d20cb375be6d\``);
         await queryRunner.query(`ALTER TABLE \`media\` DROP FOREIGN KEY \`FK_4841bb1d4497db26e56a9edabd9\``);
+        await queryRunner.query(`ALTER TABLE \`download_item\` DROP FOREIGN KEY \`FK_3c8cc71dc253a8bda6525d1661e\``);
+        await queryRunner.query(`ALTER TABLE \`download_item\` DROP FOREIGN KEY \`FK_f00a12e0bf2ae742fb8b7a8b7ef\``);
+        await queryRunner.query(`ALTER TABLE \`download_item\` DROP FOREIGN KEY \`FK_23a017bba43457003da2bfbc559\``);
+        await queryRunner.query(`ALTER TABLE \`rule\` DROP FOREIGN KEY \`FK_0fba34c0f0e23f53e5058650a35\``);
+        await queryRunner.query(`ALTER TABLE \`rule\` DROP FOREIGN KEY \`FK_2952a30d05d90b805c055aa7886\``);
         await queryRunner.query(`ALTER TABLE \`source\` DROP FOREIGN KEY \`FK_ee6c36f54891cc9dc488a778a2b\``);
         await queryRunner.query(`ALTER TABLE \`fetch_log\` DROP FOREIGN KEY \`FK_4f282fdbf618217bd3f224854b0\``);
         await queryRunner.query(`ALTER TABLE \`file\` DROP FOREIGN KEY \`FK_b2d8e683f020f61115edea206b3\``);
@@ -111,13 +109,13 @@ export class Schema1700826821107 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE \`series\``);
         await queryRunner.query(`DROP TABLE \`series_subscribe\``);
         await queryRunner.query(`DROP TABLE \`episode\``);
-        await queryRunner.query(`DROP TABLE \`series_tag\``);
-        await queryRunner.query(`DROP TABLE \`rule\``);
+        await queryRunner.query(`DROP TABLE \`media\``);
         await queryRunner.query(`DROP INDEX \`IDX_900be723d0d64b162ce682cc9d\` ON \`download_item\``);
         await queryRunner.query(`DROP TABLE \`download_item\``);
-        await queryRunner.query(`DROP TABLE \`media\``);
+        await queryRunner.query(`DROP TABLE \`rule\``);
         await queryRunner.query(`DROP TABLE \`source\``);
         await queryRunner.query(`DROP TABLE \`fetch_log\``);
+        await queryRunner.query(`DROP TABLE \`series_tag\``);
         await queryRunner.query(`DROP TABLE \`file\``);
         await queryRunner.query(`DROP TABLE \`permission\``);
     }

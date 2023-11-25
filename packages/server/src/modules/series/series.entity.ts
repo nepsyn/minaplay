@@ -10,7 +10,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
-import { Rule } from '../subscribe/rule.entity';
 import { SeriesTag } from './series-tag.entity';
 import { File } from '../file/file.entity';
 import { User } from '../user/user.entity';
@@ -90,10 +89,6 @@ export class Series {
   /** 单集 */
   @OneToMany(() => Episode, (episode) => episode.series)
   episodes: Episode[];
-
-  /** 订阅规则 */
-  @OneToMany(() => Rule, (rule) => rule.series)
-  rules: Rule[];
 
   /** 创建时间 */
   @CreateDateColumn()

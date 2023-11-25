@@ -3,8 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { SeriesSubscribe } from './series-subscribe.entity';
 import { NotificationService } from '../notification/notification.service';
-import { User } from '../user/user.entity';
-import { Series } from './series.entity';
 import { EpisodeService } from './episode.service';
 import { instanceToPlain } from 'class-transformer';
 import { Episode } from './episode.entity';
@@ -34,26 +32,17 @@ export class SeriesSubscribeService {
     return result.affected > 0;
   }
 
-  async notifyUpdate(series: Series) {
-    let subscribeUsers: User[] = [];
-    if (series) {
+  async notifyUpdate(episodeId: number) {
+    const episode = await this.episodeService.findOneBy({ id: episodeId });
+    if (episode && episode.series) {
       const [subscribes] = await this.findAndCount({
         where: {
-          series: { id: series.id },
+          series: { id: episode.series.id },
           notify: true,
         },
       });
-      subscribeUsers = subscribes.map(({ user }) => user);
-    }
-    const episode = await this.episodeService.findOne({
-      where: {
-        series: { id: series.id },
-      },
-      order: {
-        createAt: 'DESC',
-      },
-    });
-    if (episode) {
+      const subscribeUsers = subscribes.map(({ user }) => user);
+
       await this.notificationService.notify(
         'new-episode',
         {

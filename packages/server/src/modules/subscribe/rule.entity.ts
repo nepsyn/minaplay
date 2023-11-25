@@ -8,7 +8,6 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
-import { Series } from '../series/series.entity';
 import { File } from '../file/file.entity';
 import { DownloadItem } from './download-item.entity';
 import fs from 'fs-extra';
@@ -38,14 +37,6 @@ export class Rule {
   @Exclude()
   @OneToMany(() => DownloadItem, (download) => download.rule)
   downloads: DownloadItem[];
-
-  /** 剧集 */
-  @ManyToOne(() => Series, (series) => series.rules, {
-    onDelete: 'SET NULL',
-    eager: true,
-    nullable: true,
-  })
-  series?: Series;
 
   /** 专用订阅源 */
   @ManyToOne(() => Source, {

@@ -151,6 +151,7 @@ export default {
     },
     sections: {
       info: 'Information',
+      code: 'Code Edit',
       error: 'Error Log',
     },
     info: {

@@ -16,8 +16,8 @@ import { FeedEntry } from '@extractus/feed-extractor';
 import { Rule } from './rule.entity';
 import { FetchLog } from './fetch-log.entity';
 import { Source } from './source.entity';
-import { Media } from '../media/media.entity';
 import path from 'path';
+import { SeriesService } from '../series/series.service';
 
 @Injectable()
 export class DownloadItemService implements OnModuleInit {
@@ -26,6 +26,7 @@ export class DownloadItemService implements OnModuleInit {
     private aria2Service: Aria2Service,
     private ruleErrorLogService: RuleErrorLogService,
     private mediaService: MediaService,
+    private seriesService: SeriesService,
     private episodeService: EpisodeService,
     private mediaFileService: MediaFileService,
     private seriesSubscribeService: SeriesSubscribeService,
@@ -89,15 +90,12 @@ export class DownloadItemService implements OnModuleInit {
       error: null,
     });
     task.on('complete', async (files) => {
-      const medias: Media[] = [];
-
       // media files
       for (const file of files.filter((file) => VALID_VIDEO_MIME.includes(file.mimetype))) {
-        const copy = Object.freeze(Object.assign({}, file));
-
-        let descriptor: RuleFileDescriptor;
+        // generate file descriptor
+        let descriptor: RuleFileDescriptor = {};
         try {
-          descriptor = (await props.describeFn?.(entry, copy)) ?? {};
+          descriptor = await props.describeFn?.(entry, file);
         } catch (error) {
           if (props.rule && props.describeFn) {
             await this.ruleErrorLogService.save({
@@ -110,30 +108,18 @@ export class DownloadItemService implements OnModuleInit {
           continue;
         }
 
+        // save media
         const { id } = await this.mediaService.save({
-          name: descriptor.name ?? file.name,
-          description: descriptor.description,
+          name: file.name,
+          isPublic: true,
+          ...(descriptor.media ?? {}),
           download: { id: item.id },
-          isPublic: descriptor.isPublic ?? true,
           file: { id: file.id },
         });
         const media = await this.mediaService.findOneBy({ id });
-        medias.push(media);
         await this.mediaFileService.generateMediaFiles(media);
 
-        if (props.rule?.series) {
-          await this.episodeService.save({
-            title: descriptor.title ?? file.name,
-            no: descriptor.no,
-            pubAt: descriptor.pubAt ?? entry.published ?? new Date(),
-            media: { id: media.id },
-            series: { id: props.rule.series.id },
-          });
-        }
-      }
-
-      // attachment files
-      for (const media of medias) {
+        // attachment files
         const attachments = files
           .filter((file) => !VALID_VIDEO_MIME.includes(file.mimetype))
           .filter((file) => path.dirname(media.file.path) === path.dirname(file.path));
@@ -143,17 +129,36 @@ export class DownloadItemService implements OnModuleInit {
             attachments: attachments.map(({ id }) => ({ id })),
           });
         }
-      }
 
-      // notify media update
-      for (const media of medias) {
+        // notify media update
         await this.pluginService.emitAllEnabled('onNewMedia', media.id);
-      }
 
-      // notify series update
-      if (props.rule?.series && medias.length > 0) {
-        await this.seriesSubscribeService.notifyUpdate(props.rule.series);
-        await this.pluginService.emitAllEnabled('onNewEpisode', props.rule.series.id);
+        // save series
+        if (descriptor.episode?.series) {
+          let series = await this.seriesService.findOneBy({
+            name: descriptor.episode.series,
+            season: descriptor.episode.season,
+          });
+          if (!series) {
+            series = await this.seriesService.save({
+              name: descriptor.episode.series,
+              season: descriptor.episode.season,
+            });
+          }
+
+          // save episode
+          const { id: episodeId } = await this.episodeService.save({
+            title: file.name,
+            pubAt: entry.published ?? new Date(),
+            ...(descriptor.episode ?? {}),
+            media: { id: media.id },
+            series: { id: series.id },
+          });
+
+          // notify series update
+          await this.seriesSubscribeService.notifyUpdate(episodeId);
+          await this.pluginService.emitAllEnabled('onNewEpisode', episodeId);
+        }
       }
     });
 

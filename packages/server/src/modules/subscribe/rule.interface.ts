@@ -1,9 +1,8 @@
 import { FeedEntry } from '@extractus/feed-extractor';
 import { File } from '../file/file.entity';
-import { Source } from './source.entity';
 
 export interface RuleEntryValidator {
-  (entry: FeedEntry, source: Omit<Source, 'user' | 'downloads' | 'logs'>): boolean | Promise<boolean>;
+  (entry: FeedEntry): boolean | Promise<boolean>;
 }
 
 export interface RuleMediaDescriptor {
@@ -13,12 +12,18 @@ export interface RuleMediaDescriptor {
 }
 
 export interface RuleEpisodeDescriptor {
+  series: string;
+  season?: string;
+
   title?: string;
   no?: string;
   pubAt?: Date;
 }
 
-export type RuleFileDescriptor = RuleMediaDescriptor & RuleEpisodeDescriptor;
+export interface RuleFileDescriptor {
+  media?: RuleMediaDescriptor;
+  episode?: RuleEpisodeDescriptor;
+}
 
 export interface RuleFileDescriber {
   (entry: FeedEntry, file: File): RuleFileDescriptor | Promise<RuleFileDescriptor>;

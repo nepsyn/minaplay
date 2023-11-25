@@ -75,7 +75,6 @@ export class RuleController {
 
     const { id } = await this.ruleService.save({
       ...data,
-      series: { id: data.seriesId },
       source: { id: data.sourceId },
       file,
     });
@@ -102,14 +101,13 @@ export class RuleController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async querySubscribeRule(@Query() query: RuleQueryDto) {
-    const { keyword, id, seriesId, sourceId } = query;
+    const { keyword, id, sourceId } = query;
     const [result, total] = await this.ruleService.findAndCount({
       where: buildQueryOptions<Rule>({
         keyword,
         keywordProperties: (entity) => [entity.remark],
         exact: {
           id,
-          series: { id: seriesId },
           source: { id: sourceId },
         },
       }),
@@ -146,7 +144,6 @@ export class RuleController {
     await this.ruleService.save({
       id,
       ...data,
-      series: { id: data.seriesId },
       source: { id: data.sourceId },
     });
 

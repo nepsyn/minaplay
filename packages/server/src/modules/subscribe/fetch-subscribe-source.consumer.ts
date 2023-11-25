@@ -81,7 +81,6 @@ export class FetchSubscribeSourceConsumer {
         continue;
       }
 
-      const { user, downloads, logs, ...sourceData } = source;
       for (const entry of validEntries) {
         const sameItem = await this.downloadItemService.findOneBy({ title: entry.title });
         if (sameItem) {
@@ -89,7 +88,7 @@ export class FetchSubscribeSourceConsumer {
         }
 
         try {
-          const valid = await hooks.validate?.(entry, sourceData);
+          const valid = await hooks.validate?.(entry);
           if (!valid) {
             continue;
           }

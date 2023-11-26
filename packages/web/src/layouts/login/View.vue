@@ -26,11 +26,11 @@
             @click:append-inner="passwordVisible = !passwordVisible"
             maxlength="20"
             :type="passwordVisible ? 'text' : 'password'"
-            @keydown.enter="login"
+            @keydown.enter="login()"
           ></v-text-field>
         </v-card-text>
         <div class="pa-3">
-          <v-btn :loading="pending" block color="primary" @click="login">{{ t('login.btn') }}</v-btn>
+          <v-btn :loading="pending" block color="primary" @click="login()">{{ t('login.btn') }}</v-btn>
         </div>
       </v-card>
     </v-container>

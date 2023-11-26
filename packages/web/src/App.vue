@@ -12,9 +12,10 @@ import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useI18n } from 'vue-i18n';
 import { useToastStore } from '@/store/toast';
 import { useApiStore } from '@/store/api';
-import { onBeforeMount } from 'vue';
+import { onBeforeMount, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
+import * as monaco from 'monaco-editor';
 
 const toast = useToastStore();
 const { t } = useI18n();
@@ -27,6 +28,15 @@ try {
   const themeMedia = matchMedia('(prefers-color-scheme: dark)');
   layout.toggleDarkMode(themeMedia.matches);
 } catch {}
+
+watch(
+  () => layout.darkMode,
+  () => {
+    document.getElementsByTagName('html')[0].dataset.codeTheme = layout.darkMode ? 'github-dark' : 'github-light';
+    monaco.editor.setTheme(layout.darkMode ? 'vs-dark' : 'vs');
+  },
+  { immediate: true },
+);
 
 onBeforeMount(async () => {
   if (api.isLogin) {

@@ -75,6 +75,20 @@ export default {
       },
     },
   },
+  common: {
+    download: {
+      title: 'Download',
+      item: 'download task',
+      sorts: {
+        createAt: 'Create Time',
+        title: 'Title',
+      },
+      copyLink: 'Copy Download Link',
+      linkCopied: 'Download link copied',
+      linkCopyFailed: 'Download link copy failed',
+      createAt: 'Create at',
+    },
+  },
   source: {
     title: 'RSS Sources',
     unnamed: 'Unnamed RSS source',
@@ -130,17 +144,6 @@ export default {
       clearLogsTitle: 'Clear All Confirm',
       clearLogsConfirm: 'Are you sure to clear all logs?',
     },
-    downloads: {
-      item: 'download task',
-      sorts: {
-        createAt: 'Create Time',
-        title: 'Title',
-      },
-      copyLink: 'Copy Download Link',
-      linkCopied: 'Download link copied',
-      linkCopyFailed: 'Download link copy failed',
-      createAt: 'Create at',
-    },
   },
   rule: {
     title: 'Rules',
@@ -151,13 +154,18 @@ export default {
     },
     sections: {
       info: 'Information',
-      code: 'Code Edit',
       error: 'Error Log',
+      download: 'Download',
     },
     info: {
+      code: 'Code',
       actions: 'Actions',
       delete: 'Delete Subscribe Rule',
       deleteDescription: 'Delete this subscribe rule. Note that this action is irreversible!',
+    },
+    logs: {
+      clearLogsTitle: 'Clear All Confirm',
+      clearLogsConfirm: 'Are you sure to clear all error logs?',
     },
   },
   login: {

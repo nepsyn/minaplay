@@ -24,12 +24,13 @@ import {
   FetchLogQueryDto,
   RuleDto,
   RuleEntity,
+  RuleErrorLogEntity,
   RuleQueryDto,
   SourceDto,
   SourceEntity,
   SourceQueryDto,
 } from '@/api/interfaces/subscribe.interface';
-import { ApiQueryResult } from '@/api/interfaces/common.interface';
+import { ApiQueryDto, ApiQueryResult } from '@/api/interfaces/common.interface';
 
 export const useApiStore = defineStore('api', () => {
   const user = ref<UserEntity | undefined>(undefined);
@@ -144,6 +145,9 @@ export const useApiStore = defineStore('api', () => {
     query: apiGet<ApiQueryResult<RuleEntity>, RuleQueryDto>('/subscribe/rule'),
     update: (id: number) => apiPut<RuleEntity, RuleDto>(`/subscribe/rule/${id}`),
     delete: (id: number) => apiDelete(`/subscribe/rule/${id}`),
+    getErrorLogsById: (id: number) =>
+      apiGet<ApiQueryResult<RuleErrorLogEntity>, ApiQueryDto<RuleErrorLogEntity>>(`/subscribe/rule/${id}/log`),
+    clearErrorLogsById: (id: number) => apiDelete(`/subscribe/rule/${id}/log`),
   };
 
   const Download = {

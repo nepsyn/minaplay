@@ -4,12 +4,12 @@
     <div v-if="item.url" class="d-flex flex-row align-center">
       <span class="text-caption text-truncate" v-text="item.url"></span>
       <div>
-        <v-btn :icon="mdiContentCopy" variant="text" size="x-small" @click="copyLink"></v-btn>
-        <v-tooltip activator="parent">{{ t('source.downloads.copyLink') }}</v-tooltip>
+        <v-btn :icon="mdiContentCopy" variant="text" size="x-small" @click="copyLink()"></v-btn>
+        <v-tooltip activator="parent">{{ t('common.download.copyLink') }}</v-tooltip>
       </div>
     </div>
     <p class="text-caption">
-      {{ t('source.downloads.createAt') }}
+      {{ t('common.download.createAt') }}
       {{ new Date(item.createAt).toLocaleString(locale) }}
       -
       {{ downloadItemProps.text }}
@@ -23,7 +23,7 @@
           :prepend-icon="action.icon"
           v-if="action.show"
           link
-          @click="action.click"
+          @click="action.click()"
           :disabled="action.loading"
         >
           {{ action.text }}
@@ -42,7 +42,7 @@
             <v-card-actions>
               <v-spacer></v-spacer>
               <v-btn variant="text" color="primary">{{ t('app.cancel') }}</v-btn>
-              <v-btn variant="plain" color="error" @click="deleteItem">{{ t('app.ok') }}</v-btn>
+              <v-btn variant="plain" color="error" @click="deleteItem()">{{ t('app.ok') }}</v-btn>
             </v-card-actions>
           </v-card>
         </v-menu>
@@ -124,10 +124,10 @@ const downloadItemProps = computed(() => {
 const copyLink = () => {
   copyContent(props.item.url)
     .then(() => {
-      toast.toastSuccess(t('source.downloads.linkCopied'));
+      toast.toastSuccess(t('common.download.linkCopied'));
     })
     .catch(() => {
-      toast.toastError(t('source.downloads.linkCopyFailed'));
+      toast.toastError(t('common.download.linkCopyFailed'));
     });
 };
 

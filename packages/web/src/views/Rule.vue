@@ -36,7 +36,7 @@
             :prepend-icon="mdiPlus"
             block
             :loading="creating"
-            @click="createRule"
+            @click="createRule()"
           >
             {{ t('app.actions.add') }}
           </v-btn>
@@ -46,7 +46,7 @@
       <multi-items-loader :loader="rulesLoader" class="px-0 py-2 mt-2" auto>
         <v-row>
           <v-col v-for="rule in rules" :key="rule.id" cols="12" sm="6" md="4">
-            <div @click="router.push(`/rule/${rule.id}`)">{{ rule }}</div>
+            <rule-overview class="h-100" :rule="rule"></rule-overview>
           </v-col>
         </v-row>
       </multi-items-loader>
@@ -67,6 +67,8 @@ import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useRouter } from 'vue-router';
 import { useToastStore } from '@/store/toast';
+import DefaultTemplateCode from '@/assets/templates/default.ts?raw';
+import RuleOverview from '@/components/rule/RuleOverview.vue';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -77,6 +79,7 @@ const rulesLoader = useAxiosPageLoader(
   async (query?: RuleQueryDto) => {
     return await api.Rule.query({
       ...(query ?? {}),
+      order: filters.value.order,
       keyword: filters.value.keyword,
     });
   },
@@ -102,7 +105,7 @@ const {
 } = useAxiosRequest(async () => {
   return await api.Rule.create({
     remark: t('rule.unnamed'),
-    code: '',
+    code: DefaultTemplateCode,
   });
 });
 onCreated(async (data) => {

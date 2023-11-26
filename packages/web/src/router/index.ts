@@ -61,7 +61,7 @@ const routes: RouteRecordRaw[] = [
               {
                 path: '/source/:id/download',
                 name: 'source-download',
-                component: () => import('@/views/source/SourceDownload.vue'),
+                component: () => import('@/views/common/SubscribeDownload.vue'),
               },
             ],
           },
@@ -86,14 +86,14 @@ const routes: RouteRecordRaw[] = [
                 component: () => import('@/views/rule/RuleInfo.vue'),
               },
               {
-                path: '/rule/:id/code',
-                name: 'rule-code',
-                component: () => import('@/views/rule/RuleCodeEdit.vue'),
-              },
-              {
                 path: '/rule/:id/error',
                 name: 'rule-error',
                 component: () => import('@/views/rule/RuleErrorLog.vue'),
+              },
+              {
+                path: '/rule/:id/download',
+                name: 'rule-download',
+                component: () => import('@/views/common/SubscribeDownload.vue'),
               },
             ],
           },

@@ -1,12 +1,12 @@
 <template>
   <v-container class="pa-0">
-    <span class="text-h4">{{ t('source.sections.download') }}</span>
+    <span class="text-h4">{{ t('common.download.title') }}</span>
     <v-row class="py-2 mt-3" dense>
       <v-col cols="12" sm="4">
         <v-text-field
           variant="outlined"
           :label="t('app.input.keyword')"
-          :placeholder="t('app.input.placeholder', { item: t('source.downloads.item') })"
+          :placeholder="t('app.input.placeholder', { item: t('common.download.item') })"
           density="compact"
           v-model="filters.keyword"
           hide-details
@@ -48,7 +48,7 @@
           height="40"
           :prepend-icon="mdiRefresh"
           :loading="downloadsLoader.pending.value"
-          @click="query"
+          @click="query()"
         >
           {{ t('app.actions.refresh') }}
         </v-btn>
@@ -87,8 +87,9 @@ const route = useRoute();
 
 const downloadsLoader = useAxiosPageLoader(
   async (query?: DownloadItemQueryDto) => {
-    return await api.Source.getDownloadItemsById(Number(route.params.id))({
+    return await api.Download.query({
       ...(query ?? {}),
+      [route.name === 'source-download' ? 'sourceId' : 'ruleId']: Number(route.params.id),
       keyword: filters.value.keyword,
       status: filters.value.status,
       order: filters.value.order,

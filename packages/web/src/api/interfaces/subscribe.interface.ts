@@ -1,5 +1,4 @@
 import { UserEntity } from './user.interface';
-import { SeriesEntity } from './series.interface';
 import { ApiQueryDto } from './common.interface';
 import { StatusEnum } from '@/api/enums/status.enum';
 
@@ -45,8 +44,9 @@ export interface RuleEntity {
   id: number;
   /** 备注 */
   remark?: string;
-  /** 剧集 */
-  series: SeriesEntity;
+  /** 订阅源 */
+  source: SourceEntity;
+  /** 代码 */
   code: string;
   /** 创建时间 */
   createAt: Date;
@@ -57,13 +57,18 @@ export interface RuleEntity {
 export interface RuleDto {
   code?: string;
   remark?: string;
-  seriesId?: number | null;
+  sourceId?: number | null;
 }
 
 export interface RuleQueryDto extends ApiQueryDto<RuleEntity> {
   keyword?: string;
   id?: number;
-  seriesId?: number;
+  sourceId?: number;
+}
+
+export interface RuleErrorLogEntity {
+  error: string;
+  createAt: Date;
 }
 
 export interface FetchLogEntity {

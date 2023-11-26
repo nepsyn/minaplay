@@ -23,7 +23,7 @@
             variant="flat"
             :prepend-icon="mdiPlus"
             :loading="creating"
-            @click="createSource"
+            @click="createSource()"
             block
           >
             {{ t('app.actions.add') }}
@@ -33,7 +33,7 @@
       <v-divider class="my-2"></v-divider>
       <multi-items-loader :loader="sourcesLoader" class="px-0 py-2 mt-2" auto>
         <v-row>
-          <v-col v-for="source in sourcesLoader.items.value" :key="source.id" cols="12" sm="6" md="4">
+          <v-col v-for="source in sources" :key="source.id" cols="12" sm="6" md="4">
             <source-overview :source="source" @update="onSourceUpdate"></source-overview>
           </v-col>
         </v-row>
@@ -50,7 +50,7 @@ import { useApiStore } from '@/store/api';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import SourceOverview from '@/components/source/SourceOverview.vue';
 import { SourceEntity, SourceQueryDto } from '@/api/interfaces/subscribe.interface';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { mdiPlus } from '@mdi/js';
 import { debounce } from '@/utils/utils';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
@@ -65,10 +65,14 @@ const router = useRouter();
 
 const sourcesLoader = useAxiosPageLoader(
   async (query?: SourceQueryDto) => {
-    return await api.Source.query({ ...(query ?? {}), keyword: keyword.value });
+    return await api.Source.query({
+      ...(query ?? {}),
+      keyword: keyword.value,
+    });
   },
   { page: 0, size: 120 },
 );
+const sources = computed(() => sourcesLoader.items.value);
 
 const keyword = ref('');
 const useQuery = debounce(() => {

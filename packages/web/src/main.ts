@@ -1,7 +1,9 @@
 import { registerPlugins } from '@/plugins';
 import { createApp } from 'vue';
 import App from './App.vue';
+import '@/plugins/monaco';
 import '@/css/main.sass';
+import '@/css/highlightjs.sass';
 
 const app = createApp(App);
 registerPlugins(app);

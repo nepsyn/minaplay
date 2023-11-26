@@ -12,7 +12,7 @@
     <template v-slot:append>
       <div class="d-flex flex-row align-center">
         <div class="d-none d-sm-flex">
-          <v-btn v-for="(action, index) in actions" :key="index" icon @click="action.click">
+          <v-btn v-for="(action, index) in actions" :key="index" icon @click="action.click()">
             <v-icon :icon="action.icon" size="large"></v-icon>
             <v-tooltip activator="parent" location="bottom" open-delay="500">{{ action.text }}</v-tooltip>
           </v-btn>
@@ -25,7 +25,7 @@
                 <template v-for="(action, index) in actions" :key="index">
                   <v-list-item
                     link
-                    @click="action.click"
+                    @click="action.click()"
                     :title="action.text"
                     :prepend-icon="action.icon"
                   ></v-list-item>
@@ -70,7 +70,7 @@
                         <v-btn color="primary" variant="text" @click="isActive.value = false">
                           {{ t('app.cancel') }}
                         </v-btn>
-                        <v-btn color="error" variant="plain" @click="logout" :loading="logoutPending">
+                        <v-btn color="error" variant="plain" @click="logout()" :loading="logoutPending">
                           {{ t('app.ok') }}
                         </v-btn>
                       </v-card-actions>
@@ -152,7 +152,9 @@ const {
   onResolved: onLogoutResolved,
   onRejected: onLogoutRejected,
   pending: logoutPending,
-} = useAxiosRequest(api.Auth.logout);
+} = useAxiosRequest(async () => {
+  return await api.Auth.logout();
+});
 onLogoutResolved(async () => {
   api.setToken(undefined);
   api.user = undefined;

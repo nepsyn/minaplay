@@ -51,7 +51,7 @@ defineExpose({
           color="primary"
           elevation="8"
           :icon="mdiChevronUp"
-          @click="toTop"
+          @click="toTop()"
         ></v-btn>
       </v-layout-item>
     </slot>

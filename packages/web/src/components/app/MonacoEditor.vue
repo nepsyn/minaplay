@@ -4,59 +4,37 @@
 
 <script setup lang="ts">
 import * as monaco from 'monaco-editor';
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import TypeScriptWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-import { onMounted, ref, watch } from 'vue';
+import { KeyCode } from 'monaco-editor';
+
+import { onMounted, onUnmounted, ref } from 'vue';
 import { useLayoutStore } from '@/store/layout';
 
 const layout = useLayoutStore();
 
-self.MonacoEnvironment = {
-  getWorker: function (_, label) {
-    switch (label) {
-      case 'json':
-        return new JsonWorker();
-      case 'typescript':
-      case 'javascript':
-        return new TypeScriptWorker();
-      default:
-        return new EditorWorker();
-    }
-  },
-};
-
 const editorRef = ref<HTMLElement | undefined>(undefined);
-const editor = ref<monaco.editor.IStandaloneCodeEditor | undefined>(undefined);
+let editor: monaco.editor.IStandaloneCodeEditor | undefined = undefined;
 
 const props = withDefaults(
   defineProps<{
-    modalValue?: string;
+    value?: string;
     language?: string;
     readonly?: boolean;
     minimap?: boolean;
     wordWrap?: boolean;
+    autoFocus?: boolean;
   }>(),
   {
-    modalValue: '',
+    value: '',
     readonly: false,
     minimap: false,
     wordWrap: true,
-  },
-);
-
-watch(
-  () => layout.darkMode,
-  (value) => {
-    if (editor.value) {
-      monaco.editor.setTheme(value ? 'vs-dark' : 'vs');
-    }
+    autoFocus: false,
   },
 );
 
 onMounted(() => {
-  editor.value = monaco.editor.create(editorRef.value!, {
-    value: props.modalValue,
+  editor = monaco.editor.create(editorRef.value!, {
+    value: props.value,
     language: props.language,
     readOnly: props.readonly,
     minimap: {
@@ -65,18 +43,38 @@ onMounted(() => {
     automaticLayout: true,
     theme: layout.darkMode ? 'vs-dark' : 'vs',
     wordWrap: props.wordWrap ? 'on' : 'off',
+    scrollbar: {
+      alwaysConsumeMouseWheel: false,
+    },
     scrollBeyondLastLine: false,
     tabSize: 2,
     tabCompletion: 'on',
   });
+  editor.onDidChangeModelContent(() => {
+    emits('update:value', editor?.getValue() ?? '');
+  });
+  editor.onKeyDown((e) => {
+    if (e.ctrlKey && e.keyCode === KeyCode.KeyS) {
+      e.preventDefault();
+      emits('save');
+    }
+  });
+  if (props.autoFocus) {
+    editor?.focus();
+  }
+});
+
+onUnmounted(() => {
+  editor?.dispose();
 });
 
 const emits = defineEmits<{
-  (ev: 'update:modalValue', value: string): any;
+  (ev: 'update:value', value: string): any;
+  (ev: 'save'): any;
 }>();
 
 defineExpose({
-  editor,
+  getEditor: () => editor,
 });
 </script>
 

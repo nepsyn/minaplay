@@ -24,9 +24,18 @@
           counter="40"
           persistent-counter
         ></v-text-field>
+        <span class="text-h6">{{ t('rule.info.code') }}</span>
+        <monaco-editor
+          ref="editorRef"
+          class="border rounded mt-2"
+          v-model:value="edit!.code"
+          language="typescript"
+          @save="save()"
+          style="min-height: 240px"
+        ></monaco-editor>
         <div class="d-flex flex-row mt-4">
           <v-btn
-            @click="save"
+            @click="save()"
             :loading="saving"
             variant="tonal"
             color="primary"
@@ -35,7 +44,7 @@
           >
             {{ t('app.actions.save') }}
           </v-btn>
-          <v-btn @click="reset" color="warning" variant="tonal" class="flex-grow-0 ml-2" :prepend-icon="mdiClose">
+          <v-btn @click="reset()" color="warning" variant="tonal" class="flex-grow-0 ml-2" :prepend-icon="mdiClose">
             {{ t('app.actions.reset') }}
           </v-btn>
         </div>
@@ -57,7 +66,7 @@
                     <v-btn color="primary" variant="text">
                       {{ t('app.cancel') }}
                     </v-btn>
-                    <v-btn color="error" variant="plain" @click="deleteRule">
+                    <v-btn color="error" variant="plain" @click="deleteRule()">
                       {{ t('app.ok') }}
                     </v-btn>
                   </v-card-actions>
@@ -81,6 +90,7 @@ import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 import { mdiCheck, mdiClose, mdiPencilLock } from '@mdi/js';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useToastStore } from '@/store/toast';
+import MonacoEditor from '@/components/app/MonacoEditor.vue';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -88,7 +98,9 @@ const route = useRoute();
 const router = useRouter();
 const toast = useToastStore();
 
-const ruleLoader = useAxiosRequest(api.Rule.getById(Number(route.params.id)));
+const ruleLoader = useAxiosRequest(async () => {
+  return await api.Rule.getById(Number(route.params.id))();
+});
 ruleLoader.onResolved((data) => {
   edit.value = { ...data };
 });
@@ -103,6 +115,7 @@ const {
 } = useAxiosRequest(async () => {
   return await api.Rule.update(Number(route.params.id))({
     remark: edit.value?.remark,
+    code: edit.value?.code,
   });
 });
 onSaved((data) => {
@@ -129,8 +142,10 @@ onRuleDeleteFailed(() => {
   toast.toastError(t('error.other'));
 });
 
+const editorRef = ref<typeof MonacoEditor | undefined>(undefined);
 const reset = () => {
   edit.value = { ...ruleLoader.data.value! };
+  editorRef.value?.getEditor()?.setValue(edit.value.code);
 };
 </script>
 

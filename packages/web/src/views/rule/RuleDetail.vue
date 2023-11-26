@@ -31,7 +31,7 @@ import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import { computed } from 'vue';
-import { mdiCodeBraces, mdiInformationOutline, mdiProgressClose } from '@mdi/js';
+import { mdiDownloadCircleOutline, mdiInformationOutline, mdiProgressClose } from '@mdi/js';
 import NavSections from '@/components/app/NavSections.vue';
 import NavTabs from '@/components/app/NavTabs.vue';
 import { VScrollXReverseTransition, VScrollYReverseTransition } from 'vuetify/components/transitions';
@@ -47,14 +47,14 @@ const tabs = computed(() => [
     text: t('rule.sections.info'),
   },
   {
-    to: `/rule/${route.params.id}/code`,
-    icon: mdiCodeBraces,
-    text: t('rule.sections.code'),
-  },
-  {
     to: `/rule/${route.params.id}/error`,
     icon: mdiProgressClose,
     text: t('rule.sections.error'),
+  },
+  {
+    to: `/rule/${route.params.id}/download`,
+    icon: mdiDownloadCircleOutline,
+    text: t('rule.sections.download'),
   },
 ]);
 </script>

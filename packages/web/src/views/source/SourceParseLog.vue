@@ -40,7 +40,7 @@
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn variant="text" color="primary">{{ t('app.cancel') }}</v-btn>
-                <v-btn variant="plain" color="error" @click="clearLogs">{{ t('app.ok') }}</v-btn>
+                <v-btn variant="plain" color="error" @click="clearLogs()">{{ t('app.ok') }}</v-btn>
               </v-card-actions>
             </v-card>
           </v-menu>
@@ -159,7 +159,9 @@ const {
   request: clearLogs,
   onResolved: onLogsCleared,
   onRejected: onLogsClearFailed,
-} = useAxiosRequest(api.Source.clearFetchLogsById(Number(route.params.id)));
+} = useAxiosRequest(async () => {
+  return await api.Source.clearFetchLogsById(Number(route.params.id))();
+});
 onLogsCleared(() => {
   logsLoader.reset(true);
 });

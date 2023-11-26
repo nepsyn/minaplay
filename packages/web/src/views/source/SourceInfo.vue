@@ -77,7 +77,7 @@
         ></v-text-field>
         <div class="d-flex flex-row mt-4">
           <v-btn
-            @click="save"
+            @click="save()"
             :loading="saving"
             variant="tonal"
             color="primary"
@@ -86,7 +86,7 @@
           >
             {{ t('app.actions.save') }}
           </v-btn>
-          <v-btn @click="reset" color="warning" variant="tonal" class="flex-grow-0 ml-2" :prepend-icon="mdiClose">
+          <v-btn @click="reset()" color="warning" variant="tonal" class="flex-grow-0 ml-2" :prepend-icon="mdiClose">
             {{ t('app.actions.reset') }}
           </v-btn>
         </div>
@@ -97,7 +97,7 @@
               <p class="text-subtitle-1">{{ t('source.info.update') }}</p>
               <p class="text-caption">{{ t('source.info.updateDescription') }}</p>
             </v-container>
-            <v-btn class="ml-4" variant="tonal" color="primary" :loading="updateRequesting" @click="requestUpdate">
+            <v-btn class="ml-4" variant="tonal" color="primary" :loading="updateRequesting" @click="requestUpdate()">
               {{ t('source.info.updateBtn') }}
             </v-btn>
           </v-container>
@@ -134,7 +134,7 @@
                     <v-btn color="primary" variant="text">
                       {{ t('app.cancel') }}
                     </v-btn>
-                    <v-btn color="error" variant="plain" @click="deleteSource">
+                    <v-btn color="error" variant="plain" @click="deleteSource()">
                       {{ t('app.ok') }}
                     </v-btn>
                   </v-card-actions>
@@ -166,7 +166,9 @@ const router = useRouter();
 const { t, locale } = useI18n();
 const toast = useToastStore();
 
-const sourceLoader = useAxiosRequest(api.Source.getById(Number(route.params.id)));
+const sourceLoader = useAxiosRequest(async () => {
+  return await api.Source.getById(Number(route.params.id))();
+});
 sourceLoader.onResolved((data) => {
   edit.value = { ...data };
 });
@@ -222,7 +224,9 @@ const {
   request: requestUpdate,
   onResolved: onUpdateRequested,
   onRejected: onUpdateRequestFailed,
-} = useAxiosRequest(api.Source.invokeFetchJobById(Number(route.params.id)));
+} = useAxiosRequest(async () => {
+  return await api.Source.invokeFetchJobById(Number(route.params.id))();
+});
 onUpdateRequested(() => {
   toast.toastSuccess(t('source.info.updateToast'));
 });

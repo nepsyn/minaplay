@@ -141,7 +141,7 @@
         </v-container>
         <monaco-editor
           v-else
-          :modal-value="rawDataText"
+          :value="rawDataText"
           language="json"
           readonly
           class="flex-grow-1 border rounded"
@@ -178,7 +178,9 @@ const api = useApiStore();
 const route = useRoute();
 const toast = useToastStore();
 
-const rawDataLoader = useAxiosRequest(api.Source.fetchRawData(Number(route.params.id)));
+const rawDataLoader = useAxiosRequest(async () => {
+  return await api.Source.fetchRawData(Number(route.params.id))();
+});
 const rawData = computed(() => rawDataLoader.data.value);
 const rawDataText = computed(() => (rawData.value ? JSON.stringify(rawData.value, null, 2) : ''));
 

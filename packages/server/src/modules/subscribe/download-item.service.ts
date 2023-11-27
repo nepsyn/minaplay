@@ -10,8 +10,6 @@ import { RuleErrorLogService } from './rule-error-log.service';
 import { MediaService } from '../media/media.service';
 import { EpisodeService } from '../series/episode.service';
 import { MediaFileService } from '../media/media-file.service';
-import { SeriesSubscribeService } from '../series/series-subscribe.service';
-import { PluginService } from '../plugin/plugin.service';
 import { FeedEntry } from '@extractus/feed-extractor';
 import { Rule } from './rule.entity';
 import { FetchLog } from './fetch-log.entity';
@@ -29,8 +27,6 @@ export class DownloadItemService implements OnModuleInit {
     private seriesService: SeriesService,
     private episodeService: EpisodeService,
     private mediaFileService: MediaFileService,
-    private seriesSubscribeService: SeriesSubscribeService,
-    private pluginService: PluginService,
   ) {}
 
   async onModuleInit() {
@@ -91,11 +87,11 @@ export class DownloadItemService implements OnModuleInit {
     });
     task.on('complete', async (files) => {
       // media files
-      for (const file of files.filter((file) => VALID_VIDEO_MIME.includes(file.mimetype))) {
+      for (const mediaFile of files.filter((file) => VALID_VIDEO_MIME.includes(file.mimetype))) {
         // generate file descriptor
         let descriptor: RuleFileDescriptor = {};
         try {
-          descriptor = await props.describeFn?.(entry, file);
+          descriptor = await props.describeFn?.(entry, mediaFile);
         } catch (error) {
           if (props.rule && props.describeFn) {
             await this.ruleErrorLogService.save({
@@ -108,30 +104,22 @@ export class DownloadItemService implements OnModuleInit {
           continue;
         }
 
-        // save media
-        const { id } = await this.mediaService.save({
-          name: file.name,
-          isPublic: true,
-          ...(descriptor.media ?? {}),
-          download: { id: item.id },
-          file: { id: file.id },
-        });
-        const media = await this.mediaService.findOneBy({ id });
-        await this.mediaFileService.generateMediaFiles(media);
-
         // attachment files
         const attachments = files
           .filter((file) => !VALID_VIDEO_MIME.includes(file.mimetype))
-          .filter((file) => path.dirname(media.file.path) === path.dirname(file.path));
-        if (attachments.length > 0) {
-          await this.mediaService.save({
-            id: media.id,
-            attachments: attachments.map(({ id }) => ({ id })),
-          });
-        }
+          .filter((attachment) => path.dirname(attachment.path) === path.dirname(mediaFile.path));
 
-        // notify media update
-        await this.pluginService.emitAllEnabled('onNewMedia', media.id);
+        // save media
+        const { id } = await this.mediaService.save({
+          name: mediaFile.name,
+          isPublic: true,
+          ...(descriptor.media ?? {}),
+          download: { id: item.id },
+          file: { id: mediaFile.id },
+          attachments: attachments.map(({ id }) => ({ id })),
+        });
+        const media = await this.mediaService.findOneBy({ id });
+        await this.mediaFileService.generateMediaFiles(media);
 
         // save series
         if (descriptor.episode?.series) {
@@ -147,17 +135,13 @@ export class DownloadItemService implements OnModuleInit {
           }
 
           // save episode
-          const { id: episodeId } = await this.episodeService.save({
-            title: file.name,
+          await this.episodeService.save({
+            title: mediaFile.name,
             pubAt: entry.published ?? new Date(),
             ...(descriptor.episode ?? {}),
             media: { id: media.id },
             series: { id: series.id },
           });
-
-          // notify series update
-          await this.seriesSubscribeService.notifyUpdate(episodeId);
-          await this.pluginService.emitAllEnabled('onNewEpisode', episodeId);
         }
       }
     });

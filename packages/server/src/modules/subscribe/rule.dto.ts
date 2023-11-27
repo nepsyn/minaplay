@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsArray, IsInt, IsOptional, IsString, MaxLength } from 'class-validator';
 
 export class RuleDto {
   @ApiProperty({
@@ -23,8 +23,12 @@ export class RuleDto {
   @ApiProperty({
     description: '订阅源id',
     required: false,
+    type: [Number],
   })
   @IsOptional()
-  @IsInt()
-  sourceId?: number;
+  @IsArray()
+  @IsInt({
+    each: true,
+  })
+  sourceIds?: number[];
 }

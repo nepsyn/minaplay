@@ -36,6 +36,8 @@ import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { RuleErrorLog } from './rule-error-log.entity';
 import { RuleErrorLogService } from './rule-error-log.service';
+import { SourceService } from './source.service';
+import { In } from 'typeorm';
 
 @Controller('subscribe/rule')
 @UseGuards(AuthorizationGuard)
@@ -45,6 +47,7 @@ export class RuleController {
   constructor(
     private ruleService: RuleService,
     private ruleErrorLogService: RuleErrorLogService,
+    private sourceService: SourceService,
     private fileService: FileService,
   ) {}
 
@@ -75,7 +78,7 @@ export class RuleController {
 
     const { id } = await this.ruleService.save({
       ...data,
-      source: { id: data.sourceId },
+      sources: data.sourceIds?.map((id) => ({ id })),
       file,
     });
     return await this.ruleService.findOneBy({ id });
@@ -101,14 +104,23 @@ export class RuleController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async querySubscribeRule(@Query() query: RuleQueryDto) {
-    const { keyword, id, sourceId } = query;
+    const { keyword, sourceId } = query;
+
+    let idCondition = undefined;
+    if (sourceId) {
+      const source = await this.sourceService.findOneBy({ id: sourceId });
+      if (source) {
+        const rules = await source.rules;
+        idCondition = In(rules.map(({ id }) => id));
+      }
+    }
+
     const [result, total] = await this.ruleService.findAndCount({
       where: buildQueryOptions<Rule>({
         keyword,
         keywordProperties: (entity) => [entity.remark],
         exact: {
-          id,
-          source: { id: sourceId },
+          id: idCondition,
         },
       }),
       skip: query.page * query.size,
@@ -144,7 +156,7 @@ export class RuleController {
     await this.ruleService.save({
       id,
       ...data,
-      source: { id: data.sourceId },
+      sources: data.sourceIds?.map((id) => ({ id })),
     });
 
     return await this.ruleService.findOneBy({ id });

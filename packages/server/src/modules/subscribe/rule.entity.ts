@@ -2,6 +2,8 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -36,15 +38,15 @@ export class Rule {
   /** 下载内容 */
   @Exclude()
   @OneToMany(() => DownloadItem, (download) => download.rule)
-  downloads: DownloadItem[];
+  downloads: Promise<DownloadItem[]>;
 
-  /** 专用订阅源 */
-  @ManyToOne(() => Source, {
-    onDelete: 'SET NULL',
+  /** 订阅源 */
+  @ManyToMany(() => Source, (source) => source.rules, {
+    onDelete: 'CASCADE',
     eager: true,
-    nullable: true,
   })
-  source?: Source;
+  @JoinTable()
+  sources: Source[];
 
   @Expose()
   get code() {

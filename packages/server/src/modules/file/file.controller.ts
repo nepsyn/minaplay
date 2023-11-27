@@ -218,13 +218,12 @@ export class FileController {
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
   async queryFile(@Query() query: FileQueryDto) {
-    const { keyword, id, md5, source, userId, start, end } = query;
+    const { keyword, md5, source, userId, start, end } = query;
     const [result, total] = await this.fileService.findAndCount({
       where: buildQueryOptions<File>({
         keyword,
         keywordProperties: (entity) => [entity.name, entity.mimetype],
         exact: {
-          id,
           md5,
           source,
           user: { id: userId },

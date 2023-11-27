@@ -19,8 +19,8 @@ export class ViewHistory {
 
   /** 媒体 */
   @ManyToOne(() => Media, {
-    eager: true,
     onDelete: 'CASCADE',
+    eager: true,
   })
   media: Media;
 

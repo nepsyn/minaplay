@@ -42,9 +42,6 @@ export class SeriesTagController {
       where: buildQueryOptions<SeriesTag>({
         keyword,
         keywordProperties: (entity) => [entity.name],
-        exact: {
-          name: query.name,
-        },
       }),
       skip: query.page * query.size,
       take: query.size,

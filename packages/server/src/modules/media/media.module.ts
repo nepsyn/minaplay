@@ -11,10 +11,11 @@ import { MediaFileService } from './media-file.service';
 import { ViewHistory } from './view-history.entity';
 import { ViewHistoryService } from './view-history.service';
 import { ViewHistoryController } from './view-history.controller';
+import { MediaEntitySubscriber } from './media.entity.subscriber';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Media, ViewHistory]), FileModule, AuthorizationModule, UserModule],
-  providers: [MediaService, MediaFileService, ViewHistoryService],
+  providers: [MediaService, MediaFileService, ViewHistoryService, MediaEntitySubscriber],
   controllers: [ViewHistoryController, MediaController],
   exports: [MediaService, MediaFileService, ViewHistoryService],
 })

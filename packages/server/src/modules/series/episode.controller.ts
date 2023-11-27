@@ -49,13 +49,12 @@ export class EpisodeController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
   async queryEpisodes(@Query() query: EpisodeQueryDto) {
-    const { keyword, id, seriesId, start, end } = query;
+    const { keyword, seriesId, start, end } = query;
     const [result, total] = await this.episodeService.findAndCount({
       where: buildQueryOptions<Episode>({
         keyword,
         keywordProperties: (entity) => [entity.title],
         exact: {
-          id,
           series: { id: seriesId },
           createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
         },
@@ -98,7 +97,6 @@ export class EpisodeController {
       series: { id: data.seriesId },
       media: { id: data.mediaId },
     });
-    await this.pluginService.emitAllEnabled('onNewEpisode', series.id);
 
     return await this.episodeService.findOneBy({ id });
   }

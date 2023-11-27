@@ -2,6 +2,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -11,6 +12,7 @@ import { Exclude } from 'class-transformer';
 import { User } from '../user/user.entity';
 import { FetchLog } from './fetch-log.entity';
 import { DownloadItem } from './download-item.entity';
+import { Rule } from './rule.entity';
 
 /** 订阅源 */
 @Entity()
@@ -49,15 +51,21 @@ export class Source {
   })
   enabled: boolean;
 
+  /** 规则 */
+  @ManyToMany(() => Rule, (rule) => rule.sources, {
+    onDelete: 'CASCADE',
+  })
+  rules: Promise<Rule[]>;
+
   /** 更新记录 */
   @Exclude()
   @OneToMany(() => FetchLog, (log) => log.source)
-  logs: FetchLog[];
+  logs: Promise<FetchLog[]>;
 
   /** 下载内容 */
   @Exclude()
   @OneToMany(() => DownloadItem, (download) => download.source)
-  downloads: DownloadItem[];
+  downloads: Promise<DownloadItem[]>;
 
   /** 创建用户 */
   @ManyToOne(() => User, (user) => user.sources, {

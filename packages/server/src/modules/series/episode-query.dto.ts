@@ -14,15 +14,6 @@ export class EpisodeQueryDto extends ApiQueryDto<Episode> {
   keyword?: string;
 
   @ApiProperty({
-    description: '单集ID',
-    required: false,
-  })
-  @Transform(({ value }) => Number(value))
-  @IsOptional()
-  @IsInt()
-  id?: number;
-
-  @ApiProperty({
     description: '剧集ID',
     required: false,
   })

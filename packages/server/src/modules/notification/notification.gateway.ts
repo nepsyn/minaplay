@@ -16,8 +16,12 @@ export class NotificationGateway implements OnGatewayConnection {
   @WebSocketServer()
   private readonly server: Server;
 
-  async notify<T extends NotificationEventType>(event: T, data: NotificationEventMap[T], room: string | string[]) {
-    this.server.to(room).emit(event, data);
+  async notify<T extends NotificationEventType>(event: T, data: NotificationEventMap[T], room?: string | string[]) {
+    if (room) {
+      this.server.to(room).emit(event, data);
+    } else {
+      this.server.emit(event, data);
+    }
   }
 
   async handleConnection(socket: Socket) {

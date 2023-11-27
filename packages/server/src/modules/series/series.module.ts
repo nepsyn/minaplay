@@ -12,10 +12,11 @@ import { EpisodeController } from './episode.controller';
 import { FileModule } from '../file/file.module';
 import { SeriesSubscribe } from './series-subscribe.entity';
 import { SeriesSubscribeService } from './series-subscribe.service';
+import { EpisodeEntitySubscriber } from './episode.entity.subscriber';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Series, SeriesTag, SeriesSubscribe, Episode]), FileModule],
-  providers: [SeriesService, SeriesTagService, SeriesSubscribeService, EpisodeService],
+  providers: [SeriesService, SeriesTagService, SeriesSubscribeService, EpisodeService, EpisodeEntitySubscriber],
   controllers: [SeriesTagController, EpisodeController, SeriesController],
   exports: [SeriesService, SeriesTagService, SeriesSubscribeService, EpisodeService],
 })

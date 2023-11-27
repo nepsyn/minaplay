@@ -97,7 +97,6 @@ export class EpisodeController {
       series: { id: data.seriesId },
       media: { id: data.mediaId },
     });
-    await this.pluginService.emitAllEnabled('onNewEpisode', series.id);
 
     return await this.episodeService.findOneBy({ id });
   }

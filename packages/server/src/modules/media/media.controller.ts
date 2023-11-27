@@ -103,7 +103,6 @@ export class MediaController {
     if (media.file?.isExist && !media.metadata) {
       await this.mediaFileService.generateMediaFiles(media);
     }
-    await this.pluginService.emitAllEnabled('onNewMedia', id);
 
     return await this.mediaService.findOneBy({ id });
   }

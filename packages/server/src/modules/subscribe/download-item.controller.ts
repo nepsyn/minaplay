@@ -203,13 +203,12 @@ export class DownloadItemController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async queryDownloadItem(@Query() query: DownloadItemQueryDto) {
-    const { keyword, id, url, sourceId, ruleId, logId, start, end, status } = query;
+    const { keyword, url, sourceId, ruleId, logId, start, end, status } = query;
     const [result, total] = await this.downloadItemService.findAndCount({
       where: buildQueryOptions<DownloadItem>({
         keyword,
         keywordProperties: (entity) => [entity.title, entity.url],
         exact: {
-          id,
           url,
           source: { id: sourceId },
           rule: { id: ruleId },

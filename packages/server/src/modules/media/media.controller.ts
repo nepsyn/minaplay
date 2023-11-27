@@ -66,13 +66,12 @@ export class MediaController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
   async queryMedia(@Query() query: MediaQueryDto, @RequestUser() user: User) {
-    const { keyword, id, start, end } = query;
+    const { keyword, start, end } = query;
     const [result, total] = await this.mediaService.findAndCount({
       where: buildQueryOptions<Media>({
         keyword,
         keywordProperties: (entity) => [entity.name, entity.description],
         exact: {
-          id,
           createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
           isPublic: user.hasOneOf(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP) ? undefined : true,
         },

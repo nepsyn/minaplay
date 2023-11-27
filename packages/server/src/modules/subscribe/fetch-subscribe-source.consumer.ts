@@ -10,7 +10,6 @@ import { StatusEnum } from '../../enums/status.enum';
 import { FeedData } from '@extractus/feed-extractor';
 import { RuleErrorLogService } from './rule-error-log.service';
 import { RuleHooks } from './rule.interface';
-import { IsNull } from 'typeorm';
 
 @Injectable()
 @Processor('fetch-subscribe-source')
@@ -28,13 +27,31 @@ export class FetchSubscribeSourceConsumer {
   @Process()
   async fetchSubscribeSource(job: Job<Source>) {
     const { id } = job.data;
+    // find source
     const source = await this.sourceService.findOneBy({ id });
 
+    // find rules
+    const [rules] = await this.ruleService.findAndCount({
+      where: {
+        sources: {
+          id: source.id,
+        },
+      },
+    });
+    const validRules = rules.filter((rule) => rule.file.isExist);
+
+    // save initial log
     const log = await this.fetchLogService.save({
       source: { id: source.id },
-      status: StatusEnum.PENDING,
+      status: validRules.length > 0 ? StatusEnum.PENDING : StatusEnum.SUCCESS,
     });
 
+    // no valid rules
+    if (validRules.length === 0) {
+      return;
+    }
+
+    // fetch RSS data
     let data: FeedData;
     try {
       data = await this.sourceService.readSource(source.url);
@@ -56,13 +73,8 @@ export class FetchSubscribeSourceConsumer {
       return;
     }
 
-    const [rules] = await this.ruleService.findAndCount({
-      where: [{ source: IsNull() }, { source: { id: source.id } }],
-    });
-
+    // validate entries
     const validEntries = data.entries.filter((entry) => entry.enclosure?.url);
-    const validRules = rules.filter((rule) => rule.file.isExist);
-
     let count = 0;
     for (const rule of validRules) {
       let hooks: RuleHooks;

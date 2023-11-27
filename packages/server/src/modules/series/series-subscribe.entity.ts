@@ -7,6 +7,7 @@ import { Exclude } from 'class-transformer';
 @Entity()
 export class SeriesSubscribe {
   /** 用户 */
+  @Exclude()
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
   })
@@ -17,8 +18,8 @@ export class SeriesSubscribe {
   userId: number;
 
   /** 剧集 */
+  @Exclude()
   @ManyToOne(() => Series, {
-    eager: true,
     onDelete: 'CASCADE',
   })
   series: Series;

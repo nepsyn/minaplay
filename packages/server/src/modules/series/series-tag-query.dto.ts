@@ -1,7 +1,7 @@
 import { ApiQueryDto } from '../../utils/api.query.dto';
 import { SeriesTag } from './series-tag.entity';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsOptional, IsString, MaxLength } from 'class-validator';
+import { IsOptional, IsString } from 'class-validator';
 
 export class SeriesTagQueryDto extends ApiQueryDto<SeriesTag> {
   @ApiProperty({
@@ -11,13 +11,4 @@ export class SeriesTagQueryDto extends ApiQueryDto<SeriesTag> {
   @IsOptional()
   @IsString()
   keyword?: string;
-
-  @ApiProperty({
-    description: '剧集标签名称',
-    required: false,
-  })
-  @IsOptional()
-  @MaxLength(40)
-  @IsString()
-  name?: string;
 }

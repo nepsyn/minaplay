@@ -26,24 +26,29 @@ import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { PermissionEnum } from '../../enums/permission.enum';
 import { ErrorCodeEnum } from '../../enums/error-code.enum';
-import { Between } from 'typeorm';
+import { Between, In } from 'typeorm';
 import { SeriesSubscribeDto } from './series-subscribe.dto';
 import { SeriesSubscribeService } from './series-subscribe.service';
+import { SeriesTagService } from './series-tag.service';
 
 @Controller('series')
 @UseGuards(AuthorizationGuard)
 @ApiTags('series')
 @ApiBearerAuth()
 export class SeriesController {
-  constructor(private seriesService: SeriesService, private seriesSubscribeService: SeriesSubscribeService) {}
+  constructor(
+    private seriesService: SeriesService,
+    private seriesTagService: SeriesTagService,
+    private seriesSubscribeService: SeriesSubscribeService,
+  ) {}
 
   @Get(':id')
   @ApiOperation({
     description: '查看剧集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
-  async getSeriesById(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
-    const series = await this.seriesService.buildCompositeQuery(user.id, { id }).getOne();
+  async getSeriesById(@Param('id', ParseIntPipe) id: number) {
+    const series = await this.seriesService.findOneBy({ id });
     if (!series) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
@@ -69,7 +74,7 @@ export class SeriesController {
       tags: data.tags?.map((name) => ({ name })),
     });
 
-    return await this.seriesService.buildCompositeQuery(user.id, { id }).getOne();
+    return await this.seriesService.findOneBy({ id });
   }
 
   @Get()
@@ -78,45 +83,34 @@ export class SeriesController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
   async querySeries(@RequestUser() user: User, @Query() query: SeriesQueryDto) {
-    const { keyword, id, name, season, finished, subscribed, userId, tags, start, end } = query;
-    const qb = this.seriesService
-      .buildCompositeQuery(
-        user.id,
-        buildQueryOptions<Series>({
-          keyword,
-          keywordProperties: (entity) => [entity.name, entity.description],
-          exact: {
-            id,
-            name,
-            season,
-            finished,
-            user: { id: userId },
-            createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
-          },
-        }),
-      )
-      .andWhere(subscribed ? `subscribe.seriesId IS ${subscribed ? 'NOT NULL' : 'NULL'}` : {});
+    const { keyword, name, season, finished, userId, tag: tagName, start, end } = query;
 
-    if (tags && tags.length > 0) {
-      qb.andWhere(
-        'series.id IN ' +
-          qb
-            .subQuery()
-            .from(Series, 's1')
-            .leftJoinAndSelect('s1.tags', 't1')
-            .where('t1.name IN (:tags)', { tags })
-            .select('s1.id')
-            .groupBy('s1.id')
-            .having('COUNT(DISTINCT t1.name) = :tagsCount', { tagsCount: tags.length })
-            .getQuery(),
-      );
+    let idCondition = undefined;
+    if (tagName) {
+      const tag = await this.seriesTagService.findOneBy({ name: tagName });
+      if (tag) {
+        const series = await tag.series;
+        idCondition = In(series.map(({ id }) => id));
+      }
     }
 
-    const [result, total] = await qb
-      .skip(query.page * query.size)
-      .take(query.size)
-      .orderBy(`series.${query.sort}`, query.order)
-      .getManyAndCount();
+    const [result, total] = await this.seriesService.findAndCount({
+      where: buildQueryOptions<Series>({
+        keyword,
+        keywordProperties: (entity) => [entity.name, entity.description],
+        exact: {
+          id: idCondition,
+          name,
+          season,
+          finished,
+          user: { id: userId },
+          createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
+        },
+      }),
+      skip: query.page * query.size,
+      take: query.size,
+      order: { [query.sort]: query.order },
+    });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
   }
@@ -126,7 +120,7 @@ export class SeriesController {
     description: '修改剧集信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
-  async updateSeries(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number, @Body() data: SeriesDto) {
+  async updateSeries(@Param('id', ParseIntPipe) id: number, @Body() data: SeriesDto) {
     const series = await this.seriesService.findOneBy({ id });
     if (!series) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -144,7 +138,7 @@ export class SeriesController {
       tags: data.tags?.map((name) => ({ name })),
     });
 
-    return await this.seriesService.buildCompositeQuery(user.id, { id }).getOne();
+    return await this.seriesService.findOneBy({ id });
   }
 
   @Delete(':id')
@@ -155,6 +149,15 @@ export class SeriesController {
   async deleteSeries(@Param('id', ParseIntPipe) id: number) {
     await this.seriesService.delete({ id });
     return {};
+  }
+
+  @Get(':id/subscribe')
+  @ApiOperation({
+    description: '获取订阅信息',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
+  async getSubscribeInfoBySeriesId(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
+    return (await this.seriesSubscribeService.findOneBy({ seriesId: id, userId: user.id })) ?? {};
   }
 
   @Post(':id/subscribe')
@@ -172,13 +175,11 @@ export class SeriesController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    const subscribe = await this.seriesSubscribeService.save({
+    return await this.seriesSubscribeService.save({
       ...data,
       user: { id: user.id },
       series: { id },
     });
-
-    return { notify: subscribe.notify };
   }
 
   @Delete(':id/subscribe')

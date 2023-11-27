@@ -15,14 +15,6 @@ export class DownloadItemQueryDto extends ApiQueryDto<FetchLog> {
   keyword?: string;
 
   @ApiProperty({
-    description: '下载项目id',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  id?: string;
-
-  @ApiProperty({
     description: '下载链接',
     required: false,
   })

@@ -9,8 +9,10 @@ export class SeriesTag {
   name: string;
 
   /** 剧集 */
-  @ManyToMany(() => Series, (series) => series.tags)
-  series: Series[];
+  @ManyToMany(() => Series, (series) => series.tags, {
+    onDelete: 'CASCADE',
+  })
+  series: Promise<Series[]>;
 
   /** 创建时间 */
   @CreateDateColumn()

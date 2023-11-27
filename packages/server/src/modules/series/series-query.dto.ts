@@ -14,15 +14,6 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   keyword?: string;
 
   @ApiProperty({
-    description: '剧集ID',
-    required: false,
-  })
-  @Transform(({ value }) => Number(value))
-  @IsOptional()
-  @IsInt()
-  id?: number;
-
-  @ApiProperty({
     description: '剧集名称',
     required: false,
   })
@@ -49,16 +40,6 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   finished?: boolean;
 
   @ApiProperty({
-    description: '是否订阅',
-    required: false,
-    enum: [0, 1],
-  })
-  @Transform(({ value }) => Boolean(Number(value)))
-  @IsOptional()
-  @IsBoolean()
-  subscribed?: boolean;
-
-  @ApiProperty({
     description: '创建用户id',
     required: false,
   })
@@ -70,14 +51,10 @@ export class SeriesQueryDto extends ApiQueryDto<Series> {
   @ApiProperty({
     description: '剧集标签',
     required: false,
-    type: [String],
   })
-  @Transform(({ value }) => (value ? [].concat(value) : undefined))
   @IsOptional()
-  @IsString({
-    each: true,
-  })
-  tags?: string[];
+  @IsString()
+  tag?: string;
 
   @ApiProperty({
     description: '开始时间',

@@ -71,6 +71,7 @@ export class Series {
 
   /** 标签 */
   @ManyToMany(() => SeriesTag, (tag) => tag.series, {
+    onDelete: 'CASCADE',
     eager: true,
   })
   @JoinTable()

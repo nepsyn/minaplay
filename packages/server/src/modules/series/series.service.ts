@@ -24,22 +24,6 @@ export class SeriesService {
     return await this.seriesRepository.findAndCount(options);
   }
 
-  buildCompositeQuery(userId: number, where?: FindOptionsWhere<Series> | FindOptionsWhere<Series>[]) {
-    return this.seriesRepository
-      .createQueryBuilder('series')
-      .leftJoinAndSelect('series.user', 'user')
-      .leftJoinAndSelect('series.poster', 'poster')
-      .leftJoinAndSelect('series.tags', 'tags')
-      .leftJoinAndSelect('user.avatar', 'avatar')
-      .leftJoinAndSelect(
-        'series.subscribes',
-        'subscribe',
-        'series.id = subscribe.seriesId AND subscribe.userId = :userId',
-        { userId },
-      )
-      .where(where);
-  }
-
   async delete(where: FindOptionsWhere<Series>) {
     const series = await this.seriesRepository.find({ where });
     for (const item of series) {

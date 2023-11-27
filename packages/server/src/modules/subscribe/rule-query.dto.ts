@@ -14,15 +14,6 @@ export class RuleQueryDto extends ApiQueryDto<Rule> {
   keyword?: string;
 
   @ApiProperty({
-    description: '订阅规则id',
-    required: false,
-  })
-  @Transform(({ value }) => Number(value))
-  @IsOptional()
-  @IsInt()
-  id?: number;
-
-  @ApiProperty({
     description: '订阅源id',
     required: false,
   })

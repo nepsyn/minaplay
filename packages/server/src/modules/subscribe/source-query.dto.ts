@@ -14,23 +14,6 @@ export class SourceQueryDto extends ApiQueryDto<Source> {
   keyword?: string;
 
   @ApiProperty({
-    description: '订阅源id',
-    required: false,
-  })
-  @Transform(({ value }) => Number(value))
-  @IsOptional()
-  @IsInt()
-  id?: number;
-
-  @ApiProperty({
-    description: '订阅源url',
-    required: false,
-  })
-  @IsOptional()
-  @IsString()
-  url?: string;
-
-  @ApiProperty({
     description: '是否启用',
     required: false,
     enum: [0, 1],

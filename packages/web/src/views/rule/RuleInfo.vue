@@ -24,7 +24,28 @@
           counter="40"
           persistent-counter
         ></v-text-field>
-        <span class="text-h6">{{ t('rule.info.code') }}</span>
+        <v-autocomplete
+          :label="t('rule.entity.sources')"
+          class="mt-4"
+          variant="outlined"
+          color="primary"
+          density="comfortable"
+          multiple
+          chips
+          closable-chips
+          v-model="edit!.sourceIds"
+          :items="sourcesLoader.data.value?.items ?? rule?.sources"
+          :item-title="(item) => item.title ?? item.remark ?? t('rule.unnamed')"
+          item-value="id"
+          :loading="sourcesLoader.pending.value"
+          hide-details
+          :no-data-text="t('app.loader.empty')"
+          @focus.once="sourcesLoader.request()"
+          clearable
+          :filter-keys="['title', 'remark', 'url']"
+          :item-props="(item) => ({ density: 'comfortable', subtitle: item.url })"
+        ></v-autocomplete>
+        <span class="text-h6 mt-4">{{ t('rule.info.code') }}</span>
         <monaco-editor
           ref="editorRef"
           class="border rounded mt-2"
@@ -102,10 +123,14 @@ const ruleLoader = useAxiosRequest(async () => {
   return await api.Rule.getById(Number(route.params.id))();
 });
 ruleLoader.onResolved((data) => {
-  edit.value = { ...data };
+  edit.value = { ...data, sourceIds: data.sources.map(({ id }) => id) };
 });
-const source = computed(() => ruleLoader.data.value);
-const edit = ref(source.value);
+const rule = computed(() => ruleLoader.data.value);
+const edit = ref({ ...(rule.value ?? {}), sourceIds: rule.value?.sources.map(({ id }) => id) ?? [] });
+
+const sourcesLoader = useAxiosRequest(async () => {
+  return await api.Source.query({ size: 1024 });
+});
 
 const {
   pending: saving,
@@ -116,6 +141,7 @@ const {
   return await api.Rule.update(Number(route.params.id))({
     remark: edit.value?.remark,
     code: edit.value?.code,
+    sourceIds: edit.value?.sourceIds,
   });
 });
 onSaved((data) => {
@@ -144,7 +170,7 @@ onRuleDeleteFailed(() => {
 
 const editorRef = ref<typeof MonacoEditor | undefined>(undefined);
 const reset = () => {
-  edit.value = { ...ruleLoader.data.value! };
+  edit.value = { ...rule.value!, sourceIds: rule.value?.sources.map(({ id }) => id) ?? [] };
   editorRef.value?.getEditor()?.setValue(edit.value.code);
 };
 </script>

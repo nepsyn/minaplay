@@ -31,8 +31,8 @@ export interface SeriesDto {
 
 export interface SeriesQueryDto extends ApiQueryDto<SeriesEntity> {
   keyword?: string;
-  id?: number;
   name?: string;
+  tag?: string;
   userId?: number;
   start?: string;
   end?: string;
@@ -83,7 +83,6 @@ export interface EpisodeDto {
 
 export interface EpisodeQueryDto extends ApiQueryDto<EpisodeEntity> {
   keyword?: string;
-  id?: number;
   seriesId?: number;
   start?: string;
   end?: string;

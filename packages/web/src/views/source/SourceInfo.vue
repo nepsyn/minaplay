@@ -46,22 +46,17 @@
           counter="40"
           persistent-counter
           :items="cronExps"
-          item-title="name"
+          item-title="value"
           item-value="value"
           filter-keys="value"
-          :menu-props="{ closeOnContentClick: true }"
+          :return-object="false"
+          :item-props="(item) => ({ density: 'comfortable', subtitle: item.name })"
         >
           <template #prepend-inner>
             <v-icon :icon="mdiClockOutline"></v-icon>
             <v-tooltip activator="parent">
               <pre class="text-caption">{{ nextTriggerTimes }}</pre>
             </v-tooltip>
-          </template>
-          <template #item="{ props }">
-            <v-list-item density="comfortable" link @click="edit!.cron = props.value as string">
-              <v-list-item-title>{{ props.title }}</v-list-item-title>
-              <v-list-item-subtitle>{{ props.value }}</v-list-item-subtitle>
-            </v-list-item>
           </template>
         </v-combobox>
         <v-text-field
@@ -247,7 +242,7 @@ onEnabledToggled((data) => {
 });
 onEnabledToggleFailed(() => {
   toast.toastError(t('error.other'));
-  edit.value!.enabled = sourceLoader.data.value!.enabled;
+  edit.value!.enabled = source.value!.enabled;
 });
 
 const {
@@ -267,7 +262,7 @@ onSourceDeleteFailed(() => {
 });
 
 const reset = () => {
-  edit.value = { ...sourceLoader.data.value! };
+  edit.value = { ...source.value! };
 };
 
 const nextTriggerTimes = computed(() => {

@@ -33,7 +33,6 @@ export interface SourceDto {
 
 export interface SourceQueryDto extends ApiQueryDto<SourceEntity> {
   keyword?: string;
-  id?: number;
   url?: string;
   enabled?: number;
   userId?: number;
@@ -45,7 +44,7 @@ export interface RuleEntity {
   /** 备注 */
   remark?: string;
   /** 订阅源 */
-  source: SourceEntity;
+  sources: SourceEntity[];
   /** 代码 */
   code: string;
   /** 创建时间 */
@@ -57,13 +56,12 @@ export interface RuleEntity {
 export interface RuleDto {
   code?: string;
   remark?: string;
-  sourceId?: number | null;
+  sourceIds?: number[];
 }
 
 export interface RuleQueryDto extends ApiQueryDto<RuleEntity> {
   keyword?: string;
-  id?: number;
-  sourceId?: number;
+  source?: number;
 }
 
 export interface RuleErrorLogEntity {
@@ -119,8 +117,6 @@ export interface DownloadItemDto {
 
 export interface DownloadItemQueryDto extends ApiQueryDto<DownloadItemEntity> {
   keyword?: string;
-  id?: string;
-  url?: string;
   sourceId?: number;
   ruleId?: number;
   logId?: string;

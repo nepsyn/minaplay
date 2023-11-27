@@ -22,7 +22,6 @@ export interface FileEntity {
 
 export interface FileQueryDto extends ApiQueryDto<FileEntity> {
   keyword?: string;
-  id?: string;
   md5?: string;
   source?: FileSourceEnum;
   userId?: number;

@@ -9,9 +9,9 @@ export default {
     loader: {
       loading: 'Loading...',
       error: 'Oops, something went wrong! Please try ',
-      all: 'All items loaded.',
-      empty: 'No items founded.',
-      notLoaded: 'Data not loaded. Please try ',
+      all: 'All items loaded',
+      empty: 'No items founded',
+      notLoaded: 'Data not loaded! Please try ',
       moreBtn: 'Load More',
       retryBtn: 'Reload',
       loadBtn: 'Load',
@@ -151,6 +151,7 @@ export default {
     entity: {
       id: 'ID',
       remark: 'Remark',
+      sources: 'RSS Sources',
     },
     sections: {
       info: 'Information',

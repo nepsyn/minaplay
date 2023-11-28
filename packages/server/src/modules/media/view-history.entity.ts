@@ -28,14 +28,10 @@ export class ViewHistory {
   @ManyToOne(() => Episode, {
     onDelete: 'SET NULL',
     nullable: true,
+    eager: true,
   })
   @JoinColumn()
   episode?: Episode;
-
-  @Column({
-    nullable: true,
-  })
-  episodeId?: number;
 
   /** 用户 */
   @ManyToOne(() => User, {

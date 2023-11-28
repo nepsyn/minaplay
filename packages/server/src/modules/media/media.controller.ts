@@ -29,7 +29,6 @@ import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
 import { ViewHistoryDto } from './view-history.dto';
 import { ViewHistoryService } from './view-history.service';
-import { PluginService } from '../plugin/plugin.service';
 
 @Controller('media')
 @UseGuards(AuthorizationGuard)
@@ -40,7 +39,6 @@ export class MediaController {
     private mediaService: MediaService,
     private viewHistoryService: ViewHistoryService,
     private mediaFileService: MediaFileService,
-    private pluginService: PluginService,
   ) {}
 
   @Get(':id')
@@ -173,6 +171,7 @@ export class MediaController {
       id: history?.id,
       ...data,
       media: { id },
+      episode: { id: data.episodeId },
       user: { id: user.id },
     });
   }

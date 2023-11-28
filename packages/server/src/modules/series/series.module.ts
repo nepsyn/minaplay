@@ -18,7 +18,7 @@ import { SeriesSubscribeController } from './series-subscribe.controller';
 @Module({
   imports: [TypeOrmModule.forFeature([Series, SeriesTag, SeriesSubscribe, Episode]), FileModule],
   providers: [SeriesService, SeriesTagService, SeriesSubscribeService, EpisodeService, EpisodeEntitySubscriber],
-  controllers: [SeriesTagController, EpisodeController, SeriesController, SeriesSubscribeController],
+  controllers: [SeriesTagController, SeriesSubscribeController, EpisodeController, SeriesController],
   exports: [SeriesService, SeriesTagService, SeriesSubscribeService, EpisodeService],
 })
 export class SeriesModule {}

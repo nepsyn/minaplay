@@ -30,6 +30,9 @@ export class SeriesSubscribeController {
           user: { id: user.id },
         },
       }),
+      relations: {
+        series: true,
+      },
       skip: query.page * query.size,
       take: query.size,
       order: { [query.sort]: query.order },

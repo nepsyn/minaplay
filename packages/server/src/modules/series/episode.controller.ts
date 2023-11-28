@@ -25,11 +25,7 @@ import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { Between } from 'typeorm';
 import { EpisodeQueryDto } from './episode-query.dto';
-import { RequestUser } from '../authorization/request.user.decorator';
-import { User } from '../user/user.entity';
-import { ViewHistoryDto } from '../media/view-history.dto';
 import { ViewHistoryService } from '../media/view-history.service';
-import { PluginService } from '../plugin/plugin.service';
 
 @Controller('series/episode')
 @UseGuards(AuthorizationGuard)
@@ -40,7 +36,6 @@ export class EpisodeController {
     private seriesService: SeriesService,
     private viewHistoryService: ViewHistoryService,
     private episodeService: EpisodeService,
-    private pluginService: PluginService,
   ) {}
 
   @Get()
@@ -129,46 +124,6 @@ export class EpisodeController {
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async deleteEpisode(@Param('id', ParseIntPipe) id: number) {
     await this.episodeService.delete({ id });
-    return {};
-  }
-
-  @Post(':id/history')
-  @ApiOperation({
-    description: '添加历史记录',
-  })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
-  async createEpisodeHistory(
-    @RequestUser() user: User,
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: ViewHistoryDto,
-  ) {
-    const episode = await this.episodeService.findOneBy({ id });
-    if (!episode) {
-      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-    }
-
-    const history = await this.viewHistoryService.findOneBy({
-      media: { id: episode.media.id },
-    });
-    return await this.viewHistoryService.save({
-      id: history?.id,
-      ...data,
-      episode: { id },
-      media: { id: episode.media.id },
-      user: { id: user.id },
-    });
-  }
-
-  @Delete(':id/history')
-  @ApiOperation({
-    description: '删除历史记录',
-  })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
-  async deleteEpisodeHistory(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
-    await this.viewHistoryService.delete({
-      episode: { id },
-      user: { id: user.id },
-    });
     return {};
   }
 }

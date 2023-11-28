@@ -9,4 +9,12 @@ export class ViewHistoryDto {
   @IsOptional()
   @IsInt()
   progress?: number;
+
+  @ApiProperty({
+    description: '单集id',
+    required: false,
+  })
+  @IsOptional()
+  @IsInt()
+  episodeId?: number;
 }

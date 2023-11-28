@@ -1,5 +1,7 @@
 import { FileEntity } from '@/api/interfaces/file.interface';
 import { ApiQueryDto } from '@/api/interfaces/common.interface';
+import { EpisodeEntity } from '@/api/interfaces/series.interface';
+import { UserEntity } from '@/api/interfaces/user.interface';
 
 export interface MediaEntity {
   /** id */
@@ -36,4 +38,19 @@ export interface MediaQueryDto extends ApiQueryDto<MediaEntity> {
   keyword?: string;
   start?: string;
   end?: string;
+}
+
+export interface ViewHistoryEntity {
+  id: string;
+  media: MediaEntity;
+  episode?: EpisodeEntity;
+  user: UserEntity;
+  progress?: number;
+  createAt: Date;
+  updateAt: Date;
+}
+
+export interface ViewHistoryDto {
+  progress?: number;
+  episodeId?: number;
 }

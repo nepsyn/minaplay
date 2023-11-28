@@ -31,6 +31,27 @@ import {
   SourceQueryDto,
 } from '@/api/interfaces/subscribe.interface';
 import { ApiQueryDto, ApiQueryResult } from '@/api/interfaces/common.interface';
+import {
+  EpisodeDto,
+  EpisodeEntity,
+  EpisodeQueryDto,
+  SeriesDto,
+  SeriesEntity,
+  SeriesQueryDto,
+  SeriesSubscribeDto,
+  SeriesSubscribeEntity,
+  SeriesTagDto,
+  SeriesTagEntity,
+  SeriesTagQueryDto,
+} from '@/api/interfaces/series.interface';
+import {
+  MediaDto,
+  MediaEntity,
+  MediaQueryDto,
+  ViewHistoryDto,
+  ViewHistoryEntity,
+} from '@/api/interfaces/media.interface';
+import { FileQueryDto } from '@/api/interfaces/file.interface';
 
 export const useApiStore = defineStore('api', () => {
   const user = ref<UserEntity | undefined>(undefined);
@@ -121,6 +142,11 @@ export const useApiStore = defineStore('api', () => {
   const File = {
     buildRawPath: (id: string, name?: string) => `/file/${id}/raw/${name ?? ''}`,
     buildDownloadPath: (id: string, name?: string) => `/file/${id}/download/${name ?? ''}`,
+    fetchRaw: (id: string, config?: AxiosRequestConfig) => apiGet(`/file/${id}/raw`, config),
+    uploadImage: apiUpload<FileEntity>('/file/image'),
+    uploadVideo: apiUpload<FileEntity>('/file/video'),
+    query: apiGet<ApiQueryResult<FileEntity>, FileQueryDto>('/file'),
+    delete: (id: string) => apiDelete(`/file/${id}`),
   };
 
   const Source = {
@@ -161,6 +187,52 @@ export const useApiStore = defineStore('api', () => {
     cancel: (id: string) => apiPost<DownloadItemEntity>(`/subscribe/download/${id}/cancel`),
   };
 
+  const Series = {
+    create: apiPost<SeriesEntity, SeriesDto>('/series'),
+    getById: (id: number) => apiGet<SeriesEntity>(`/series/${id}`),
+    update: (id: number) => apiPut<SeriesEntity, SeriesDto>(`/series/${id}`),
+    delete: (id: number) => apiDelete(`/series/${id}`),
+    query: apiGet<ApiQueryResult<SeriesEntity>, SeriesQueryDto>('/series'),
+    findSubscribe: (id: number) => apiGet<SeriesSubscribeEntity>(`/series/${id}/subscribe`),
+    addSubscribe: (id: number) => apiPost<SeriesSubscribeEntity, SeriesSubscribeDto>(`/series/${id}/subscribe`),
+    deleteSubscribe: (id: number) => apiDelete(`/series/${id}/subscribe`),
+  };
+
+  const SeriesSubscribe = {
+    getAll: apiGet<ApiQueryResult<SeriesSubscribeEntity>>('/series/subscribe'),
+    deleteAll: apiDelete('/series/subscribe'),
+  };
+
+  const SeriesTag = {
+    create: apiPost<SeriesTagEntity, SeriesTagDto>('/series/tag'),
+    delete: (id: number) => apiDelete(`/series/tag/${id}`),
+    query: apiGet<ApiQueryResult<SeriesTagEntity>, SeriesTagQueryDto>('/series/tag'),
+  };
+
+  const Episode = {
+    create: apiPost<EpisodeEntity, EpisodeDto>('/series/episode'),
+    getById: (id: number) => apiGet<EpisodeEntity>(`/series/episode/${id}`),
+    update: (id: number) => apiPut<EpisodeEntity, EpisodeDto>(`/series/episode/${id}`),
+    delete: (id: number) => apiDelete(`/series/episode/${id}`),
+    query: apiGet<ApiQueryResult<EpisodeEntity>, EpisodeQueryDto>(`/series/episode`),
+  };
+
+  const Media = {
+    create: apiPost<MediaEntity, MediaDto>(`/media`),
+    getById: (id: string) => apiGet<MediaEntity>(`/media/${id}`),
+    query: apiGet<ApiQueryResult<MediaEntity>, MediaQueryDto>(`/media`),
+    update: (id: string) => apiPut<MediaEntity, MediaDto>(`/media/${id}`),
+    delete: (id: string) => apiDelete(`/media/${id}`),
+    findHistory: (id: number) => apiGet<ViewHistoryEntity>(`/media/${id}/history`),
+    addHistory: (id: number) => apiPost<ViewHistoryEntity, ViewHistoryDto>(`/media/${id}/history`),
+    deleteHistory: (id: number) => apiDelete(`/media/${id}/history`),
+  };
+
+  const ViewHistory = {
+    getAll: apiGet<ApiQueryResult<ViewHistoryEntity>>('/media/history'),
+    deleteAll: apiDelete('/media/history'),
+  };
+
   return {
     isLogin,
     setToken,
@@ -172,5 +244,11 @@ export const useApiStore = defineStore('api', () => {
     Source,
     Rule,
     Download,
+    Series,
+    SeriesSubscribe,
+    SeriesTag,
+    Episode,
+    Media,
+    ViewHistory,
   };
 });

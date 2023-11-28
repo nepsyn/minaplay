@@ -74,6 +74,21 @@ export default {
         btn: 'Logout',
       },
     },
+    upload: {
+      title: 'Upload Files',
+      drop: 'Drop files here to upload',
+      cancelTitle: 'Cancel Confirm',
+      cancelConfirm: 'Are your sure to cancel this upload?',
+      status: {
+        finished: 'Finished',
+        generating: 'Generating Media Files',
+        sizeExceed: 'File Size Exceeded(> 10GB)',
+        canceled: 'Canceled',
+        wrongType: 'Wrong File Type',
+        wrongContent: 'Wrong File Content',
+        error: 'Unknown Error',
+      },
+    },
   },
   common: {
     download: {
@@ -88,6 +103,13 @@ export default {
       linkCopyFailed: 'Download link copy failed',
       createAt: 'Create at',
     },
+  },
+  resource: {
+    updates: 'Latest Updates',
+    continue: 'Continue Watching',
+    subscribe: 'My Subscribe',
+    series: 'Latest Series',
+    medias: 'Latest Medias',
   },
   source: {
     title: 'RSS Sources',

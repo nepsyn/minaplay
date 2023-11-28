@@ -2,7 +2,7 @@
   <to-top-container class="page-height overflow-auto">
     <v-container class="d-flex flex-column py-md-12">
       <span class="text-h4">{{ t('source.title') }}</span>
-      <v-row class="py-2 mt-4" dense>
+      <v-row class="py-2" dense>
         <v-col cols="12" sm="auto" class="flex-grow-1">
           <v-text-field
             variant="outlined"

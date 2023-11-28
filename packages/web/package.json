@@ -16,6 +16,7 @@
     "@mdi/js": "^7.3.67",
     "axios": "^1.6.2",
     "cron-parser": "^4.9.0",
+    "filesize": "^10.1.0",
     "highlight.js": "^11.9.0",
     "monaco-editor": "^0.44.0",
     "pinia": "^2.1.7",

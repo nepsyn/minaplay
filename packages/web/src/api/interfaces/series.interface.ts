@@ -57,6 +57,16 @@ export interface SeriesTagQueryDto extends ApiQueryDto<SeriesTagEntity> {
   keyword?: string;
 }
 
+export interface SeriesSubscribeEntity {
+  series?: SeriesEntity;
+  notify: boolean;
+  createAt: Date;
+}
+
+export interface SeriesSubscribeDto {
+  notify?: boolean;
+}
+
 export interface EpisodeEntity {
   /** id */
   id: number;
@@ -68,6 +78,8 @@ export interface EpisodeEntity {
   series: SeriesEntity;
   /** 媒体 */
   media: MediaEntity;
+  /** 发布时间 */
+  pubAt: Date;
   /** 创建时间 */
   createAt: Date;
   /** 更新时间 */

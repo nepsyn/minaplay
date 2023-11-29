@@ -140,8 +140,8 @@ export const useApiStore = defineStore('api', () => {
   };
 
   const File = {
-    buildRawPath: (id: string, name?: string) => `/file/${id}/raw/${name ?? ''}`,
-    buildDownloadPath: (id: string, name?: string) => `/file/${id}/download/${name ?? ''}`,
+    buildRawPath: (id: string, name?: string) => baseUrl + `/file/${id}/raw/${name ?? ''}`,
+    buildDownloadPath: (id: string, name?: string) => baseUrl + `/file/${id}/download/${name ?? ''}`,
     fetchRaw: (id: string, config?: AxiosRequestConfig) => apiGet(`/file/${id}/raw`, config),
     uploadImage: apiUpload<FileEntity>('/file/image'),
     uploadVideo: apiUpload<FileEntity>('/file/video'),

@@ -1,5 +1,6 @@
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { StatusEnum } from '@/api/enums/status.enum';
+import { FileSourceEnum } from '@/api/enums/file-source.enum';
 
 export default {
   app: {
@@ -106,10 +107,15 @@ export default {
   },
   resource: {
     updates: 'Latest Updates',
-    continue: 'Continue Watching',
-    subscribe: 'My Subscribe',
-    series: 'Latest Series',
     medias: 'Latest Medias',
+  },
+  media: {
+    source: {
+      [FileSourceEnum.AUTO_GENERATED]: 'Auto Generate',
+      [FileSourceEnum.ARIA2_DOWNLOAD]: 'Auto Download',
+      [FileSourceEnum.USER_UPLOAD]: 'User Upload',
+      other: 'Unknown Source',
+    },
   },
   source: {
     title: 'RSS Sources',

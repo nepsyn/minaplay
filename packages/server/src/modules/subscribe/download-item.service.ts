@@ -136,8 +136,8 @@ export class DownloadItemService implements OnModuleInit {
 
           // save episode
           await this.episodeService.save({
-            title: mediaFile.name,
-            pubAt: entry.published ?? new Date(),
+            title: entry.title,
+            pubAt: Date.parse(String(entry.published)) ? new Date(entry.published) : new Date(),
             ...(descriptor.episode ?? {}),
             media: { id: media.id },
             series: { id: series.id },

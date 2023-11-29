@@ -43,14 +43,16 @@ export class EpisodeEntitySubscriber implements EntitySubscriberInterface<Episod
           user: true,
         },
       });
-      await this.emailService.notify(
-        'new-episode',
-        {
-          episode: instanceToPlain(event.entity) as Episode,
-          time: new Date(),
-        },
-        subscribes.map(({ user }) => String(user.email)),
-      );
+      if (subscribes.length > 0) {
+        await this.emailService.notify(
+          'new-episode',
+          {
+            episode: instanceToPlain(event.entity) as Episode,
+            time: new Date(),
+          },
+          subscribes.map(({ user }) => String(user.email)),
+        );
+      }
     }
   }
 }

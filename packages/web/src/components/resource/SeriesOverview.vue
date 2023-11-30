@@ -1,6 +1,5 @@
 <template>
   <v-container
-    v-ripple
     fluid
     class="pa-0 d-flex flex-column justify-center position-relative rounded-lg clickable series-container"
   >
@@ -9,7 +8,7 @@
         :aspect-ratio="1 / 1.4"
         cover
         :src="series.poster ? api.File.buildRawPath(series.poster.id, series.poster.name) : SeriesCoverFallback"
-        class="rounded-lg"
+        class="series-img rounded-lg"
       >
         <template #placeholder>
           <v-img :src="SeriesCoverFallback" cover></v-img>
@@ -72,4 +71,10 @@ defineProps<{
   top: 0
   right: 0
   max-width: 75%
+
+.series-img
+  transition: box-shadow 0.3s
+
+.series-container:hover .series-img
+  box-shadow: 0 4px 10px #888888
 </style>

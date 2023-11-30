@@ -23,7 +23,18 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/resource',
         name: 'resource',
-        component: () => import('@/views/Resource.vue'),
+        children: [
+          {
+            path: '/resource',
+            name: 'resource',
+            component: () => import('@/views/Resource.vue'),
+          },
+          {
+            path: '/media/:id',
+            name: 'media',
+            component: () => import('@/views/resource/MediaPlay.vue'),
+          },
+        ],
       },
       {
         path: '/live',

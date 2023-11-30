@@ -1,10 +1,10 @@
 <template>
-  <v-container v-ripple fluid class="d-flex flex-column rounded-lg pa-0 clickable media-container">
+  <v-container fluid class="d-flex flex-column rounded-lg pa-0 clickable media-container">
     <v-img
       :aspect-ratio="16 / 9"
       cover
       :src="media.poster ? api.File.buildRawPath(media.poster.id, media.poster.name) : MediaCoverFallback"
-      class="rounded-lg"
+      class="media-img rounded-lg"
     >
       <template #placeholder>
         <v-img :src="MediaCoverFallback" cover></v-img>
@@ -33,7 +33,7 @@ import { useI18n } from 'vue-i18n';
 const { t } = useI18n();
 const api = useApiStore();
 
-const props = defineProps<{
+defineProps<{
   media: MediaEntity;
 }>();
 </script>
@@ -53,4 +53,10 @@ const props = defineProps<{
 
 .media-container:hover .media-title
   color: rgb(var(--v-theme-primary))
+
+.media-img
+  transition: box-shadow 0.3s
+
+.media-container:hover .media-img
+  box-shadow: 0 4px 10px #888888
 </style>

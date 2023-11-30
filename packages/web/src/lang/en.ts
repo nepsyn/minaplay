@@ -108,6 +108,7 @@ export default {
   resource: {
     updates: 'Latest Updates',
     medias: 'Latest Medias',
+    noDescription: 'No Description',
   },
   media: {
     source: {

@@ -30,7 +30,7 @@
       <multi-items-loader :loader="mediasLoader" class="px-0 py-4" :hide-empty="medias.length > 0">
         <v-row>
           <v-col v-for="media in medias" :key="media.id" cols="6" sm="4" md="3">
-            <media-overview :media="media"></media-overview>
+            <media-overview :media="media" @click="router.push({ path: `/media/${media.id}` })"></media-overview>
           </v-col>
         </v-row>
         <template #loading>
@@ -56,9 +56,11 @@ import { mdiMultimedia, mdiUpdate } from '@mdi/js';
 import { EpisodeQueryDto } from '@/api/interfaces/series.interface';
 import MediaOverview from '@/components/resource/MediaOverview.vue';
 import SeriesOverview from '@/components/resource/SeriesOverview.vue';
+import { useRouter } from 'vue-router';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
+const router = useRouter();
 
 const updatesLoader = useAxiosPageLoader(
   async (query?: EpisodeQueryDto) => {

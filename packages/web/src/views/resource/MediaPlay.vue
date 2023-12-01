@@ -14,6 +14,17 @@
                   {{ new Date(media!.createAt).toLocaleString(locale) }}
                 </span>
                 <v-spacer></v-spacer>
+                <div v-for="(action, index) in actions" :key="index">
+                  <v-btn
+                    density="comfortable"
+                    size="small"
+                    :color="action.color"
+                    :icon="action.icon"
+                    @click="action.click()"
+                    variant="text"
+                  ></v-btn>
+                  <v-tooltip location="bottom" activator="parent">{{ action.text }}</v-tooltip>
+                </div>
               </v-container>
               <v-divider class="my-2"></v-divider>
               <pre
@@ -56,13 +67,16 @@ import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 import VideoPlayer from '@/components/app/VideoPlayer.vue';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
-import { mdiMultimedia } from '@mdi/js';
+import { mdiContentCopy, mdiMotionPlayOutline, mdiMultimedia, mdiVlc } from '@mdi/js';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
+import { copyContent } from '@/utils/utils';
+import { useToastStore } from '@/store/toast';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
 const route = useRoute();
 const router = useRouter();
+const toast = useToastStore();
 
 const mediaLoader = useAxiosRequest(async (id?: string) => {
   return await api.Media.getById(id ?? String(route.params.id))();
@@ -84,6 +98,45 @@ const recommendsLoader = useAxiosPageLoader(
   { page: 0, size: 12 },
 );
 const recommends = computed(() => recommendsLoader.items.value);
+
+const actions = [
+  {
+    text: t('media.actions.copy'),
+    icon: mdiContentCopy,
+    color: 'info',
+    click: () => {
+      if (media.value) {
+        copyContent(api.File.buildRawPath(media.value.file!.id, media.value.file!.name))
+          .then(() => {
+            toast.toastSuccess(t('utils.copied'));
+          })
+          .catch(() => {
+            toast.toastError(t('utils.copyFailed'));
+          });
+      }
+    },
+  },
+  {
+    text: t('media.actions.openInVLC'),
+    icon: mdiVlc,
+    color: 'warning',
+    click: () => {
+      if (media.value) {
+        const a = document.createElement('a');
+        a.href = `vlc://${api.File.buildRawPath(media.value.file!.id, media.value.file!.name)}`;
+        a.click();
+      }
+    },
+  },
+  {
+    text: t('media.actions.play'),
+    icon: mdiMotionPlayOutline,
+    color: 'secondary',
+    click: () => {
+      //
+    },
+  },
+];
 </script>
 
 <style scoped lang="sass"></style>

@@ -24,7 +24,8 @@
         </div>
         <div class="plyr__controls__item plyr__time--duration plyr__time" aria-label="Duration" role="timer">00:00</div>
         <button
-          class="plyr__controls__item plyr__control d-none d-sm-flex"
+          v-if="subtitleFiles.length > 0"
+          class="plyr__controls__item plyr__control"
           :class="{ 'plyr__control--pressed': renderer !== undefined }"
           type="button"
         >
@@ -90,6 +91,15 @@
             <use xlink:href="#plyr-download"></use>
           </svg>
         </a>
+        <button
+          class="plyr__controls__item plyr__control d-none d-sm-flex"
+          type="button"
+          @click="pageFullscreen = !pageFullscreen"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <path :d="mdiApplicationOutline" />
+          </svg>
+        </button>
         <button class="plyr__controls__item plyr__control" type="button" data-plyr="fullscreen">
           <svg class="icon--pressed" aria-hidden="true" focusable="false">
             <use xlink:href="#plyr-exit-fullscreen"></use>
@@ -109,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, shallowRef } from 'vue';
+import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue';
 import MediaPosterFallback from '@/assets/banner.jpeg';
 import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
@@ -120,6 +130,7 @@ import jassubWorkerUrl from 'jassub/dist/jassub-worker.js?url';
 import jassubWasmUrl from 'jassub/dist/jassub-worker.wasm?url';
 import { useI18n } from 'vue-i18n';
 import { FileEntity } from '@/api/interfaces/file.interface';
+import { mdiApplicationOutline } from '@mdi/js';
 
 const SUBTITLE_EXTENSIONS = ['.ass', '.ssa'];
 const FONT_EXTENSIONS = ['.otf', '.ttf', '.woff'];
@@ -174,14 +185,35 @@ const renderSubtitle = (index: number) => {
   }
 };
 
+const pageFullscreen = ref(false);
+watch(
+  () => pageFullscreen.value,
+  (value) => {
+    if (player) {
+      if (value) {
+        player.elements.container?.classList.add('page-fullscreen');
+      } else {
+        player.elements.container?.classList.remove('page-fullscreen');
+      }
+    }
+  },
+);
+
 onMounted(async () => {
   if (videoRef.value) {
     player = new Plyr(videoRef.value, {
       controls: controlsRef.value,
       autoplay: true,
+      ratio: '16:9',
       keyboard: {
         global: true,
       },
+    });
+
+    player.on('exitfullscreen', () => {
+      if (player) {
+        pageFullscreen.value = false;
+      }
     });
 
     if (subtitleFiles.value) {
@@ -199,4 +231,13 @@ onUnmounted(() => {
 });
 </script>
 
-<style scoped lang="sass"></style>
+<style lang="sass">
+.page-fullscreen
+  position: fixed !important
+  top: 0
+  left: 0
+  width: 100vw
+  height: 100vh
+  z-index: 10007 !important
+  background-color: black
+</style>

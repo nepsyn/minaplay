@@ -116,8 +116,8 @@
                       </div>
                     </div>
                   </template>
-                  <v-list-item-title class="text-break text-wrap">
-                    {{ item.raw.title ?? item.raw.id }}
+                  <v-list-item-title>
+                    <pre class="text-body-1 text-break text-pre-wrap">{{ item.raw.title ?? item.raw.id }}</pre>
                   </v-list-item-title>
                   <v-list-item-subtitle v-if="item.raw.published">
                     {{ `${t('source.raw.publishAt')} ${new Date(item.raw.published).toLocaleString(locale)}` }}

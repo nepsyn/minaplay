@@ -40,6 +40,7 @@ export default {
       edit: 'Edit',
       clear: 'Clear All',
       close: 'Close',
+      view: 'View',
       retry: 'Retry',
       refresh: 'Refresh',
       download: 'Download',
@@ -117,6 +118,11 @@ export default {
       [FileSourceEnum.ARIA2_DOWNLOAD]: 'Auto Download',
       [FileSourceEnum.USER_UPLOAD]: 'User Upload',
       other: 'Unknown Source',
+    },
+    actions: {
+      copy: 'Copy Video URL',
+      openInVLC: 'Open VLC',
+      play: 'Play Together',
     },
   },
   source: {

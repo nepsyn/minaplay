@@ -60,8 +60,6 @@ export class DownloadItemService implements OnModuleInit {
       });
     });
 
-    await this.aria2Service.startTask(task);
-
     return [task, item] as const;
   }
 
@@ -89,7 +87,7 @@ export class DownloadItemService implements OnModuleInit {
       // media files
       for (const mediaFile of files.filter((file) => VALID_VIDEO_MIME.includes(file.mimetype))) {
         // generate file descriptor
-        let descriptor: RuleFileDescriptor = {};
+        let descriptor: RuleFileDescriptor;
         try {
           descriptor = await props.describeFn?.(entry, mediaFile);
         } catch (error) {
@@ -102,6 +100,8 @@ export class DownloadItemService implements OnModuleInit {
           }
 
           continue;
+        } finally {
+          descriptor ??= {};
         }
 
         // attachment files
@@ -145,6 +145,8 @@ export class DownloadItemService implements OnModuleInit {
         }
       }
     });
+
+    await this.aria2Service.startTask(task);
 
     return [task, item] as const;
   }

@@ -43,7 +43,9 @@ export class File {
 
   /** 本地文件路径 */
   @Exclude()
-  @Column()
+  @Column({
+    length: 1024,
+  })
   path: string;
 
   /** 过期时间 */

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, NavigationGuard, RouteRecordRaw } from 'vue-router';
+import { createRouter, createWebHashHistory, NavigationGuard, RouteRecordRaw } from 'vue-router';
 import { useApiStore } from '@/store/api';
 
 const LoginGuard: NavigationGuard = (to) => {
@@ -131,7 +131,7 @@ const routes: RouteRecordRaw[] = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHashHistory(process.env.BASE_URL),
   routes,
 });
 

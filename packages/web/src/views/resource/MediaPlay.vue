@@ -4,11 +4,8 @@
       <v-row>
         <v-col cols="12" md="8">
           <single-item-loader class="pa-0" :loader="mediaLoader">
-            <v-responsive class="rounded" :aspect-ratio="16 / 9" max-height="520">
-              <video-player
-                :src="api.File.buildRawPath(media!.file!.id, media!.file!.name)"
-                :poster="media!.poster && api.File.buildRawPath(media!.poster.id, media!.poster.name)"
-              ></video-player>
+            <v-responsive class="rounded-lg" :aspect-ratio="16 / 9" max-height="520">
+              <video-player :media="media!"></video-player>
             </v-responsive>
             <v-container fluid class="pa-0 mt-4 d-flex flex-column">
               <span class="text-h6 text-wrap">{{ media!.name }}</span>

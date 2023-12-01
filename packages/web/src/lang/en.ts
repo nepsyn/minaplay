@@ -39,6 +39,7 @@ export default {
       delete: 'Delete',
       edit: 'Edit',
       clear: 'Clear All',
+      close: 'Close',
       retry: 'Retry',
       refresh: 'Refresh',
       download: 'Download',

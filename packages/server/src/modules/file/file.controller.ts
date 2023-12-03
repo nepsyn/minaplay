@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpCode,
+  Inject,
   Logger,
   NotFoundException,
   Param,
@@ -38,6 +39,7 @@ import { File } from './file.entity';
 import { Between } from 'typeorm';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { Response } from 'express';
+import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 
 @Controller('file')
 @ApiTags('file')
@@ -45,7 +47,7 @@ import { Response } from 'express';
 export class FileController {
   private readonly logger = new Logger(FileController.name);
 
-  constructor(private fileService: FileService) {}
+  constructor(private fileService: FileService, @Inject(CACHE_MANAGER) private cacheStore: CacheStore) {}
 
   @Post('image')
   @HttpCode(200)
@@ -158,6 +160,21 @@ export class FileController {
     }
   }
 
+  async getFilePathById(id: string) {
+    const key = `file-${id}-path`;
+    let path = await this.cacheStore.get<string>(key);
+    if (!path) {
+      const file = await this.fileService.findOneBy({ id });
+      if (!file || !file.isExist) {
+        throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+      }
+      path = file.path;
+      await this.cacheStore.set(key, path, { ttl: 60 * 60 * 1000 });
+    }
+
+    return path;
+  }
+
   @Get(':id')
   @ApiOperation({
     description: '查看文件',
@@ -178,12 +195,7 @@ export class FileController {
     description: '原始文件数据',
   })
   async getRawFileById(@Param('id') id: string, @Res() res: Response) {
-    const file = await this.fileService.findOneBy({ id });
-    if (!file || !file.isExist) {
-      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-    }
-
-    res.sendFile(file.path);
+    res.sendFile(await this.getFilePathById(id));
   }
 
   @Get([':id/download', ':id/download/:name'])
@@ -191,12 +203,7 @@ export class FileController {
     description: '下载文件',
   })
   async downloadFileById(@Param('id') id: string, @Res() res: Response, @Param('name') name?: string) {
-    const file = await this.fileService.findOneBy({ id });
-    if (!file || !file.isExist) {
-      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-    }
-
-    res.download(file.path, name ?? file.name);
+    res.download(await this.getFilePathById(id), name);
   }
 
   @Get()

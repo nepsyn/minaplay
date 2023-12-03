@@ -17,21 +17,24 @@
 
       <div
         v-if="label"
-        class="position-absolute d-flex justify-end pa-1 text-caption bg-error rounded-te-lg rounded-bs clickable label-container"
+        class="position-absolute d-flex justify-end pa-1 text-caption bg-error rounded-te-lg rounded-bs text-break text-wrap text-center clickable label-container"
       >
         {{ label }}
       </div>
 
       <div
         v-if="note"
-        class="position-absolute d-flex w-100 justify-center align-center pa-1 text-caption font-weight-bold rounded-b-lg text-break text-wrap note-container clickable"
+        class="position-absolute d-flex w-100 justify-center align-center pa-1 text-caption font-weight-bold rounded-b-lg text-break text-wrap text-center note-container clickable"
       >
         {{ note }}
       </div>
     </div>
 
-    <span class="mt-2 mb-1 px-1 clickable series-title font-weight-bold text-truncate text-center" :title="series.name">
-      {{ series.name }}
+    <span
+      class="mt-2 mb-1 px-1 clickable series-title font-weight-bold text-truncate text-center"
+      :title="`${series.name}${series.season ?? ''}`"
+    >
+      {{ `${series.name}${series.season ?? ''}` }}
     </span>
   </v-container>
 </template>

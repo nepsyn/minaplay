@@ -9,7 +9,7 @@
           size="x-small"
           :icon="mdiShare"
           color="primary"
-          @click="router.push(`/media/${media!.id}`)"
+          @click="router.push({ path: `/media/${media!.id}` })"
         ></v-btn>
         <v-btn
           variant="text"

@@ -1,6 +1,6 @@
 <template>
   <v-container fluid class="rounded-lg pa-0 clickable media-container">
-    <v-row no-gutters class="pa-0">
+    <v-row no-gutters>
       <v-col cols="4">
         <v-img
           :aspect-ratio="16 / 9"

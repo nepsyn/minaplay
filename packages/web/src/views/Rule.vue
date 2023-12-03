@@ -76,9 +76,9 @@ const router = useRouter();
 const toast = useToastStore();
 
 const rulesLoader = useAxiosPageLoader(
-  async (query?: RuleQueryDto) => {
+  async (query: RuleQueryDto = {}) => {
     return await api.Rule.query({
-      ...(query ?? {}),
+      ...query,
       order: filters.value.order,
       keyword: filters.value.keyword,
     });

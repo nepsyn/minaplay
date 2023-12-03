@@ -64,9 +64,9 @@ const toast = useToastStore();
 const router = useRouter();
 
 const sourcesLoader = useAxiosPageLoader(
-  async (query?: SourceQueryDto) => {
+  async (query: SourceQueryDto = {}) => {
     return await api.Source.query({
-      ...(query ?? {}),
+      ...query,
       keyword: keyword.value,
     });
   },

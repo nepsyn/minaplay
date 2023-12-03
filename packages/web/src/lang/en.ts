@@ -44,6 +44,8 @@ export default {
       retry: 'Retry',
       refresh: 'Refresh',
       download: 'Download',
+      more: 'more',
+      collapse: 'collapse',
       pause: 'Pause',
       unpause: 'Unpause',
       cancel: 'Cancel',
@@ -108,9 +110,21 @@ export default {
     },
   },
   resource: {
-    updates: 'Latest Updates',
-    medias: 'Latest Medias',
+    updates: 'Updates',
+    medias: 'Medias',
+    series: 'Series',
+    episodes: 'Episodes',
+    information: 'Info',
     noDescription: 'No Description',
+    episode: {
+      next: 'Next',
+      previous: 'Prev',
+    },
+    actions: {
+      copy: 'Copy Video URL',
+      openInVLC: 'Open VLC',
+      play: 'Play Together',
+    },
   },
   media: {
     source: {
@@ -118,11 +132,6 @@ export default {
       [FileSourceEnum.ARIA2_DOWNLOAD]: 'Auto Download',
       [FileSourceEnum.USER_UPLOAD]: 'User Upload',
       other: 'Unknown Source',
-    },
-    actions: {
-      copy: 'Copy Video URL',
-      openInVLC: 'Open VLC',
-      play: 'Play Together',
     },
   },
   source: {

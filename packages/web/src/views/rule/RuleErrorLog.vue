@@ -71,9 +71,9 @@ const route = useRoute();
 const toast = useToastStore();
 
 const logsLoader = useAxiosPageLoader(
-  async (query?: ApiQueryDto<RuleErrorLogEntity>) => {
+  async (query: ApiQueryDto<RuleErrorLogEntity> = {}) => {
     return await api.Rule.getErrorLogsById(Number(route.params.id))({
-      ...(query ?? {}),
+      ...query,
       order: filters.value.order,
     });
   },

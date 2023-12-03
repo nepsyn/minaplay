@@ -8,6 +8,12 @@ export interface SeriesEntity {
   id: number;
   /** 剧集名称 */
   name: string;
+  /** 剧集季度 */
+  season?: string;
+  /** 剧集是否已完结 */
+  finished?: boolean;
+  /** 完整剧集单集数量 */
+  count?: number;
   /** 剧描述称 */
   description?: string;
   /** 创建用户 */

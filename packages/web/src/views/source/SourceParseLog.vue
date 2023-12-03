@@ -88,9 +88,9 @@ const route = useRoute();
 const toast = useToastStore();
 
 const logsLoader = useAxiosPageLoader(
-  async (query?: FetchLogQueryDto) => {
+  async (query: FetchLogQueryDto = {}) => {
     return await api.Source.getFetchLogsById(Number(route.params.id))({
-      ...(query ?? {}),
+      ...query,
       status: filters.value.status,
       order: filters.value.order,
     });

@@ -12,6 +12,7 @@
               :series="episode.series"
               :label="episode.pubAt && new Date(episode.pubAt).toLocaleDateString(locale)"
               :note="episode.no"
+              @click="router.push({ path: `/episode/${episode.id}` })"
             ></series-overview>
           </v-col>
         </v-row>
@@ -63,9 +64,9 @@ const api = useApiStore();
 const router = useRouter();
 
 const updatesLoader = useAxiosPageLoader(
-  async (query?: EpisodeQueryDto) => {
+  async (query: EpisodeQueryDto = {}) => {
     return await api.Episode.query({
-      ...(query ?? {}),
+      ...query,
       sort: 'pubAt',
       order: 'DESC',
     });
@@ -74,6 +75,15 @@ const updatesLoader = useAxiosPageLoader(
 );
 const updates = computed(() => updatesLoader.items.value);
 
-const mediasLoader = useAxiosPageLoader(api.Media.query, { page: 0, size: 12 });
+const mediasLoader = useAxiosPageLoader(
+  async (query = {}) => {
+    return await api.Media.query({
+      ...query,
+      sort: 'createAt',
+      order: 'DESC',
+    });
+  },
+  { page: 0, size: 12 },
+);
 const medias = computed(() => mediasLoader.items.value);
 </script>

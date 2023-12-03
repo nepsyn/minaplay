@@ -39,7 +39,8 @@
             activator="parent"
             location="top center"
             open-on-hover
-            class="text-center"
+            scroll-strategy="close"
+            class="text-center position-fixed"
             open-delay="0"
             close-delay="0"
             :attach="controlsRef"
@@ -48,13 +49,21 @@
               <v-list-item
                 v-for="(subtitle, index) in subtitleFiles"
                 :key="index"
+                :active="currentSubtitle?.id === subtitle.id"
+                :color="currentSubtitle?.id === subtitle.id ? 'primary' : undefined"
                 link
                 density="compact"
                 @click="renderSubtitle(index)"
               >
                 {{ getSubtitleName(subtitle) }}
               </v-list-item>
-              <v-list-item link density="compact" @click="renderSubtitle(-1)">
+              <v-list-item
+                :active="!currentSubtitle"
+                :color="!currentSubtitle ? 'primary' : undefined"
+                link
+                density="compact"
+                @click="renderSubtitle(-1)"
+              >
                 {{ t('app.actions.close') }}
               </v-list-item>
             </v-list>
@@ -166,6 +175,7 @@ const videoRef = ref<HTMLVideoElement | undefined>(undefined);
 const controlsRef = ref<HTMLElement | undefined>(undefined);
 let player: Plyr | undefined = undefined;
 let renderer = shallowRef<JASSUB | undefined>(undefined);
+const currentSubtitle = ref<FileEntity | undefined>(undefined);
 const renderSubtitle = (index: number) => {
   if (renderer.value) {
     renderer.value.destroy();
@@ -173,6 +183,7 @@ const renderSubtitle = (index: number) => {
   }
 
   const subtitle = subtitleFiles.value[index];
+  currentSubtitle.value = subtitle;
   if (subtitle && videoRef.value) {
     renderer.value = new JASSUB({
       video: videoRef.value,
@@ -236,8 +247,8 @@ onUnmounted(() => {
   position: fixed !important
   top: 0
   left: 0
-  width: 100vw
-  height: 100vh
+  width: 100dvw
+  height: 100dvh
   z-index: 10007 !important
   background-color: black
 </style>

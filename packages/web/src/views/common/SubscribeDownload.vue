@@ -86,9 +86,9 @@ const api = useApiStore();
 const route = useRoute();
 
 const downloadsLoader = useAxiosPageLoader(
-  async (query?: DownloadItemQueryDto) => {
+  async (query: DownloadItemQueryDto = {}) => {
     return await api.Download.query({
-      ...(query ?? {}),
+      ...query,
       [route.name === 'source-download' ? 'sourceId' : 'ruleId']: Number(route.params.id),
       keyword: filters.value.keyword,
       status: filters.value.status,

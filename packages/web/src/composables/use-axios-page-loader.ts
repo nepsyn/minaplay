@@ -23,6 +23,7 @@ export function useAxiosPageLoader<
   onResolved((resp) => {
     items.value.push(...resp.items);
     total.value = resp.total;
+    page.value++;
   });
 
   const loaded = computed(() => data.value !== undefined || error.value !== undefined);

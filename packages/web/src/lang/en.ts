@@ -44,8 +44,8 @@ export default {
       retry: 'Retry',
       refresh: 'Refresh',
       download: 'Download',
-      more: 'more',
-      collapse: 'collapse',
+      more: '[more]',
+      collapse: '[collapse]',
       pause: 'Pause',
       unpause: 'Unpause',
       cancel: 'Cancel',
@@ -124,6 +124,7 @@ export default {
       copy: 'Copy Video URL',
       openInVLC: 'Open VLC',
       play: 'Play Together',
+      watch: 'Watch Now',
     },
   },
   media: {

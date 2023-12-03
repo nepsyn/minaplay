@@ -39,6 +39,11 @@ const routes: RouteRecordRaw[] = [
             name: 'episode',
             component: () => import('@/views/resource/MediaPlay.vue'),
           },
+          {
+            path: '/series/:seriesId',
+            name: 'series',
+            component: () => import('@/views/resource/SeriesInfo.vue'),
+          },
         ],
       },
       {

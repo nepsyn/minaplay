@@ -3,7 +3,7 @@
     <v-container class="d-flex flex-column py-md-12">
       <v-row>
         <v-col cols="12" md="8">
-          <single-item-loader class="pa-0" :loader="isMedia ? mediaLoader : episodeLoader">
+          <single-item-loader class="pa-0" :loader="isMedia ? mediaLoader : currentEpisodeLoader">
             <v-responsive class="rounded-lg" :aspect-ratio="16 / 9" max-height="520">
               <video-player :media="media!"></video-player>
             </v-responsive>
@@ -21,7 +21,7 @@
                   {{ t('resource.episode.previous') }}
                 </v-btn>
                 <span class="text-h6 px-2 text-truncate">
-                  {{ episode?.no ?? episode?.title ?? media?.name }}
+                  {{ currentEpisode?.no ?? currentEpisode?.title ?? media?.name }}
                 </span>
                 <v-btn
                   variant="flat"
@@ -53,7 +53,6 @@
               </v-container>
               <v-divider class="my-2"></v-divider>
               <pre
-                style="min-height: 100px"
                 class="text-body-2 text-pre-wrap text-break bg-transparent"
                 v-text="media!.description ?? t('resource.noDescription')"
               ></pre>
@@ -83,14 +82,14 @@
                 <v-icon :icon="mdiViewComfy" size="large"></v-icon>
                 <span class="text-h6 ml-3">{{ t('resource.episodes') }}</span>
               </div>
-              <multi-items-loader class="px-0 py-3" :loader="episodesLoader" :hide-empty="episodes.length > 0">
+              <multi-items-loader class="px-0 py-3" :loader="episodesLoader" :hide-empty="episodes.length > 0" lazy>
                 <v-row dense>
                   <v-col v-for="(item, index) in episodes" :key="item.id" cols="auto">
                     <v-btn
                       class="text-truncate"
                       variant="outlined"
-                      :active="item.id === episode?.id"
-                      :color="item.id === episode?.id ? 'primary' : undefined"
+                      :active="item.id === currentEpisode?.id"
+                      :color="item.id === currentEpisode?.id ? 'primary' : undefined"
                       @click="router.push({ path: `/episode/${item.id}` })"
                     >
                       {{ item.no ?? index + 1 }}
@@ -104,15 +103,15 @@
                 <v-icon :icon="mdiInformationVariantCircleOutline" size="large"></v-icon>
                 <span class="text-h6 ml-3">{{ t('resource.information') }}</span>
               </div>
-              <single-item-loader class="px-0 py-3" :loader="episodeLoader">
+              <single-item-loader class="px-0 py-3" :loader="currentEpisodeLoader">
                 <v-row>
                   <v-col cols="4">
                     <zoom-img
                       class="rounded-lg"
                       :aspect-ratio="1 / 1.4"
                       :src="
-                        episode?.series?.poster
-                          ? api.File.buildRawPath(episode.series.poster.id, episode.series.poster.name)
+                        currentEpisode?.series?.poster
+                          ? api.File.buildRawPath(currentEpisode.series.poster.id, currentEpisode.series.poster.name)
                           : SeriesPosterFallback
                       "
                       :placeholder="SeriesPosterFallback"
@@ -121,16 +120,16 @@
                   <v-col cols="8" class="d-flex flex-column">
                     <span
                       class="text-body-1 font-weight-bold text-break clickable series-title"
-                      @click="router.push({ path: `/series/${episode?.series.id}` })"
+                      @click="router.push({ path: `/series/${currentEpisode?.series.id}` })"
                     >
-                      {{ `${episode?.series.name}${episode?.series.season ?? ''}` }}
+                      {{ `${currentEpisode?.series.name}${currentEpisode?.series.season ?? ''}` }}
                     </span>
                     <div>
                       <v-chip
                         color="primary"
                         class="mb-2 mt-1"
                         size="x-small"
-                        v-for="(tag, index) in episode?.series?.tags ?? []"
+                        v-for="(tag, index) in currentEpisode?.series?.tags ?? []"
                         :key="index"
                         label
                         :text="tag.name"
@@ -138,8 +137,7 @@
                     </div>
                     <v-divider class="my-1"></v-divider>
                     <expandable-text
-                      :content="episode?.series?.description ?? t('resource.noDescription')"
-                      style="min-height: 100px"
+                      :content="currentEpisode?.series?.description ?? t('resource.noDescription')"
                       class="text-body-2"
                     ></expandable-text>
                   </v-col>
@@ -210,27 +208,27 @@ const isMedia = computed(() => route.name === 'media');
 const mediaLoader = useAxiosRequest(async (id?: string) => {
   return await api.Media.getById(id ?? String(route.params.mediaId))();
 });
-const episodeLoader = useAxiosRequest(async (id?: number) => {
+const currentEpisodeLoader = useAxiosRequest(async (id?: number) => {
   return await api.Episode.getById(id ?? Number(route.params.episodeId))();
 });
 const media = computed<MediaEntity | undefined>(() =>
-  isMedia.value ? mediaLoader.data.value : episodeLoader.data.value?.media,
+  isMedia.value ? mediaLoader.data.value : currentEpisodeLoader.data.value?.media,
 );
-const episode = computed<EpisodeEntity | undefined>(() => episodeLoader.data.value);
+const currentEpisode = computed<EpisodeEntity | undefined>(() => currentEpisodeLoader.data.value);
 onBeforeRouteUpdate(async (to, from) => {
   if (to.name === 'media' && to.params.mediaId !== from.params.mediaId) {
     await mediaLoader.request(String(to.params.mediaId));
   } else if (to.name === 'episode' && to.params.episodeId !== from.params.episodeId) {
-    await episodeLoader.request(Number(to.params.episodeId));
+    await currentEpisodeLoader.request(Number(to.params.episodeId));
   }
 });
 
 const hasEpisode = (offset: number) => {
-  const currentIndex = episodes.value.findIndex((value) => value.id === episode.value?.id);
+  const currentIndex = episodes.value.findIndex((value) => value.id === currentEpisode.value?.id);
   return currentIndex === -1 ? false : currentIndex + offset in episodes.value;
 };
 const toEpisode = async (offset: number) => {
-  const currentIndex = episodes.value.findIndex((value) => value.id === episode.value?.id);
+  const currentIndex = episodes.value.findIndex((value) => value.id === currentEpisode.value?.id);
   if (currentIndex + offset in episodes.value) {
     await router.push({ path: `/episode/${episodes.value[currentIndex + offset].id}` });
   }
@@ -252,7 +250,7 @@ const episodesLoader = useAxiosPageLoader(
   async (query = {}) => {
     return await api.Episode.query({
       ...query,
-      seriesId: episode.value?.series.id,
+      seriesId: currentEpisode.value?.series.id,
       sort: 'pubAt',
       order: 'ASC',
     });
@@ -260,6 +258,11 @@ const episodesLoader = useAxiosPageLoader(
   { page: 0, size: 24 },
 );
 const episodes = computed<EpisodeEntity[]>(() => episodesLoader.items.value);
+currentEpisodeLoader.onResolved(() => {
+  if (!episodesLoader.loaded.value) {
+    episodesLoader.request();
+  }
+});
 
 const seriesLoader = useAxiosPageLoader(
   async (query: SeriesQueryDto = {}) => {

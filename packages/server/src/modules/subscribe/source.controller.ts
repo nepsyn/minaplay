@@ -111,7 +111,7 @@ export class SourceController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async updateSource(@Param('id', ParseIntPipe) id: number, @Body() data: SourceDto) {
-    const source = await this.sourceService.findOneBy({ id });
+    let source = await this.sourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
@@ -120,15 +120,14 @@ export class SourceController {
       id,
       ...data,
     });
+    source = await this.sourceService.findOneBy({ id });
 
-    if (data.enabled !== undefined) {
-      await this.sourceService.deleteFetchSubscribeDataJob(id);
-      if (data.enabled === true) {
-        await this.sourceService.addFetchSubscribeDataJob(source);
-      }
+    await this.sourceService.deleteFetchSubscribeDataJob(source.id);
+    if (source.enabled === true) {
+      await this.sourceService.addFetchSubscribeDataJob(source);
     }
 
-    return await this.sourceService.findOneBy({ id });
+    return source;
   }
 
   @Delete(':id')

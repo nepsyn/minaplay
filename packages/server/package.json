@@ -30,7 +30,7 @@
     "bcrypt": "^5.1.1",
     "bull": "^4.11.5",
     "cache-manager": "^5.3.1",
-    "cache-manager-redis-store": "^3.0.1",
+    "cache-manager-redis-yet": "^4.1.2",
     "check-disk-space": "^3.4.0",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.0",

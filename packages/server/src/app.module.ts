@@ -9,7 +9,7 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ApplicationExceptionFilter } from './utils/application.exception.filter';
 import { FileModule } from './modules/file/file.module';
 import { RedisClientOptions } from 'redis';
-import { redisStore } from 'cache-manager-redis-store';
+import { redisStore } from 'cache-manager-redis-yet';
 import { buildException } from './utils/build-exception.util';
 import { ErrorCodeEnum } from './enums/error-code.enum';
 import { Aria2Module } from './modules/aria2/aria2.module';
@@ -34,7 +34,7 @@ import { PluginModule } from './modules/plugin/plugin.module';
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
-        store: redisStore as any,
+        store: redisStore,
         url: `redis://${configService.get('REDIS_HOST', '127.0.0.1')}:${configService.get('REDIS_PORT', 6379)}`,
         database: Number(configService.get('REDIS_DB', 0)),
         password: configService.get('REDIS_PASSWORD'),

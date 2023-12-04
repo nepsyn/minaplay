@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import os from 'node:os';
-import process from 'process';
+import process from 'node:process';
 import { importESM } from '../../utils/import-esm.util';
 import { RESOURCE_DIR } from '../../constants';
 import checkDiskSpace from 'check-disk-space';

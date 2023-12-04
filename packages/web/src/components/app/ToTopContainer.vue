@@ -9,7 +9,7 @@ const props = withDefaults(
   }>(),
   {
     threshold: 120,
-    size: 'default',
+    size: 'small',
   },
 );
 

@@ -39,6 +39,7 @@
             activator="parent"
             location="top center"
             open-on-hover
+            :open-on-click="false"
             scroll-strategy="close"
             class="text-center position-fixed"
             open-delay="0"

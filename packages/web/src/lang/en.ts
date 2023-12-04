@@ -107,6 +107,7 @@ export default {
       linkCopied: 'Download link copied',
       linkCopyFailed: 'Download link copy failed',
       createAt: 'Create at',
+      deleteConfirm: 'Are you sure to delete this download item? This action may cause duplicated download tasks.',
     },
   },
   resource: {
@@ -213,6 +214,19 @@ export default {
     logs: {
       clearLogsTitle: 'Clear All Confirm',
       clearLogsConfirm: 'Are you sure to clear all error logs?',
+    },
+  },
+  dashboard: {
+    sections: {
+      system: 'System',
+      user: 'Users',
+      source: 'Sources',
+      rule: 'Rules',
+      media: 'Medias',
+      series: 'Series',
+      episode: 'Episodes',
+      live: 'Lives',
+      file: 'Files',
     },
   },
   login: {

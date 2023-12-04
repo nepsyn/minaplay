@@ -32,9 +32,9 @@
 
     <span
       class="mt-2 mb-1 px-1 clickable series-title font-weight-bold text-truncate text-center"
-      :title="`${series.name}${series.season ?? ''}`"
+      :title="`${series.name} ${series.season ?? ''}`.trim()"
     >
-      {{ `${series.name}${series.season ?? ''}` }}
+      {{ `${series.name} ${series.season ?? ''}`.trim() }}
     </span>
   </v-container>
 </template>

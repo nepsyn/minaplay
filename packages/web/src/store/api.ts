@@ -52,6 +52,7 @@ import {
   ViewHistoryEntity,
 } from '@/api/interfaces/media.interface';
 import { FileQueryDto } from '@/api/interfaces/file.interface';
+import { SystemStatus } from '@/api/interfaces/system.interface';
 
 export const useApiStore = defineStore('api', () => {
   const user = ref<UserEntity | undefined>(undefined);
@@ -233,6 +234,10 @@ export const useApiStore = defineStore('api', () => {
     deleteAll: apiDelete('/media/history'),
   };
 
+  const System = {
+    getStatus: apiGet<SystemStatus>('/system/status'),
+  };
+
   return {
     isLogin,
     setToken,
@@ -250,5 +255,6 @@ export const useApiStore = defineStore('api', () => {
     Episode,
     Media,
     ViewHistory,
+    System,
   };
 });

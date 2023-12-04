@@ -122,7 +122,7 @@
                       class="text-body-1 font-weight-bold text-break clickable series-title"
                       @click="router.push({ path: `/series/${currentEpisode?.series.id}` })"
                     >
-                      {{ `${currentEpisode?.series.name}${currentEpisode?.series.season ?? ''}` }}
+                      {{ `${currentEpisode?.series.name} ${currentEpisode?.series.season ?? ''}`.trim() }}
                     </span>
                     <div>
                       <v-chip
@@ -152,7 +152,7 @@
             </div>
             <multi-items-loader class="px-0 py-3" :loader="seriesLoader" :hide-empty="series.length > 0">
               <v-row>
-                <v-col v-for="(item, index) in series" :key="item.id" cols="4">
+                <v-col v-for="item in series" :key="item.id" cols="4">
                   <series-overview
                     @click="router.push({ path: `/series/${item.id}` })"
                     :series="item"
@@ -295,8 +295,12 @@ const actions = [
     color: 'warning',
     click: () => {
       if (media.value) {
+        let path = api.File.buildRawPath(media.value.file!.id, media.value.file!.name);
+        if (path.startsWith('/')) {
+          path = `${window.origin}${path}`;
+        }
         const a = document.createElement('a');
-        a.href = `vlc://${api.File.buildRawPath(media.value.file!.id, media.value.file!.name)}`;
+        a.href = `vlc://${path}`;
         a.click();
       }
     },

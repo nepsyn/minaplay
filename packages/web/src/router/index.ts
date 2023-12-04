@@ -124,6 +124,54 @@ const routes: RouteRecordRaw[] = [
         path: '/dashboard',
         name: 'dashboard',
         component: () => import('@/views/Dashboard.vue'),
+        redirect: '/dashboard/system',
+        children: [
+          {
+            path: '/dashboard/system',
+            name: 'dash-system',
+            component: () => import('@/views/dashboard/DashSystem.vue'),
+          },
+          {
+            path: '/dashboard/user',
+            name: 'dash-user',
+            component: () => import('@/views/dashboard/DashUsers.vue'),
+          },
+          {
+            path: '/dashboard/source',
+            name: 'dash-source',
+            component: () => import('@/views/dashboard/DashSources.vue'),
+          },
+          {
+            path: '/dashboard/rule',
+            name: 'dash-rule',
+            component: () => import('@/views/dashboard/DashRules.vue'),
+          },
+          {
+            path: '/dashboard/media',
+            name: 'dash-media',
+            component: () => import('@/views/dashboard/DashMedias.vue'),
+          },
+          {
+            path: '/dashboard/series',
+            name: 'dash-series',
+            component: () => import('@/views/dashboard/DashSeries.vue'),
+          },
+          {
+            path: '/dashboard/episode',
+            name: 'dash-episode',
+            component: () => import('@/views/dashboard/DashEpisodes.vue'),
+          },
+          {
+            path: '/dashboard/live',
+            name: 'dash-live',
+            component: () => import('@/views/dashboard/DashLives.vue'),
+          },
+          {
+            path: '/dashboard/file',
+            name: 'dash-file',
+            component: () => import('@/views/dashboard/DashFiles.vue'),
+          },
+        ],
       },
       {
         path: '/setting',

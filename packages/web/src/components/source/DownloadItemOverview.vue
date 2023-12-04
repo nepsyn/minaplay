@@ -37,7 +37,7 @@
           <v-card>
             <v-card-title>{{ t('app.actions.deleteTitle') }}</v-card-title>
             <v-card-text>
-              {{ t('app.actions.deleteConfirm', { item: t('app.entities.download') }) }}
+              {{ t('common.download.deleteConfirm') }}
             </v-card-text>
             <v-card-actions>
               <v-spacer></v-spacer>

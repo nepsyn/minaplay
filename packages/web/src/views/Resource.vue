@@ -5,7 +5,13 @@
         <v-icon :icon="mdiUpdate" size="x-large"></v-icon>
         <span class="text-h5 ml-3">{{ t('resource.updates') }}</span>
       </div>
-      <multi-items-loader :loader="updatesLoader" class="px-0 py-4" hide-load-more :hide-empty="updates.length > 0">
+      <multi-items-loader
+        :loader="updatesLoader"
+        class="px-0 py-4"
+        hide-load-more
+        :hide-empty="updates.length > 0"
+        :auto="updates.length < 12"
+      >
         <v-row>
           <v-col v-for="episode in updates" :key="episode.id" cols="4" sm="3" md="2">
             <series-overview
@@ -73,7 +79,12 @@ const updatesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 12 },
 );
-const updates = computed(() => updatesLoader.items.value);
+const updates = computed(() =>
+  updatesLoader.items.value.filter(
+    (episode, index) =>
+      episode.series && updatesLoader.items.value.findIndex(({ series }) => series?.id === episode.series.id) === index,
+  ),
+);
 
 const mediasLoader = useAxiosPageLoader(
   async (query = {}) => {

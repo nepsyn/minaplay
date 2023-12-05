@@ -169,7 +169,7 @@ export class FileController {
         throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
       }
       path = file.path;
-      await this.cacheStore.set(key, path, { ttl: 60 * 60 * 1000 });
+      await this.cacheStore.set(key, path, 60 * 60 * 1000);
     }
 
     return path;

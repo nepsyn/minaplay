@@ -60,7 +60,7 @@ export class AuthorizationService {
         lastSendTimestamp: Date.now(),
         secureTimes: 5,
       },
-      { ttl: 30 * 60 * 1000 },
+      30 * 60 * 1000,
     );
 
     return key;
@@ -78,7 +78,7 @@ export class AuthorizationService {
     if (!valid) {
       cache.secureTimes--;
       if (cache.secureTimes > 0) {
-        await this.cacheStore.set(token, cache);
+        await this.cacheStore.set(token, cache, 30 * 60 * 1000);
       } else {
         await this.cacheStore.del(token);
       }

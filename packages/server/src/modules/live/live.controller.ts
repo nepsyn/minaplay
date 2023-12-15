@@ -13,8 +13,8 @@ import { LiveGateway } from './live.gateway';
 import { encryptPassword } from '../../utils/encrypt-password.util';
 import { LiveQueryDto } from './live-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { File } from '../file/file.entity';
 import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
+import { Live } from './live.entity';
 
 @Controller('live')
 @UseGuards(AuthorizationGuard)
@@ -45,9 +45,9 @@ export class LiveController {
   async queryLive(@Query() query: LiveQueryDto) {
     const { keyword, userId } = query;
     const [result, total] = await this.liveService.findAndCount({
-      where: buildQueryOptions<File>({
+      where: buildQueryOptions<Live>({
         keyword,
-        keywordProperties: (entity) => [entity.name, entity.mimetype],
+        keywordProperties: (entity) => [entity.title],
         exact: {
           user: { id: userId },
         },

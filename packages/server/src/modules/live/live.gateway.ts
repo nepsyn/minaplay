@@ -65,7 +65,7 @@ export class LiveGateway implements OnGatewayDisconnect {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    if (live.password) {
+    if (live.hasPassword) {
       const valid = password != null ? await compare(password, live.password) : false;
       if (!valid) {
         throw buildException(ForbiddenException, ErrorCodeEnum.WRONG_LIVE_PASSWORD);

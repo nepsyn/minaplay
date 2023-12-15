@@ -14,15 +14,17 @@
         ></v-list-item>
       </v-list>
     </v-navigation-drawer>
-    <v-main class="d-flex flex-column page-height">
-      <nav-tabs class="d-flex d-md-none" :tabs="tabs"></nav-tabs>
-      <to-top-container class="scrollable-container">
-        <router-view v-slot="{ Component }">
-          <keep-alive>
-            <component :is="Component" />
-          </keep-alive>
-        </router-view>
-      </to-top-container>
+    <v-main>
+      <v-container class="pa-0 d-flex flex-column page-height">
+        <nav-tabs class="d-flex d-md-none" :tabs="tabs"></nav-tabs>
+        <to-top-container class="scrollable-container">
+          <router-view v-slot="{ Component }">
+            <keep-alive>
+              <component :is="Component" />
+            </keep-alive>
+          </router-view>
+        </to-top-container>
+      </v-container>
     </v-main>
   </v-layout>
 </template>

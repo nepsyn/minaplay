@@ -35,7 +35,7 @@ defineExpose({
 </script>
 
 <template>
-  <div ref="containerRef" class="pa-0" @scroll="onScroll">
+  <div ref="containerRef" @scroll="onScroll">
     <slot></slot>
     <slot name="activator" :to-top="toTop">
       <v-layout-item

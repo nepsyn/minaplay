@@ -20,7 +20,7 @@
           </span>
           <v-spacer></v-spacer>
           <div class="ml-2 px-1 text-caption">
-            <span>{{ t(`media.source.${media.file?.source ?? 'other'}`) }}</span>
+            <span>{{ t(`file.source.${media.file?.source ?? 'other'}`) }}</span>
             ·
             <time-ago :time="media.createAt"></time-ago>
           </div>

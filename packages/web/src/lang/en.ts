@@ -7,19 +7,23 @@ export default {
     name: 'MinaPlay',
     ok: 'OK',
     cancel: 'Cancel',
+    on: 'ON',
+    off: 'OFF',
     loader: {
       loading: 'Loading...',
-      error: 'Oops, something went wrong! Please try ',
+      error: 'Whoops, something went wrong! Please try ',
       all: 'All items loaded',
       empty: 'No items founded',
       notLoaded: 'Data not loaded! Please try ',
       moreBtn: 'Load More',
       retryBtn: 'Reload',
       loadBtn: 'Load',
+      itemsPerPage: 'Items Per Page',
+      pageText: 'Page {page} of {max}',
     },
     input: {
       keyword: 'Keyword',
-      placeholder: 'Find your {item}...',
+      placeholder: 'Find {item}...',
       sort: 'Sort By',
       order: 'Order By',
       status: 'Status',
@@ -43,6 +47,7 @@ export default {
       view: 'View',
       retry: 'Retry',
       refresh: 'Refresh',
+      upload: 'Upload',
       download: 'Download',
       more: '[more]',
       collapse: '[collapse]',
@@ -129,11 +134,44 @@ export default {
     },
   },
   media: {
-    source: {
-      [FileSourceEnum.AUTO_GENERATED]: 'Auto Generate',
-      [FileSourceEnum.ARIA2_DOWNLOAD]: 'Auto Download',
-      [FileSourceEnum.USER_UPLOAD]: 'User Upload',
-      other: 'Unknown Source',
+    entity: {
+      name: 'Name',
+      isPublic: 'Is Public',
+      poster: 'Poster',
+      createAt: 'Create At',
+    },
+  },
+  series: {
+    entity: {
+      name: 'Name',
+      poster: 'Poster',
+      season: 'Season',
+      count: 'Episode Count',
+      user: 'User',
+      createAt: 'Create At',
+    },
+  },
+  episode: {
+    entity: {
+      title: 'Title',
+      no: 'No',
+      series: 'Series',
+      media: 'Media',
+      pubAt: 'Publish At',
+      createAt: 'Create At',
+    },
+  },
+  user: {
+    entity: {
+      username: 'Username',
+      avatar: 'Avatar',
+      email: 'Email',
+      notify: 'Notify Enabled',
+      createAt: 'Create At',
+    },
+    actions: {
+      modifyPermissions: 'Modify Permissions',
+      resetPassword: 'Reset Password',
     },
   },
   source: {
@@ -149,6 +187,9 @@ export default {
       remark: 'Remark',
       cron: 'CRON Expression',
       url: 'URL',
+      enabled: 'Enabled',
+      user: 'Create User',
+      createAt: 'Create At',
     },
     sections: {
       info: 'Information',
@@ -199,6 +240,9 @@ export default {
       id: 'ID',
       remark: 'Remark',
       sources: 'RSS Sources',
+      user: 'Create User',
+      createAt: 'Create At',
+      updateAt: 'Update At',
     },
     sections: {
       info: 'Information',
@@ -214,6 +258,31 @@ export default {
     logs: {
       clearLogsTitle: 'Clear All Confirm',
       clearLogsConfirm: 'Are you sure to clear all error logs?',
+    },
+  },
+  file: {
+    entity: {
+      name: 'Name',
+      size: 'Size',
+      md5: 'MD5',
+      mimetype: 'Mimetype',
+      source: 'Source',
+      createAt: 'Create At',
+    },
+    source: {
+      [FileSourceEnum.AUTO_GENERATED]: 'Auto Generate',
+      [FileSourceEnum.ARIA2_DOWNLOAD]: 'Auto Download',
+      [FileSourceEnum.USER_UPLOAD]: 'User Upload',
+      other: 'Unknown Source',
+    },
+  },
+  live: {
+    entity: {
+      title: 'Title',
+      hasPassword: 'Need Password',
+      poster: 'Poster',
+      user: 'User',
+      createAt: 'Create At',
     },
   },
   dashboard: {

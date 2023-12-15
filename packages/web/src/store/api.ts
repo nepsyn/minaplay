@@ -53,6 +53,7 @@ import {
 } from '@/api/interfaces/media.interface';
 import { FileQueryDto } from '@/api/interfaces/file.interface';
 import { SystemStatus } from '@/api/interfaces/system.interface';
+import { LiveDto, LiveEntity, LiveQueryDto } from '@/api/interfaces/live.interface';
 
 export const useApiStore = defineStore('api', () => {
   const user = ref<UserEntity | undefined>(undefined);
@@ -137,7 +138,7 @@ export const useApiStore = defineStore('api', () => {
   const User = {
     getProfileById: (id: number) => apiGet<UserEntity>(`/user/${id}/profile`),
     modifyProfileById: (id: number) => apiGet<UserEntity, UserDto>(`/user/${id}/profile`),
-    query: apiGet<UserEntity[], UserQueryDto>('/user'),
+    query: apiGet<ApiQueryResult<UserEntity>, UserQueryDto>('/user'),
   };
 
   const File = {
@@ -218,6 +219,14 @@ export const useApiStore = defineStore('api', () => {
     query: apiGet<ApiQueryResult<EpisodeEntity>, EpisodeQueryDto>(`/series/episode`),
   };
 
+  const Live = {
+    create: apiPost<LiveEntity, LiveDto>(`/live`),
+    getById: (id: string) => apiGet<LiveEntity>(`/live/${id}`),
+    query: apiGet<ApiQueryResult<LiveEntity>, LiveQueryDto>(`/live`),
+    update: (id: string) => apiPut<LiveEntity, LiveDto>(`/live/${id}`),
+    delete: (id: string) => apiDelete(`/live/${id}`),
+  };
+
   const Media = {
     create: apiPost<MediaEntity, MediaDto>(`/media`),
     getById: (id: string) => apiGet<MediaEntity>(`/media/${id}`),
@@ -253,6 +262,7 @@ export const useApiStore = defineStore('api', () => {
     SeriesSubscribe,
     SeriesTag,
     Episode,
+    Live,
     Media,
     ViewHistory,
     System,

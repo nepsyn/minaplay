@@ -3,10 +3,12 @@
     <p class="text-subtitle-1 font-weight-bold" v-text="item.title"></p>
     <div v-if="item.url" class="d-flex flex-row align-center">
       <span class="text-caption text-truncate" v-text="item.url"></span>
-      <div>
-        <v-btn :icon="mdiContentCopy" variant="text" size="x-small" @click="copyLink()"></v-btn>
-        <v-tooltip activator="parent">{{ t('common.download.copyLink') }}</v-tooltip>
-      </div>
+      <v-tooltip>
+        {{ t('common.download.copyLink') }}
+        <template #activator="{ props }">
+          <v-btn v-bind="props" :icon="mdiContentCopy" variant="text" size="x-small" @click="copyLink()"></v-btn>
+        </template>
+      </v-tooltip>
     </div>
     <p class="text-caption">
       {{ t('common.download.createAt') }}
@@ -29,24 +31,24 @@
           {{ action.text }}
         </v-chip>
       </template>
-      <div>
-        <v-chip density="comfortable" :prepend-icon="mdiDelete" link :disabled="deleting">
-          {{ t('app.actions.delete') }}
-        </v-chip>
-        <v-menu activator="parent" location="bottom">
-          <v-card>
-            <v-card-title>{{ t('app.actions.deleteTitle') }}</v-card-title>
-            <v-card-text>
-              {{ t('common.download.deleteConfirm') }}
-            </v-card-text>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn variant="text" color="primary">{{ t('app.cancel') }}</v-btn>
-              <v-btn variant="plain" color="error" @click="deleteItem()">{{ t('app.ok') }}</v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-menu>
-      </div>
+      <v-menu location="bottom">
+        <v-card>
+          <v-card-title>{{ t('app.actions.deleteTitle') }}</v-card-title>
+          <v-card-text>
+            {{ t('common.download.deleteConfirm') }}
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn variant="text" color="primary">{{ t('app.cancel') }}</v-btn>
+            <v-btn variant="plain" color="error" @click="deleteItem()">{{ t('app.ok') }}</v-btn>
+          </v-card-actions>
+        </v-card>
+        <template #activator="{ props }">
+          <v-chip v-bind="props" density="comfortable" :prepend-icon="mdiDelete" link :disabled="deleting">
+            {{ t('app.actions.delete') }}
+          </v-chip>
+        </template>
+      </v-menu>
     </div>
   </v-alert>
 </template>

@@ -17,20 +17,29 @@
         ></v-select>
       </v-col>
       <v-col class="flex-grow-1 text-end">
-        <v-btn variant="flat" color="error" height="40" :prepend-icon="mdiDelete" :loading="logsClearing">
-          {{ t('app.actions.clear') }}
-          <v-menu activator="parent" location="bottom">
-            <v-card>
-              <v-card-title>{{ t('rule.logs.clearLogsTitle') }}</v-card-title>
-              <v-card-text>{{ t('rule.logs.clearLogsConfirm') }}</v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn variant="text" color="primary">{{ t('app.cancel') }}</v-btn>
-                <v-btn variant="plain" color="error" @click="clearLogs()">{{ t('app.ok') }}</v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-menu>
-        </v-btn>
+        <v-menu location="bottom">
+          <v-card>
+            <v-card-title>{{ t('rule.logs.clearLogsTitle') }}</v-card-title>
+            <v-card-text>{{ t('rule.logs.clearLogsConfirm') }}</v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn variant="text" color="primary">{{ t('app.cancel') }}</v-btn>
+              <v-btn variant="plain" color="error" @click="clearLogs()">{{ t('app.ok') }}</v-btn>
+            </v-card-actions>
+          </v-card>
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              variant="flat"
+              color="error"
+              height="40"
+              :prepend-icon="mdiDelete"
+              :loading="logsClearing"
+            >
+              {{ t('app.actions.clear') }}
+            </v-btn>
+          </template>
+        </v-menu>
       </v-col>
     </v-row>
     <v-divider class="my-2"></v-divider>

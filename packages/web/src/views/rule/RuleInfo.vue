@@ -76,24 +76,27 @@
               <p class="text-subtitle-1">{{ t('rule.info.delete') }}</p>
               <p class="text-caption">{{ t('rule.info.deleteDescription') }}</p>
             </v-container>
-            <v-btn class="ml-4" variant="tonal" color="error" :loading="ruleDeleting">
-              {{ t('app.actions.delete') }}
-              <v-dialog width="auto" activator="parent" close-on-content-click>
-                <v-card>
-                  <v-card-title>{{ t('app.actions.deleteTitle') }}</v-card-title>
-                  <v-card-text>{{ t('app.actions.deleteConfirm', { item: t('app.entities.rule') }) }}</v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" variant="text">
-                      {{ t('app.cancel') }}
-                    </v-btn>
-                    <v-btn color="error" variant="plain" @click="deleteRule()">
-                      {{ t('app.ok') }}
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-            </v-btn>
+
+            <v-dialog width="auto" close-on-content-click>
+              <v-card>
+                <v-card-title>{{ t('app.actions.deleteTitle') }}</v-card-title>
+                <v-card-text>{{ t('app.actions.deleteConfirm', { item: t('app.entities.rule') }) }}</v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary" variant="text">
+                    {{ t('app.cancel') }}
+                  </v-btn>
+                  <v-btn color="error" variant="plain" @click="deleteRule()">
+                    {{ t('app.ok') }}
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+              <template #activator="{ props }">
+                <v-btn v-bind="props" class="ml-4" variant="tonal" color="error" :loading="ruleDeleting">
+                  {{ t('app.actions.delete') }}
+                </v-btn>
+              </template>
+            </v-dialog>
           </v-container>
         </v-sheet>
       </div>

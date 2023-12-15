@@ -12,75 +12,86 @@
     <template v-slot:append>
       <div class="d-flex flex-row align-center">
         <div class="d-none d-sm-flex">
-          <v-btn v-for="(action, index) in actions" :key="index" icon @click="action.click()">
-            <v-icon :icon="action.icon" size="large"></v-icon>
-            <v-tooltip activator="parent" location="bottom" open-delay="500">{{ action.text }}</v-tooltip>
-          </v-btn>
+          <v-tooltip v-for="(action, index) in actions" :key="index" location="bottom" open-delay="500">
+            {{ action.text }}
+            <template #activator="{ props }">
+              <v-btn v-bind="props" icon @click="action.click()">
+                <v-icon :icon="action.icon" size="large"></v-icon>
+              </v-btn>
+            </template>
+          </v-tooltip>
         </div>
-        <v-btn class="d-flex d-sm-none" icon>
-          <v-icon :icon="mdiDotsVertical" size="large"></v-icon>
-          <v-menu activator="parent">
-            <v-card max-width="360" class="overflow-x-hidden">
-              <v-list density="compact" class="pa-0">
-                <template v-for="(action, index) in actions" :key="index">
-                  <v-list-item
-                    link
-                    @click="action.click()"
-                    :title="action.text"
-                    :prepend-icon="action.icon"
-                  ></v-list-item>
-                </template>
-              </v-list>
-            </v-card>
-          </v-menu>
-        </v-btn>
+        <v-menu>
+          <v-card max-width="360" class="overflow-x-hidden">
+            <v-list density="compact" class="pa-0">
+              <template v-for="(action, index) in actions" :key="index">
+                <v-list-item
+                  link
+                  @click="action.click()"
+                  :title="action.text"
+                  :prepend-icon="action.icon"
+                ></v-list-item>
+              </template>
+            </v-list>
+          </v-card>
+          <template #activator="{ props }">
+            <v-btn v-bind="props" class="d-flex d-sm-none" icon>
+              <v-icon :icon="mdiDotsVertical" size="large"></v-icon>
+            </v-btn>
+          </template>
+        </v-menu>
         <v-divider v-if="api.user" class="mx-2" inset vertical></v-divider>
-        <user-avatar
-          v-if="api.user"
-          class="clickable"
-          :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar?.id, api.user?.avatar?.name)"
-          size="40"
-        >
-          <v-menu activator="parent">
-            <v-card min-width="240" max-width="360" class="overflow-x-hidden">
-              <v-container fluid class="d-flex flex-row align-center">
-                <user-avatar
-                  :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar?.id, api.user?.avatar?.name)"
-                  size="64"
-                ></user-avatar>
-                <v-container fluid class="py-0 d-flex flex-column">
-                  <span class="text-h6 text-truncate">{{ api.user!.username }}</span>
-                  <v-container fluid class="pa-0">
-                    <v-btn variant="tonal" color="primary" size="x-small" :prepend-icon="mdiPencil">
-                      {{ t('layout.user.edit') }}
-                    </v-btn>
-                  </v-container>
+        <v-menu v-if="api.user">
+          <v-card min-width="240" max-width="360" class="overflow-x-hidden">
+            <v-container fluid class="d-flex flex-row align-center">
+              <user-avatar
+                :src="api.user.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
+                size="64"
+              ></user-avatar>
+              <v-container fluid class="py-0 d-flex flex-column">
+                <span class="text-h6 text-truncate">{{ api.user!.username }}</span>
+                <v-container fluid class="pa-0">
+                  <v-btn variant="tonal" color="primary" size="x-small" :prepend-icon="mdiPencil">
+                    {{ t('layout.user.edit') }}
+                  </v-btn>
                 </v-container>
               </v-container>
-              <v-divider></v-divider>
-              <v-btn variant="plain" block color="error">
-                {{ t('layout.user.logout.btn') }}
-                <v-dialog width="auto" activator="parent">
-                  <template #default="{ isActive }">
-                    <v-card>
-                      <v-card-title>{{ t('layout.user.logout.title') }}</v-card-title>
-                      <v-card-text>{{ t('layout.user.logout.confirm') }}</v-card-text>
-                      <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn color="primary" variant="text" @click="isActive.value = false">
-                          {{ t('app.cancel') }}
-                        </v-btn>
-                        <v-btn color="error" variant="plain" @click="logout()" :loading="logoutPending">
-                          {{ t('app.ok') }}
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </template>
-                </v-dialog>
-              </v-btn>
-            </v-card>
-          </v-menu>
-        </user-avatar>
+            </v-container>
+            <v-divider></v-divider>
+            <v-dialog width="auto">
+              <template #default="{ isActive }">
+                <v-card>
+                  <v-card-title>{{ t('layout.user.logout.title') }}</v-card-title>
+                  <v-card-text>{{ t('layout.user.logout.confirm') }}</v-card-text>
+                  <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn color="primary" variant="text" @click="isActive.value = false">
+                      {{ t('app.cancel') }}
+                    </v-btn>
+                    <v-btn color="error" variant="plain" @click="logout()" :loading="logoutPending">
+                      {{ t('app.ok') }}
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </template>
+              <template #activator="{ props }">
+                <v-btn v-bind="props" variant="plain" block color="error">
+                  {{ t('layout.user.logout.btn') }}
+                </v-btn>
+              </template>
+            </v-dialog>
+          </v-card>
+          <template #activator="{ props }">
+            <user-avatar
+              v-bind="props"
+              v-if="api.user"
+              class="clickable"
+              :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar?.id, api.user?.avatar?.name)"
+              size="40"
+            >
+            </user-avatar>
+          </template>
+        </v-menu>
       </div>
     </template>
   </v-app-bar>

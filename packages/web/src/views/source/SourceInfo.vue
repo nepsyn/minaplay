@@ -53,9 +53,11 @@
           :item-props="(item) => ({ density: 'comfortable', subtitle: item.name })"
         >
           <template #prepend-inner>
-            <v-icon :icon="mdiClockOutline"></v-icon>
-            <v-tooltip activator="parent">
+            <v-tooltip>
               <pre class="text-caption">{{ nextTriggerTimes }}</pre>
+              <template #activator="{ props }">
+                <v-icon v-bind="props" :icon="mdiClockOutline"></v-icon>
+              </template>
             </v-tooltip>
           </template>
         </v-combobox>
@@ -118,24 +120,26 @@
               <p class="text-subtitle-1">{{ t('source.info.delete') }}</p>
               <p class="text-caption">{{ t('source.info.deleteDescription') }}</p>
             </v-container>
-            <v-btn class="ml-4" variant="tonal" color="error" :loading="sourceDeleting">
-              {{ t('app.actions.delete') }}
-              <v-dialog width="auto" activator="parent" close-on-content-click>
-                <v-card>
-                  <v-card-title>{{ t('app.actions.deleteTitle') }}</v-card-title>
-                  <v-card-text>{{ t('app.actions.deleteConfirm', { item: t('app.entities.source') }) }}</v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" variant="text">
-                      {{ t('app.cancel') }}
-                    </v-btn>
-                    <v-btn color="error" variant="plain" @click="deleteSource()">
-                      {{ t('app.ok') }}
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-dialog>
-            </v-btn>
+            <v-dialog width="auto" close-on-content-click>
+              <v-card>
+                <v-card-title>{{ t('app.actions.deleteTitle') }}</v-card-title>
+                <v-card-text>{{ t('app.actions.deleteConfirm', { item: t('app.entities.source') }) }}</v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary" variant="text">
+                    {{ t('app.cancel') }}
+                  </v-btn>
+                  <v-btn color="error" variant="plain" @click="deleteSource()">
+                    {{ t('app.ok') }}
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+              <template #activator="{ props }">
+                <v-btn v-bind="props" class="ml-4" variant="tonal" color="error" :loading="sourceDeleting">
+                  {{ t('app.actions.delete') }}
+                </v-btn>
+              </template>
+            </v-dialog>
           </v-container>
         </v-sheet>
       </div>

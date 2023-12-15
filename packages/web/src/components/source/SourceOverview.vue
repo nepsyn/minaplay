@@ -11,19 +11,22 @@
       <span class="ml-2 text-wrap text-break">{{ source.title ?? t('source.unnamed') }}</span>
       <v-spacer></v-spacer>
       <div>
-        <v-switch
-          v-model="editEnabled"
-          :loading="enabledChanging"
-          class="ml-2"
-          :false-icon="mdiPause"
-          :true-icon="mdiProgressCheck"
-          density="comfortable"
-          color="success"
-          hide-details
-          @change="changeEnabled"
-        ></v-switch>
-        <v-tooltip location="bottom" activator="parent">
+        <v-tooltip location="bottom">
           {{ source.enabled ? t('source.working') : t('source.paused') }}
+          <template #activator="{ props }">
+            <v-switch
+              v-bind="props"
+              v-model="editEnabled"
+              :loading="enabledChanging"
+              class="ml-2"
+              :false-icon="mdiPause"
+              :true-icon="mdiProgressCheck"
+              density="comfortable"
+              color="success"
+              hide-details
+              @change="changeEnabled"
+            ></v-switch>
+          </template>
         </v-tooltip>
       </div>
     </v-card-title>
@@ -32,9 +35,11 @@
       <div class="d-flex align-center">
         <span class="text-subtitle-1">{{ source.cron }}</span>
         <div v-if="source.enabled" class="ml-2 d-flex align-center">
-          <v-icon size="small" :icon="mdiClockOutline"></v-icon>
-          <v-tooltip activator="parent" location="bottom">
+          <v-tooltip location="bottom">
             <pre class="text-caption">{{ nextTriggerTimes }}</pre>
+            <template #activator="{ props }">
+              <v-icon v-bind="props" size="small" :icon="mdiClockOutline"></v-icon>
+            </template>
           </v-tooltip>
         </div>
       </div>

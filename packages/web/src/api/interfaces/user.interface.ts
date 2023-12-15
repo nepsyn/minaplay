@@ -9,6 +9,10 @@ export interface UserEntity {
   username: string;
   /** 创建时间 */
   createAt: Date;
+  /** 是否启用通知 */
+  notify?: boolean;
+  /** 邮箱地址 */
+  email?: string;
   /** 修改时间 */
   updateAt: Date;
   /** 头像文件 id */

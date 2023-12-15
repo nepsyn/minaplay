@@ -29,27 +29,21 @@ export interface SourceDto {
   remark?: string;
   cron?: string;
   enabled?: boolean;
+  user?: UserEntity;
 }
 
 export interface SourceQueryDto extends ApiQueryDto<SourceEntity> {
   keyword?: string;
-  url?: string;
   enabled?: number;
   userId?: number;
 }
 
 export interface RuleEntity {
-  /** id */
   id: number;
-  /** 备注 */
   remark?: string;
-  /** 订阅源 */
   sources: SourceEntity[];
-  /** 代码 */
   code: string;
-  /** 创建时间 */
   createAt: Date;
-  /** 更新时间 */
   updateAt: Date;
 }
 
@@ -61,7 +55,7 @@ export interface RuleDto {
 
 export interface RuleQueryDto extends ApiQueryDto<RuleEntity> {
   keyword?: string;
-  source?: number;
+  sourceId?: number;
 }
 
 export interface RuleErrorLogEntity {

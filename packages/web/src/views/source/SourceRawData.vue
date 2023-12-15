@@ -81,39 +81,51 @@
                       <div class="d-none d-sm-flex flex-row">
                         <template v-for="(action, index) in actions" :key="index">
                           <div v-if="action.show(item.raw)">
-                            <v-btn
-                              size="small"
-                              density="comfortable"
-                              variant="text"
-                              :icon="action.icon"
-                              @click="action.click(item.raw)"
-                              :loading="action.key === 'download' && downloadCreating && currentEntry === item.raw"
-                              :disabled="action.key === 'download' && downloadCreating && currentEntry !== item.raw"
-                            >
-                            </v-btn>
-                            <v-tooltip activator="parent">{{ action.name }}</v-tooltip>
+                            <v-tooltip>
+                              {{ action.name }}
+                              <template #activator="{ props }">
+                                <v-btn
+                                  v-bind="props"
+                                  size="small"
+                                  density="comfortable"
+                                  variant="text"
+                                  :icon="action.icon"
+                                  @click="action.click(item.raw)"
+                                  :loading="action.key === 'download' && downloadCreating && currentEntry === item.raw"
+                                  :disabled="action.key === 'download' && downloadCreating && currentEntry !== item.raw"
+                                >
+                                </v-btn>
+                              </template>
+                            </v-tooltip>
                           </div>
                         </template>
                       </div>
-                      <div class="d-flex d-sm-none">
-                        <v-btn size="small" density="comfortable" variant="text" :icon="mdiDotsVertical"></v-btn>
-                        <v-menu activator="parent">
-                          <v-list density="comfortable">
-                            <template v-for="(action, index) in actions" :key="index">
-                              <v-list-item
-                                density="compact"
-                                link
-                                v-if="action.show(item.raw)"
-                                :prepend-icon="action.icon"
-                                @click="action.click(item.raw)"
-                                :title="action.name"
-                                :disabled="action.key === 'download' && downloadCreating"
-                              >
-                              </v-list-item>
-                            </template>
-                          </v-list>
-                        </v-menu>
-                      </div>
+                      <v-menu>
+                        <v-list density="comfortable">
+                          <template v-for="(action, index) in actions" :key="index">
+                            <v-list-item
+                              density="compact"
+                              link
+                              v-if="action.show(item.raw)"
+                              :prepend-icon="action.icon"
+                              @click="action.click(item.raw)"
+                              :title="action.name"
+                              :disabled="action.key === 'download' && downloadCreating"
+                            >
+                            </v-list-item>
+                          </template>
+                        </v-list>
+                        <template #activator="{ props }">
+                          <v-btn
+                            class="d-flex d-sm-none"
+                            v-bind="props"
+                            size="small"
+                            density="comfortable"
+                            variant="text"
+                            :icon="mdiDotsVertical"
+                          ></v-btn>
+                        </template>
+                      </v-menu>
                     </div>
                   </template>
                   <v-list-item-title>

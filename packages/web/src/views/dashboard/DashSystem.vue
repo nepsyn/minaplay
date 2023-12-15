@@ -8,9 +8,6 @@
         <span class="text-h6"> Work Time </span>
       </v-sheet>
       <v-sheet rounded border class="pa-3 mt-4">
-        <span class="text-h6"> Application Logs </span>
-      </v-sheet>
-      <v-sheet rounded border class="pa-3 mt-4">
         <span class="text-h6"> Version </span>
       </v-sheet>
     </single-item-loader>

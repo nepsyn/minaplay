@@ -40,15 +40,20 @@
                 </span>
                 <v-spacer></v-spacer>
                 <div v-for="(action, index) in actions" :key="index">
-                  <v-btn
-                    density="comfortable"
-                    size="small"
-                    :color="action.color"
-                    :icon="action.icon"
-                    @click="action.click()"
-                    variant="text"
-                  ></v-btn>
-                  <v-tooltip location="bottom" activator="parent">{{ action.text }}</v-tooltip>
+                  <v-tooltip location="bottom">
+                    {{ action.text }}
+                    <template #activator="{ props }">
+                      <v-btn
+                        v-bind="props"
+                        density="comfortable"
+                        size="small"
+                        :color="action.color"
+                        :icon="action.icon"
+                        @click="action.click()"
+                        variant="text"
+                      ></v-btn>
+                    </template>
+                  </v-tooltip>
                 </div>
               </v-container>
               <v-divider class="my-2"></v-divider>

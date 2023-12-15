@@ -23,53 +23,56 @@
           00:00
         </div>
         <div class="plyr__controls__item plyr__time--duration plyr__time" aria-label="Duration" role="timer">00:00</div>
-        <button
-          v-if="subtitleFiles.length > 0"
-          class="plyr__controls__item plyr__control"
-          :class="{ 'plyr__control--pressed': renderer !== undefined }"
-          type="button"
+        <v-menu
+          location="top center"
+          open-on-hover
+          :open-on-click="false"
+          scroll-strategy="close"
+          class="text-center position-fixed"
+          open-delay="0"
+          close-delay="0"
+          :attach="controlsRef"
         >
-          <svg class="icon--pressed" aria-hidden="true" focusable="false">
-            <use xlink:href="#plyr-captions-on"></use>
-          </svg>
-          <svg class="icon--not-pressed" aria-hidden="true" focusable="false">
-            <use xlink:href="#plyr-captions-off"></use>
-          </svg>
-          <v-menu
-            activator="parent"
-            location="top center"
-            open-on-hover
-            :open-on-click="false"
-            scroll-strategy="close"
-            class="text-center position-fixed"
-            open-delay="0"
-            close-delay="0"
-            :attach="controlsRef"
-          >
-            <v-list class="rounded py-0" density="compact">
-              <v-list-item
-                v-for="(subtitle, index) in subtitleFiles"
-                :key="index"
-                :active="currentSubtitle?.id === subtitle.id"
-                :color="currentSubtitle?.id === subtitle.id ? 'primary' : undefined"
-                link
-                density="compact"
-                @click="renderSubtitle(index)"
-              >
-                {{ getSubtitleName(subtitle) }}
-              </v-list-item>
-              <v-list-item
-                :active="!currentSubtitle"
-                :color="!currentSubtitle ? 'primary' : undefined"
-                link
-                density="compact"
-                @click="renderSubtitle(-1)"
-              >
-                {{ t('app.actions.close') }}
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </button>
+          <v-list class="rounded py-0" density="compact">
+            <v-list-item
+              v-for="(subtitle, index) in subtitleFiles"
+              :key="index"
+              :active="currentSubtitle?.id === subtitle.id"
+              :color="currentSubtitle?.id === subtitle.id ? 'primary' : undefined"
+              link
+              density="compact"
+              @click="renderSubtitle(index)"
+            >
+              {{ getSubtitleName(subtitle) }}
+            </v-list-item>
+            <v-list-item
+              :active="!currentSubtitle"
+              :color="!currentSubtitle ? 'primary' : undefined"
+              link
+              density="compact"
+              @click="renderSubtitle(-1)"
+            >
+              {{ t('app.actions.close') }}
+            </v-list-item>
+          </v-list>
+          <template #activator="{ props }">
+            <button
+              v-bind="props"
+              v-if="subtitleFiles.length > 0"
+              class="plyr__controls__item plyr__control"
+              :class="{ 'plyr__control--pressed': renderer !== undefined }"
+              type="button"
+            >
+              <svg class="icon--pressed" aria-hidden="true" focusable="false">
+                <use xlink:href="#plyr-captions-on"></use>
+              </svg>
+              <svg class="icon--not-pressed" aria-hidden="true" focusable="false">
+                <use xlink:href="#plyr-captions-off"></use>
+              </svg>
+            </button>
+          </template>
+        </v-menu>
+
         <div class="plyr__controls__item plyr__volume d-none d-sm-flex">
           <button type="button" class="plyr__control" data-plyr="mute">
             <svg class="icon--pressed" aria-hidden="true" focusable="false">
@@ -106,8 +109,8 @@
           type="button"
           @click="pageFullscreen = !pageFullscreen"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-            <path :d="mdiApplicationOutline" />
+          <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; scale: 1.2" viewBox="0 0 24 24">
+            <path :d="pageFullscreen ? mdiArrowCollapseAll : mdiStretchToPageOutline" />
           </svg>
         </button>
         <button class="plyr__controls__item plyr__control" type="button" data-plyr="fullscreen">
@@ -140,7 +143,7 @@ import jassubWorkerUrl from 'jassub/dist/jassub-worker.js?url';
 import jassubWasmUrl from 'jassub/dist/jassub-worker.wasm?url';
 import { useI18n } from 'vue-i18n';
 import { FileEntity } from '@/api/interfaces/file.interface';
-import { mdiApplicationOutline } from '@mdi/js';
+import { mdiArrowCollapseAll, mdiStretchToPageOutline } from '@mdi/js';
 
 const SUBTITLE_EXTENSIONS = ['.ass', '.ssa'];
 const FONT_EXTENSIONS = ['.otf', '.ttf', '.woff'];

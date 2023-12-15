@@ -20,8 +20,7 @@
           @click="emits('close')"
         ></v-btn>
         <div v-else>
-          <v-btn variant="text" color="error" size="x-small" v-bind="props" :icon="mdiStop"></v-btn>
-          <v-menu activator="parent" min-width="240" offset="y" location="bottom">
+          <v-menu min-width="240" offset="y" location="bottom">
             <v-card>
               <v-card-title>
                 {{ t('layout.upload.cancelTitle') }}
@@ -35,6 +34,9 @@
                 <v-btn variant="text" color="primary">{{ t('app.cancel') }}</v-btn>
               </v-card-actions>
             </v-card>
+            <template #activator="{ props }">
+              <v-btn v-bind="props" variant="text" color="error" size="x-small" :icon="mdiStop"></v-btn>
+            </template>
           </v-menu>
         </div>
       </div>
@@ -74,7 +76,6 @@ import { mdiClose, mdiShare, mdiStop } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
-import { filesize } from 'filesize';
 
 const { t } = useI18n();
 const api = useApiStore();

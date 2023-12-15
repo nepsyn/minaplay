@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { File } from '../file/file.entity';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { User } from '../user/user.entity';
 
 /** 直播房间 */
@@ -22,6 +22,12 @@ export class Live {
     nullable: true,
   })
   password?: string;
+
+  /** 是否有密码 */
+  @Expose()
+  get hasPassword() {
+    return this.password != null;
+  }
 
   /** 封面图片 */
   @Exclude()

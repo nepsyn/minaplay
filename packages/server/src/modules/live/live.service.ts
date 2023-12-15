@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Live } from './live.entity';
-import { DeepPartial, FindOptionsWhere, Repository } from 'typeorm';
+import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { LiveState } from './live.state';
 import { instanceToPlain } from 'class-transformer';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
@@ -21,6 +21,9 @@ export class LiveService {
     return await this.liveRepository.findOneBy(where);
   }
 
+  async findAndCount(options?: FindManyOptions<Live>) {
+    return await this.liveRepository.findAndCount(options);
+  }
   async delete(where: FindOptionsWhere<Live>) {
     const result = await this.liveRepository.delete(where);
     return result.affected > 0;

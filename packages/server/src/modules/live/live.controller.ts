@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { LiveService } from './live.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from '../authorization/require-permissions.decorator';
@@ -11,6 +11,10 @@ import { User } from '../user/user.entity';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { LiveGateway } from './live.gateway';
 import { encryptPassword } from '../../utils/encrypt-password.util';
+import { LiveQueryDto } from './live-query.dto';
+import { buildQueryOptions } from '../../utils/build-query-options.util';
+import { File } from '../file/file.entity';
+import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 
 @Controller('live')
 @UseGuards(AuthorizationGuard)
@@ -31,6 +35,29 @@ export class LiveController {
     }
 
     return live;
+  }
+
+  @Get()
+  @ApiOperation({
+    description: '查询直播间',
+  })
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
+  async queryLive(@Query() query: LiveQueryDto) {
+    const { keyword, userId } = query;
+    const [result, total] = await this.liveService.findAndCount({
+      where: buildQueryOptions<File>({
+        keyword,
+        keywordProperties: (entity) => [entity.name, entity.mimetype],
+        exact: {
+          user: { id: userId },
+        },
+      }),
+      skip: query.page * query.size,
+      take: query.size,
+      order: { [query.sort]: query.order },
+    });
+
+    return new ApiPaginationResultDto(result, total, query.page, query.size);
   }
 
   @Post()

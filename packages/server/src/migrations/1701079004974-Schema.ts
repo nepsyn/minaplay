@@ -46,7 +46,7 @@ export class Schema1701079004974 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`action_log\` ADD CONSTRAINT \`FK_3ae4a33eaf8f3270b447a8959a0\` FOREIGN KEY (\`targetId\`) REFERENCES \`user\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`live\` ADD CONSTRAINT \`FK_a7dd2df57371a73bfe3a050a8cd\` FOREIGN KEY (\`posterId\`) REFERENCES \`file\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`live\` ADD CONSTRAINT \`FK_edcfbd2bec0ad90cef885009c53\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);
-        await queryRunner.query(`ALTER TABLE \`live_chat\` ADD CONSTRAINT \`FK_f7daa054784e42febe527143124\` FOREIGN KEY (\`liveId\`) REFERENCES \`live\`(\`id\`) ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE \`live_chat\` ADD CONSTRAINT \`FK_f7daa054784e42febe527143124\` FOREIGN KEY (\`liveId\`) REFERENCES \`live\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`live_chat\` ADD CONSTRAINT \`FK_ffa00cf1b8f5b6bbc372f205ee5\` FOREIGN KEY (\`userId\`) REFERENCES \`user\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`view_history\` ADD CONSTRAINT \`FK_e5d6405eaf1c0d04b21a905f6b2\` FOREIGN KEY (\`mediaId\`) REFERENCES \`media\`(\`id\`) ON DELETE CASCADE ON UPDATE NO ACTION`);
         await queryRunner.query(`ALTER TABLE \`view_history\` ADD CONSTRAINT \`FK_747e1b3307c7dfa69f9c8396a76\` FOREIGN KEY (\`episodeId\`) REFERENCES \`episode\`(\`id\`) ON DELETE SET NULL ON UPDATE NO ACTION`);

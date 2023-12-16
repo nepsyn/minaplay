@@ -93,7 +93,7 @@ export class User {
   updateAt: Date;
 
   /** 权限名称列表 */
-  @Expose()
+  @Expose({ groups: ['profile'] })
   get permissionNames() {
     return this.permissions?.map((permission) => permission.name) ?? [];
   }

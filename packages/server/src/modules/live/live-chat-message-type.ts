@@ -1,5 +1,5 @@
 import { ClassConstructor, Expose, plainToInstance } from 'class-transformer';
-import { Equals, IsBase64, IsString, IsUrl, Length, validateSync } from 'class-validator';
+import { Equals, IsString, IsUrl, Length, validateSync } from 'class-validator';
 
 interface TypedMessage {
   type: MinaplayMessageType;
@@ -14,7 +14,7 @@ export class Text implements TypedMessage {
   /** 文本内容 */
   @Expose()
   @IsString()
-  @Length(1, 256)
+  @Length(1, 40)
   content: string;
 }
 
@@ -30,19 +30,7 @@ export class NetworkImage implements TypedMessage {
   url: string;
 }
 
-/** base64 图片 */
-export class Base64Image implements TypedMessage {
-  @Expose()
-  @Equals('Base64Image')
-  type: 'Base64Image';
-
-  /** 图片 base64 编码 */
-  @Expose()
-  @IsBase64()
-  base64: string;
-}
-
-const MessageMap = { Text, NetworkImage, Base64Image };
+const MessageMap = { Text, NetworkImage };
 export type MinaplayMessageType = keyof typeof MessageMap;
 export type MinaplayMessage = InstanceType<(typeof MessageMap)[MinaplayMessageType]>;
 

@@ -20,10 +20,10 @@ import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { LiveAudienceWsGuard } from './live-audience.ws.guard.service';
 import { WsLiveState } from './live-state.ws.decorator';
 import { LiveState } from './live.state';
-import { MinaplayMessage, parseMessage } from '../../utils/message-type';
+import { MinaplayMessage, parseMessage } from './live-chat-message-type';
 import { LiveChatService } from './live-chat.service';
 import { Between } from 'typeorm';
-import { CreatorOnly } from './creator-only.ws.decorator';
+import { RoomOwnerOnly } from './room-owner-only.ws.decorator';
 import { instanceToPlain } from 'class-transformer';
 import { User } from '../user/user.entity';
 import { LiveVoiceService } from './live-voice.service';
@@ -166,7 +166,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('revoke')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
-  @CreatorOnly()
+  @RoomOwnerOnly()
   async handleRevoke(@ConnectedSocket() socket: Socket, @MessageBody('id') id: string) {
     if (id == null) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
@@ -179,7 +179,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('mute-chat')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
-  @CreatorOnly()
+  @RoomOwnerOnly()
   async handleMute(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState, @MessageBody('id') id: number) {
     if (id == null) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
@@ -196,7 +196,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('unmute-chat')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
-  @CreatorOnly()
+  @RoomOwnerOnly()
   async handleUnmute(
     @ConnectedSocket() socket: Socket,
     @WsLiveState() state: LiveState,
@@ -226,7 +226,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('kick')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
-  @CreatorOnly()
+  @RoomOwnerOnly()
   async handleKick(@ConnectedSocket() socket: Socket, @MessageBody('id') id: number) {
     if (id == null || id === socket.data.user.id) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
@@ -252,7 +252,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('stream-media')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
-  @CreatorOnly()
+  @RoomOwnerOnly()
   async handleStreamFile(
     @ConnectedSocket() socket: Socket,
     @WsLiveState() state: LiveState,
@@ -284,7 +284,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('stop-stream-media')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
-  @CreatorOnly()
+  @RoomOwnerOnly()
   async handleStopStreamFile(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState) {
     await this.liveStreamService.stopPublish(socket.data.live.id);
     state.stream = undefined;

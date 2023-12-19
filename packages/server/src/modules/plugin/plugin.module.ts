@@ -1,12 +1,12 @@
 import { ConsoleLogger, DynamicModule, ForwardReference, Module, Type } from '@nestjs/common';
 import path from 'path';
 import fs from 'fs-extra';
-import { getMinaPlayPluginDescriptor, isMinaPlayPlugin } from '../../utils/plugin.decorator';
 import { MinaPlayPluginConstructor } from '../../interfaces/plugins';
 import { PluginService } from './plugin.service';
 import { AuthorizationModule } from '../authorization/authorization.module';
 import { UserModule } from '../user/user.module';
 import { PluginController } from './plugin.controller';
+import { getMinaPlayPluginDescriptor, isMinaPlayPlugin } from '../../common/plugin.decorator';
 
 @Module({})
 export class PluginModule {

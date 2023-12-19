@@ -13,8 +13,8 @@ import { LiveGateway } from './live.gateway';
 import { encryptPassword } from '../../utils/encrypt-password.util';
 import { LiveQueryDto } from './live-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { Live } from './live.entity';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('live')
 @UseGuards(AuthorizationGuard)

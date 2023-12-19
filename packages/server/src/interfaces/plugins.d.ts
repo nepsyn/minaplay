@@ -11,9 +11,11 @@ export interface MinaPlayPluginDescriptor {
 
 export interface MinaPlayPluginHooks {
   onEnabled?();
+
   onDisabled?();
 
   onNewMedia?(mediaId: string);
+
   onNewEpisode?(seriesId: number);
 }
 

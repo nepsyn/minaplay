@@ -9,7 +9,6 @@ import {
 } from '@nestjs/websockets';
 import { ClassSerializerInterceptor, NotFoundException, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthorizationWsGuard } from '../authorization/authorization.ws.guard';
-import { ApplicationGatewayInterceptor } from '../../utils/application.gateway.interceptor';
 import { LiveService } from './live.service';
 import { LiveStateWsInterceptor } from './live-state.ws.interceptor';
 import { RequirePermissions } from '../authorization/require-permissions.decorator';
@@ -30,10 +29,11 @@ import { LiveVoiceService } from './live-voice.service';
 import { types as MediasoupTypes } from 'mediasoup';
 import { LiveStreamService } from './live-stream.service';
 import { VALID_VIDEO_MIME } from '../../constants';
-import { ApplicationGatewayExceptionFilter } from '../../utils/application.gateway.exception.filter';
 import { MediaService } from '../media/media.service';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 import { compare } from 'bcrypt';
+import { ApplicationGatewayInterceptor } from '../../common/application.gateway.interceptor';
+import { ApplicationGatewayExceptionFilter } from '../../common/application.gateway.exception.filter';
 
 @WebSocketGateway({
   namespace: 'live',

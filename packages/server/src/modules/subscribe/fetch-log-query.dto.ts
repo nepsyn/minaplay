@@ -1,8 +1,8 @@
-import { ApiQueryDto } from '../../utils/api.query.dto';
 import { FetchLog } from './fetch-log.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsOptional } from 'class-validator';
 import { StatusEnum } from '../../enums/status.enum';
+import { ApiQueryDto } from '../../common/api.query.dto';
 
 export class FetchLogQueryDto extends ApiQueryDto<FetchLog> {
   @ApiProperty({

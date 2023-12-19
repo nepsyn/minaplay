@@ -10,10 +10,10 @@ import { UserDto } from './user.dto';
 import { UserQueryDto } from './user-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { User } from './user.entity';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { RequestUser } from '../authorization/request.user.decorator';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 import { instanceToPlain } from 'class-transformer';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('user')
 @UseGuards(AuthorizationGuard)

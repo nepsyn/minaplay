@@ -4,6 +4,7 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { MINAPLAY_VERSION } from './constants';
+import { SocketIOAdapter } from './common/socket-io.adapter';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
@@ -19,6 +20,9 @@ async function bootstrap() {
   if (Number(configService.get('APP_ENABLE_CORS', 0)) === 1) {
     app.enableCors();
   }
+
+  // use custom socket-io adapter
+  app.useWebSocketAdapter(new SocketIOAdapter(app, configService));
 
   // swagger settings
   if (configService.get('APP_ENV') === 'dev') {

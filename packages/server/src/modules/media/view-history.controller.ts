@@ -6,10 +6,10 @@ import { PermissionEnum } from '../../enums/permission.enum';
 import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
-import { ApiQueryDto } from '../../utils/api.query.dto';
 import { ViewHistory } from './view-history.entity';
 import { ViewHistoryService } from './view-history.service';
+import { ApiQueryDto } from '../../common/api.query.dto';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('media/history')
 @UseGuards(AuthorizationGuard)

@@ -24,7 +24,6 @@ import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
 import { SourceQueryDto } from './source-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { Source } from './source.entity';
 import { FetchLogService } from './fetch-log.service';
 import { FetchLogQueryDto } from './fetch-log-query.dto';
@@ -33,6 +32,7 @@ import { Between } from 'typeorm';
 import { DownloadItemQueryDto } from './download-item-query.dto';
 import { DownloadItemService } from './download-item.service';
 import { DownloadItem } from './download-item.entity';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('subscribe/source')
 @UseGuards(AuthorizationGuard)

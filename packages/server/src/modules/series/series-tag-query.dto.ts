@@ -1,7 +1,7 @@
-import { ApiQueryDto } from '../../utils/api.query.dto';
 import { SeriesTag } from './series-tag.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsOptional, IsString } from 'class-validator';
+import { ApiQueryDto } from '../../common/api.query.dto';
 
 export class SeriesTagQueryDto extends ApiQueryDto<SeriesTag> {
   @ApiProperty({

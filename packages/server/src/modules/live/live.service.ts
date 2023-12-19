@@ -24,6 +24,7 @@ export class LiveService {
   async findAndCount(options?: FindManyOptions<Live>) {
     return await this.liveRepository.findAndCount(options);
   }
+
   async delete(where: FindOptionsWhere<Live>) {
     const result = await this.liveRepository.delete(where);
     return result.affected > 0;

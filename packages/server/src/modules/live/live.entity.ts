@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Up
 import { File } from '../file/file.entity';
 import { Exclude, Expose } from 'class-transformer';
 import { User } from '../user/user.entity';
+import { isDefined } from 'class-validator';
 
 /** 直播房间 */
 @Entity()
@@ -26,7 +27,7 @@ export class Live {
   /** 是否有密码 */
   @Expose()
   get hasPassword() {
-    return this.password != null;
+    return isDefined(this.password);
   }
 
   /** 封面图片 */

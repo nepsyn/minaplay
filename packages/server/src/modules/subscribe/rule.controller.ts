@@ -38,6 +38,7 @@ import { SourceService } from './source.service';
 import { In } from 'typeorm';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 import { ApiQueryDto } from '../../common/api.query.dto';
+import { isDefined } from 'class-validator';
 
 @Controller('subscribe/rule')
 @UseGuards(AuthorizationGuard)
@@ -57,7 +58,7 @@ export class RuleController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createSubscribeRule(@RequestUser() user: User, @Body() data: RuleDto) {
-    if (data.code == null) {
+    if (!isDefined(data.code)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 

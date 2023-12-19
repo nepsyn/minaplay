@@ -16,6 +16,7 @@ import { importESM } from '../../utils/import-esm.util';
 import { randomUUID } from 'crypto';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { Aria2WsClient } from './aria2.ws-client';
+import { isDefined } from 'class-validator';
 
 @Injectable()
 export class Aria2Service implements OnModuleInit {
@@ -56,7 +57,7 @@ export class Aria2Service implements OnModuleInit {
   }
 
   get isActive() {
-    return this.client !== undefined && this.client.conn.readyState === this.client.conn.OPEN;
+    return isDefined(this.client) && this.client.conn.readyState === this.client.conn.OPEN;
   }
 
   private async connectWs() {

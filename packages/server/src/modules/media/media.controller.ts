@@ -29,6 +29,7 @@ import { User } from '../user/user.entity';
 import { ViewHistoryDto } from './view-history.dto';
 import { ViewHistoryService } from './view-history.service';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { isDefined } from 'class-validator';
 
 @Controller('media')
 @UseGuards(AuthorizationGuard)
@@ -47,6 +48,10 @@ export class MediaController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
   async getMediaById(@Param('id') id: string, @RequestUser() user: User) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const media = await this.mediaService.findOneBy({
       id,
       ...(user.hasOneOf(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP) ? {} : { isPublic: true }),
@@ -88,7 +93,7 @@ export class MediaController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
   async createMedia(@Body() data: MediaDto) {
-    if (data.name == null || data.fileId == null) {
+    if (!isDefined(data.name) || !isDefined(data.fileId)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -111,6 +116,10 @@ export class MediaController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
   async updateMedia(@Param('id') id: string, @Body() data: MediaDto) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const media = await this.mediaService.findOneBy({ id });
     if (!media) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -132,6 +141,10 @@ export class MediaController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
   async deleteMedia(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     await this.mediaService.delete({ id });
     return {};
   }
@@ -142,6 +155,10 @@ export class MediaController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
   async getViewHistoryByMediaId(@RequestUser() user: User, @Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const history = await this.viewHistoryService.findOneBy({
       user: { id: user.id },
       media: { id },
@@ -159,6 +176,10 @@ export class MediaController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
   async createViewHistory(@RequestUser() user: User, @Param('id') id: string, @Body() data: ViewHistoryDto) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const media = await this.mediaService.findOneBy({ id });
     if (!media) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -182,6 +203,10 @@ export class MediaController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
   async deleteViewHistory(@RequestUser() user: User, @Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     await this.viewHistoryService.delete({
       media: { id },
       user: { id: user.id },

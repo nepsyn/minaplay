@@ -1,4 +1,13 @@
-import { Controller, Get, HttpCode, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  HttpCode,
+  NotFoundException,
+  Param,
+  Post,
+  UseGuards,
+} from '@nestjs/common';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PluginService } from './plugin.service';
@@ -6,6 +15,7 @@ import { RequirePermissions } from '../authorization/require-permissions.decorat
 import { PermissionEnum } from '../../enums/permission.enum';
 import { buildException } from '../../utils/build-exception.util';
 import { ErrorCodeEnum } from '../../enums/error-code.enum';
+import { isDefined } from 'class-validator';
 
 @Controller('plugins')
 @UseGuards(AuthorizationGuard)
@@ -29,6 +39,10 @@ export class PluginController {
   })
   @HttpCode(200)
   async enablePlugin(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const control = await this.pluginService.toggleEnabled(id, true);
     if (!control) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -43,6 +57,10 @@ export class PluginController {
   })
   @HttpCode(200)
   async disablePlugin(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const control = await this.pluginService.toggleEnabled(id, false);
     if (!control) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);

@@ -33,6 +33,7 @@ import { DownloadItemQueryDto } from './download-item-query.dto';
 import { DownloadItemService } from './download-item.service';
 import { DownloadItem } from './download-item.entity';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { isDefined } from 'class-validator';
 
 @Controller('subscribe/source')
 @UseGuards(AuthorizationGuard)
@@ -51,7 +52,7 @@ export class SourceController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createSource(@RequestUser() user: User, @Body() data: SourceDto) {
-    if (data.url == null || data.enabled == null) {
+    if (!isDefined(data.url) || !isDefined(data.enabled)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 

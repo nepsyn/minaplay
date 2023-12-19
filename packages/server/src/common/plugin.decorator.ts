@@ -1,5 +1,6 @@
 import { MinaPlayPluginConstructor, MinaPlayPluginDescriptor } from '../interfaces/plugins';
 import { Injectable } from '@nestjs/common';
+import { isDefined } from 'class-validator';
 
 export const MINAPLAY_PLUGIN_KEY = 'MINAPLAY_PLUGIN';
 
@@ -16,5 +17,5 @@ export function getMinaPlayPluginDescriptor(target: Function): MinaPlayPluginDes
 
 export function isMinaPlayPlugin(target: Function): target is MinaPlayPluginConstructor {
   const descriptor = getMinaPlayPluginDescriptor(target);
-  return descriptor?.id != null;
+  return isDefined(descriptor?.id);
 }

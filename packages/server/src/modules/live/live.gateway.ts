@@ -7,7 +7,14 @@ import {
   WebSocketServer,
   WsException,
 } from '@nestjs/websockets';
-import { ClassSerializerInterceptor, NotFoundException, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
+import {
+  BadRequestException,
+  ClassSerializerInterceptor,
+  NotFoundException,
+  UseFilters,
+  UseGuards,
+  UseInterceptors,
+} from '@nestjs/common';
 import { AuthorizationWsGuard } from '../authorization/authorization.ws.guard';
 import { LiveService } from './live.service';
 import { LiveStateWsInterceptor } from './live-state.ws.interceptor';
@@ -34,6 +41,7 @@ import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exceptio
 import { compare } from 'bcrypt';
 import { ApplicationGatewayInterceptor } from '../../common/application.gateway.interceptor';
 import { ApplicationGatewayExceptionFilter } from '../../common/application.gateway.exception.filter';
+import { isDefined } from 'class-validator';
 
 @WebSocketGateway({
   namespace: 'live',
@@ -60,13 +68,17 @@ export class LiveGateway implements OnGatewayDisconnect {
     @MessageBody('id') id: string,
     @MessageBody('password') password: string,
   ) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const live = await this.liveService.findOneBy({ id });
     if (!live) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
     if (live.hasPassword) {
-      const valid = password != null ? await compare(password, live.password) : false;
+      const valid = isDefined(password) ? await compare(password, live.password) : false;
       if (!valid) {
         throw buildException(ForbiddenException, ErrorCodeEnum.WRONG_LIVE_PASSWORD);
       }
@@ -148,7 +160,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     @MessageBody('start') startTime: Date,
     @MessageBody('end') endTime?: Date,
   ) {
-    if (startTime == null) {
+    if (!isDefined(startTime)) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -168,7 +180,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @UseGuards(LiveAudienceWsGuard)
   @RoomOwnerOnly()
   async handleRevoke(@ConnectedSocket() socket: Socket, @MessageBody('id') id: string) {
-    if (id == null) {
+    if (!isDefined(id)) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -181,7 +193,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @UseGuards(LiveAudienceWsGuard)
   @RoomOwnerOnly()
   async handleMute(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState, @MessageBody('id') id: number) {
-    if (id == null) {
+    if (!isDefined(id)) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -202,7 +214,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     @WsLiveState() state: LiveState,
     @MessageBody('id') id: number,
   ) {
-    if (id == null) {
+    if (!isDefined(id)) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -228,7 +240,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   @UseGuards(LiveAudienceWsGuard)
   @RoomOwnerOnly()
   async handleKick(@ConnectedSocket() socket: Socket, @MessageBody('id') id: number) {
-    if (id == null || id === socket.data.user.id) {
+    if (!isDefined(id) || id === socket.data.user.id) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -258,6 +270,10 @@ export class LiveGateway implements OnGatewayDisconnect {
     @WsLiveState() state: LiveState,
     @MessageBody('id') id: string,
   ) {
+    if (!isDefined(id)) {
+      throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const media = await this.mediaService.findOneBy({ id });
     if (!(media && media.file?.isExist)) {
       throw buildException(WsException, ErrorCodeEnum.NOT_FOUND);
@@ -327,6 +343,10 @@ export class LiveGateway implements OnGatewayDisconnect {
     @MessageBody('transportId') transportId: string,
     @MessageBody('dtlsParameters') dtlsParameters: MediasoupTypes.DtlsParameters,
   ) {
+    if (!isDefined(transportId)) {
+      throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     await this.liveVoiceService.connectTransport(socket.data.live.id, socket.data.user.id, transportId, dtlsParameters);
   }
 
@@ -338,6 +358,10 @@ export class LiveGateway implements OnGatewayDisconnect {
     @MessageBody('transportId') transportId: string,
     @MessageBody('rtpParameters') rtpParameters: MediasoupTypes.RtpParameters,
   ) {
+    if (!isDefined(transportId)) {
+      throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const producer = await this.liveVoiceService.createProducer(
       socket.data.live.id,
       socket.data.user.id,
@@ -376,6 +400,10 @@ export class LiveGateway implements OnGatewayDisconnect {
     @MessageBody('producerId') producerId: string,
     @MessageBody('rtpCapabilities') rtpCapabilities: MediasoupTypes.RtpCapabilities,
   ) {
+    if (!isDefined(transportId) || !isDefined(producerId)) {
+      throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const consumer = await this.liveVoiceService.createConsumer(
       socket.data.live.id,
       socket.data.user.id,

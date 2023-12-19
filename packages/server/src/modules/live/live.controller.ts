@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  NotFoundException,
+  Param,
+  Post,
+  Put,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { LiveService } from './live.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from '../authorization/require-permissions.decorator';
@@ -15,6 +27,7 @@ import { LiveQueryDto } from './live-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { Live } from './live.entity';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { isDefined } from 'class-validator';
 
 @Controller('live')
 @UseGuards(AuthorizationGuard)
@@ -29,6 +42,10 @@ export class LiveController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
   async getLiveById(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const live = await this.liveService.findOneBy({ id });
     if (!live) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -83,6 +100,10 @@ export class LiveController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   async updateLive(@Param('id') id: string, @Body() data: LiveDto) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const live = await this.liveService.findOneBy({ id });
     if (!live) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -105,6 +126,10 @@ export class LiveController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   async deleteLive(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     await this.liveService.delete({ id });
     await this.liveGateway.dispose(id);
     return {};

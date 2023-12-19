@@ -4,6 +4,7 @@ import { Series } from './series.entity';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, In, Repository } from 'typeorm';
 import { File } from '../file/file.entity';
 import { FileService } from '../file/file.service';
+import { isDefined } from 'class-validator';
 
 @Injectable()
 export class SeriesService {
@@ -29,7 +30,7 @@ export class SeriesService {
     for (const item of series) {
       const ids = []
         .concat(item.poster)
-        .filter((v) => v != null)
+        .filter((v) => isDefined(v))
         .map((v: File) => v.id);
       await this.fileService.delete({
         id: In(ids),

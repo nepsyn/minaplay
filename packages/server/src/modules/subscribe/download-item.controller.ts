@@ -31,6 +31,7 @@ import { Between, In, IsNull, Not } from 'typeorm';
 import { Aria2Service } from '../aria2/aria2.service';
 import { SourceService } from './source.service';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { isDefined } from 'class-validator';
 
 @Controller('subscribe/download')
 @UseGuards(AuthorizationGuard)
@@ -73,6 +74,10 @@ export class DownloadItemController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async getDownloadItemById(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const item = await this.downloadItemService.findOneBy({ id });
     if (!item) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -88,6 +93,10 @@ export class DownloadItemController {
   @HttpCode(200)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async retryDownloadTask(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const item = await this.downloadItemService.findOneBy({ id });
     if (!item) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -128,6 +137,10 @@ export class DownloadItemController {
   @HttpCode(200)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async pauseDownloadTask(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const item = await this.downloadItemService.findOneBy({
       id,
       gid: Not(IsNull()),
@@ -153,6 +166,10 @@ export class DownloadItemController {
   @HttpCode(200)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async unpauseDownloadTask(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const item = await this.downloadItemService.findOneBy({
       id,
       gid: Not(IsNull()),
@@ -178,6 +195,10 @@ export class DownloadItemController {
   @HttpCode(200)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async cancelDownloadTask(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const item = await this.downloadItemService.findOneBy({
       id,
       gid: Not(IsNull()),
@@ -231,6 +252,10 @@ export class DownloadItemController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async deleteDownloadItem(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     await this.downloadItemService.delete({ id });
     return {};
   }

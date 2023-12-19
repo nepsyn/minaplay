@@ -40,6 +40,7 @@ import { Response } from 'express';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 import { ApiFile } from '../../common/api.file.decorator';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { isDefined } from 'class-validator';
 
 @Controller('file')
 @ApiTags('file')
@@ -182,6 +183,10 @@ export class FileController {
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
   async getFileById(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const file = await this.fileService.findOneBy({ id });
     if (!file) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -195,6 +200,10 @@ export class FileController {
     description: '原始文件数据',
   })
   async getRawFileById(@Param('id') id: string, @Res() res: Response) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     res.sendFile(await this.getFilePathById(id));
   }
 
@@ -203,6 +212,10 @@ export class FileController {
     description: '下载文件',
   })
   async downloadFileById(@Param('id') id: string, @Res() res: Response, @Param('name') name?: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     res.download(await this.getFilePathById(id), name);
   }
 
@@ -240,6 +253,10 @@ export class FileController {
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP)
   async deleteFile(@Param('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     await this.fileService.delete({ id });
     return {};
   }

@@ -4,6 +4,7 @@ import { Media } from './media.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FileService } from '../file/file.service';
 import { File } from '../file/file.entity';
+import { isDefined } from 'class-validator';
 
 @Injectable()
 export class MediaService {
@@ -28,7 +29,7 @@ export class MediaService {
         .concat(media.file)
         .concat(media.poster)
         .concat(media.attachments)
-        .filter((v) => v != null)
+        .filter((v) => isDefined(v))
         .map((v: File) => v.id);
       await this.fileService.delete({
         id: In(ids),

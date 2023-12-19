@@ -2,6 +2,7 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { Reflector } from '@nestjs/core';
 import { ROOM_OWNER_ONLY_SYMBOL } from './room-owner-only.ws.decorator';
+import { isDefined } from 'class-validator';
 
 @Injectable()
 export class LiveAudienceWsGuard implements CanActivate {
@@ -15,6 +16,6 @@ export class LiveAudienceWsGuard implements CanActivate {
       return socket.data.user && socket.data.live && socket.data.user.id === socket.data.live.user.id;
     }
 
-    return socket.data.live !== undefined;
+    return isDefined(socket.data.live);
   }
 }

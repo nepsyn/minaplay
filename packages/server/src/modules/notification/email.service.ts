@@ -6,6 +6,8 @@ import { NotificationEventMap, NotificationEventType } from './notification-even
 import Handlebars from 'handlebars';
 import path from 'path';
 import fs from 'fs-extra';
+import { isDefined } from 'class-validator';
+import { isUndefined } from '@nestjs/common/utils/shared.utils';
 
 @Injectable()
 export class EmailService implements OnModuleInit {
@@ -77,11 +79,11 @@ export class EmailService implements OnModuleInit {
     to: string | string[],
   ): Promise<void>;
   async notify(event: string, data: object, to: string | string[]) {
-    if (this.templates[event] === undefined) {
+    if (isUndefined(this.templates[event])) {
       this.templates[event] = await this.compileTemplate(event);
     }
 
-    if (this.templates[event] === null) {
+    if (!isDefined(this.templates[event])) {
       this.logger.error(`No handlebars template found for event: ${event}`);
       return;
     }

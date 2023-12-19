@@ -13,7 +13,6 @@ export class LiveChat {
   /** 直播 */
   @ManyToOne(() => Live, {
     onDelete: 'CASCADE',
-    eager: true,
   })
   live: Live;
 

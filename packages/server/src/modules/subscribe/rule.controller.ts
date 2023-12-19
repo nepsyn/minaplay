@@ -32,12 +32,12 @@ import { FileService } from '../file/file.service';
 import { RuleQueryDto } from './rule-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { Rule } from './rule.entity';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
-import { ApiQueryDto } from '../../utils/api.query.dto';
 import { RuleErrorLog } from './rule-error-log.entity';
 import { RuleErrorLogService } from './rule-error-log.service';
 import { SourceService } from './source.service';
 import { In } from 'typeorm';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { ApiQueryDto } from '../../common/api.query.dto';
 
 @Controller('subscribe/rule')
 @UseGuards(AuthorizationGuard)

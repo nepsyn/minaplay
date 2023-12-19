@@ -6,7 +6,6 @@ import { BullModule } from '@nestjs/bull';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthorizationModule } from './modules/authorization/authorization.module';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { ApplicationExceptionFilter } from './utils/application.exception.filter';
 import { FileModule } from './modules/file/file.module';
 import { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-yet';
@@ -22,6 +21,7 @@ import { SubscribeModule } from './modules/subscribe/subscribe.module';
 import { SystemModule } from './modules/system/system.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { PluginModule } from './modules/plugin/plugin.module';
+import { ApplicationExceptionFilter } from './common/application.exception.filter';
 
 @Module({
   imports: [

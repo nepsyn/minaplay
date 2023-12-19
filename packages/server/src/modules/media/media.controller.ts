@@ -22,13 +22,13 @@ import { MediaQueryDto } from './media-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { Between } from 'typeorm';
 import { Media } from './media.entity';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { MediaDto } from './media.dto';
 import { MediaFileService } from './media-file.service';
 import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
 import { ViewHistoryDto } from './view-history.dto';
 import { ViewHistoryService } from './view-history.service';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('media')
 @UseGuards(AuthorizationGuard)

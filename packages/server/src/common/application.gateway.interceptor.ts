@@ -2,8 +2,8 @@ import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nes
 import { WsException } from '@nestjs/websockets';
 import { map, Observable } from 'rxjs';
 import { Socket } from 'socket.io';
-import { buildException } from './build-exception.util';
 import { ErrorCodeEnum } from '../enums/error-code.enum';
+import { buildException } from '../utils/build-exception.util';
 
 @Injectable()
 export class ApplicationGatewayInterceptor implements NestInterceptor {

@@ -28,9 +28,9 @@ import { DownloadItemQueryDto } from './download-item-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { DownloadItem } from './download-item.entity';
 import { Between, In, IsNull, Not } from 'typeorm';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { Aria2Service } from '../aria2/aria2.service';
 import { SourceService } from './source.service';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('subscribe/download')
 @UseGuards(AuthorizationGuard)

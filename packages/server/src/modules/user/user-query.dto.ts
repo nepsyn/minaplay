@@ -1,8 +1,8 @@
-import { ApiQueryDto } from '../../utils/api.query.dto';
 import { User } from './user.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { ApiQueryDto } from '../../common/api.query.dto';
 
 export class UserQueryDto extends ApiQueryDto<User> {
   @ApiProperty({

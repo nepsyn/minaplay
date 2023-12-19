@@ -20,7 +20,6 @@ import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
 import { SeriesQueryDto } from './series-query.dto';
 import { Series } from './series.entity';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { buildException } from '../../utils/build-exception.util';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
@@ -30,6 +29,7 @@ import { Between, In } from 'typeorm';
 import { SeriesSubscribeDto } from './series-subscribe.dto';
 import { SeriesSubscribeService } from './series-subscribe.service';
 import { SeriesTagService } from './series-tag.service';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('series')
 @UseGuards(AuthorizationGuard)

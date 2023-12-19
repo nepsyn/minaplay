@@ -6,10 +6,10 @@ import { RequirePermissions } from '../authorization/require-permissions.decorat
 import { PermissionEnum } from '../../enums/permission.enum';
 import { RequestUser } from '../authorization/request.user.decorator';
 import { User } from '../user/user.entity';
-import { ApiQueryDto } from '../../utils/api.query.dto';
 import { SeriesSubscribe } from './series-subscribe.entity';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
+import { ApiQueryDto } from '../../common/api.query.dto';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('series/subscribe')
 @UseGuards(AuthorizationGuard)

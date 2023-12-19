@@ -21,7 +21,6 @@ import { randomUUID } from 'crypto';
 import fs from 'fs-extra';
 import { diskStorage } from 'multer';
 import path from 'path';
-import { ApiFile } from '../../utils/api.file.decorator';
 import { User } from '../user/user.entity';
 import { FileService } from './file.service';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
@@ -37,9 +36,10 @@ import { FileQueryDto } from './file-query.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { File } from './file.entity';
 import { Between } from 'typeorm';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { Response } from 'express';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
+import { ApiFile } from '../../common/api.file.decorator';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('file')
 @ApiTags('file')

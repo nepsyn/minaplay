@@ -27,13 +27,13 @@ import { ErrorCodeEnum } from '../../enums/error-code.enum';
 import { PermissionEnum } from '../../enums/permission.enum';
 import { ActionLogService } from './action-log.service';
 import { AuthActionEnum } from '../../enums/auth-action.enum';
-import { RequestIp } from '../../utils/request.ip.decorator';
 import { EmailBindDto } from './email-bind.dto';
 import { EmailVerifyDto } from './email-verify.dto';
 import { ChangePasswordDto } from './change-password.dto';
 import { encryptPassword } from '../../utils/encrypt-password.util';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 import { CreateUserDto } from './create-user.dto';
+import { RequestIp } from '../../common/request.ip.decorator';
 
 @Controller('auth')
 @ApiTags('auth')

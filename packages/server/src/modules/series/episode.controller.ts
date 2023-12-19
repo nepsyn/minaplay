@@ -21,11 +21,11 @@ import { EpisodeDto } from './episode.dto';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
 import { SeriesService } from './series.service';
 import { Episode } from './episode.entity';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { Between } from 'typeorm';
 import { EpisodeQueryDto } from './episode-query.dto';
 import { ViewHistoryService } from '../media/view-history.service';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('series/episode')
 @UseGuards(AuthorizationGuard)

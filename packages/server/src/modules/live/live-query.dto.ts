@@ -1,8 +1,8 @@
-import { ApiQueryDto } from '../../utils/api.query.dto';
 import { Live } from './live.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
+import { ApiQueryDto } from '../../common/api.query.dto';
 
 export class LiveQueryDto extends ApiQueryDto<Live> {
   @ApiProperty({

@@ -6,9 +6,9 @@ import { RequirePermissions } from '../authorization/require-permissions.decorat
 import { PermissionEnum } from '../../enums/permission.enum';
 import { SeriesTagDto } from './series-tag.dto';
 import { SeriesTagQueryDto } from './series-tag-query.dto';
-import { ApiPaginationResultDto } from '../../utils/api.pagination.result.dto';
 import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { SeriesTag } from './series-tag.entity';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('series/tag')
 @UseGuards(AuthorizationGuard)

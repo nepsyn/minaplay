@@ -1,7 +1,7 @@
-import { ApiQueryDto } from '../../utils/api.query.dto';
 import { Media } from './media.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { ApiQueryDto } from '../../common/api.query.dto';
 
 export class MediaQueryDto extends ApiQueryDto<Media> {
   @ApiProperty({

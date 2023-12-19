@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } f
 import { Exclude, Expose } from 'class-transformer';
 import { Live } from './live.entity';
 import { User } from '../user/user.entity';
-import { MinaplayMessage, MinaplayMessageType, parseMessage } from '../../utils/message-type';
+import { MinaplayMessage, MinaplayMessageType, parseMessage } from './live-chat-message-type';
 
 @Entity()
 export class LiveChat {
@@ -31,7 +31,9 @@ export class LiveChat {
 
   /** 消息内容 */
   @Exclude()
-  @Column()
+  @Column({
+    type: 'text',
+  })
   content: string;
 
   /** 消息实体 */

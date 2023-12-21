@@ -30,7 +30,7 @@ export class LiveService {
     return result.affected > 0;
   }
 
-  async createLiveState(id: string, renew = false): Promise<LiveState | undefined> {
+  async createOrGetLiveState(id: string, renew = false): Promise<LiveState | undefined> {
     const cacheKey = `live:${id}`;
 
     if (!renew) {

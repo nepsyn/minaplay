@@ -89,7 +89,7 @@ export class LiveController {
       poster: { id: data.posterFileId },
       user: { id: user.id },
     });
-    await this.liveService.createLiveState(id);
+    await this.liveService.createOrGetLiveState(id);
 
     return await this.liveService.findOneBy({ id });
   }
@@ -115,7 +115,7 @@ export class LiveController {
       password: data.password && (await encryptPassword(data.password)),
       poster: { id: data.posterFileId },
     });
-    await this.liveService.createLiveState(id, true);
+    await this.liveService.createOrGetLiveState(id, true);
 
     return await this.liveService.findOneBy({ id });
   }

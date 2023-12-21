@@ -10,7 +10,7 @@ export class LiveStateWsInterceptor implements NestInterceptor {
   async intercept(context: ExecutionContext, next: CallHandler) {
     const socket: Socket = context.switchToWs().getClient();
     if (socket.data.live) {
-      socket.data.state = await this.liveService.createLiveState(socket.data.live.id);
+      socket.data.state = await this.liveService.createOrGetLiveState(socket.data.live.id);
     }
 
     return next.handle().pipe(

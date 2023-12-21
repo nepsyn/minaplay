@@ -61,6 +61,21 @@ export class LiveGateway implements OnGatewayDisconnect {
   @WebSocketServer()
   private readonly server: Server;
 
+  @SubscribeMessage('info')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
+  async handleInfo(@MessageBody('id') id: string) {
+    if (!isDefined(id)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
+    const live = await this.liveService.findOneBy({ id });
+    if (!live) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+
+    return live;
+  }
+
   @SubscribeMessage('join')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
   async handleJoin(
@@ -99,7 +114,7 @@ export class LiveGateway implements OnGatewayDisconnect {
       consumers: new Map(),
     });
 
-    const state = await this.liveService.createLiveState(live.id);
+    const state = await this.liveService.createOrGetLiveState(live.id);
     state.users.push(instanceToPlain(socket.data.user) as User);
     await this.liveService.updateLiveState(state);
 

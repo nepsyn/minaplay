@@ -43,7 +43,7 @@
         density="compact"
       >
         <template #item.size="{ item }">
-          {{ filesize(item.size) }}
+          {{ filesize(item.size, {}) }}
         </template>
         <template #item.source="{ item }">
           {{ t(`file.source.${item.source ?? 'other'}`) }}

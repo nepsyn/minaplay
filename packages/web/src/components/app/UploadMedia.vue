@@ -48,7 +48,7 @@
       fluid
       class="px-4 py-2 d-flex flex-row align-center justify-space-between text-truncate upload-caption"
     >
-      <span>{{ filesize(file.size) }}</span>
+      <span>{{ filesize(file.size, {}) }}</span>
       <template v-if="finished">
         <span class="text-error text-truncate" v-if="error">{{ error }}</span>
         <span v-else class="text-success">
@@ -75,7 +75,7 @@ import { MediaEntity } from '@/api/interfaces/media.interface';
 import { mdiClose, mdiShare, mdiStop } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
-import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
+import { filesize } from 'filesize';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -126,12 +126,8 @@ onMounted(async () => {
   } catch (e: any) {
     if (controller.signal.aborted) {
       error.value = t('layout.upload.status.canceled');
-    } else if (e.response?.data.code === ErrorCodeEnum.INVALID_VIDEO_FILE_TYPE) {
-      error.value = t('layout.upload.status.wrongType');
-    } else if (e.response?.data.code === ErrorCodeEnum.INVALID_FILE) {
-      error.value = t('layout.upload.status.wrongContent');
     } else {
-      error.value = t('layout.upload.status.error');
+      error.value = e.response?.data.code ? t(`error.${e.response?.data.code}`) : t('layout.upload.status.error');
     }
     emits('error');
   } finally {

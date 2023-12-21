@@ -176,8 +176,8 @@ onLogoutResolved(async () => {
     },
   });
 });
-onLogoutRejected(() => {
-  toast.toastError(t('error.other'));
+onLogoutRejected((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const actions = ref([

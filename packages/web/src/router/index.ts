@@ -49,7 +49,16 @@ const routes: RouteRecordRaw[] = [
       {
         path: '/live',
         name: 'live',
-        component: () => import('@/views/Live.vue'),
+        children: [
+          {
+            path: '/live',
+            component: () => import('@/views/Live.vue'),
+          },
+          {
+            path: '/live/:id',
+            component: () => import('@/views/live/LivePlay.vue'),
+          },
+        ],
       },
       {
         path: '/source',

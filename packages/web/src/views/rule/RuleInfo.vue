@@ -112,7 +112,6 @@ import { useApiStore } from '@/store/api';
 import { useRoute, useRouter } from 'vue-router';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 import { mdiCheck, mdiClose, mdiPencilLock } from '@mdi/js';
-import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useToastStore } from '@/store/toast';
 import MonacoEditor from '@/components/app/MonacoEditor.vue';
 
@@ -151,8 +150,8 @@ onSaved((data) => {
   toast.toastSuccess(t('app.actions.saveToast'));
   ruleLoader.data.value = data;
 });
-onSaveFailed(() => {
-  toast.toastError(t(`error.${ErrorCodeEnum.BAD_REQUEST}`));
+onSaveFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const {
@@ -167,8 +166,8 @@ onRuleDeleted(async () => {
   toast.toastSuccess(t('app.actions.deleteToast'));
   await router.replace({ path: '/rule' });
 });
-onRuleDeleteFailed(() => {
-  toast.toastError(t('error.other'));
+onRuleDeleteFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const editorRef = ref<typeof MonacoEditor | undefined>(undefined);

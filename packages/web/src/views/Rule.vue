@@ -111,8 +111,8 @@ const {
 onCreated(async (data) => {
   await router.push({ path: `/rule/${data.id}` });
 });
-onCreateFailed(() => {
-  toast.toastError(t('error.other'));
+onCreateFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 </script>
 

@@ -217,8 +217,8 @@ const {
 onDownloadCreated(() => {
   toast.toastSuccess(t('source.raw.downloadCreated'));
 });
-onDonwloadCreateFailed(() => {
-  toast.toastError(t('error.other'));
+onDonwloadCreateFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const actions = [

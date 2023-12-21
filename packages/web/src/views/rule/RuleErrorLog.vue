@@ -109,8 +109,8 @@ const {
 onLogsCleared(() => {
   logsLoader.reset(true);
 });
-onLogsClearFailed(() => {
-  toast.toastError(t('error.other'));
+onLogsClearFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 </script>
 

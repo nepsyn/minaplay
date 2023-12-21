@@ -1,6 +1,6 @@
 <template>
   <to-top-container class="page-height overflow-auto">
-    <v-container class="d-flex flex-column py-md-12">
+    <v-container fluid class="d-flex flex-column pa-md-12">
       <v-row>
         <v-col cols="12" md="8">
           <single-item-loader class="pa-0" :loader="isMedia ? mediaLoader : currentEpisodeLoader">

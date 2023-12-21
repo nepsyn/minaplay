@@ -91,8 +91,8 @@ const {
 onEnabledChanged((data) => {
   emits('update', data);
 });
-onEnabledChangeFailed(() => {
-  toast.toastError(t('error.other'));
+onEnabledChangeFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
   editEnabled.value = props.source.enabled;
 });
 

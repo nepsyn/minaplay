@@ -157,7 +157,6 @@ import { computed, ref } from 'vue';
 import { mdiCheck, mdiClockOutline, mdiClose, mdiPencilLock } from '@mdi/js';
 import { parseExpression } from 'cron-parser';
 import { useToastStore } from '@/store/toast';
-import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 
 const api = useApiStore();
 const route = useRoute();
@@ -191,8 +190,8 @@ onSaved((data) => {
   toast.toastSuccess(t('app.actions.saveToast'));
   sourceLoader.data.value = data;
 });
-onSaveFailed(() => {
-  toast.toastError(t(`error.${ErrorCodeEnum.BAD_REQUEST}`));
+onSaveFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const cronExps = [
@@ -229,8 +228,8 @@ const {
 onUpdateRequested(() => {
   toast.toastSuccess(t('source.info.updateToast'));
 });
-onUpdateRequestFailed(() => {
-  toast.toastError(t('error.other'));
+onUpdateRequestFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const {
@@ -244,8 +243,8 @@ const {
 onEnabledToggled((data) => {
   sourceLoader.data.value = data;
 });
-onEnabledToggleFailed(() => {
-  toast.toastError(t('error.other'));
+onEnabledToggleFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
   edit.value!.enabled = source.value!.enabled;
 });
 
@@ -261,8 +260,8 @@ onSourceDeleted(async () => {
   toast.toastSuccess(t('app.actions.deleteToast'));
   await router.replace({ path: '/source' });
 });
-onSourceDeleteFailed(() => {
-  toast.toastError(t('error.other'));
+onSourceDeleteFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const reset = () => {

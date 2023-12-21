@@ -2,15 +2,29 @@
   <video ref="videoRef" :src="src" :poster="poster" crossorigin="anonymous">
     <div ref="controlsRef">
       <div class="plyr__controls">
-        <button class="plyr__controls__item plyr__control" type="button" data-plyr="play" aria-label="Play">
-          <svg class="icon--pressed" aria-hidden="true" focusable="false">
-            <use xlink:href="#plyr-pause"></use>
-          </svg>
-          <svg class="icon--not-pressed" aria-hidden="true" focusable="false">
-            <use xlink:href="#plyr-play"></use>
-          </svg>
-        </button>
-        <div class="plyr__controls__item plyr__progress__container">
+        <div class="plyr__controls__item d-flex align-center">
+          <button
+            v-if="!live"
+            class="plyr__controls__item plyr__control"
+            type="button"
+            data-plyr="play"
+            aria-label="Play"
+          >
+            <svg class="icon--pressed" aria-hidden="true" focusable="false">
+              <use xlink:href="#plyr-pause"></use>
+            </svg>
+            <svg class="icon--not-pressed" aria-hidden="true" focusable="false">
+              <use xlink:href="#plyr-play"></use>
+            </svg>
+          </button>
+          <button v-if="live" type="button" class="plyr__control" data-plyr="restart">
+            <svg role="presentation">
+              <use xlink:href="#plyr-restart"></use>
+            </svg>
+          </button>
+          <span v-if="live" class="plyr__controls__item ml-2"> LIVE </span>
+        </div>
+        <div v-if="!live" class="plyr__controls__item plyr__progress__container">
           <div class="plyr__progress">
             <input data-plyr="seek" type="range" min="0" max="100" step="0.01" value="0" aria-label="Seek" />
             <progress class="plyr__progress__buffer" min="0" max="100" value="0" role="progressbar" aria-hidden="true">
@@ -19,11 +33,24 @@
             <span role="tooltip" class="plyr__tooltip">00:00</span>
           </div>
         </div>
-        <div class="plyr__controls__item plyr__time--current plyr__time" aria-label="Current time" role="timer">
+        <div
+          v-if="!live"
+          class="plyr__controls__item plyr__time--current plyr__time"
+          aria-label="Current time"
+          role="timer"
+        >
           00:00
         </div>
-        <div class="plyr__controls__item plyr__time--duration plyr__time" aria-label="Duration" role="timer">00:00</div>
+        <div
+          v-if="!live"
+          class="plyr__controls__item plyr__time--duration plyr__time"
+          aria-label="Duration"
+          role="timer"
+        >
+          00:00
+        </div>
         <v-menu
+          v-if="!live"
           location="top center"
           open-on-hover
           :open-on-click="false"
@@ -94,8 +121,9 @@
           />
         </div>
         <a
+          v-if="!live && media?.file"
           class="plyr__controls__item plyr__control d-none d-sm-flex"
-          :href="api.File.buildDownloadPath(media.file!.id, media.file!.name)"
+          :href="api.File.buildDownloadPath(media.file.id, media.file.name)"
           target="_blank"
           download
           data-plyr="download"
@@ -151,28 +179,36 @@ const FONT_EXTENSIONS = ['.otf', '.ttf', '.woff'];
 const { t } = useI18n();
 const api = useApiStore();
 
-const props = defineProps<{
-  media: MediaEntity;
-}>();
-const src = computed(() => api.File.buildRawPath(props.media.file!.id, props.media.file!.name));
-const poster = computed(() =>
-  props.media.poster ? api.File.buildRawPath(props.media.poster.id, props.media.poster.name) : MediaPosterFallback,
+const props = withDefaults(
+  defineProps<{
+    media?: MediaEntity;
+    live?: boolean;
+  }>(),
+  {
+    live: false,
+  },
 );
-const subtitleFiles = computed(() =>
-  props.media.attachments.filter(({ name }) => {
-    const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
-    return SUBTITLE_EXTENSIONS.includes(ext);
-  }),
+
+const src = ref('');
+const poster = ref('');
+
+const subtitleFiles = computed(
+  () =>
+    props.media?.attachments?.filter(({ name }) => {
+      const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
+      return SUBTITLE_EXTENSIONS.includes(ext);
+    }) ?? [],
 );
 const getSubtitleName = (subtitle: FileEntity) => {
   const lastIndex = subtitle.name.lastIndexOf('.');
   return subtitle.name.slice(0, lastIndex > -1 ? lastIndex : subtitle.name.length);
 };
-const fontFiles = computed(() =>
-  props.media.attachments.filter(({ name }) => {
-    const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
-    return FONT_EXTENSIONS.includes(ext);
-  }),
+const fontFiles = computed(
+  () =>
+    props.media?.attachments?.filter(({ name }) => {
+      const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
+      return FONT_EXTENSIONS.includes(ext);
+    }) ?? [],
 );
 
 const videoRef = ref<HTMLVideoElement | undefined>(undefined);
@@ -224,6 +260,13 @@ onMounted(async () => {
         global: true,
       },
     });
+
+    if (props.media) {
+      src.value = api.File.buildRawPath(props.media.file!.id, props.media.file!.name);
+      poster.value = props.media.poster
+        ? api.File.buildRawPath(props.media.poster.id, props.media.poster.name)
+        : MediaPosterFallback;
+    }
 
     player.on('exitfullscreen', () => {
       if (player) {

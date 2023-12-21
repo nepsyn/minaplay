@@ -144,8 +144,8 @@ const {
 onRetried((data) => {
   emits('update', data);
 });
-onRetryFailed(() => {
-  toast.toastError(t('error.other'));
+onRetryFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const {
@@ -159,8 +159,8 @@ const {
 onPaused((data) => {
   emits('update', data);
 });
-onPauseFailed(() => {
-  toast.toastError(t('error.other'));
+onPauseFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const {
@@ -174,8 +174,8 @@ const {
 onUnpaused((data) => {
   emits('update', data);
 });
-onUnpauseFailed(() => {
-  toast.toastError(t('error.other'));
+onUnpauseFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const {
@@ -189,8 +189,8 @@ const {
 onCanceled((data) => {
   emits('update', data);
 });
-onCancelFailed(() => {
-  toast.toastError(t('error.other'));
+onCancelFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const {
@@ -204,8 +204,8 @@ const {
 onDeleted(() => {
   emits('delete', props.item);
 });
-onDeleteFailed(() => {
-  toast.toastError(t('error.other'));
+onDeleteFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const actions = ref([

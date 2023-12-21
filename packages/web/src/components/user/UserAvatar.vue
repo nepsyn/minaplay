@@ -13,10 +13,10 @@ withDefaults(
 </script>
 
 <template>
-  <v-avatar :size="size!">
-    <v-img :src="src!">
+  <v-avatar :size="size">
+    <v-img :src="src">
       <template #placeholder>
-        <v-icon :size="size!" :icon="mdiAccountCircle"></v-icon>
+        <v-icon :size="size" :icon="mdiAccountCircle"></v-icon>
       </template>
     </v-img>
     <slot></slot>

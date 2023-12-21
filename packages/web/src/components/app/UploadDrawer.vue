@@ -8,20 +8,23 @@
   >
     <v-container fluid class="pa-0 d-flex flex-column h-100">
       <v-container fluid class="pa-0">
-        <v-toolbar color="background" rounded="0">
+        <v-toolbar density="comfortable" color="background" rounded="0">
           <v-toolbar-title>
             {{ t('layout.upload.title') }}
           </v-toolbar-title>
           <v-spacer></v-spacer>
           <v-btn class="mr-4" variant="text" color="primary" :icon="mdiPlus" @click="selectAndUploadMedia"></v-btn>
         </v-toolbar>
+        <v-alert class="mx-4 mb-2" variant="tonal" type="warning" density="compact" :icon="mdiInformationOutline">
+          {{ t('layout.upload.closePageHint') }}
+        </v-alert>
         <v-divider></v-divider>
       </v-container>
       <v-container @dragenter.prevent @dragover.prevent @drop.prevent="onDrop" fluid class="pa-0 scrollable-container">
         <template v-if="uploadFiles.length > 0">
           <upload-media
             v-for="(file, index) in uploadFiles"
-            :key="index"
+            :key="file.name"
             :file="file"
             @close="uploadFiles.splice(index, 1)"
           ></upload-media>
@@ -42,7 +45,7 @@
 <script setup lang="ts">
 import { useDisplay } from 'vuetify';
 import { useLayoutStore } from '@/store/layout';
-import { mdiPlus } from '@mdi/js';
+import { mdiInformationOutline, mdiPlus } from '@mdi/js';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UploadMedia from '@/components/app/UploadMedia.vue';
@@ -57,10 +60,12 @@ const selectAndUploadMedia = () => {
   const el = document.createElement('input');
   el.accept = 'video/*';
   el.type = 'file';
+  el.multiple = true;
   el.onchange = async (e) => {
-    const file: File = (e.target as any).files[0];
-    if (file) {
-      uploadFiles.value.push(file);
+    for (const file of (e.target as any).files) {
+      if (file) {
+        uploadFiles.value.push(file);
+      }
     }
   };
   el.click();

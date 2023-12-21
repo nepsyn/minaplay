@@ -50,7 +50,7 @@
             class="rounded ma-1"
             min-width="120"
             max-width="160"
-            :src="item.poster ? api.File.buildRawPath(item.poster.id, item.poster.name) : MediaPosterFallback"
+            :src="item.poster ? api.File.buildRawPath(item.poster.id, item.poster.name) : LivePosterFallback"
           ></zoom-img>
         </template>
         <template #item.user="{ item }">
@@ -103,7 +103,7 @@ import { useAxiosRequest } from '@/composables/use-axios-request';
 import { debounce } from '@/utils/utils';
 import { LiveEntity, LiveQueryDto } from '@/api/interfaces/live.interface';
 import UserAvatar from '@/components/user/UserAvatar.vue';
-import MediaPosterFallback from '@/assets/banner.jpeg';
+import LivePosterFallback from '@/assets/live-poster-fallback.png';
 import ZoomImg from '@/components/app/ZoomImg.vue';
 
 const { t, locale } = useI18n();

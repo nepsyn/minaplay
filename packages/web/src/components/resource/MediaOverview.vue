@@ -3,11 +3,11 @@
     <v-img
       :aspect-ratio="16 / 9"
       cover
-      :src="media.poster ? api.File.buildRawPath(media.poster.id, media.poster.name) : MediaCoverFallback"
+      :src="media.poster ? api.File.buildRawPath(media.poster.id, media.poster.name) : MediaPosterFallback"
       class="media-img rounded-lg"
     >
       <template #placeholder>
-        <v-img :src="MediaCoverFallback" cover></v-img>
+        <v-img :src="MediaPosterFallback" cover></v-img>
       </template>
     </v-img>
 
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { MediaEntity } from '@/api/interfaces/media.interface';
 import { useApiStore } from '@/store/api';
-import MediaCoverFallback from '@/assets/banner.jpeg';
+import MediaPosterFallback from '@/assets/banner.jpeg';
 import TimeAgo from '@/components/app/TimeAgo.vue';
 import { useI18n } from 'vue-i18n';
 

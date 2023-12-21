@@ -46,9 +46,7 @@ import { useApiStore } from '@/store/api';
 import { useI18n } from 'vue-i18n';
 import { MessageSchema } from '@/lang';
 import { useRoute, useRouter } from 'vue-router';
-import { AxiosError } from 'axios';
 import { useToastStore } from '@/store/toast';
-import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import BannerLandscape from '@/assets/banner-landscape.jpeg';
 
 const { t } = useI18n<{ message: MessageSchema }>();
@@ -78,12 +76,8 @@ onLoginResolved(async (data) => {
   api.user = user;
   await router.replace((route.query.redirectUrl as string) || '/');
 });
-onLoginRejected(async (error) => {
-  const content =
-    error instanceof AxiosError && error.response?.data?.code
-      ? t(`error.${error.response?.data?.code}`)
-      : t(`error.${ErrorCodeEnum.BAD_REQUEST}`);
-  toast.toastError(content);
+onLoginRejected(async (error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 </script>
 

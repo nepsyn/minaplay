@@ -15,6 +15,7 @@ const light = {
     warning: '#ed6c02',
     info: '#0288d1',
     success: '#2e7d32',
+    chat: '#e5e5e5',
   },
 };
 
@@ -29,6 +30,7 @@ const dark = {
     warning: '#ffa726',
     info: '#29b6f6',
     success: '#66bb6a',
+    chat: '#323232',
   },
 };
 

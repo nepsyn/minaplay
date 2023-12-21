@@ -43,7 +43,6 @@ withDefaults(
     maxHeight?: string | number;
   }>(),
   {
-    aspectRatio: 16 / 9,
     placeholder: MediaPosterFallback,
   },
 );

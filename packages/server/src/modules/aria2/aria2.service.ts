@@ -24,7 +24,7 @@ export class Aria2Service implements OnModuleInit {
 
   private tasks: Map<string, Aria2DownloadTask> = new Map();
 
-  private static TRACKER_CACHE_KEY = 'aria2-tracker';
+  private static TRACKER_CACHE_KEY = 'aria2:trackers';
   private logger = new ConsoleLogger(Aria2Service.name);
 
   constructor(

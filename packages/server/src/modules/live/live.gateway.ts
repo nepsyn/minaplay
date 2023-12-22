@@ -99,6 +99,14 @@ export class LiveGateway implements OnGatewayDisconnect {
       }
     }
 
+    const clients = await this.server.fetchSockets();
+    const client = clients.find(
+      (client) => client.id !== socket.id && client.data.user && client.data.user.id === socket.data.user.id,
+    );
+    if (client) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.DUPLICATED_CONNECTION);
+    }
+
     await this.makeClientLeaveCurrentRoom(socket);
     socket.join(live.id);
     socket.data.live = live;
@@ -115,7 +123,9 @@ export class LiveGateway implements OnGatewayDisconnect {
     });
 
     const state = await this.liveService.createOrGetLiveState(live.id);
-    state.users.push(instanceToPlain(socket.data.user) as User);
+    if (!state.users.find((user) => user.id === socket.data.user.id)) {
+      state.users.push(instanceToPlain(socket.data.user) as User);
+    }
     await this.liveService.updateLiveState(state);
 
     return state;
@@ -468,9 +478,12 @@ export class LiveGateway implements OnGatewayDisconnect {
     if (socket.data.live) {
       // 退出房间
       socket.leave(socket.data.live.id);
-      // 更新房间用户
-      socket.data.state.users = socket.data.state.users.filter((user: User) => user.id !== socket.data.user.id);
-      await this.liveService.updateLiveState(socket.data.state);
+
+      // 更新用户
+      const state = await this.liveService.createOrGetLiveState(socket.data.live.id);
+      state.users = state.users.filter((user: User) => user.id !== socket.data.user?.id);
+      await this.liveService.updateLiveState(state);
+
       // 清除数据
       socket.data.live = undefined;
       socket.data.state = undefined;

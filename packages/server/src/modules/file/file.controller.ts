@@ -162,7 +162,7 @@ export class FileController {
   }
 
   async getFilePathById(id: string) {
-    const key = `file-${id}-path`;
+    const key = `file-path:${id}`;
     let path = await this.cacheStore.get<string>(key);
     if (!path) {
       const file = await this.fileService.findOneBy({ id });

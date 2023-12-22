@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Live } from './live.entity';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
@@ -7,11 +7,18 @@ import { instanceToPlain } from 'class-transformer';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 
 @Injectable()
-export class LiveService {
+export class LiveService implements OnModuleInit {
   constructor(
     @InjectRepository(Live) private liveRepository: Repository<Live>,
     @Inject(CACHE_MANAGER) private cacheStore: CacheStore,
   ) {}
+
+  async onModuleInit() {
+    const lives = await this.liveRepository.find();
+    for (const live of lives) {
+      await this.deleteLiveState(live.id);
+    }
+  }
 
   async save(live: DeepPartial<Live>) {
     return await this.liveRepository.save(live);
@@ -60,7 +67,7 @@ export class LiveService {
   }
 
   async updateLiveState(state: LiveState) {
-    await this.cacheStore.set(`live:${state.live.id}`, state);
+    await this.cacheStore.set(`live:${state.live.id}`, state, 0);
   }
 
   async deleteLiveState(id: string) {

@@ -172,15 +172,6 @@ export class LiveVoiceService implements OnModuleInit {
     return consumer;
   }
 
-  async closeProducer(groupId: string, peerId: number, producerId: string) {
-    const group = await this.getVoiceGroup(groupId);
-    const peer = group.peers.get(peerId);
-    if (peer.producers.has(producerId)) {
-      peer.producers.get(producerId).close();
-      peer.producers.delete(producerId);
-    }
-  }
-
   async removePeer(groupId: string, peerId: number) {
     const group = this.groups.get(groupId);
     const peer = group?.peers.get(peerId);

@@ -4,6 +4,7 @@ import { LiveModuleOptions } from './live.module.interface';
 import NodeMediaServer from 'node-media-server';
 import { ChildProcess, spawn } from 'child_process';
 import { generateMD5 } from '../../utils/generate-md5.util';
+import { LIVE_STREAM_DIR } from 'src/constants';
 
 @Injectable()
 export class LiveStreamService implements OnModuleInit {
@@ -22,6 +23,11 @@ export class LiveStreamService implements OnModuleInit {
         gop_cache: true,
         ping: 30,
         ping_timeout: 60,
+      },
+      http: {
+        mediaroot: LIVE_STREAM_DIR,
+        port: this.options.streamHttpPort,
+        allow_origin: '*',
       },
       auth: {
         publish: true,
@@ -65,7 +71,20 @@ export class LiveStreamService implements OnModuleInit {
     );
     this.streams.set(streamId, cp);
 
-    return `rtmp://${this.options.appHost}:${this.options.streamRtmpPort}/live/${streamId}`;
+    return {
+      rtmp: {
+        port: this.options.streamRtmpPort,
+        path: `/live/${streamId}`,
+      },
+      http: {
+        port: this.options.streamHttpPort,
+        path: `/live/${streamId}.flv`,
+      },
+      ws: {
+        port: this.options.streamHttpPort,
+        path: `/live/${streamId}.flv`,
+      },
+    };
   }
 
   async stopPublish(streamId: string) {

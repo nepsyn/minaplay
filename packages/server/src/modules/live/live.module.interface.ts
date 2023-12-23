@@ -5,9 +5,8 @@ export interface LiveModuleOptions {
   mediasoupMaxIncomeBitrate?: number;
 
   streamRtmpPort?: number;
+  streamHttpPort?: number;
   streamChunkSize?: number;
   streamFfmpegPath: string;
   streamPublishKey: string;
-
-  appHost: string;
 }

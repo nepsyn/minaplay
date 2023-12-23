@@ -279,13 +279,6 @@ export class LiveGateway implements OnGatewayDisconnect {
     }
   }
 
-  @SubscribeMessage('dispose')
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
-  @UseGuards(LiveAudienceWsGuard)
-  async handleDispose(@ConnectedSocket() socket: Socket) {
-    await this.dispose(socket.data.live.id);
-  }
-
   @SubscribeMessage('stream-media')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
@@ -470,8 +463,6 @@ export class LiveGateway implements OnGatewayDisconnect {
     this.server.to(liveId).socketsLeave(liveId);
     // 关闭房间语音服务
     await this.liveVoiceService.removeGroup(liveId);
-    // 删除房间缓存
-    await this.liveService.deleteLiveState(liveId);
   }
 
   private async makeClientLeaveCurrentRoom(socket: Socket | RemoteSocket<any, any>) {

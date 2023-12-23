@@ -37,14 +37,12 @@ export class LiveService implements OnModuleInit {
     return result.affected > 0;
   }
 
-  async createOrGetLiveState(id: string, renew = false): Promise<LiveState | undefined> {
+  async createOrGetLiveState(id: string): Promise<LiveState | undefined> {
     const cacheKey = `live:${id}`;
 
-    if (!renew) {
-      const state: LiveState = await this.cacheStore.get(cacheKey);
-      if (state) {
-        return state;
-      }
+    const state: LiveState = await this.cacheStore.get(cacheKey);
+    if (state) {
+      return state;
     }
 
     const live = await this.findOneBy({ id });

@@ -28,6 +28,7 @@ import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { Live } from './live.entity';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 import { isDefined } from 'class-validator';
+import { instanceToPlain } from 'class-transformer';
 
 @Controller('live')
 @UseGuards(AuthorizationGuard)
@@ -104,7 +105,7 @@ export class LiveController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    const live = await this.liveService.findOneBy({ id });
+    let live = await this.liveService.findOneBy({ id });
     if (!live) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
@@ -115,9 +116,13 @@ export class LiveController {
       password: data.password && (await encryptPassword(data.password)),
       poster: { id: data.posterFileId },
     });
-    await this.liveService.createOrGetLiveState(id, true);
+    live = await this.liveService.findOneBy({ id });
 
-    return await this.liveService.findOneBy({ id });
+    const state = await this.liveService.createOrGetLiveState(id);
+    state.live = instanceToPlain(live) as Live;
+    await this.liveService.updateLiveState(state);
+
+    return live;
   }
 
   @Delete(':id')
@@ -130,8 +135,13 @@ export class LiveController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    await this.liveService.delete({ id });
-    await this.liveGateway.dispose(id);
+    const live = await this.liveService.findOneBy({ id });
+    if (live) {
+      await this.liveService.delete({ id });
+      await this.liveGateway.dispose(id);
+      await this.liveService.deleteLiveState(id);
+    }
+
     return {};
   }
 }

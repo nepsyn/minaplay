@@ -223,6 +223,7 @@ export const useApiStore = defineStore('api', () => {
 
   const Live = {
     socketPath: baseUrl + '/live',
+    buildStreamPath: (path: string) => baseUrl + '/api/v1' + path,
     create: apiPost<LiveEntity, LiveDto>(`/api/v1/live`),
     getById: (id: string) => apiGet<LiveEntity>(`/api/v1/live/${id}`),
     query: apiGet<ApiQueryResult<LiveEntity>, LiveQueryDto>(`/api/v1/live`),

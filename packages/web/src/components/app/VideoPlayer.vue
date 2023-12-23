@@ -3,13 +3,7 @@
     <div ref="controlsRef">
       <div class="plyr__controls">
         <div class="plyr__controls__item d-flex align-center">
-          <button
-            v-if="!live"
-            class="plyr__controls__item plyr__control"
-            type="button"
-            data-plyr="play"
-            aria-label="Play"
-          >
+          <button class="plyr__controls__item plyr__control" type="button" data-plyr="play" aria-label="Play">
             <svg class="icon--pressed" aria-hidden="true" focusable="false">
               <use xlink:href="#plyr-pause"></use>
             </svg>
@@ -17,7 +11,7 @@
               <use xlink:href="#plyr-play"></use>
             </svg>
           </button>
-          <button v-if="live" type="button" class="plyr__control" data-plyr="restart">
+          <button v-if="live" @click="refresh()" type="button" class="plyr__control" data-plyr="restart">
             <svg role="presentation">
               <use xlink:href="#plyr-restart"></use>
             </svg>
@@ -173,6 +167,7 @@ import { useI18n } from 'vue-i18n';
 import { FileEntity } from '@/api/interfaces/file.interface';
 import { mdiArrowCollapseAll, mdiStretchToPageOutline } from '@mdi/js';
 import { LiveStream } from '@/api/interfaces/live.interface';
+import MpegTs from 'mpegts.js';
 
 const SUBTITLE_EXTENSIONS = ['.ass', '.ssa'];
 const FONT_EXTENSIONS = ['.otf', '.ttf', '.woff'];
@@ -216,6 +211,7 @@ const fontFiles = computed(
 const videoRef = ref<HTMLVideoElement | undefined>(undefined);
 const controlsRef = ref<HTMLElement | undefined>(undefined);
 let player: Plyr | undefined = undefined;
+let livePlayer: MpegTs.Player | undefined = undefined;
 let renderer = shallowRef<JASSUB | undefined>(undefined);
 const currentSubtitle = ref<FileEntity | undefined>(undefined);
 const renderSubtitle = (index: number) => {
@@ -255,6 +251,11 @@ watch(
 const loadResource = () => {
   if (player) {
     player.stop();
+    if (livePlayer) {
+      livePlayer.destroy();
+      livePlayer = undefined;
+    }
+
     src.value = '';
     poster.value = '';
   }
@@ -268,8 +269,33 @@ const loadResource = () => {
 
   if (props.stream && props.live) {
     if (props.stream.type === 'server-push') {
-      src.value = props.stream.media.url;
+      if (props.stream.url?.endsWith('.flv') && videoRef.value) {
+        livePlayer = MpegTs.createPlayer({
+          type: 'flv',
+          isLive: true,
+          url: api.Live.buildStreamPath(props.stream.url),
+        });
+        livePlayer.attachMediaElement(videoRef.value);
+        livePlayer.load();
+        livePlayer.play();
+      }
+    } else if (props.stream.type === 'live-stream') {
+      if (props.stream.url?.endsWith('.flv') && videoRef.value) {
+        livePlayer = MpegTs.createPlayer({
+          type: 'flv',
+          isLive: true,
+          url: props.stream.url,
+        });
+        livePlayer.attachMediaElement(videoRef.value);
+        livePlayer.load();
+        livePlayer.play();
+      }
     }
+  }
+};
+const refresh = () => {
+  if (livePlayer) {
+    livePlayer.currentTime = livePlayer.buffered.end(0) - 1;
   }
 };
 watch(
@@ -284,6 +310,7 @@ onMounted(async () => {
       controls: controlsRef.value,
       autoplay: true,
       ratio: '16:9',
+      clickToPlay: !props.live,
       keyboard: {
         global: true,
       },

@@ -27,25 +27,28 @@ export interface LiveQueryDto extends ApiQueryDto<LiveEntity> {
 
 export interface ServerPushMediaStream {
   type: 'server-push';
-  media: {
-    title: string;
-    url: string;
-  };
+  title?: string;
+  url: string;
   updateAt: Date;
 }
 
 export interface ClientSyncMediaStream {
   type: 'client-sync';
-  media: {
-    title: string;
-    url: string;
-  };
+  title?: string;
+  url: string;
   status: 'playing' | 'paused';
   position: number;
   updateAt: Date;
 }
 
-export type LiveStream = ServerPushMediaStream | ClientSyncMediaStream;
+export interface ThirdPartyLiveStream {
+  type: 'live-stream';
+  title?: string;
+  url: string;
+  updateAt: Date;
+}
+
+export type LiveStream = ServerPushMediaStream | ClientSyncMediaStream | ThirdPartyLiveStream;
 
 export interface LiveState {
   live: LiveEntity;

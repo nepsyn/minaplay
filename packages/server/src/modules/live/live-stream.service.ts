@@ -78,11 +78,11 @@ export class LiveStreamService implements OnModuleInit {
       },
       http: {
         port: this.options.streamHttpPort,
-        path: `/live/${streamId}.flv`,
+        path: `/live/${streamId}/stream.flv`,
       },
       ws: {
         port: this.options.streamHttpPort,
-        path: `/live/${streamId}.flv`,
+        path: `/live/${streamId}/stream.flv`,
       },
     };
   }

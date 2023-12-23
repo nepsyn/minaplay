@@ -12,11 +12,12 @@ import { LiveChat } from './live-chat.entity';
 import { LiveVoiceService } from './live-voice.service';
 import { LiveStreamService } from './live-stream.service';
 import { FileModule } from '../file/file.module';
+import { LiveStreamController } from './live-stream.controller';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Live, LiveChat]), AuthorizationModule, UserModule, FileModule],
   providers: [LiveService, LiveVoiceService, LiveStreamService, LiveChatService, LiveGateway],
-  controllers: [LiveController],
+  controllers: [LiveStreamController, LiveController],
   exports: [LiveService, LiveVoiceService, LiveStreamService, LiveChatService],
 })
 export class LiveModule extends LiveConfigurableModule {

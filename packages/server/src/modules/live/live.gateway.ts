@@ -279,11 +279,11 @@ export class LiveGateway implements OnGatewayDisconnect {
     }
   }
 
-  @SubscribeMessage('stream-media')
+  @SubscribeMessage('stream-server-push')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
   @RoomOwnerOnly()
-  async handleStreamFile(
+  async handleStreamServerPush(
     @ConnectedSocket() socket: Socket,
     @WsLiveState() state: LiveState,
     @MessageBody('id') id: string,
@@ -300,26 +300,52 @@ export class LiveGateway implements OnGatewayDisconnect {
       throw buildException(WsException, ErrorCodeEnum.INVALID_VIDEO_FILE_TYPE);
     }
 
-    const url = await this.liveStreamService.publishVideoFile(socket.data.live.id, media.file.path);
+    const address = await this.liveStreamService.publishVideoFile(socket.data.live.id, media.file.path);
     state.stream = {
       type: 'server-push',
-      media: {
-        title: media.name,
-        url,
-      },
+      title: media.name,
+      url: address.http.path,
       updateAt: new Date(),
     };
 
     this.server.to(socket.data.live.id).emit('stream', {
       stream: state.stream,
     });
+
+    return state.stream;
   }
 
-  @SubscribeMessage('stop-stream-media')
+  @SubscribeMessage('stream-third-party')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
   @RoomOwnerOnly()
-  async handleStopStreamFile(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState) {
+  async handleStreamThirdParty(
+    @ConnectedSocket() socket: Socket,
+    @WsLiveState() state: LiveState,
+    @MessageBody('url') url: string,
+  ) {
+    if (!isDefined(url)) {
+      throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
+    state.stream = {
+      type: 'server-push',
+      url,
+      updateAt: new Date(),
+    };
+
+    this.server.to(socket.data.live.id).emit('stream', {
+      stream: state.stream,
+    });
+
+    return state.stream;
+  }
+
+  @SubscribeMessage('stop-stream')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
+  @UseGuards(LiveAudienceWsGuard)
+  @RoomOwnerOnly()
+  async handleStopStreamServerPush(@ConnectedSocket() socket: Socket, @WsLiveState() state: LiveState) {
     await this.liveStreamService.stopPublish(socket.data.live.id);
     state.stream = undefined;
 

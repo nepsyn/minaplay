@@ -90,10 +90,10 @@ import { ApplicationExceptionFilter } from './common/application.exception.filte
         mediasoupAudioChannel: Number(configService.get('MS_AUDIO_CHANNELS', 2)),
         mediasoupMaxIncomeBitrate: Number(configService.get('MS_AUDIO_MAX_INCOME_BITRATE', 1500000)),
         streamRtmpPort: Number(configService.get('STREAM_RTMP_PORT', 1935)),
+        streamHttpPort: configService.get('STREAM_HTTP_PORT', 3001),
         streamChunkSize: Number(configService.get('STREAM_CHUNK_SIZE', 60000)),
         streamFfmpegPath: configService.get('FFMPEG_PATH', 'ffmpeg'),
         streamPublishKey: configService.get('STREAM_PUBLISH_KEY'),
-        appHost: configService.get('APP_HOST', '127.0.0.1'),
       }),
     }),
     MediaModule.registerAsync({

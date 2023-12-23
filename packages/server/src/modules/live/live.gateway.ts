@@ -329,7 +329,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     }
 
     state.stream = {
-      type: 'server-push',
+      type: 'live-stream',
       url,
       updateAt: new Date(),
     };

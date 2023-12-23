@@ -356,7 +356,21 @@ export class LiveGateway implements OnGatewayDisconnect {
   @SubscribeMessage('voice-create-webrtc-transport')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
   @UseGuards(LiveAudienceWsGuard)
-  async handleVoiceCreateWebrtcTransport(
+  async handleVoiceCreateWebrtcTransport(@ConnectedSocket() socket: Socket) {
+    const transport = await this.liveVoiceService.createWebRtcTransport(socket.data.live.id, socket.data.user.id);
+
+    return {
+      id: transport.id,
+      iceParameters: transport.iceParameters,
+      iceCandidates: transport.iceCandidates,
+      dtlsParameters: transport.dtlsParameters,
+    };
+  }
+
+  @SubscribeMessage('voice-connect-webrtc-transport')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP, PermissionEnum.LIVE_VIEW)
+  @UseGuards(LiveAudienceWsGuard)
+  async handleVoiceConnectWebrtcTransport(
     @ConnectedSocket() socket: Socket,
     @MessageBody('transportId') transportId: string,
     @MessageBody('dtlsParameters') dtlsParameters: MediasoupTypes.DtlsParameters,

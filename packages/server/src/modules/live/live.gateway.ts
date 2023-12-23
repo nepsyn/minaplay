@@ -489,6 +489,9 @@ export class LiveGateway implements OnGatewayDisconnect {
       state.users = state.users.filter((user: User) => user.id !== socket.data.user?.id);
       await this.liveService.updateLiveState(state);
 
+      // 退出语音
+      await this.liveVoiceService.removePeer(socket.data.live.id, socket.data.user?.id);
+
       // 清除数据
       socket.data.live = undefined;
       socket.data.state = undefined;

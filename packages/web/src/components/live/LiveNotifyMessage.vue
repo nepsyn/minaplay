@@ -1,11 +1,13 @@
 <template>
-  <v-alert v-if="getNotifyText(notify)" :type="notify.data.type ?? 'info'" density="compact" variant="tonal">
-    <div v-if="['connect', 'disconnect'].includes(notify.data.action)">
-      {{ getNotifyText(notify) }}
+  <v-alert :type="notify.data.type ?? 'info'" density="compact" variant="tonal">
+    <div v-if="['member-join', 'member-quit'].includes(notify.data.action)">
+      <span>
+        <strong>{{ notify.data.user?.username }}</strong>
+        {{ t(`live.play.notify.${notify.data.action}`) }}
+      </span>
     </div>
-    <div v-else-if="['member-join', 'member-quit'].includes(notify.data.action)">
-      <span class="font-weight-bold">{{ notify.data.operator?.username }}</span>
-      <span class="ml-1">{{ getNotifyText(notify) }}</span>
+    <div v-else>
+      {{ t(`live.play.notify.${notify.data.action}`) }}
     </div>
   </v-alert>
 </template>
@@ -19,21 +21,6 @@ const { t } = useI18n();
 defineProps<{
   notify: LiveNotify;
 }>();
-
-const getNotifyText = (notify: LiveNotify) => {
-  switch (notify.data.action) {
-    case 'connect':
-      return t('live.play.notify.connect');
-    case 'disconnect':
-      return t('live.play.notify.disconnect');
-    case 'member-join':
-      return t('live.play.notify.memberJoin');
-    case 'member-quit':
-      return t('live.play.notify.memberQuit');
-    default:
-      return undefined;
-  }
-};
 </script>
 
 <style scoped lang="sass"></style>

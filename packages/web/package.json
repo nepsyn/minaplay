@@ -19,6 +19,7 @@
     "filesize": "^10.1.0",
     "highlight.js": "^11.9.0",
     "jassub": "^1.7.15",
+    "mediasoup-client": "^3.7.1",
     "monaco-editor": "^0.45.0",
     "pinia": "^2.1.7",
     "plyr": "^3.7.8",

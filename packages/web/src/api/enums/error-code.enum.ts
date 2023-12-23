@@ -53,4 +53,6 @@ export enum ErrorCodeEnum {
   VOICE_SERVICE_ESTABLISH_FAILED = 0x0603,
   /** 直播房间密码错误 */
   WRONG_LIVE_PASSWORD = 0x0604,
+  /** 存在多个连接 */
+  DUPLICATED_CONNECTION = 0x0605,
 }

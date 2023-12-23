@@ -15,14 +15,14 @@
                   <div class="text-subtitle-2 text-medium-emphasis">
                     <span>{{ live.user?.username ?? t('user.deleted') }}</span>
                     ·
-                    <time-ago :time="live.createAt"></time-ago>
+                    <time-ago :time="live.createAt" interval="60000"></time-ago>
                   </div>
                 </v-container>
               </template>
               <v-skeleton-loader v-else type="list-item-avatar-two-line" min-width="360px"></v-skeleton-loader>
             </v-container>
             <v-responsive :aspect-ratio="16 / 9" max-height="520" class="rounded-b">
-              <video-player live></video-player>
+              <video-player live :stream="state?.stream"></video-player>
             </v-responsive>
           </v-container>
         </v-col>
@@ -31,8 +31,10 @@
             <div class="d-flex flex-column flex-grow-0">
               <v-tabs color="primary" grow v-model="tab" class="rounded-t-lg">
                 <v-tab value="chat">{{ t('live.play.tabs.chat') }}</v-tab>
-                <v-tab v-if="validated" value="audience">{{ t('live.play.tabs.audience') }}</v-tab>
-                <v-tab v-if="validated" value="settings">{{ t('live.play.tabs.settings') }}</v-tab>
+                <v-tab v-if="validated" value="voice">{{ t('live.play.tabs.voice') }}</v-tab>
+                <v-tab v-if="validated && live?.user?.id === api.user?.id" value="settings">
+                  {{ t('live.play.tabs.settings') }}
+                </v-tab>
               </v-tabs>
               <v-divider></v-divider>
             </div>
@@ -69,7 +71,7 @@
                       :prepend-icon="mdiImagePlus"
                       :disabled="!validated || chatSending"
                       v-model.trim="chatText"
-                      @keydown.enter="sendChat({ type: 'Text', content: chatText })"
+                      @keydown.enter="chatText?.length > 0 && sendChat({ type: 'Text', content: chatText })"
                       @click:prepend="selectAndSendImage()"
                     >
                       <template #append-inner>
@@ -86,29 +88,98 @@
                   </v-container>
                 </div>
               </div>
-              <div class="d-flex flex-column flex-grow-1" v-else-if="tab === 'audience'">
-                <v-container class="scrollable-container">
-                  <p v-for="i in 120">{{ i }}</p>
+              <div class="d-flex flex-column flex-grow-1" v-else-if="tab === 'voice'">
+                <v-container v-if="voiceMembers.length > 0" class="scrollable-container">
+                  <v-row dense>
+                    <v-col v-for="voice in voiceMembers" :key="voice.user.id" cols="12">
+                      <v-container class="pa-0 d-flex flex-row align-center">
+                        <v-tooltip location="bottom">
+                          {{ voice.user.username }}
+                          <template #activator="{ props }">
+                            <user-avatar
+                              size="50"
+                              v-bind="props"
+                              :src="
+                                voice.user.avatar && api.File.buildRawPath(voice.user.avatar.id, voice.user.avatar.name)
+                              "
+                            ></user-avatar>
+                          </template>
+                        </v-tooltip>
+                        <v-slider
+                          class="mx-4"
+                          color="primary"
+                          density="comfortable"
+                          hide-details
+                          min="0"
+                          max="100"
+                          v-model="voice.volume"
+                          @change="voice.el.volume = voice.volume / 100"
+                          :prepend-icon="voice.volume > 0 ? mdiVolumeHigh : mdiVolumeOff"
+                          @click:prepend="
+                            voice.volume = voice.volume > 0 ? 0 : 100;
+                            voice.el.volume = voice.volume / 100;
+                          "
+                        ></v-slider>
+                      </v-container>
+                    </v-col>
+                  </v-row>
+                </v-container>
+                <v-container v-else class="scrollable-container d-flex flex-column align-center justify-center">
+                  <v-icon :icon="mdiEmoticonCoolOutline" size="100"></v-icon>
+                  <span class="font-italic font-weight-bold mt-4 px-6">{{ t('live.play.voice.single') }}</span>
                 </v-container>
                 <div class="d-flex flex-column flex-grow-0">
                   <v-divider></v-divider>
                   <v-container class="d-flex align-center">
-                    <v-tooltip location="bottom">
-                      {{ api.user?.username }}
-                      <template #activator="{ props }">
-                        <user-avatar
-                          v-bind="props"
-                          size="48"
-                          :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
-                        ></user-avatar>
-                      </template>
-                    </v-tooltip>
-                    <v-btn
-                      variant="flat"
-                      class="text-medium-emphasis"
-                      density="comfortable"
-                      :icon="mdiMicrophone"
-                    ></v-btn>
+                    <template v-if="producer && !producer.closed && !voiceConnecting">
+                      <v-tooltip location="bottom">
+                        {{ api.user?.username }}
+                        <template #activator="{ props }">
+                          <user-avatar
+                            v-bind="props"
+                            size="48"
+                            :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
+                          ></user-avatar>
+                        </template>
+                      </v-tooltip>
+                      <v-tooltip>
+                        {{ producer.paused ? t('live.play.voice.muted') : t('live.play.voice.talking') }}
+                        <template #activator="{ props }">
+                          <v-btn
+                            variant="flat"
+                            class="text-medium-emphasis"
+                            density="comfortable"
+                            :icon="producer.paused ? mdiMicrophoneOff : mdiMicrophone"
+                            v-bind="props"
+                            @click="producer.paused ? producer.resume() : producer.pause()"
+                          ></v-btn>
+                        </template>
+                      </v-tooltip>
+
+                      <v-spacer></v-spacer>
+                      <v-btn
+                        :loading="voiceConnecting"
+                        variant="plain"
+                        :prepend-icon="mdiPhoneOff"
+                        color="error"
+                        @click="disconnectVoice()"
+                      >
+                        {{ t('live.play.voice.quit') }}
+                      </v-btn>
+                    </template>
+                    <template v-else>
+                      <v-container class="pa-0 d-flex justify-center align-center">
+                        <v-btn
+                          :loading="voiceConnecting"
+                          variant="tonal"
+                          :prepend-icon="mdiPhone"
+                          color="primary"
+                          @click="connectVoice()"
+                        >
+                          {{ t('live.play.voice.join') }}
+                        </v-btn>
+                      </v-container>
+                    </template>
                   </v-container>
                 </div>
               </div>
@@ -159,9 +230,20 @@ import { useApiStore } from '@/store/api';
 import { useRoute, useRouter } from 'vue-router';
 import VideoPlayer from '@/components/app/VideoPlayer.vue';
 import UserAvatar from '@/components/user/UserAvatar.vue';
-import { computed, onUnmounted, ref } from 'vue';
+import { computed, onUnmounted, ref, shallowRef } from 'vue';
 import TimeAgo from '@/components/app/TimeAgo.vue';
-import { mdiImagePlus, mdiLock, mdiMicrophone, mdiNavigationVariant } from '@mdi/js';
+import {
+  mdiEmoticonCoolOutline,
+  mdiImagePlus,
+  mdiLock,
+  mdiMicrophone,
+  mdiMicrophoneOff,
+  mdiNavigationVariant,
+  mdiPhone,
+  mdiPhoneOff,
+  mdiVolumeHigh,
+  mdiVolumeOff,
+} from '@mdi/js';
 import { TimeoutError, useSocketIOConnection } from '@/composables/use-socket-io-connection';
 import {
   LiveChatEntity,
@@ -170,12 +252,17 @@ import {
   LiveEvent,
   LiveEventMap,
   LiveState,
+  LiveStream,
+  RoomVoice,
 } from '@/api/interfaces/live.interface';
 import LiveMessage from '@/components/live/LiveMessage.vue';
 import { useToastStore } from '@/store/toast';
 import { useAsyncTask } from '@/composables/use-async-task';
 import { UserEntity } from '@/api/interfaces/user.interface';
 import axios from 'axios';
+import { Device } from 'mediasoup-client';
+import { Transport } from 'mediasoup-client/lib/Transport';
+import { Producer } from 'mediasoup-client/lib/Producer';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -207,10 +294,10 @@ socket.on('connect', async () => {
   try {
     const live = await emit('info', { id: String(route.params.id) });
     state.value = { live, users: [], muted: { chat: [], voice: [] }, updateAt: new Date() };
-    validateDialog.value = live.hasPassword;
-    validated.value = !live.hasPassword;
+    validateDialog.value = live.hasPassword && live.user?.id !== api.user?.id;
+    validated.value = !validateDialog.value;
 
-    if (!live.hasPassword) {
+    if (validated.value) {
       await join();
     }
   } catch (error: any) {
@@ -225,13 +312,18 @@ socket.on('disconnect', () => {
     },
   });
 });
+socket.on('stream', (data: { stream: LiveStream }) => {
+  if (state.value) {
+    state.value.stream = data.stream;
+  }
+});
 socket.on('member-join', (data: { user: UserEntity }) => {
   if (data.user.id !== api.user?.id) {
     push({
       type: 'Notify',
       data: {
         action: 'member-join',
-        operator: data.user,
+        user: data.user,
       },
     });
   }
@@ -245,7 +337,7 @@ socket.on('member-quit', (data: { user: UserEntity }) => {
       type: 'Notify',
       data: {
         action: 'member-quit',
-        operator: data.user,
+        user: data.user,
       },
     });
   }
@@ -253,12 +345,67 @@ socket.on('member-quit', (data: { user: UserEntity }) => {
   if (state.value) {
     state.value.users = state.value.users.filter((user) => user.id !== data.user.id);
   }
+  voiceMembers.value = voiceMembers.value.filter((voice) => voice.user.id !== data.user.id);
+});
+socket.on('member-kick', async (data: { user: UserEntity }) => {
+  if (data.user.id === api.user?.id) {
+    toast.toastWarning(t('live.play.notify.member-kick'));
+    await router.replace({ path: '/live' });
+  }
+
+  if (state.value) {
+    state.value.users = state.value.users.filter((user) => user.id !== data.user.id);
+  }
+  voiceMembers.value = voiceMembers.value.filter((voice) => voice.user.id !== data.user.id);
 });
 socket.on('member-chat', (data: LiveChatEntity) => {
   push({
     type: 'Chat',
     data,
   });
+});
+socket.on('member-chat-revoke', (data: { id: string }) => {
+  events.value = events.value.filter((event) => event.type === 'Notify' || event.data.id !== data.id);
+});
+socket.on('member-mute-chat', (data: { id: number }) => {
+  if (state.value && !state.value.muted.chat.includes(data.id)) {
+    state.value.muted.chat.push(data.id);
+  }
+  if (data.id === api.user?.id) {
+    push({
+      type: 'Notify',
+      data: {
+        action: 'member-mute-chat',
+        user: api.user,
+        type: 'warning',
+      },
+    });
+  }
+});
+socket.on('member-unmute-chat', (data: { id: number }) => {
+  if (state.value) {
+    state.value.muted.chat = state.value.muted.chat.filter((id) => id !== data.id);
+  }
+});
+socket.on('member-mute-voice', (data: { id: number }) => {
+  if (state.value && !state.value.muted.voice.includes(data.id)) {
+    state.value.muted.voice.push(data.id);
+  }
+  if (data.id === api.user?.id) {
+    push({
+      type: 'Notify',
+      data: {
+        action: 'member-mute-voice',
+        user: api.user,
+        type: 'warning',
+      },
+    });
+  }
+});
+socket.on('member-unmute-voice', (data: { id: number }) => {
+  if (state.value) {
+    state.value.muted.voice = state.value.muted.voice.filter((id) => id !== data.id);
+  }
 });
 
 const password = ref('');
@@ -362,6 +509,169 @@ const push = (message: LiveEvent) => {
     events.value.shift();
   }
   events.value.push(message);
+};
+
+const device = new Device();
+const voiceConnecting = ref(false);
+let producerTransport = shallowRef<Transport | undefined>(undefined);
+const consumerTransport = shallowRef<Transport | undefined>(undefined);
+const producer = ref<Producer | undefined>(undefined);
+const voiceMembers = ref<RoomVoice[]>([]);
+const disconnectVoice = async () => {
+  socket.off('voice-new-producer');
+  socket.off('voice-closed-producer');
+
+  if (consumerTransport.value && !consumerTransport.value.closed) {
+    consumerTransport.value.close();
+    consumerTransport.value = undefined;
+  }
+  if (producerTransport.value && !producerTransport.value.closed) {
+    producerTransport.value.close();
+    producerTransport.value = undefined;
+  }
+  if (producer.value && !producer.value.closed) {
+    producer.value.close();
+    producer.value = undefined;
+  }
+
+  voiceMembers.value = [];
+};
+const connectVoice = async () => {
+  await disconnectVoice();
+
+  voiceConnecting.value = true;
+  try {
+    if (!device.loaded) {
+      const cap = await emit('voice-rtp-capabilities');
+      await device.load({ routerRtpCapabilities: cap });
+    }
+
+    // producer
+    const producerTransportParams = await emit('voice-create-webrtc-transport');
+    producerTransport.value = device.createSendTransport({
+      ...producerTransportParams,
+    });
+    producerTransport.value.on('connect', async (data, callback) => {
+      await emit('voice-connect-webrtc-transport', {
+        transportId: producerTransportParams.id,
+        dtlsParameters: data.dtlsParameters,
+      });
+      callback();
+    });
+    producerTransport.value.on('produce', async (data, callback) => {
+      const resp = await emit('voice-create-producer', {
+        transportId: producerTransport.value?.id,
+        rtpParameters: data.rtpParameters,
+      });
+      callback({
+        id: resp.producerId,
+      });
+    });
+    producerTransport.value.on('connectionstatechange', (state) => {
+      if (state === 'failed') {
+        toast.toastError(t('live.play.voiceConnectFailed'));
+        producerTransport.value?.close();
+      }
+    });
+
+    // consumer
+    const consumerTransportParams = await emit('voice-create-webrtc-transport');
+    consumerTransport.value = device.createRecvTransport({
+      ...consumerTransportParams,
+    });
+    consumerTransport.value.on('connect', async (data, callback) => {
+      await emit('voice-connect-webrtc-transport', {
+        transportId: consumerTransportParams.id,
+        dtlsParameters: data.dtlsParameters,
+      });
+      callback();
+    });
+    consumerTransport.value.on('connectionstatechange', (state) => {
+      if (state === 'failed') {
+        toast.toastError(t('live.play.voice.voiceConnectFailed'));
+        consumerTransport.value?.close();
+      }
+    });
+
+    // current users
+    const producers = await emit('voice-get-producers');
+    console.log(producers);
+    for (const { userId, producerId } of producers) {
+      await consume(userId, producerId);
+    }
+
+    // auto consume
+    socket.on('voice-new-producer', async (data) => {
+      await consume(data.userId, data.producerId);
+    });
+
+    // auto release
+    socket.on('voice-closed-producer', async (data) => {
+      voiceMembers.value = voiceMembers.value.filter((voice) => voice.user.id !== data.userId);
+    });
+
+    await produce();
+  } catch (error: any) {
+    if (error instanceof TimeoutError) {
+      toast.toastError(t('error.timeout'));
+    } else {
+      toast.toastError(t(`error.${error?.code ?? 'other'}`));
+    }
+  } finally {
+    voiceConnecting.value = false;
+  }
+};
+const consume = async (userId: number, producerId: string) => {
+  const user = state.value?.users.find((user) => user.id === userId);
+  const member = voiceMembers.value.find((voice) => voice.user.id === userId);
+  if (user && !member && userId !== api.user?.id) {
+    const params = await emit('voice-create-consumer', {
+      rtpCapabilities: device.rtpCapabilities,
+      transportId: consumerTransport.value?.id,
+      producerId: producerId,
+    });
+    const consumer = await consumerTransport.value?.consume({
+      id: params.consumerId,
+      producerId: params.producerId,
+      kind: 'audio',
+      rtpParameters: params.rtpParameters,
+    });
+
+    if (consumer) {
+      const stream = new MediaStream();
+      stream.addTrack(consumer.track);
+
+      const el = new Audio();
+      el.srcObject = stream;
+      el.autoplay = true;
+      el.volume = 1;
+      voiceMembers.value.push({
+        user: state.value?.users.find((user) => user.id === userId) as UserEntity,
+        el,
+        volume: 100,
+      });
+    }
+  }
+};
+const produce = async () => {
+  if (device.canProduce('audio')) {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: false,
+      });
+      const track = stream.getAudioTracks()[0];
+      producer.value = await producerTransport.value?.produce({
+        track,
+      });
+    } catch {
+      await disconnectVoice();
+      toast.toastError(t('live.play.voice.voiceNoInputDevice'));
+    }
+  } else {
+    await disconnectVoice();
+    toast.toastError(t('live.play.voice.voiceNotEnabled'));
+  }
 };
 
 const tab = ref('chat');

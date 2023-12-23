@@ -15,7 +15,7 @@
           <v-tooltip v-for="(action, index) in actions" :key="index" location="bottom" open-delay="500">
             {{ action.text }}
             <template #activator="{ props }">
-              <v-btn v-bind="props" icon @click="action.click()">
+              <v-btn v-if="action.show" v-bind="props" icon @click="action.click()">
                 <v-icon :icon="action.icon" size="large"></v-icon>
               </v-btn>
             </template>
@@ -27,6 +27,7 @@
               <template v-for="(action, index) in actions" :key="index">
                 <v-list-item
                   link
+                  v-if="action.show"
                   @click="action.click()"
                   :title="action.text"
                   :prepend-icon="action.icon"
@@ -148,6 +149,7 @@ import UserAvatar from '@/components/user/UserAvatar.vue';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useRoute, useRouter } from 'vue-router';
 import { useToastStore } from '@/store/toast';
+import { PermissionEnum } from '@/api/enums/permission.enum';
 
 const { t } = useI18n<{ message: MessageSchema }>();
 const layout = useLayoutStore();
@@ -187,6 +189,7 @@ const actions = ref([
     click: () => {
       layout.uploadDrawer = !layout.uploadDrawer;
     },
+    show: api.hasPermission(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP, PermissionEnum.FILE_UPLOAD_VIDEO),
   },
   {
     text: computed(() => (layout.darkMode ? t('layout.actions.light') : t('layout.actions.dark'))),
@@ -194,6 +197,7 @@ const actions = ref([
     click: () => {
       layout.toggleDarkMode(!layout.darkMode);
     },
+    show: true,
   },
   {
     text: t('layout.actions.github'),
@@ -201,6 +205,7 @@ const actions = ref([
     click: () => {
       openUrl('https://github.com/nepsyn/minaplay');
     },
+    show: true,
   },
 ]);
 

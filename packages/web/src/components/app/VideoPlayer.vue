@@ -172,6 +172,7 @@ import jassubWasmUrl from 'jassub/dist/jassub-worker.wasm?url';
 import { useI18n } from 'vue-i18n';
 import { FileEntity } from '@/api/interfaces/file.interface';
 import { mdiArrowCollapseAll, mdiStretchToPageOutline } from '@mdi/js';
+import { LiveStream } from '@/api/interfaces/live.interface';
 
 const SUBTITLE_EXTENSIONS = ['.ass', '.ssa'];
 const FONT_EXTENSIONS = ['.otf', '.ttf', '.woff'];
@@ -183,6 +184,7 @@ const props = withDefaults(
   defineProps<{
     media?: MediaEntity;
     live?: boolean;
+    stream?: LiveStream;
   }>(),
   {
     live: false,
@@ -250,6 +252,32 @@ watch(
   },
 );
 
+const loadResource = () => {
+  if (player) {
+    player.stop();
+    src.value = '';
+    poster.value = '';
+  }
+
+  if (props.media && !props.live) {
+    src.value = api.File.buildRawPath(props.media.file!.id, props.media.file!.name);
+    poster.value = props.media.poster
+      ? api.File.buildRawPath(props.media.poster.id, props.media.poster.name)
+      : MediaPosterFallback;
+  }
+
+  if (props.stream && props.live) {
+    if (props.stream.type === 'server-push') {
+      src.value = props.stream.media.url;
+    }
+  }
+};
+watch(
+  () => [props.media, props.stream],
+  () => {
+    loadResource();
+  },
+);
 onMounted(async () => {
   if (videoRef.value) {
     player = new Plyr(videoRef.value, {
@@ -261,12 +289,7 @@ onMounted(async () => {
       },
     });
 
-    if (props.media) {
-      src.value = api.File.buildRawPath(props.media.file!.id, props.media.file!.name);
-      poster.value = props.media.poster
-        ? api.File.buildRawPath(props.media.poster.id, props.media.poster.name)
-        : MediaPosterFallback;
-    }
+    loadResource();
 
     player.on('exitfullscreen', () => {
       if (player) {

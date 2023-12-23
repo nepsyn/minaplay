@@ -1,6 +1,8 @@
 import { UserEntity } from '@/api/interfaces/user.interface';
 import { FileEntity } from '@/api/interfaces/file.interface';
 import { ApiQueryDto } from '@/api/interfaces/common.interface';
+import { MediaKind, RtpCapabilities, RtpParameters } from 'mediasoup-client/lib/RtpParameters';
+import { DtlsParameters, TransportOptions } from 'mediasoup-client/lib/Transport';
 
 export interface LiveEntity {
   id: string;
@@ -76,9 +78,16 @@ export interface LiveChatEntity {
 export interface LiveNotify {
   type: 'Notify';
   data: {
-    operator?: UserEntity;
-    target?: UserEntity;
-    action: 'connect' | 'disconnect' | 'member-join' | 'member-quit';
+    user?: UserEntity;
+    action:
+      | 'connect'
+      | 'disconnect'
+      | 'member-join'
+      | 'member-quit'
+      | 'member-mute-chat'
+      | 'member-unmute-chat'
+      | 'member-mute-voice'
+      | 'member-unmute-voice';
     type?: 'info' | 'warning' | 'success' | 'error';
   };
 }
@@ -95,4 +104,27 @@ export type LiveEventMap = {
   join: [{ id: string; password?: string }, LiveState];
   chat: [{ message: LiveChatText | LiveChatNetworkImage }, undefined];
   messages: [{ start: string; end?: string }, LiveChatEntity[]];
+
+  'voice-rtp-capabilities': [undefined, RtpCapabilities];
+  'voice-get-producers': [undefined, { userId: number; producerId: string }[]];
+  'voice-create-webrtc-transport': [undefined, TransportOptions];
+  'voice-connect-webrtc-transport': [{ transportId: string; dtlsParameters: DtlsParameters }, undefined];
+  'voice-create-producer': [{ transportId: string; dtlsParameters: DtlsParameters }, { producerId: string }];
+  'voice-create-consumer': [
+    { transportId: string; producerId: string; rtpCapabilities: RtpCapabilities },
+    {
+      consumerId: string;
+      producerId: string;
+      kind: MediaKind;
+      rtpParameters: RtpParameters;
+      type: 'simple' | 'simulcast' | 'svc' | 'pipe';
+      producerPaused: boolean;
+    },
+  ];
 };
+
+export interface RoomVoice {
+  user: UserEntity;
+  el: HTMLAudioElement;
+  volume: number;
+}

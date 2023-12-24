@@ -34,7 +34,7 @@ export class AuthorizationService {
     await this.updateTicket(user.id, ticket);
 
     return {
-      ...instanceToPlain(user),
+      ...instanceToPlain(user, { groups: ['profile'] }),
       token,
     };
   }

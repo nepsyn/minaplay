@@ -13,7 +13,7 @@
             {{ t('layout.upload.title') }}
           </v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn class="mr-4" variant="text" color="primary" :icon="mdiPlus" @click="selectAndUploadMedia"></v-btn>
+          <v-btn class="mr-4" variant="text" color="primary" :icon="mdiPlus" @click="selectAndUploadMedia()"></v-btn>
         </v-toolbar>
         <v-alert class="mx-4 mb-2" variant="tonal" type="warning" density="compact" :icon="mdiInformationOutline">
           {{ t('layout.upload.closePageHint') }}
@@ -31,7 +31,7 @@
         </template>
         <v-container v-else class="h-100 d-flex justify-center align-center">
           <div class="upload-box d-flex flex-column justify-center align-center">
-            <v-icon size="40" :icon="mdiPlus"></v-icon>
+            <v-btn variant="text" size="40" :icon="mdiPlus" @click="selectAndUploadMedia()"></v-btn>
             <span class="text-body-2 mt-2">
               {{ t('layout.upload.drop') }}
             </span>
@@ -49,6 +49,7 @@ import { mdiInformationOutline, mdiPlus } from '@mdi/js';
 import { ref } from 'vue';
 import { useI18n } from 'vue-i18n';
 import UploadMedia from '@/components/app/UploadMedia.vue';
+import { selectFile } from '@/utils/utils';
 
 const { t } = useI18n();
 const display = useDisplay();
@@ -57,18 +58,9 @@ const layout = useLayoutStore();
 const uploadFiles = ref<File[]>([]);
 
 const selectAndUploadMedia = () => {
-  const el = document.createElement('input');
-  el.accept = 'video/*';
-  el.type = 'file';
-  el.multiple = true;
-  el.onchange = async (e) => {
-    for (const file of (e.target as any).files) {
-      if (file) {
-        uploadFiles.value.push(file);
-      }
-    }
-  };
-  el.click();
+  selectFile('video/*', true, (files) => {
+    uploadFiles.value.push(...files);
+  });
 };
 
 const onDrop = (e: DragEvent) => {

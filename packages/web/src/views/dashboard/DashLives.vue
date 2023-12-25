@@ -6,6 +6,11 @@
           {{ t('app.actions.add') }}
         </v-btn>
       </v-col>
+      <v-col cols="auto">
+        <v-btn variant="flat" color="info" :prepend-icon="mdiRefresh" :loading="loading" @click="request()">
+          {{ t('app.actions.refresh') }}
+        </v-btn>
+      </v-col>
     </v-row>
     <v-row dense class="mt-2">
       <v-col cols="12">
@@ -28,14 +33,14 @@
         v-model:page="page"
         v-model:sort-by="sortBy"
         :headers="headers"
-        :items-length="files?.total ?? 0"
-        :items="files?.items ?? []"
+        :items-length="lives?.total ?? 0"
+        :items="lives?.items ?? []"
         :loading="loading"
         color="primary"
         :loading-text="t('app.loader.loading')"
         :no-data-text="t('app.loader.empty')"
         :items-per-page-text="t('app.loader.itemsPerPage')"
-        :page-text="t('app.loader.pageText', { page, max: Math.ceil((files?.total ?? 0) / size) })"
+        :page-text="t('app.loader.pageText', { page, max: Math.ceil((lives?.total ?? 0) / size) })"
         :items-per-page-options="[10, 25, 50]"
         hover
         item-value="id"
@@ -48,6 +53,7 @@
         <template #item.poster="{ item }">
           <zoom-img
             class="rounded ma-1"
+            :aspect-ratio="16 / 9"
             min-width="120"
             max-width="160"
             :src="item.poster ? api.File.buildRawPath(item.poster.id, item.poster.name) : LivePosterFallback"
@@ -91,11 +97,32 @@
         </template>
       </v-data-table-server>
     </v-sheet>
+
+    <v-dialog v-model="deleteDialog" width="auto">
+      <v-card v-if="editItem">
+        <v-card-title>
+          {{ t('app.actions.deleteTitle') }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column">
+          <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.live') }) }}</span>
+          <span class="font-italic font-weight-bold"> "{{ editItem.title || t('live.unnamed') }}" </span>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="deleteDialog = false">
+            {{ t('app.cancel') }}
+          </v-btn>
+          <v-btn variant="plain" color="error" :loading="liveClosing" @click="closeLive(editItem.id)">
+            {{ t('app.ok') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { mdiCheck, mdiClose, mdiMagnify, mdiPencil, mdiPlus } from '@mdi/js';
+import { mdiCheck, mdiClose, mdiMagnify, mdiPlus, mdiRefresh, mdiShare } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { ref } from 'vue';
@@ -105,9 +132,13 @@ import { LiveEntity, LiveQueryDto } from '@/api/interfaces/live.interface';
 import UserAvatar from '@/components/user/UserAvatar.vue';
 import LivePosterFallback from '@/assets/live-poster-fallback.png';
 import ZoomImg from '@/components/app/ZoomImg.vue';
+import { useRouter } from 'vue-router';
+import { useToastStore } from '@/store/toast';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
+const router = useRouter();
+const toast = useToastStore();
 
 const page = ref(1);
 const size = ref(10);
@@ -116,7 +147,7 @@ const filters = ref<LiveQueryDto>({});
 const {
   pending: loading,
   request,
-  data: files,
+  data: lives,
 } = useAxiosRequest(async () => {
   return await api.Live.query({
     ...Object.fromEntries(
@@ -162,20 +193,47 @@ const headers = ref([
   },
 ]);
 
+const editItem = ref<LiveEntity | undefined>(undefined);
+
+const deleteDialog = ref(false);
+const {
+  pending: liveClosing,
+  request: closeLive,
+  onResolved: onLiveClosed,
+  onRejected: onLiveCloseFailed,
+} = useAxiosRequest(async (id: string) => {
+  return await api.Live.delete(id)();
+});
+onLiveClosed(async () => {
+  toast.toastSuccess(t('app.actions.deleteToast'));
+  if (lives.value) {
+    lives.value.items = lives.value.items.filter(({ id }) => id !== editItem.value?.id);
+  }
+  deleteDialog.value = false;
+});
+onLiveCloseFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
 const actions = [
   {
-    text: t('app.actions.edit'),
-    icon: mdiPencil,
+    text: t('app.actions.view'),
+    icon: mdiShare,
     color: 'info',
     show: (item: LiveEntity) => true,
-    click: (item: LiveEntity) => undefined,
+    click: (item: LiveEntity) => {
+      router.push({ path: `/live/${item.id}` });
+    },
   },
   {
     text: t('app.actions.close'),
     icon: mdiClose,
     color: 'error',
     show: (item: LiveEntity) => true,
-    click: (item: LiveEntity) => undefined,
+    click: (item: LiveEntity) => {
+      editItem.value = item;
+      deleteDialog.value = true;
+    },
   },
 ];
 </script>

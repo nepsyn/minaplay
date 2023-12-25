@@ -6,6 +6,11 @@
           {{ t('app.actions.add') }}
         </v-btn>
       </v-col>
+      <v-col cols="auto">
+        <v-btn variant="flat" color="info" :prepend-icon="mdiRefresh" :loading="loading" @click="request()">
+          {{ t('app.actions.refresh') }}
+        </v-btn>
+      </v-col>
     </v-row>
     <v-row dense class="mt-2">
       <v-col cols="12">
@@ -100,7 +105,7 @@
 </template>
 
 <script setup lang="ts">
-import { mdiDelete, mdiMagnify, mdiPencil, mdiPlus, mdiShare } from '@mdi/js';
+import { mdiDelete, mdiMagnify, mdiPencil, mdiPlus, mdiRefresh, mdiShare } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { ref } from 'vue';

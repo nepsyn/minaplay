@@ -32,7 +32,7 @@ import MediaPosterFallback from '@/assets/banner.jpeg';
 
 withDefaults(
   defineProps<{
-    src: string;
+    src?: string;
     placeholder?: string;
     aspectRatio?: string | number;
     width?: string | number;

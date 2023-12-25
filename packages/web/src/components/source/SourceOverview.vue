@@ -8,7 +8,7 @@
           </template>
         </v-img>
       </v-icon>
-      <span class="ml-2 text-wrap text-break">{{ source.title ?? t('source.unnamed') }}</span>
+      <span class="ml-2 text-wrap text-break">{{ source.title || t('source.unnamed') }}</span>
       <v-spacer></v-spacer>
       <div>
         <v-tooltip location="bottom">

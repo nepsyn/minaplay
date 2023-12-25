@@ -189,65 +189,6 @@ const props = withDefaults(
 const src = ref('');
 const poster = ref('');
 
-const subtitleFiles = computed(
-  () =>
-    props.media?.attachments?.filter(({ name }) => {
-      const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
-      return SUBTITLE_EXTENSIONS.includes(ext);
-    }) ?? [],
-);
-const getSubtitleName = (subtitle: FileEntity) => {
-  const lastIndex = subtitle.name.lastIndexOf('.');
-  return subtitle.name.slice(0, lastIndex > -1 ? lastIndex : subtitle.name.length);
-};
-const fontFiles = computed(
-  () =>
-    props.media?.attachments?.filter(({ name }) => {
-      const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
-      return FONT_EXTENSIONS.includes(ext);
-    }) ?? [],
-);
-
-const videoRef = ref<HTMLVideoElement | undefined>(undefined);
-const controlsRef = ref<HTMLElement | undefined>(undefined);
-let player: Plyr | undefined = undefined;
-let livePlayer: MpegTs.Player | undefined = undefined;
-let renderer = shallowRef<JASSUB | undefined>(undefined);
-const currentSubtitle = ref<FileEntity | undefined>(undefined);
-const renderSubtitle = (index: number) => {
-  if (renderer.value) {
-    renderer.value.destroy();
-    renderer.value = undefined;
-  }
-
-  const subtitle = subtitleFiles.value[index];
-  currentSubtitle.value = subtitle;
-  if (subtitle && videoRef.value) {
-    renderer.value = new JASSUB({
-      video: videoRef.value,
-      subUrl: api.File.buildRawPath(subtitle.id, subtitle.name),
-      fonts: fontFiles.value.map(({ id, name }) => api.File.buildRawPath(id, name)),
-      onDemandRender: false,
-      workerUrl: jassubWorkerUrl,
-      wasmUrl: jassubWasmUrl,
-    });
-  }
-};
-
-const pageFullscreen = ref(false);
-watch(
-  () => pageFullscreen.value,
-  (value) => {
-    if (player) {
-      if (value) {
-        player.elements.container?.classList.add('page-fullscreen');
-      } else {
-        player.elements.container?.classList.remove('page-fullscreen');
-      }
-    }
-  },
-);
-
 const loadResource = () => {
   if (player) {
     player.stop();
@@ -293,17 +234,57 @@ const loadResource = () => {
     }
   }
 };
-const refresh = () => {
-  if (livePlayer) {
-    livePlayer.currentTime = livePlayer.buffered.end(0) - 1;
-  }
-};
 watch(
   () => [props.media, props.stream],
   () => {
     loadResource();
   },
 );
+
+const subtitleFiles = computed(
+  () =>
+    props.media?.attachments?.filter(({ name }) => {
+      const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
+      return SUBTITLE_EXTENSIONS.includes(ext);
+    }) ?? [],
+);
+const getSubtitleName = (subtitle: FileEntity) => {
+  const lastIndex = subtitle.name.lastIndexOf('.');
+  return subtitle.name.slice(0, lastIndex > -1 ? lastIndex : subtitle.name.length);
+};
+const fontFiles = computed(
+  () =>
+    props.media?.attachments?.filter(({ name }) => {
+      const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
+      return FONT_EXTENSIONS.includes(ext);
+    }) ?? [],
+);
+
+const videoRef = ref<HTMLVideoElement | undefined>(undefined);
+const controlsRef = ref<HTMLElement | undefined>(undefined);
+let player: Plyr | undefined = undefined;
+let livePlayer: MpegTs.Player | undefined = undefined;
+let renderer = shallowRef<JASSUB | undefined>(undefined);
+const currentSubtitle = ref<FileEntity | undefined>(undefined);
+const renderSubtitle = (index: number) => {
+  if (renderer.value) {
+    renderer.value.destroy();
+    renderer.value = undefined;
+  }
+
+  const subtitle = subtitleFiles.value[index];
+  currentSubtitle.value = subtitle;
+  if (subtitle && videoRef.value) {
+    renderer.value = new JASSUB({
+      video: videoRef.value,
+      subUrl: api.File.buildRawPath(subtitle.id, subtitle.name),
+      fonts: fontFiles.value.map(({ id, name }) => api.File.buildRawPath(id, name)),
+      onDemandRender: false,
+      workerUrl: jassubWorkerUrl,
+      wasmUrl: jassubWasmUrl,
+    });
+  }
+};
 onMounted(async () => {
   if (videoRef.value) {
     player = new Plyr(videoRef.value, {
@@ -333,10 +314,33 @@ onUnmounted(() => {
   if (renderer.value) {
     renderer.value.destroy();
   }
+  if (livePlayer) {
+    livePlayer.destroy();
+  }
   if (player) {
     player.destroy();
   }
 });
+
+const pageFullscreen = ref(false);
+watch(
+  () => pageFullscreen.value,
+  (value) => {
+    if (player) {
+      if (value) {
+        player.elements.container?.classList.add('page-fullscreen');
+      } else {
+        player.elements.container?.classList.remove('page-fullscreen');
+      }
+    }
+  },
+);
+
+const refresh = () => {
+  if (livePlayer) {
+    livePlayer.currentTime = livePlayer.buffered.end(0) - 1;
+  }
+};
 </script>
 
 <style lang="sass">

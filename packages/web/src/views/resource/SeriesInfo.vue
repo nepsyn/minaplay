@@ -12,7 +12,7 @@
             </v-col>
           </v-row>
         </template>
-        <v-sheet border class="pa-6 rounded">
+        <v-sheet v-if="series" border class="pa-6 rounded">
           <v-row>
             <v-col cols="9" class="d-flex flex-column">
               <span class="text-h5 text-break">{{ series.name }}</span>
@@ -80,7 +80,9 @@
           <multi-items-loader class="px-0 py-3" :loader="episodesLoader" :hide-empty="episodes.length > 0">
             <v-row dense>
               <v-col cols="auto" v-for="episode in episodes" :key="episode.id">
-                <v-btn variant="outlined">{{ episode.no }}</v-btn>
+                <v-btn variant="outlined" @click="router.push({ path: `/episode/${episode.id}` })">{{
+                  episode.no
+                }}</v-btn>
               </v-col>
             </v-row>
           </multi-items-loader>

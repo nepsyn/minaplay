@@ -2,8 +2,13 @@
   <v-container class="d-flex flex-column pa-md-12">
     <v-row dense>
       <v-col cols="auto">
-        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus">
+        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus" :loading="creating" @click="createSource()">
           {{ t('app.actions.add') }}
+        </v-btn>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn variant="flat" color="info" :prepend-icon="mdiRefresh" :loading="loading" @click="request()">
+          {{ t('app.actions.refresh') }}
         </v-btn>
       </v-col>
     </v-row>
@@ -96,11 +101,32 @@
         </template>
       </v-data-table-server>
     </v-sheet>
+
+    <v-dialog v-model="deleteDialog" width="auto">
+      <v-card v-if="editItem">
+        <v-card-title>
+          {{ t('app.actions.deleteTitle') }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column">
+          <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.source') }) }}</span>
+          <span class="font-italic font-weight-bold"> "{{ editItem.title || editItem.remark || editItem.url }}" </span>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="deleteDialog = false">
+            {{ t('app.cancel') }}
+          </v-btn>
+          <v-btn variant="plain" color="error" :loading="sourceDeleting" @click="deleteSource(editItem.id)">
+            {{ t('app.ok') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { mdiCheck, mdiClose, mdiDelete, mdiMagnify, mdiPencil, mdiPlus } from '@mdi/js';
+import { mdiCheck, mdiClose, mdiDelete, mdiMagnify, mdiPencil, mdiPlus, mdiRefresh } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { ref } from 'vue';
@@ -108,9 +134,13 @@ import { useAxiosRequest } from '@/composables/use-axios-request';
 import { debounce } from '@/utils/utils';
 import { SourceEntity, SourceQueryDto } from '@/api/interfaces/subscribe.interface';
 import UserAvatar from '@/components/user/UserAvatar.vue';
+import { useRouter } from 'vue-router';
+import { useToastStore } from '@/store/toast';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
+const toast = useToastStore();
+const router = useRouter();
 
 const page = ref(1);
 const size = ref(10);
@@ -176,20 +206,67 @@ const headers = ref([
   },
 ]);
 
+const editItem = ref<SourceEntity | undefined>(undefined);
+
+const {
+  pending: creating,
+  request: createSource,
+  onResolved: onCreated,
+  onRejected: onCreateFailed,
+} = useAxiosRequest(async () => {
+  return await api.Source.create({
+    title: t('source.unnamed'),
+    cron: '0 */30 * * * *',
+    url: 'https://example.com/rss.xml',
+    enabled: false,
+  });
+});
+onCreated(async (data) => {
+  await router.push({ path: `/source/${data.id}` });
+});
+onCreateFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const deleteDialog = ref(false);
+const {
+  pending: sourceDeleting,
+  request: deleteSource,
+  onResolved: onSourceDeleted,
+  onRejected: onSourceDeleteFailed,
+} = useAxiosRequest(async (id: number) => {
+  return await api.Source.delete(id)();
+});
+onSourceDeleted(async () => {
+  toast.toastSuccess(t('app.actions.deleteToast'));
+  if (sources.value) {
+    sources.value.items = sources.value.items.filter(({ id }) => id !== editItem.value?.id);
+  }
+  deleteDialog.value = false;
+});
+onSourceDeleteFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
 const actions = [
   {
     text: t('app.actions.edit'),
     icon: mdiPencil,
     color: 'info',
     show: (item: SourceEntity) => true,
-    click: (item: SourceEntity) => undefined,
+    click: (item: SourceEntity) => {
+      router.push({ path: `/source/${item.id}` });
+    },
   },
   {
     text: t('app.actions.delete'),
     icon: mdiDelete,
     color: 'error',
     show: (item: SourceEntity) => true,
-    click: (item: SourceEntity) => undefined,
+    click: (item: SourceEntity) => {
+      editItem.value = item;
+      deleteDialog.value = true;
+    },
   },
 ];
 </script>

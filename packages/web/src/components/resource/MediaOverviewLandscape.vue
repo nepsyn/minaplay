@@ -16,7 +16,7 @@
       <v-col cols="8">
         <v-container class="pa-0 d-flex flex-column h-100">
           <span class="ml-2 px-1 media-title font-weight-bold" :title="media.name">
-            {{ media.name }}
+            {{ media.name || media.file?.name }}
           </span>
           <v-spacer></v-spacer>
           <div class="ml-2 px-1 text-caption">

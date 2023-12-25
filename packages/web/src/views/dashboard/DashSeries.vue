@@ -6,6 +6,11 @@
           {{ t('app.actions.add') }}
         </v-btn>
       </v-col>
+      <v-col cols="auto">
+        <v-btn variant="flat" color="info" :prepend-icon="mdiRefresh" :loading="loading" @click="request()">
+          {{ t('app.actions.refresh') }}
+        </v-btn>
+      </v-col>
     </v-row>
     <v-row dense class="mt-2">
       <v-col cols="12">
@@ -47,14 +52,9 @@
           <tr>
             <td :colspan="headers.length">
               <v-container fluid class="d-flex flex-column">
-                <v-row dense v-if="item.tags?.length > 0" class="mb-1">
-                  <v-col cols="auto" v-for="tag in item.tags" :key="tag.name">
-                    <v-chip label density="comfortable" color="info">{{ tag.name }}</v-chip>
-                  </v-col>
-                </v-row>
                 <expandable-text
                   class="text-subtitle-2"
-                  :content="item.description ?? t('resource.noDescription')"
+                  :content="item.description || t('resource.noDescription')"
                 ></expandable-text>
               </v-container>
             </td>
@@ -99,7 +99,7 @@
 </template>
 
 <script setup lang="ts">
-import { mdiDelete, mdiMagnify, mdiPencil, mdiPlus, mdiShare } from '@mdi/js';
+import { mdiDelete, mdiMagnify, mdiPencil, mdiPlus, mdiRefresh, mdiShare } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { ref } from 'vue';

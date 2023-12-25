@@ -28,10 +28,10 @@
       ></user-avatar>
       <div class="d-flex flex-column px-1 justify-space-around">
         <div class="mt-2 d-flex flex-row align-center font-weight-bold live-title">
-          <span class="text-wrap text-break">{{ live.title ?? t('live.unnamed') }}</span>
+          <span class="text-wrap text-break">{{ live.title || t('live.unnamed') }}</span>
           <v-icon class="ml-1 text-medium-emphasis" v-if="live.hasPassword" :icon="mdiLock" size="x-small"></v-icon>
         </div>
-        <span class="text-caption text-medium-emphasis">{{ live.user?.username ?? t('user.deleted') }}</span>
+        <span class="text-caption text-medium-emphasis">{{ live.user?.username || t('user.deleted') }}</span>
       </div>
     </div>
   </div>

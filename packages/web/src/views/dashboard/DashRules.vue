@@ -2,8 +2,13 @@
   <v-container class="d-flex flex-column pa-md-12">
     <v-row dense>
       <v-col cols="auto">
-        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus">
+        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus" :loading="creating" @click="createRule()">
           {{ t('app.actions.add') }}
+        </v-btn>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn variant="flat" color="info" :prepend-icon="mdiRefresh" :loading="loading" @click="request()">
+          {{ t('app.actions.refresh') }}
         </v-btn>
       </v-col>
     </v-row>
@@ -108,11 +113,32 @@
         </template>
       </v-data-table-server>
     </v-sheet>
+
+    <v-dialog v-model="deleteDialog" width="auto">
+      <v-card v-if="editItem">
+        <v-card-title>
+          {{ t('app.actions.deleteTitle') }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column">
+          <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.rule') }) }}</span>
+          <span class="font-italic font-weight-bold"> "{{ editItem.remark || t('rule.unnamed') }}" </span>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="deleteDialog = false">
+            {{ t('app.cancel') }}
+          </v-btn>
+          <v-btn variant="plain" color="error" :loading="ruleDeleting" @click="deleteRule(editItem.id)">
+            {{ t('app.ok') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { mdiDelete, mdiMagnify, mdiPencil, mdiPlus } from '@mdi/js';
+import { mdiDelete, mdiMagnify, mdiPencil, mdiPlus, mdiRefresh } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { ref } from 'vue';
@@ -120,9 +146,14 @@ import { useAxiosRequest } from '@/composables/use-axios-request';
 import { debounce } from '@/utils/utils';
 import { RuleEntity, RuleQueryDto } from '@/api/interfaces/subscribe.interface';
 import BlankFavicon from '@/assets/blank-favicon.png';
+import { useRouter } from 'vue-router';
+import { useToastStore } from '@/store/toast';
+import DefaultTemplateCode from '@/assets/templates/default.ts?raw';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
+const router = useRouter();
+const toast = useToastStore();
 
 const page = ref(1);
 const size = ref(10);
@@ -183,20 +214,65 @@ const headers = ref([
   },
 ]);
 
+const editItem = ref<RuleEntity | undefined>(undefined);
+
+const {
+  pending: creating,
+  request: createRule,
+  onResolved: onCreated,
+  onRejected: onCreateFailed,
+} = useAxiosRequest(async () => {
+  return await api.Rule.create({
+    remark: t('rule.unnamed'),
+    code: DefaultTemplateCode,
+  });
+});
+onCreated(async (data) => {
+  await router.push({ path: `/rule/${data.id}` });
+});
+onCreateFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const deleteDialog = ref(false);
+const {
+  pending: ruleDeleting,
+  request: deleteRule,
+  onResolved: onRuleDeleted,
+  onRejected: onRuleDeleteFailed,
+} = useAxiosRequest(async (id: number) => {
+  return await api.Rule.delete(id)();
+});
+onRuleDeleted(async () => {
+  toast.toastSuccess(t('app.actions.deleteToast'));
+  if (rules.value) {
+    rules.value.items = rules.value.items.filter(({ id }) => id !== editItem.value?.id);
+  }
+  deleteDialog.value = false;
+});
+onRuleDeleteFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
 const actions = [
   {
     text: t('app.actions.edit'),
     icon: mdiPencil,
     color: 'info',
     show: (item: RuleEntity) => true,
-    click: (item: RuleEntity) => undefined,
+    click: (item: RuleEntity) => {
+      router.push({ path: `/rule/${item.id}` });
+    },
   },
   {
     text: t('app.actions.delete'),
     icon: mdiDelete,
     color: 'error',
     show: (item: RuleEntity) => true,
-    click: (item: RuleEntity) => undefined,
+    click: (item: RuleEntity) => {
+      editItem.value = item;
+      deleteDialog.value = true;
+    },
   },
 ];
 </script>

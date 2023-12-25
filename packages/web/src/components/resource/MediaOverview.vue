@@ -12,7 +12,7 @@
     </v-img>
 
     <span class="mt-2 px-1 media-title font-weight-bold" :title="media.name">
-      {{ media.name }}
+      {{ media.name || media.file?.name }}
     </span>
 
     <div class="my-1 px-1 text-caption">

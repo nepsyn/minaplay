@@ -183,6 +183,58 @@
                   </v-container>
                 </div>
               </div>
+              <div class="d-flex flex-column" v-else-if="tab === 'settings'">
+                <v-list class="py-0">
+                  <v-list-item link>
+                    <template #prepend>
+                      <span>{{ t('live.entity.title') }}</span>
+                    </template>
+                    <template #append>
+                      <span class="text-medium-emphasis text-break text-wrap ml-4">
+                        {{ live?.title ?? t('live.play.unnamed') }}
+                      </span>
+                    </template>
+                  </v-list-item>
+                  <v-divider></v-divider>
+                  <v-list-item link>
+                    <template #prepend>
+                      <span>{{ t('live.entity.password') }}</span>
+                    </template>
+                    <template #append>
+                      <v-row dense class="ml-4">
+                        <v-col class="d-flex justify-end">
+                          <v-btn variant="tonal" color="primary" :prepend-icon="mdiPencil" density="comfortable">
+                            {{ t('app.actions.edit') }}
+                          </v-btn>
+                        </v-col>
+                        <v-col v-if="live?.hasPassword" class="d-flex justify-end">
+                          <v-btn variant="tonal" color="error" :prepend-icon="mdiClose" density="comfortable">
+                            {{ t('app.cancel') }}
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                    </template>
+                  </v-list-item>
+                  <v-divider></v-divider>
+                  <v-list-item link @click="console.log(123)">
+                    <template #prepend>
+                      <span>{{ t('live.entity.poster') }}</span>
+                    </template>
+                    <template #append>
+                      <zoom-img
+                        class="rounded"
+                        min-width="120"
+                        max-width="240"
+                        :aspect-ratio="16 / 9"
+                        :src="
+                          live?.poster ? api.File.buildRawPath(live.poster.id, live.poster.name) : LivePosterFallback
+                        "
+                      ></zoom-img>
+                    </template>
+                  </v-list-item>
+                  <v-divider></v-divider>
+                </v-list>
+              </div>
             </v-fade-transition>
           </v-container>
         </v-col>
@@ -233,12 +285,14 @@ import UserAvatar from '@/components/user/UserAvatar.vue';
 import { computed, onUnmounted, ref, shallowRef } from 'vue';
 import TimeAgo from '@/components/app/TimeAgo.vue';
 import {
+  mdiClose,
   mdiEmoticonCoolOutline,
   mdiImagePlus,
   mdiLock,
   mdiMicrophone,
   mdiMicrophoneOff,
   mdiNavigationVariant,
+  mdiPencil,
   mdiPhone,
   mdiPhoneOff,
   mdiVolumeHigh,
@@ -263,6 +317,9 @@ import axios from 'axios';
 import { Device } from 'mediasoup-client';
 import { Transport } from 'mediasoup-client/lib/Transport';
 import { Producer } from 'mediasoup-client/lib/Producer';
+import ZoomImg from '@/components/app/ZoomImg.vue';
+import LivePosterFallback from '@/assets/live-poster-fallback.png';
+import { selectFile } from '@/utils/utils';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -467,11 +524,8 @@ onChatSendFailed((error: any) => {
   toast.toastError(t(`error.${error?.code ?? 'other'}`));
 });
 const selectAndSendImage = () => {
-  const el = document.createElement('input');
-  el.accept = 'image/*';
-  el.type = 'file';
-  el.onchange = async (e) => {
-    const file: File = (e.target as any).files[0];
+  selectFile('image/*', false, async (files) => {
+    const file = files[0];
     if (file) {
       chatSending.value = true;
       const controller = new AbortController();
@@ -499,8 +553,7 @@ const selectAndSendImage = () => {
         chatSending.value = false;
       }
     }
-  };
-  el.click();
+  });
 };
 
 const events = ref<LiveEvent[]>([]);

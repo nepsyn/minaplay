@@ -51,7 +51,7 @@ import {
   ViewHistoryDto,
   ViewHistoryEntity,
 } from '@/api/interfaces/media.interface';
-import { FileQueryDto } from '@/api/interfaces/file.interface';
+import { FileEntity, FileQueryDto } from '@/api/interfaces/file.interface';
 import { SystemStatus } from '@/api/interfaces/system.interface';
 import { LiveDto, LiveEntity, LiveQueryDto } from '@/api/interfaces/live.interface';
 

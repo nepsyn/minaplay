@@ -36,6 +36,8 @@ export default {
       rule: 'subscribe rule',
       download: 'download item',
       live: 'live room',
+      media: 'media',
+      file: 'File',
     },
     actions: {
       add: 'New',
@@ -136,6 +138,7 @@ export default {
   media: {
     entity: {
       name: 'Name',
+      description: 'Description',
       isPublic: 'Is Public',
       poster: 'Poster',
       createAt: 'Create At',
@@ -144,6 +147,7 @@ export default {
   series: {
     entity: {
       name: 'Name',
+      description: 'Description',
       poster: 'Poster',
       season: 'Season',
       count: 'Episode Count',
@@ -282,6 +286,7 @@ export default {
     unnamed: 'Unnamed Live Room',
     entity: {
       title: 'Title',
+      password: 'Password',
       hasPassword: 'Password Required',
       poster: 'Poster',
       user: 'User',

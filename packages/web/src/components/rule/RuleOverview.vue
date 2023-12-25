@@ -1,7 +1,7 @@
 <template>
   <v-card flat border class="d-flex flex-column">
     <v-card-title class="d-flex flex-row align-center">
-      <span class="text-wrap text-break">{{ rule.remark ?? t('rule.unnamed') }}</span>
+      <span class="text-wrap text-break">{{ rule.remark || t('rule.unnamed') }}</span>
     </v-card-title>
     <v-divider></v-divider>
     <v-card-text class="flex-grow-1 pa-0">

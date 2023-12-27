@@ -63,6 +63,7 @@
         <template #item.media="{ item }">
           <zoom-img
             class="rounded ma-1"
+            :aspect-ratio="16 / 9"
             min-width="120"
             max-width="160"
             :src="
@@ -71,12 +72,6 @@
                 : MediaPosterFallback
             "
           ></zoom-img>
-        </template>
-        <template #item.pubAt="{ item }">
-          {{ new Date(item.pubAt).toLocaleString(locale) }}
-        </template>
-        <template #item.createAt="{ item }">
-          {{ new Date(item.createAt).toLocaleString(locale) }}
         </template>
         <template #item.actions="{ item }">
           <div class="d-flex justify-end">
@@ -164,10 +159,12 @@ const headers = ref([
   {
     title: t('episode.entity.pubAt'),
     key: 'pubAt',
+    value: (row: any) => new Date(row.pubAt).toLocaleString(locale.value),
   },
   {
     title: t('episode.entity.createAt'),
     key: 'createAt',
+    value: (row: any) => new Date(row.createAt).toLocaleString(locale.value),
   },
   {
     key: 'actions',

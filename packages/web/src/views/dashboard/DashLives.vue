@@ -71,9 +71,6 @@
             </template>
           </v-tooltip>
         </template>
-        <template #item.createAt="{ item }">
-          {{ new Date(item.createAt).toLocaleString(locale) }}
-        </template>
         <template #item.actions="{ item }">
           <div class="d-flex justify-end">
             <template v-for="(action, index) in actions" :key="index">
@@ -167,6 +164,7 @@ const headers = ref([
   {
     title: t('live.entity.title'),
     key: 'title',
+    value: (row: any) => row.title || t('live.unnamed'),
   },
   {
     title: t('live.entity.hasPassword'),
@@ -186,6 +184,7 @@ const headers = ref([
   {
     title: t('live.entity.createAt'),
     key: 'createAt',
+    value: (row: any) => new Date(row.createAt).toLocaleString(locale.value),
   },
   {
     key: 'actions',

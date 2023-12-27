@@ -9,6 +9,7 @@ export default {
     cancel: 'Cancel',
     on: 'ON',
     off: 'OFF',
+    unknown: 'Unknown',
     loader: {
       loading: 'Loading...',
       error: 'Whoops, something went wrong! Please try ',
@@ -37,6 +38,7 @@ export default {
       download: 'download item',
       live: 'live room',
       media: 'media',
+      series: 'Series',
       file: 'File',
     },
     actions: {
@@ -150,7 +152,9 @@ export default {
       description: 'Description',
       poster: 'Poster',
       season: 'Season',
-      count: 'Episode Count',
+      tags: 'Tags',
+      count: 'Total Episode Count',
+      finished: 'Finished',
       user: 'User',
       createAt: 'Create At',
     },

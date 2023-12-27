@@ -74,9 +74,6 @@
         <template #item.notify="{ item }">
           <v-icon size="small" :icon="item.notify ? mdiCheck : mdiClose"></v-icon>
         </template>
-        <template #item.createAt="{ item }">
-          {{ new Date(item.createAt).toLocaleString(locale) }}
-        </template>
         <template #item.actions="{ item }">
           <div class="d-flex justify-end">
             <template v-for="(action, index) in actions" :key="index">
@@ -171,6 +168,7 @@ const headers = ref([
   {
     title: t('user.entity.createAt'),
     key: 'createAt',
+    value: (row: any) => new Date(row.createAt).toLocaleString(locale.value),
   },
   {
     key: 'actions',

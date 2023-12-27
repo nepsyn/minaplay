@@ -42,15 +42,6 @@
         @update:options="request()"
         density="compact"
       >
-        <template #item.size="{ item }">
-          {{ filesize(item.size, {}) }}
-        </template>
-        <template #item.source="{ item }">
-          {{ t(`file.source.${item.source ?? 'other'}`) }}
-        </template>
-        <template #item.createAt="{ item }">
-          {{ new Date(item.createAt).toLocaleString(locale) }}
-        </template>
         <template #item.actions="{ item }">
           <div class="d-flex justify-end">
             <template v-for="(action, index) in actions" :key="index">
@@ -144,6 +135,7 @@ const headers = ref([
   {
     title: t('file.entity.size'),
     key: 'size',
+    value: (row: any) => row.size && filesize(row.size, {}),
   },
   {
     title: t('file.entity.mimetype'),
@@ -153,10 +145,12 @@ const headers = ref([
   {
     title: t('file.entity.source'),
     key: 'source',
+    value: (row: any) => t(`file.source.${row.source ?? 'other'}`),
   },
   {
     title: t('file.entity.createAt'),
     key: 'createAt',
+    value: (row: any) => new Date(row.createAt).toLocaleString(locale.value),
   },
   {
     key: 'actions',

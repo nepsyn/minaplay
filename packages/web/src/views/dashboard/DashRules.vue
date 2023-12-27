@@ -84,12 +84,6 @@
             </v-tooltip>
           </div>
         </template>
-        <template #item.createAt="{ item }">
-          {{ new Date(item.createAt).toLocaleString(locale) }}
-        </template>
-        <template #item.updateAt="{ item }">
-          {{ new Date(item.updateAt).toLocaleString(locale) }}
-        </template>
         <template #item.actions="{ item }">
           <div class="d-flex justify-end">
             <template v-for="(action, index) in actions" :key="index">
@@ -195,6 +189,7 @@ const headers = ref([
   {
     title: t('rule.entity.remark'),
     key: 'remark',
+    value: (row: any) => row.remark || t('rule.unnamed'),
   },
   {
     title: t('rule.entity.sources'),
@@ -203,10 +198,12 @@ const headers = ref([
   {
     title: t('rule.entity.createAt'),
     key: 'createAt',
+    value: (row: any) => new Date(row.updateAt).toLocaleString(locale.value),
   },
   {
     title: t('rule.entity.updateAt'),
     key: 'updateAt',
+    value: (row: any) => new Date(row.createAt).toLocaleString(locale.value),
   },
   {
     key: 'actions',

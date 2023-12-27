@@ -72,9 +72,6 @@
         <template #item.isPublic="{ item }">
           <v-icon size="small" :icon="item.isPublic ? mdiCheck : mdiClose"></v-icon>
         </template>
-        <template #item.createAt="{ item }">
-          {{ new Date(item.createAt).toLocaleString(locale) }}
-        </template>
         <template #item.actions="{ item }">
           <div class="d-flex justify-end">
             <template v-for="(action, index) in actions" :key="index">
@@ -116,7 +113,9 @@
         <v-card-text>
           <v-container class="d-flex flex-column pa-0">
             <v-container class="pa-0">
-              <span class="text-body-1">{{ t('media.entity.name') }}</span>
+              <span class="text-body-1 font-weight-bold">
+                {{ t('media.entity.name') }}
+              </span>
               <v-text-field
                 class="mt-2"
                 variant="outlined"
@@ -127,7 +126,9 @@
               ></v-text-field>
             </v-container>
             <v-container class="mt-4 pa-0">
-              <span class="text-body-1">{{ t('media.entity.description') }}</span>
+              <span class="text-body-1 font-weight-bold">
+                {{ t('media.entity.description') }}
+              </span>
               <v-textarea
                 class="mt-2"
                 variant="outlined"
@@ -141,12 +142,14 @@
             <v-container class="mt-4 pa-0">
               <v-switch inset hide-details color="primary" density="compact" v-model="editItem.isPublic">
                 <template #prepend>
-                  <span class="text-body-1">{{ t('media.entity.isPublic') }}</span>
+                  <span class="text-body-1 font-weight-bold">{{ t('media.entity.isPublic') }}</span>
                 </template>
               </v-switch>
             </v-container>
             <v-container class="mt-4 pa-0">
-              <span class="text-body-1">{{ t('media.entity.poster') }}</span>
+              <span class="text-body-1 font-weight-bold">
+                {{ t('media.entity.poster') }}
+              </span>
               <v-row class="mt-1">
                 <v-col cols="12" md="8">
                   <zoom-img
@@ -157,7 +160,7 @@
                     class="mt-2"
                     :prepend-icon="mdiCloudUploadOutline"
                     color="warning"
-                    variant="outlined"
+                    variant="tonal"
                     block
                     :loading="posterUploading"
                     @click="selectAndUploadPoster()"
@@ -269,6 +272,7 @@ const headers = ref([
   {
     title: t('rule.entity.createAt'),
     key: 'createAt',
+    value: (row: any) => new Date(row.createAt).toLocaleString(locale.value),
   },
   {
     key: 'actions',

@@ -17,7 +17,7 @@ export interface SeriesEntity {
   /** 剧描述称 */
   description?: string;
   /** 创建用户 */
-  user: UserEntity;
+  user?: UserEntity;
   /** 纵向海报图 */
   poster?: FileEntity;
   /** 标签 */
@@ -30,14 +30,19 @@ export interface SeriesEntity {
 
 export interface SeriesDto {
   name?: string;
+  season?: string;
+  count?: number;
+  finished?: boolean;
   description?: string;
   posterFileId?: string;
-  tagIds?: number[];
+  tags?: string[];
 }
 
 export interface SeriesQueryDto extends ApiQueryDto<SeriesEntity> {
   keyword?: string;
   name?: string;
+  season?: string;
+  finished?: 0 | 1;
   tag?: string;
   userId?: number;
   start?: string;
@@ -45,8 +50,6 @@ export interface SeriesQueryDto extends ApiQueryDto<SeriesEntity> {
 }
 
 export interface SeriesTagEntity {
-  /** id */
-  id: number;
   /** 剧集名称 */
   name: string;
   /** 创建时间 */

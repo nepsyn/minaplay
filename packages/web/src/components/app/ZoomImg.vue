@@ -24,6 +24,7 @@
         </v-img>
       </v-container>
     </v-overlay>
+    <slot></slot>
   </v-img>
 </template>
 

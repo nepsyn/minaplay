@@ -15,7 +15,7 @@
         <v-sheet v-if="series" border class="pa-6 rounded">
           <v-row>
             <v-col cols="9" class="d-flex flex-column">
-              <span class="text-h5 text-break">{{ series.name }}</span>
+              <span class="text-h5 text-break">{{ series.name }}{{ series.season }}</span>
               <div class="mt-2">
                 <v-chip
                   color="primary"
@@ -46,7 +46,7 @@
             </v-col>
           </v-row>
           <v-divider class="my-3"></v-divider>
-          <v-row dense>
+          <v-row dense class="d-flex justify-start">
             <v-col cols="auto">
               <v-btn
                 class="rounded-pill"
@@ -61,7 +61,7 @@
             </v-col>
             <v-col cols="auto">
               <v-btn
-                class="ms-2 rounded-pill"
+                class="rounded-pill"
                 variant="flat"
                 :prepend-icon="mdiMotionPlayOutline"
                 color="secondary"

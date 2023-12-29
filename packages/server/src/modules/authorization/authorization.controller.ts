@@ -7,6 +7,7 @@ import {
   HttpCode,
   NotFoundException,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   UnauthorizedException,
@@ -34,6 +35,7 @@ import { encryptPassword } from '../../utils/encrypt-password.util';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
 import { CreateUserDto } from './create-user.dto';
 import { RequestIp } from '../../common/request.ip.decorator';
+import { isInt } from 'class-validator';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -228,7 +230,15 @@ export class AuthorizationController {
   @HttpCode(200)
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP)
-  async logoutUser(@RequestUser() operator: User, @Param('userId') userId: number, @RequestIp() ip: string) {
+  async logoutUser(
+    @RequestUser() operator: User,
+    @Param('userId', ParseIntPipe) userId: number,
+    @RequestIp() ip: string,
+  ) {
+    if (!isInt(userId)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const user = await this.userService.findOneBy({ id: userId });
     if (!user) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -258,10 +268,14 @@ export class AuthorizationController {
   @RequirePermissions(PermissionEnum.ROOT_OP)
   async changeUserPassword(
     @RequestUser() operator: User,
-    @Param('userId') userId: number,
+    @Param('userId', ParseIntPipe) userId: number,
     @RequestIp() ip: string,
     @Body() data: ChangePasswordDto,
   ) {
+    if (!isInt(userId)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     const user = await this.userService.findOneBy({ id: userId });
     if (!user) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -296,10 +310,14 @@ export class AuthorizationController {
   @RequirePermissions(PermissionEnum.ROOT_OP)
   async grantPermissions(
     @RequestUser() operator: User,
-    @Param('userId') userId: number,
+    @Param('userId', ParseIntPipe) userId: number,
     @Body() data: PermissionDto,
     @RequestIp() ip: string,
   ) {
+    if (!isInt(userId)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     if (operator.id === userId || data.permissionNames.includes(PermissionEnum.ROOT_OP)) {
       throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
     }
@@ -332,8 +350,12 @@ export class AuthorizationController {
   @ApiBearerAuth()
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP)
-  async deleteUser(@Param('id') id: number) {
-    const user = await this.userService.findOneBy({ id });
+  async deleteUser(@Param('userId', ParseIntPipe) userId: number) {
+    if (!isInt(userId)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
+    const user = await this.userService.findOneBy({ id: userId });
     if (!user) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
@@ -341,7 +363,7 @@ export class AuthorizationController {
       throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
     }
 
-    await this.userService.delete({ id });
+    await this.userService.delete({ id: userId });
 
     return {};
   }

@@ -57,8 +57,6 @@ onBeforeMount(async () => {
             api.user = undefined;
             toast.toastWarning(t(`error.${ErrorCodeEnum.INVALID_TOKEN}`));
             router.replace({ path: '/login', query: { redirectUrl: route.fullPath } });
-          } else if (error.response?.data?.code === ErrorCodeEnum.NO_PERMISSION) {
-            toast.toastError(t(`error.${ErrorCodeEnum.NO_PERMISSION}`));
           } else {
             return Promise.reject(error);
           }

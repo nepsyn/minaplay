@@ -33,6 +33,7 @@ export default {
       asc: 'ASC',
     },
     entities: {
+      user: 'User',
       source: 'RSS source',
       rule: 'subscribe rule',
       download: 'download item',
@@ -173,8 +174,11 @@ export default {
   },
   user: {
     deleted: 'Deleted User',
+    noPermissions: 'No Permissions',
     entity: {
       username: 'Username',
+      password: 'Password',
+      permissions: 'User Permissions',
       avatar: 'Avatar',
       email: 'Email',
       notify: 'Notify Enabled',
@@ -392,5 +396,18 @@ export default {
     [ErrorCodeEnum.DUPLICATED_CONNECTION]: 'Duplicated live connection',
     timeout: 'Request timeout! Please try again later',
     other: 'Request failed! Please try again later',
+  },
+  permission: {
+    groups: {
+      file: 'File',
+      media: 'Media',
+      series: 'Series',
+      subscribe: 'Subscribe',
+      live: 'Live',
+    },
+    fullAccess: 'Full Access',
+    view: 'View',
+    uploadVideo: 'Upload Video',
+    uploadImage: 'Upload Image',
   },
 };

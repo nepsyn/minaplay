@@ -132,7 +132,7 @@ export const useApiStore = defineStore('api', () => {
     logoutUser: (id: number) => apiPost(`/api/v1/auth/user/${id}/logout`),
     changeUserPassword: (id: number) =>
       apiPut<ChangePasswordData, ChangePasswordDto>(`/api/v1/auth/user/${id}/password`),
-    grantUser: (id: number) => apiPost<UserEntity, PermissionDto>(`/api/v1/auth/user/${id}/grant`),
+    grantUser: (id: number) => apiPut<UserEntity, PermissionDto>(`/api/v1/auth/user/${id}/permission`),
     deleteUser: (id: number) => apiDelete(`/api/v1/auth/user/${id}`),
     getAllPermissions: apiGet<PermissionEnum[]>('/api/v1/auth/permission'),
   };

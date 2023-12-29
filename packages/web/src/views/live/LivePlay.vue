@@ -11,7 +11,15 @@
                   :src="live.user?.avatar && api.File.buildRawPath(live.user.avatar.id, live.user.avatar.name)"
                 ></user-avatar>
                 <v-container class="py-0 d-flex flex-column justify-space-around">
-                  <span class="text-h6">{{ live.title ?? t('live.unnamed') }}</span>
+                  <div class="d-flex align-center">
+                    <span class="text-h6">{{ live.title ?? t('live.unnamed') }}</span>
+                    <v-icon
+                      class="ml-2 text-medium-emphasis"
+                      v-if="live.hasPassword"
+                      :icon="mdiLock"
+                      size="small"
+                    ></v-icon>
+                  </div>
                   <div class="text-subtitle-2 text-medium-emphasis">
                     <span>{{ live.user?.username ?? t('user.deleted') }}</span>
                     ·
@@ -185,18 +193,21 @@
               </div>
               <div class="d-flex flex-column" v-else-if="tab === 'settings'">
                 <v-list class="py-0">
-                  <v-list-item link>
+                  <v-list-item>
                     <template #prepend>
                       <span>{{ t('live.entity.title') }}</span>
                     </template>
                     <template #append>
-                      <span class="text-medium-emphasis text-break text-wrap ml-4">
-                        {{ live?.title ?? t('live.play.unnamed') }}
-                      </span>
+                      <div class="d-flex align-center">
+                        <span class="text-medium-emphasis text-break text-wrap ml-4">
+                          {{ live?.title ?? t('live.play.unnamed') }}
+                        </span>
+                        <v-btn class="ml-1" :icon="mdiPencil" density="comfortable" size="small" variant="text"></v-btn>
+                      </div>
                     </template>
                   </v-list-item>
                   <v-divider></v-divider>
-                  <v-list-item link>
+                  <v-list-item>
                     <template #prepend>
                       <span>{{ t('live.entity.password') }}</span>
                     </template>
@@ -216,7 +227,7 @@
                     </template>
                   </v-list-item>
                   <v-divider></v-divider>
-                  <v-list-item link @click="console.log(123)">
+                  <v-list-item>
                     <template #prepend>
                       <span>{{ t('live.entity.poster') }}</span>
                     </template>
@@ -229,7 +240,18 @@
                         :src="
                           live?.poster ? api.File.buildRawPath(live.poster.id, live.poster.name) : LivePosterFallback
                         "
-                      ></zoom-img>
+                      >
+                        <v-btn
+                          class="position-absolute"
+                          style="bottom: 4px; right: 4px"
+                          variant="flat"
+                          color="white"
+                          :icon="mdiCloudUpload"
+                          size="small"
+                          density="comfortable"
+                          @click.stop
+                        ></v-btn>
+                      </zoom-img>
                     </template>
                   </v-list-item>
                   <v-divider></v-divider>
@@ -286,6 +308,7 @@ import { computed, onUnmounted, ref, shallowRef } from 'vue';
 import TimeAgo from '@/components/app/TimeAgo.vue';
 import {
   mdiClose,
+  mdiCloudUpload,
   mdiEmoticonCoolOutline,
   mdiImagePlus,
   mdiLock,

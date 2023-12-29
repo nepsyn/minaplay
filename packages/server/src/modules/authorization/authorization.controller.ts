@@ -229,6 +229,14 @@ export class AuthorizationController {
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP)
   async logoutUser(@RequestUser() operator: User, @Param('userId') userId: number, @RequestIp() ip: string) {
+    const user = await this.userService.findOneBy({ id: userId });
+    if (!user) {
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+    if (user.isRoot) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
+    }
+
     await this.actionLogService.save({
       action: AuthActionEnum.LOGOUT,
       ip,
@@ -257,6 +265,9 @@ export class AuthorizationController {
     const user = await this.userService.findOneBy({ id: userId });
     if (!user) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
+    if (user.isRoot) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
     }
 
     await this.actionLogService.save({
@@ -326,7 +337,6 @@ export class AuthorizationController {
     if (!user) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
-
     if (user.isRoot) {
       throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
     }

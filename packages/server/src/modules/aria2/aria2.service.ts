@@ -243,7 +243,7 @@ export class Aria2Service implements OnModuleInit {
       const tracker = rawText.replace(/\s+/g, ',');
       await this.cacheStore.set(Aria2Service.TRACKER_CACHE_KEY, tracker);
     } catch (error) {
-      this.logger.error('Aria2 update trackers failed', error.stack);
+      this.logger.error('Aria2 update trackers failed', error.stack, Aria2Service.name);
     }
   }
 }

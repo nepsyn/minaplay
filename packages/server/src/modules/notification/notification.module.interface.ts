@@ -1,4 +1,6 @@
 export interface NotificationModuleOptions {
+  emailEnabled: boolean;
+
   smtpHost: string;
   smtpPort: number;
   smtpSecure?: boolean;

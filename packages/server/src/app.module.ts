@@ -115,6 +115,7 @@ import { ApplicationExceptionFilter } from './common/application.exception.filte
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
+        emailEnabled: Number(configService.get('EMAIL_ENABLED', 0)) === 1,
         smtpHost: configService.get('SMTP_HOST'),
         smtpPort: Number(configService.get('SMTP_PORT')),
         smtpSecure: Number(configService.get('SMTP_SECURE', 0)) === 1,

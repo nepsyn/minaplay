@@ -19,22 +19,24 @@ export class EmailService implements OnModuleInit {
   constructor(@Inject(NOTIFICATION_MODULE_OPTIONS_TOKEN) private options: NotificationModuleOptions) {}
 
   async onModuleInit() {
-    this.transporter = createTransport({
-      host: this.options.smtpHost,
-      port: this.options.smtpPort,
-      secure: this.options.smtpSecure,
-      auth: {
-        user: this.options.smtpUser,
-        pass: this.options.smtpPassword,
-      },
-      pool: true,
-    });
+    if (this.options.emailEnabled) {
+      this.transporter = createTransport({
+        host: this.options.smtpHost,
+        port: this.options.smtpPort,
+        secure: this.options.smtpSecure,
+        auth: {
+          user: this.options.smtpUser,
+          pass: this.options.smtpPassword,
+        },
+        pool: true,
+      });
 
-    try {
-      await this.transporter.verify();
-      this.logger.log(`Email service is running, nodemailer version=${this.transporter.getVersionString()}`);
-    } catch (error) {
-      this.logger.error('Email service connect SMTP failed', error.stack);
+      try {
+        await this.transporter.verify();
+        this.logger.log(`Email service is running, nodemailer version=${this.transporter.getVersionString()}`);
+      } catch (error) {
+        this.logger.error('Email service connect SMTP failed', error.stack, EmailService.name);
+      }
     }
   }
 
@@ -54,6 +56,10 @@ export class EmailService implements OnModuleInit {
   }
 
   async sendMail(options: SendMailOptions) {
+    if (!this.options.emailEnabled || !this.transporter) {
+      return;
+    }
+
     return new Promise((resolve, reject) => {
       this.transporter.sendMail(
         {
@@ -64,7 +70,7 @@ export class EmailService implements OnModuleInit {
         (error, info) => {
           if (error) {
             reject(error);
-            this.logger.error('Send mail error', error.stack);
+            this.logger.error('Send mail error', error.stack, EmailService.name);
           }
           resolve(info);
         },

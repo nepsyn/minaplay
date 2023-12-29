@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { ConsoleLogger, Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Source } from './source.entity';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
@@ -13,6 +13,8 @@ import { HttpsProxyAgent } from 'https-proxy-agent';
 
 @Injectable()
 export class SourceService implements OnModuleInit {
+  private logger = new ConsoleLogger(SourceService.name);
+
   constructor(
     @Inject(SUBSCRIBE_MODULE_OPTIONS_TOKEN)
     private options: SubscribeModuleOptions,
@@ -28,7 +30,11 @@ export class SourceService implements OnModuleInit {
   async onModuleInit() {
     const [sources] = await this.findAndCount();
     for (const source of sources.filter((source) => source.enabled)) {
-      await this.addFetchSubscribeDataJob(source);
+      try {
+        await this.addFetchSubscribeDataJob(source);
+      } catch (error) {
+        this.logger.error(`Source(id:${source.id}) fetch job startup failed`, error.stack, SourceService.name);
+      }
     }
   }
 

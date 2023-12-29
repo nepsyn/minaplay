@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  SerializeOptions,
   UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
@@ -203,6 +204,7 @@ export class AuthorizationController {
   @HttpCode(200)
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP)
+  @SerializeOptions({ groups: ['profile'] })
   async createUser(@Body() data: CreateUserDto) {
     const sameNameUser = await this.userService.findOneBy({ username: data.username });
     if (sameNameUser) {
@@ -308,6 +310,7 @@ export class AuthorizationController {
   @HttpCode(200)
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP)
+  @SerializeOptions({ groups: ['profile'] })
   async grantPermissions(
     @RequestUser() operator: User,
     @Param('userId', ParseIntPipe) userId: number,

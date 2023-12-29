@@ -1,4 +1,15 @@
-import { Body, Controller, Get, NotFoundException, Param, ParseIntPipe, Put, Query, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  ParseIntPipe,
+  Put,
+  Query,
+  SerializeOptions,
+  UseGuards,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { AuthorizationGuard } from '../authorization/authorization.guard';
@@ -12,7 +23,6 @@ import { buildQueryOptions } from '../../utils/build-query-options.util';
 import { User } from './user.entity';
 import { RequestUser } from '../authorization/request.user.decorator';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
-import { instanceToPlain } from 'class-transformer';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('user')
@@ -26,33 +36,35 @@ export class UserController {
   @ApiOperation({
     description: '查看用户信息',
   })
+  @SerializeOptions({ groups: ['profile'] })
   async getUserProfileById(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
+    const valid = user.isRoot || user.id === id;
+    if (!valid) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
+    }
+
     const targetUser = await this.userService.findOneBy({ id });
     if (!targetUser) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    const valid = user.isRoot || user.id === targetUser.id;
-    if (!valid) {
-      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
-    }
-
-    return instanceToPlain(targetUser, { groups: ['profile'] });
+    return targetUser;
   }
 
   @Put(':id/profile')
   @ApiOperation({
     description: '修改用户信息',
   })
+  @SerializeOptions({ groups: ['profile'] })
   async updateUserProfile(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number, @Body() data: UserDto) {
+    const valid = user.isRoot || user.id === id;
+    if (!valid) {
+      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
+    }
+
     const targetUser = await this.userService.findOneBy({ id });
     if (!targetUser) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
-    }
-
-    const valid = user.isRoot || user.id === targetUser.id;
-    if (!valid) {
-      throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
     }
 
     await this.userService.save({
@@ -61,7 +73,7 @@ export class UserController {
       avatar: { id: data.avatarFileId },
     });
 
-    return instanceToPlain(await this.userService.findOneBy({ id }), { groups: ['profile'] });
+    return await this.userService.findOneBy({ id });
   }
 
   @Get()
@@ -69,6 +81,7 @@ export class UserController {
     description: '查询用户',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP)
+  @SerializeOptions({ groups: ['profile'] })
   async queryUser(@Query() query: UserQueryDto) {
     const { keyword, id, username } = query;
     const [result, total] = await this.userService.findAndCount({
@@ -85,11 +98,6 @@ export class UserController {
       order: { [query.sort]: query.order },
     });
 
-    return new ApiPaginationResultDto(
-      result.map((v) => instanceToPlain(v, { groups: ['profile'] })),
-      total,
-      query.page,
-      query.size,
-    );
+    return new ApiPaginationResultDto(result, total, query.page, query.size);
   }
 }

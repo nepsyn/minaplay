@@ -36,9 +36,14 @@
         <span class="text-subtitle-1">{{ source.cron }}</span>
         <div v-if="source.enabled" class="ml-2 d-flex align-center">
           <v-tooltip location="bottom">
-            <pre class="text-caption">{{ nextTriggerTimes }}</pre>
+            <pre class="text-caption">{{ nextTriggerTimes ?? t('source.wrongCronExp') }}</pre>
             <template #activator="{ props }">
-              <v-icon v-bind="props" size="small" :icon="mdiClockOutline"></v-icon>
+              <v-icon
+                v-bind="props"
+                :color="nextTriggerTimes ? undefined : 'error'"
+                size="small"
+                :icon="mdiClockOutline"
+              ></v-icon>
             </template>
           </v-tooltip>
         </div>
@@ -116,7 +121,7 @@ const nextTriggerTimes = computed(() => {
         .trim()
     );
   } catch {
-    return t('source.wrongCronExp');
+    return undefined;
   }
 });
 </script>

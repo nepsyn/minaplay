@@ -102,7 +102,7 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column">
           <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.live') }) }}</span>
-          <span class="font-italic font-weight-bold"> "{{ editItem.title || t('live.unnamed') }}" </span>
+          <span class="font-italic font-weight-bold">{{ editItem.title || t('live.unnamed') }}</span>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>

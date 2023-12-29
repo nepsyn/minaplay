@@ -142,8 +142,8 @@
                           ></user-avatar>
                         </template>
                       </v-tooltip>
-                      <v-tooltip>
-                        {{ producer.paused ? t('live.play.voice.muted') : t('live.play.voice.talking') }}
+                      <v-tooltip location="bottom">
+                        {{ producer.paused ? t('live.play.voice.muted') : t('live.play.voice.speaking') }}
                         <template #activator="{ props }">
                           <v-btn
                             variant="flat"

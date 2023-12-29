@@ -54,9 +54,9 @@
         >
           <template #prepend-inner>
             <v-tooltip>
-              <pre class="text-caption">{{ nextTriggerTimes }}</pre>
+              <pre class="text-caption">{{ nextTriggerTimes ?? t('source.wrongCronExp') }}</pre>
               <template #activator="{ props }">
-                <v-icon v-bind="props" :icon="mdiClockOutline"></v-icon>
+                <v-icon v-bind="props" :color="nextTriggerTimes ? undefined : 'error'" :icon="mdiClockOutline"></v-icon>
               </template>
             </v-tooltip>
           </template>
@@ -279,7 +279,7 @@ const nextTriggerTimes = computed(() => {
         .trim()
     );
   } catch {
-    return t('source.wrongCronExp');
+    return undefined;
   }
 });
 </script>

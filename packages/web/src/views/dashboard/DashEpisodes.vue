@@ -2,7 +2,7 @@
   <v-container class="d-flex flex-column pa-md-12">
     <v-row dense>
       <v-col cols="auto">
-        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus">
+        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus" @click="createNew()">
           {{ t('app.actions.add') }}
         </v-btn>
       </v-col>
@@ -13,7 +13,7 @@
       </v-col>
     </v-row>
     <v-row dense class="mt-2">
-      <v-col cols="12">
+      <v-col cols="12" sm="6">
         <v-text-field
           variant="outlined"
           color="primary"
@@ -25,6 +25,27 @@
           clearable
           @update:model-value="useQuery"
         ></v-text-field>
+      </v-col>
+      <v-col cols="12" sm="6">
+        <v-autocomplete
+          variant="outlined"
+          color="primary"
+          hide-details
+          :label="t('app.entities.series')"
+          :items="seriesItems ?? []"
+          :item-title="(item) => `${item.name}${item.season ?? ''}`"
+          item-value="id"
+          :no-data-text="t('app.loader.empty')"
+          density="compact"
+          :loading="seriesLoading"
+          v-model.number="filters.seriesId"
+          v-model:search="seriesKeyword"
+          clearable
+          :item-props="() => ({ density: 'comfortable' })"
+          @focus.once="loadSeries()"
+          @update:model-value="request()"
+          @update:search="!filters.seriesId && useSeriesQuery(seriesKeyword)"
+        ></v-autocomplete>
       </v-col>
     </v-row>
     <v-sheet rounded border class="mt-4">
@@ -54,7 +75,7 @@
             min-width="60"
             max-width="100"
             :src="
-              item.series.poster
+              item.series?.poster
                 ? api.File.buildRawPath(item.series.poster.id, item.series.poster.name)
                 : SeriesPosterFallback
             "
@@ -67,7 +88,7 @@
             min-width="120"
             max-width="160"
             :src="
-              item.media.poster
+              item.media?.poster
                 ? api.File.buildRawPath(item.media.poster.id, item.media.poster.name)
                 : MediaPosterFallback
             "
@@ -96,23 +117,144 @@
         </template>
       </v-data-table-server>
     </v-sheet>
+
+    <v-dialog
+      :class="display.smAndUp.value ? 'w-75' : 'w-100'"
+      :fullscreen="!display.smAndUp.value"
+      v-model="editDialog"
+      scrollable
+    >
+      <v-card v-if="editItem">
+        <v-toolbar color="primary">
+          <v-btn :icon="mdiClose" @click="editDialog = false"></v-btn>
+          <v-toolbar-title>
+            {{ editItem?.id ? t('app.actions.edit') : t('app.actions.add') }}
+            {{ t('app.entities.episode') }}
+          </v-toolbar-title>
+          <v-btn
+            variant="text"
+            :disabled="!editItem.series || !editItem.media"
+            :prepend-icon="mdiCheck"
+            :loading="episodeSaving"
+            @click="saveEpisode(editItem)"
+          >
+            {{ t('app.actions.save') }}
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-6">
+          <v-container class="pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('episode.entity.title') }}</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              v-model="editItem.title"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('episode.entity.no') }}</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              v-model="editItem.no"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('episode.entity.series') }}</span>
+            <v-autocomplete
+              class="mt-2"
+              variant="outlined"
+              color="primary"
+              hide-details
+              :items="seriesItems ?? []"
+              :item-title="(item) => `${item.name}${item.season ?? ''}`"
+              return-object
+              :no-data-text="t('app.loader.empty')"
+              density="compact"
+              :loading="seriesLoading"
+              v-model="editItem.series"
+              v-model:search="editSeriesKeyword"
+              clearable
+              :item-props="() => ({ density: 'comfortable' })"
+              @focus.once="loadSeries()"
+              @update:search="!editItem.series && useSeriesQuery(editSeriesKeyword)"
+            ></v-autocomplete>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('episode.entity.media') }}</span>
+            <v-autocomplete
+              class="mt-2"
+              variant="outlined"
+              color="primary"
+              hide-details
+              :items="mediaItems ?? []"
+              :item-title="(item) => item.name || item.file?.name"
+              return-object
+              :no-data-text="t('app.loader.empty')"
+              density="compact"
+              :loading="mediasLoading"
+              v-model="editItem.media"
+              v-model:search="editMediaKeyword"
+              clearable
+              :item-props="() => ({ density: 'comfortable' })"
+              @focus.once="loadMedias()"
+              @update:search="!editItem.media && useMediasQuery(editMediaKeyword)"
+            ></v-autocomplete>
+          </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="deleteDialog" width="auto">
+      <v-card v-if="editItem">
+        <v-card-title>
+          {{ t('app.actions.deleteTitle') }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column">
+          <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.episode') }) }}</span>
+          <span class="font-italic font-weight-bold">{{ editItem.title || editItem.media?.name }}</span>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="deleteDialog = false">
+            {{ t('app.cancel') }}
+          </v-btn>
+          <v-btn variant="plain" color="error" :loading="episodeDeleting" @click="deleteEpisode(editItem!.id)">
+            {{ t('app.ok') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
 <script setup lang="ts">
-import { mdiDelete, mdiMagnify, mdiPencil, mdiPlus, mdiRefresh, mdiShare } from '@mdi/js';
+import { mdiCheck, mdiClose, mdiDelete, mdiMagnify, mdiPencil, mdiPlus, mdiRefresh, mdiShare } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { ref } from 'vue';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { debounce } from '@/utils/utils';
 import ZoomImg from '@/components/app/ZoomImg.vue';
-import { EpisodeEntity, EpisodeQueryDto } from '@/api/interfaces/series.interface';
+import { EpisodeEntity, EpisodeQueryDto, SeriesQueryDto } from '@/api/interfaces/series.interface';
 import SeriesPosterFallback from '@/assets/banner-portrait.jpeg';
 import MediaPosterFallback from '@/assets/banner.jpeg';
+import { useRouter } from 'vue-router';
+import { useToastStore } from '@/store/toast';
+import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
+import { useDisplay } from 'vuetify';
+import { MediaQueryDto } from '@/api/interfaces/media.interface';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
+const router = useRouter();
+const toast = useToastStore();
+const display = useDisplay();
 
 const page = ref(1);
 const size = ref(10);
@@ -136,6 +278,35 @@ const {
   });
 });
 const useQuery = debounce(request, 1000);
+
+const seriesKeyword = ref('');
+const {
+  pending: seriesLoading,
+  request: loadSeries,
+  items: seriesItems,
+  reset: resetSeries,
+  onRejected: onSeriesLoadFailed,
+} = useAxiosPageLoader(
+  async (query?: SeriesQueryDto) => {
+    return await api.Series.query(query);
+  },
+  { page: 0, size: 24 },
+);
+const useSeriesQuery = debounce(
+  async (keyword: string) => {
+    resetSeries();
+    await loadSeries({
+      keyword,
+      sort: 'createAt',
+      order: 'DESC',
+    });
+  },
+  500,
+  false,
+);
+onSeriesLoadFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
 
 const headers = ref([
   {
@@ -172,27 +343,121 @@ const headers = ref([
   },
 ]);
 
+const editItem = ref<EpisodeEntity | undefined>(undefined);
+const editSeriesKeyword = ref('');
+const editMediaKeyword = ref('');
+const {
+  pending: mediasLoading,
+  request: loadMedias,
+  items: mediaItems,
+  reset: resetMedias,
+  onRejected: onMediasLoadFailed,
+} = useAxiosPageLoader(
+  async (query?: MediaQueryDto) => {
+    return await api.Media.query(query);
+  },
+  { page: 0, size: 24 },
+);
+const useMediasQuery = debounce(
+  async (keyword: string) => {
+    resetMedias();
+    await loadMedias({
+      keyword,
+      sort: 'createAt',
+      order: 'DESC',
+    });
+  },
+  500,
+  false,
+);
+onMediasLoadFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const editDialog = ref(false);
+const createNew = () => {
+  editItem.value = {} as any;
+  editDialog.value = true;
+};
+const {
+  pending: episodeSaving,
+  request: saveEpisode,
+  onResolved: onEpisodeSaved,
+  onRejected: onEpisodeSaveFailed,
+} = useAxiosRequest(async (episode: EpisodeEntity) => {
+  const handler = episode.id ? api.Episode.update(episode.id) : api.Episode.create;
+  return handler({
+    title: episode.title,
+    no: episode.no,
+    seriesId: episode.series?.id,
+    mediaId: episode.media?.id,
+  });
+});
+onEpisodeSaved((data) => {
+  if (episodes.value) {
+    const index = episodes.value?.items.findIndex(({ id }) => id === data.id) ?? -1;
+    if (index > -1) {
+      episodes.value.items[index] = data;
+    } else {
+      episodes.value.items.unshift(data);
+    }
+  }
+
+  editDialog.value = false;
+});
+onEpisodeSaveFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const deleteDialog = ref(false);
+const {
+  pending: episodeDeleting,
+  request: deleteEpisode,
+  onResolved: onEpisodeDeleted,
+  onRejected: onEpisodeDeleteFailed,
+} = useAxiosRequest(async (id: number) => {
+  return await api.Episode.delete(id)();
+});
+onEpisodeDeleted(async () => {
+  toast.toastSuccess(t('app.actions.deleteToast'));
+  if (episodes.value) {
+    episodes.value.items = episodes.value.items.filter(({ id }) => id !== editItem.value?.id);
+  }
+  deleteDialog.value = false;
+});
+onEpisodeDeleteFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
 const actions = [
   {
     text: t('app.actions.view'),
     icon: mdiShare,
     color: 'info',
     show: (item: EpisodeEntity) => true,
-    click: (item: EpisodeEntity) => undefined,
+    click: (item: EpisodeEntity) => {
+      router.push({ path: `/episode/${item.id}` });
+    },
   },
   {
     text: t('app.actions.edit'),
     icon: mdiPencil,
     color: 'info',
     show: (item: EpisodeEntity) => true,
-    click: (item: EpisodeEntity) => undefined,
+    click: (item: EpisodeEntity) => {
+      editItem.value = Object.assign({}, item);
+      editDialog.value = true;
+    },
   },
   {
     text: t('app.actions.delete'),
     icon: mdiDelete,
     color: 'error',
     show: (item: EpisodeEntity) => true,
-    click: (item: EpisodeEntity) => undefined,
+    click: (item: EpisodeEntity) => {
+      editItem.value = item;
+      deleteDialog.value = true;
+    },
   },
 ];
 </script>

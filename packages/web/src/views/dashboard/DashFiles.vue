@@ -73,7 +73,7 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column">
           <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.file') }) }}</span>
-          <span class="font-italic font-weight-bold"> "{{ editItem.name }}" </span>
+          <span class="font-italic font-weight-bold">{{ editItem.name }}</span>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>

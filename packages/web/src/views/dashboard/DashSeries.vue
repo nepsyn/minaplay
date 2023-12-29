@@ -2,7 +2,7 @@
   <v-container class="d-flex flex-column pa-md-12">
     <v-row dense>
       <v-col cols="auto">
-        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus" @click="createNew">
+        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus" @click="createNew()">
           {{ t('app.actions.add') }}
         </v-btn>
       </v-col>
@@ -109,124 +109,128 @@
             {{ editItem?.id ? t('app.actions.edit') : t('app.actions.add') }}
             {{ t('app.entities.series') }}
           </v-toolbar-title>
-          <v-btn variant="text" :prepend-icon="mdiCheck" :loading="seriesSaving" @click="saveSeries(editItem)">
+          <v-btn
+            variant="text"
+            :disabled="!(editItem.name?.length > 0)"
+            :prepend-icon="mdiCheck"
+            :loading="seriesSaving"
+            @click="saveSeries(editItem)"
+          >
             {{ t('app.actions.save') }}
           </v-btn>
         </v-toolbar>
-        <v-card-text>
-          <v-container class="d-flex flex-column pa-0">
-            <v-container class="pa-0">
-              <span class="text-body-1 font-weight-bold">{{ t('series.entity.name') }}</span>
-              <v-text-field
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                v-model.trim="editItem.name"
-              ></v-text-field>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <span class="text-body-1 font-weight-bold">{{ t('series.entity.season') }}</span>
-              <v-text-field
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                v-model.trim="editItem.season"
-              ></v-text-field>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <span class="text-body-1 font-weight-bold">{{ t('series.entity.description') }}</span>
-              <v-textarea
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                rows="3"
-                v-model="editItem.description"
-              ></v-textarea>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <span class="text-body-1 font-weight-bold">{{ t('series.entity.count') }}</span>
-              <v-text-field
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                type="number"
-                v-model.number="editItem.count"
-              ></v-text-field>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <v-checkbox hide-details color="primary" density="compact" v-model="editItem.finished">
-                <template #prepend>
-                  <span class="text-body-1 font-weight-bold">{{ t('series.entity.finished') }}</span>
-                </template>
-              </v-checkbox>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <span class="text-body-1 font-weight-bold">
-                {{ t('series.entity.tags') }}
-              </span>
-              <v-autocomplete
-                :readonly="tagSaving"
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                return-object
-                chips
-                closable-chips
-                clearable
-                :loading="tagsLoading"
-                hide-no-data
-                item-title="name"
-                density="compact"
-                :items="tags"
-                multiple
-                v-model="editItem.tags"
-                v-model:search.trim="searchTag"
-                @focus.once="queryTags()"
-                @keydown.enter="saveTag(searchTag)"
-              >
-                <template #append-inner>
-                  <v-progress-circular v-if="tagSaving" indeterminate color="primary"></v-progress-circular>
-                </template>
-              </v-autocomplete>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <span class="text-body-1 font-weight-bold">
-                {{ t('series.entity.poster') }}
-              </span>
-              <v-row class="mt-1">
-                <v-col cols="12" md="4">
-                  <zoom-img
-                    :aspect-ratio="1 / 1.4"
-                    min-width="80"
-                    class="rounded"
-                    :src="
-                      editItem.poster
-                        ? api.File.buildRawPath(editItem.poster.id, editItem.poster.name)
-                        : SeriesPosterFallback
-                    "
-                  ></zoom-img>
-                  <v-btn
-                    class="mt-2"
-                    :prepend-icon="mdiCloudUploadOutline"
-                    color="warning"
-                    :text="t('app.actions.upload')"
-                    variant="tonal"
-                    block
-                    :loading="posterUploading"
-                    @click="selectAndUploadPoster"
-                  ></v-btn>
-                </v-col>
-              </v-row>
-            </v-container>
+        <v-card-text class="py-6">
+          <v-container class="pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('series.entity.name') }}</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              v-model.trim="editItem.name"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('series.entity.season') }}</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              v-model.trim="editItem.season"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('series.entity.description') }}</span>
+            <v-textarea
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              rows="3"
+              v-model="editItem.description"
+            ></v-textarea>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('series.entity.count') }}</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              type="number"
+              v-model.number="editItem.count"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <v-checkbox hide-details color="primary" density="compact" v-model="editItem.finished">
+              <template #prepend>
+                <span class="text-body-1 font-weight-bold">{{ t('series.entity.finished') }}</span>
+              </template>
+            </v-checkbox>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">
+              {{ t('series.entity.tags') }}
+            </span>
+            <v-autocomplete
+              :readonly="tagSaving"
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              return-object
+              chips
+              closable-chips
+              clearable
+              :loading="tagsLoading"
+              hide-no-data
+              item-title="name"
+              density="compact"
+              :items="tags"
+              multiple
+              v-model="editItem.tags"
+              v-model:search.trim="searchTag"
+              @focus.once="queryTags()"
+              @keydown.enter="saveTag(searchTag)"
+            >
+              <template #append-inner>
+                <v-progress-circular v-if="tagSaving" indeterminate color="primary"></v-progress-circular>
+              </template>
+            </v-autocomplete>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">
+              {{ t('series.entity.poster') }}
+            </span>
+            <v-row class="mt-1">
+              <v-col cols="12" md="4">
+                <zoom-img
+                  :aspect-ratio="1 / 1.4"
+                  min-width="80"
+                  class="rounded"
+                  :src="
+                    editItem.poster
+                      ? api.File.buildRawPath(editItem.poster.id, editItem.poster.name)
+                      : SeriesPosterFallback
+                  "
+                ></zoom-img>
+                <v-btn
+                  class="mt-2"
+                  :prepend-icon="mdiCloudUploadOutline"
+                  color="warning"
+                  :text="t('app.actions.upload')"
+                  variant="tonal"
+                  block
+                  :loading="posterUploading"
+                  @click="selectAndUploadPoster"
+                ></v-btn>
+              </v-col>
+            </v-row>
           </v-container>
         </v-card-text>
       </v-card>
@@ -239,7 +243,7 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column">
           <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.series') }) }}</span>
-          <span class="font-italic font-weight-bold"> "{{ editItem.name }}{{ editItem.season }}" </span>
+          <span class="font-italic font-weight-bold">{{ editItem.name }}{{ editItem.season }}</span>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>

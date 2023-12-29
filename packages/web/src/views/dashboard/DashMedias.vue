@@ -106,70 +106,74 @@
         <v-toolbar color="primary">
           <v-btn :icon="mdiClose" @click="editDialog = false"></v-btn>
           <v-toolbar-title> {{ t('app.actions.edit') }} {{ t('app.entities.media') }}</v-toolbar-title>
-          <v-btn variant="text" :prepend-icon="mdiCheck" :loading="mediaUpdating" @click="updateMedia(editItem)">
+          <v-btn
+            variant="text"
+            :disabled="!(editItem.name?.length > 0)"
+            :prepend-icon="mdiCheck"
+            :loading="mediaUpdating"
+            @click="updateMedia(editItem)"
+          >
             {{ t('app.actions.save') }}
           </v-btn>
         </v-toolbar>
-        <v-card-text>
-          <v-container class="d-flex flex-column pa-0">
-            <v-container class="pa-0">
-              <span class="text-body-1 font-weight-bold">
-                {{ t('media.entity.name') }}
-              </span>
-              <v-text-field
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                v-model="editItem.name"
-              ></v-text-field>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <span class="text-body-1 font-weight-bold">
-                {{ t('media.entity.description') }}
-              </span>
-              <v-textarea
-                class="mt-2"
-                variant="outlined"
-                hide-details
-                color="primary"
-                density="compact"
-                rows="3"
-                v-model="editItem.description"
-              ></v-textarea>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <v-switch inset hide-details color="primary" density="compact" v-model="editItem.isPublic">
-                <template #prepend>
-                  <span class="text-body-1 font-weight-bold">{{ t('media.entity.isPublic') }}</span>
-                </template>
-              </v-switch>
-            </v-container>
-            <v-container class="mt-4 pa-0">
-              <span class="text-body-1 font-weight-bold">
-                {{ t('media.entity.poster') }}
-              </span>
-              <v-row class="mt-1">
-                <v-col cols="12" md="8">
-                  <zoom-img
-                    class="rounded"
-                    :src="editItem.poster && api.File.buildRawPath(editItem.poster.id)"
-                  ></zoom-img>
-                  <v-btn
-                    class="mt-2"
-                    :prepend-icon="mdiCloudUploadOutline"
-                    color="warning"
-                    variant="tonal"
-                    block
-                    :loading="posterUploading"
-                    @click="selectAndUploadPoster()"
-                  >
-                    {{ t('app.actions.upload') }}
-                  </v-btn>
-                </v-col>
-              </v-row>
-            </v-container>
+        <v-card-text class="py-6">
+          <v-container class="pa-0">
+            <span class="text-body-1 font-weight-bold">
+              {{ t('media.entity.name') }}
+            </span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              v-model="editItem.name"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">
+              {{ t('media.entity.description') }}
+            </span>
+            <v-textarea
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              rows="3"
+              v-model="editItem.description"
+            ></v-textarea>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <v-switch inset hide-details color="primary" density="compact" v-model="editItem.isPublic">
+              <template #prepend>
+                <span class="text-body-1 font-weight-bold">{{ t('media.entity.isPublic') }}</span>
+              </template>
+            </v-switch>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">
+              {{ t('media.entity.poster') }}
+            </span>
+            <v-row class="mt-1">
+              <v-col cols="12" md="8">
+                <zoom-img
+                  class="rounded"
+                  :src="editItem.poster && api.File.buildRawPath(editItem.poster.id)"
+                ></zoom-img>
+                <v-btn
+                  class="mt-2"
+                  :prepend-icon="mdiCloudUploadOutline"
+                  color="warning"
+                  variant="tonal"
+                  block
+                  :loading="posterUploading"
+                  @click="selectAndUploadPoster()"
+                >
+                  {{ t('app.actions.upload') }}
+                </v-btn>
+              </v-col>
+            </v-row>
           </v-container>
         </v-card-text>
       </v-card>
@@ -182,7 +186,7 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column">
           <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.media') }) }}</span>
-          <span class="font-italic font-weight-bold"> "{{ editItem.name || editItem.file?.name }}" </span>
+          <span class="font-italic font-weight-bold">{{ editItem.name || editItem.file?.name }}</span>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>

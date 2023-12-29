@@ -106,7 +106,7 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column">
           <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.source') }) }}</span>
-          <span class="font-italic font-weight-bold"> "{{ editItem.title || editItem.remark || editItem.url }}" </span>
+          <span class="font-italic font-weight-bold">{{ editItem.title || editItem.remark || editItem.url }}</span>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>

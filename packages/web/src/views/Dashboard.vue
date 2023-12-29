@@ -2,16 +2,18 @@
   <v-layout class="page-height">
     <v-navigation-drawer class="d-none d-md-flex" mobile-breakpoint="md" location="right">
       <v-list :lines="false" density="compact" nav>
-        <v-list-subheader class="font-weight-black">{{ t('layout.sections') }}</v-list-subheader>
-        <v-list-item
-          v-for="(tab, index) in tabs"
-          :key="index"
-          color="primary"
-          :prepend-icon="tab.icon"
-          :title="tab.text"
-          :to="tab.to"
-          replace
-        ></v-list-item>
+        <template v-for="(section, index) in sections" :key="index">
+          <v-list-subheader>{{ section.nav }}</v-list-subheader>
+          <v-list-item
+            v-for="(tab, index) in section.tabs"
+            :key="index"
+            color="primary"
+            :prepend-icon="tab.icon"
+            :title="tab.text"
+            :to="tab.to"
+            replace
+          ></v-list-item>
+        </template>
       </v-list>
     </v-navigation-drawer>
     <v-main>
@@ -32,7 +34,6 @@
 <script setup lang="ts">
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import { useI18n } from 'vue-i18n';
-import { computed } from 'vue';
 import {
   mdiAccountMultiple,
   mdiAnimationPlayOutline,
@@ -48,53 +49,67 @@ import NavTabs from '@/components/app/NavTabs.vue';
 
 const { t } = useI18n();
 
-const tabs = computed(() => [
+const systemTabs = [
   {
     to: '/dashboard/system',
     icon: mdiGaugeFull,
-    text: t('dashboard.sections.system'),
+    text: t('dashboard.system'),
   },
+];
+const moduleTabs = [
   {
     to: '/dashboard/user',
     icon: mdiAccountMultiple,
-    text: t('dashboard.sections.user'),
+    text: t('dashboard.user'),
   },
   {
     to: '/dashboard/source',
     icon: mdiRss,
-    text: t('dashboard.sections.source'),
+    text: t('dashboard.source'),
   },
   {
     to: '/dashboard/rule',
     icon: mdiCodeBraces,
-    text: t('dashboard.sections.rule'),
+    text: t('dashboard.rule'),
   },
   {
     to: '/dashboard/media',
     icon: mdiMultimedia,
-    text: t('dashboard.sections.media'),
+    text: t('dashboard.media'),
   },
   {
     to: '/dashboard/series',
     icon: mdiAnimationPlayOutline,
-    text: t('dashboard.sections.series'),
+    text: t('dashboard.series'),
   },
   {
     to: '/dashboard/episode',
     icon: mdiViewComfy,
-    text: t('dashboard.sections.episode'),
+    text: t('dashboard.episode'),
   },
   {
     to: '/dashboard/live',
     icon: mdiVideoVintage,
-    text: t('dashboard.sections.live'),
+    text: t('dashboard.live'),
   },
   {
     to: '/dashboard/file',
     icon: mdiFileMultipleOutline,
-    text: t('dashboard.sections.file'),
+    text: t('dashboard.file'),
   },
-]);
+];
+const tabs = [...systemTabs, ...moduleTabs];
+
+const sections = [
+  {
+    nav: t('dashboard.nav.application'),
+    tabs: systemTabs,
+  },
+  {
+    nav: t('dashboard.nav.module'),
+    tabs: moduleTabs,
+  },
+];
 </script>
 
 <style scoped lang="sass"></style>

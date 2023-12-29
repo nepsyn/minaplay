@@ -32,17 +32,19 @@
           color="primary"
           hide-details
           :label="t('app.entities.source')"
-          :items="sourcesLoader.data.value?.items ?? []"
-          :item-title="(item) => item.title ?? item.remark ?? t('rule.unnamed')"
+          :items="sources ?? []"
+          :item-title="(item) => item.title || item.remark || t('rule.unnamed')"
           item-value="id"
           :no-data-text="t('app.loader.empty')"
           density="compact"
-          :loading="sourcesLoader.pending.value"
+          :loading="sourcesLoading"
           v-model.number="filters.sourceId"
+          v-model:search="sourceKeyword"
           clearable
-          @focus.once="sourcesLoader.request()"
           :item-props="(item) => ({ density: 'comfortable', subtitle: item.url })"
-          @update:model-value="request"
+          @focus.once="loadSources()"
+          @update:model-value="request()"
+          @update:search="!filters.sourceId && useSourceQuery()"
         ></v-autocomplete>
       </v-col>
     </v-row>
@@ -115,7 +117,7 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column">
           <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.rule') }) }}</span>
-          <span class="font-italic font-weight-bold"> "{{ editItem.remark || t('rule.unnamed') }}" </span>
+          <span class="font-italic font-weight-bold">{{ editItem.remark || t('rule.unnamed') }}</span>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -138,11 +140,12 @@ import { useApiStore } from '@/store/api';
 import { ref } from 'vue';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { debounce } from '@/utils/utils';
-import { RuleEntity, RuleQueryDto } from '@/api/interfaces/subscribe.interface';
+import { RuleEntity, RuleQueryDto, SourceQueryDto } from '@/api/interfaces/subscribe.interface';
 import BlankFavicon from '@/assets/blank-favicon.png';
 import { useRouter } from 'vue-router';
 import { useToastStore } from '@/store/toast';
 import DefaultTemplateCode from '@/assets/templates/default.ts?raw';
+import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
@@ -172,8 +175,33 @@ const {
 });
 const useQuery = debounce(request, 1000);
 
-const sourcesLoader = useAxiosRequest(async () => {
-  return await api.Source.query({ size: 1024 });
+const sourceKeyword = ref('');
+const {
+  pending: sourcesLoading,
+  request: loadSources,
+  items: sources,
+  reset: resetSources,
+  onRejected: onSourcesLoadFailed,
+} = useAxiosPageLoader(
+  async (query?: SourceQueryDto) => {
+    return await api.Source.query(query);
+  },
+  { page: 0, size: 24 },
+);
+const useSourceQuery = debounce(
+  async () => {
+    resetSources();
+    await loadSources({
+      keyword: sourceKeyword.value,
+      sort: 'createAt',
+      order: 'DESC',
+    });
+  },
+  500,
+  false,
+);
+onSourcesLoadFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const getFaviconUrl = (url: string) => {

@@ -39,6 +39,7 @@ export default {
       live: 'live room',
       media: 'media',
       series: 'Series',
+      episode: 'Episode',
       file: 'File',
     },
     actions: {
@@ -54,6 +55,7 @@ export default {
       refresh: 'Refresh',
       upload: 'Upload',
       download: 'Download',
+      select: 'Select',
       more: '[more]',
       collapse: '[collapse]',
       pause: 'Pause',
@@ -132,7 +134,7 @@ export default {
     },
     actions: {
       copy: 'Copy Video URL',
-      openInVLC: 'Open VLC',
+      openInVLC: 'Open in VLC',
       play: 'Play Together',
       watch: 'Watch Now',
     },
@@ -162,7 +164,7 @@ export default {
   episode: {
     entity: {
       title: 'Title',
-      no: 'No',
+      no: 'No.',
       series: 'Series',
       media: 'Media',
       pubAt: 'Publish At',
@@ -312,7 +314,7 @@ export default {
         join: 'Join Live Voice',
         quit: 'Quit Live Voice',
         muted: 'Muted',
-        talking: 'Talking',
+        speaking: 'Speaking',
       },
       tabs: {
         chat: 'Chat',
@@ -331,17 +333,19 @@ export default {
     },
   },
   dashboard: {
-    sections: {
-      system: 'System',
-      user: 'Users',
-      source: 'Sources',
-      rule: 'Rules',
-      media: 'Medias',
-      series: 'Series',
-      episode: 'Episodes',
-      live: 'Lives',
-      file: 'Files',
+    nav: {
+      application: 'Application',
+      module: 'Modules',
     },
+    system: 'System',
+    user: 'Users',
+    source: 'Sources',
+    rule: 'Rules',
+    media: 'Medias',
+    series: 'Series',
+    episode: 'Episodes',
+    live: 'Lives',
+    file: 'Files',
   },
   login: {
     username: 'Username',

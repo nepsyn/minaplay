@@ -34,6 +34,7 @@ import { DownloadItemService } from './download-item.service';
 import { DownloadItem } from './download-item.entity';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 import { isDefined } from 'class-validator';
+import { CronTime } from 'cron';
 
 @Controller('subscribe/source')
 @UseGuards(AuthorizationGuard)
@@ -52,7 +53,13 @@ export class SourceController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createSource(@RequestUser() user: User, @Body() data: SourceDto) {
-    if (!isDefined(data.url) || !isDefined(data.enabled)) {
+    if (!isDefined(data.url) || !isDefined(data.enabled) || !isDefined(data.cron)) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
+    try {
+      new CronTime(data.cron);
+    } catch {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
@@ -112,6 +119,12 @@ export class SourceController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async updateSource(@Param('id', ParseIntPipe) id: number, @Body() data: SourceDto) {
+    try {
+      new CronTime(data.cron);
+    } catch {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
     let source = await this.sourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);

@@ -113,7 +113,7 @@ export class DownloadItemService implements OnModuleInit {
         const { id } = await this.mediaService.save({
           name: mediaFile.name,
           isPublic: true,
-          ...(descriptor.media ?? {}),
+          ...descriptor.media,
           download: { id: item.id },
           file: { id: mediaFile.id },
           attachments: attachments.map(({ id }) => ({ id })),
@@ -138,7 +138,7 @@ export class DownloadItemService implements OnModuleInit {
           await this.episodeService.save({
             title: entry.title,
             pubAt: Date.parse(String(entry.published)) ? new Date(entry.published) : new Date(),
-            ...(descriptor.episode ?? {}),
+            ...descriptor.episode,
             media: { id: media.id },
             series: { id: series.id },
           });

@@ -31,7 +31,6 @@ export class Live {
   }
 
   /** 封面图片 */
-  @Exclude()
   @ManyToOne(() => File, {
     eager: true,
     nullable: true,

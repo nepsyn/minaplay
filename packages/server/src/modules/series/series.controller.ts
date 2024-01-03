@@ -62,9 +62,9 @@ export class SeriesController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
   async createSeries(@RequestUser() user: User, @Body() data: SeriesDto) {
-    const sameNameSeries = await this.seriesService.findOneBy({ name: data.name });
+    const sameNameSeries = await this.seriesService.findOneBy({ name: data.name, season: data.season });
     if (sameNameSeries) {
-      throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATE_SERIES_NAME);
+      throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATE_SERIES);
     }
 
     const { id } = await this.seriesService.save({
@@ -126,9 +126,9 @@ export class SeriesController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    const sameNameSeries = await this.seriesService.findOneBy({ name: data.name });
+    const sameNameSeries = await this.seriesService.findOneBy({ name: data.name, season: data.season });
     if (sameNameSeries && sameNameSeries.id !== id) {
-      throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATE_SERIES_NAME);
+      throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATE_SERIES);
     }
 
     await this.seriesService.save({

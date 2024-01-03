@@ -59,6 +59,7 @@ export interface RuleQueryDto extends ApiQueryDto<RuleEntity> {
 }
 
 export interface RuleErrorLogEntity {
+  id: number;
   error: string;
   createAt: Date;
 }

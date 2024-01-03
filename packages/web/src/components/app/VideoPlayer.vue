@@ -268,6 +268,7 @@ import { mdiArrowCollapseAll, mdiStretchToPageOutline } from '@mdi/js';
 import { LiveStream } from '@/api/interfaces/live.interface';
 import MpegTs from 'mpegts.js';
 import Hls from 'hls.js';
+// @ts-ignore
 import DanmuJs from 'danmu.js';
 
 const SUBTITLE_EXTENSIONS = ['.ass', '.ssa'];

@@ -25,7 +25,6 @@ export default {
     },
     player: {
       danmaku: {
-        enabled: 'Danmaku Enabled',
         settings: 'Danmaku Settings',
         fontSize: 'Font Size',
         opacity: 'Opacity',
@@ -45,10 +44,10 @@ export default {
     entities: {
       user: 'User',
       source: 'RSS source',
-      rule: 'subscribe rule',
-      download: 'download item',
-      live: 'live room',
-      media: 'media',
+      rule: 'Subscribe rule',
+      download: 'Download item',
+      live: 'Live room',
+      media: 'Media',
       series: 'Series',
       episode: 'Episode',
       file: 'File',
@@ -227,13 +226,12 @@ export default {
     nextTriggerTimes: 'Next Trigger Times:',
     wrongCronExp: 'Wrong Cron Expression',
     entity: {
-      id: 'ID',
       title: 'Title',
       remark: 'Remark',
       cron: 'CRON Expression',
       url: 'URL',
       enabled: 'Enabled',
-      user: 'Create User',
+      user: 'User',
       createAt: 'Create At',
     },
     sections: {
@@ -248,7 +246,7 @@ export default {
       updateDescription:
         'Run update task instantly, MinaPlay will automatically parse content and download items match your `Rules`.',
       updateBtn: 'Run Update',
-      updateToast: 'Run update succeeded.',
+      updateToast: 'Run update succeeded',
       enabled: 'Enabled',
       enabledDescription: 'Indicates whether this RSS source is enabled.',
       delete: 'Delete RSS Source',
@@ -282,10 +280,9 @@ export default {
     title: 'Rules',
     unnamed: 'Unnamed Subscribe Rule',
     entity: {
-      id: 'ID',
       remark: 'Remark',
       sources: 'RSS Sources',
-      user: 'Create User',
+      user: 'User',
       createAt: 'Create At',
       updateAt: 'Update At',
     },
@@ -431,8 +428,7 @@ export default {
     [ErrorCodeEnum.INVALID_FILE]: 'Wrong file type',
     [ErrorCodeEnum.INVALID_IMAGE_FILE_TYPE]: 'Wrong file content',
     [ErrorCodeEnum.INVALID_VIDEO_FILE_TYPE]: 'Wrong file content',
-    [ErrorCodeEnum.DUPLICATE_SERIES_NAME]: 'Duplicated series name',
-    [ErrorCodeEnum.DUPLICATE_SERIES_TAG_NAME]: 'Duplicated series tag name',
+    [ErrorCodeEnum.DUPLICATE_SERIES]: 'Duplicated series name',
     [ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT]: 'Subscribe source format is invalid RSS',
     [ErrorCodeEnum.INVALID_SUBSCRIBE_RULE_CODE]: 'Subscribe rule code is invalid',
     [ErrorCodeEnum.USER_CHAT_MUTED]: 'User chat is muted by room owner',

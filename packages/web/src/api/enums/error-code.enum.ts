@@ -35,10 +35,8 @@ export enum ErrorCodeEnum {
   /** 错误的视频文件类型 */
   INVALID_VIDEO_FILE_TYPE = 0x0303,
 
-  /** 剧集名称已存在 */
-  DUPLICATE_SERIES_NAME = 0x0401,
-  /** 剧集标签名称已存在 */
-  DUPLICATE_SERIES_TAG_NAME = 0x0402,
+  /** 剧集已存在 */
+  DUPLICATE_SERIES = 0x0401,
 
   /** 订阅源格式错误 */
   INVALID_SUBSCRIBE_SOURCE_FORMAT = 0x0501,

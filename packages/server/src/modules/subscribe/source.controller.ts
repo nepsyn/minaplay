@@ -119,10 +119,12 @@ export class SourceController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async updateSource(@Param('id', ParseIntPipe) id: number, @Body() data: SourceDto) {
-    try {
-      new CronTime(data.cron);
-    } catch {
-      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    if (data.cron) {
+      try {
+        new CronTime(data.cron);
+      } catch {
+        throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+      }
     }
 
     let source = await this.sourceService.findOneBy({ id });

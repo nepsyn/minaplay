@@ -71,7 +71,7 @@
         <template #item.sources="{ item }">
           <div class="d-flex flex-row">
             <v-tooltip v-for="source in item.sources ?? []" :key="source.id">
-              {{ source.title }}
+              {{ source.title || source.remark || t('source.unnamed') }}
               <br />
               {{ source.url }}
               <template #activator="{ props }">

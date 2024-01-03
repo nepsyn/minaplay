@@ -97,7 +97,7 @@ const filters: Ref<SeriesQueryDto> = ref({
 const seriesLoader = useAxiosPageLoader(
   async (query?: SeriesQueryDto) => {
     return await api.Series.query({
-      ...(query ?? {}),
+      ...query,
       ...filters.value,
     });
   },

@@ -128,7 +128,7 @@ ruleLoader.onResolved((data) => {
   edit.value = { ...data, sourceIds: data.sources.map(({ id }) => id) };
 });
 const rule = computed(() => ruleLoader.data.value);
-const edit = ref({ ...(rule.value ?? {}), sourceIds: rule.value?.sources.map(({ id }) => id) ?? [] });
+const edit = ref({ ...rule.value, sourceIds: rule.value?.sources.map(({ id }) => id) ?? [] });
 
 const sourcesLoader = useAxiosRequest(async () => {
   return await api.Source.query({ size: 1024 });

@@ -134,8 +134,16 @@
           </v-btn>
         </v-toolbar>
         <v-card-text class="px-0 py-4">
-          <template v-for="(group, groupIndex) in permissions" :key="groupIndex">
-            <v-list v-model:selected="editItem.permissionNames" select-strategy="leaf">
+          <v-list class="overflow-x-hidden" v-model:selected="editItem.permissionNames" select-strategy="leaf">
+            <v-list-subheader>{{ t('user.permission.groups.presets') }}</v-list-subheader>
+            <v-row dense class="px-4">
+              <v-col v-for="(preset, presetIndex) in presets" :key="presetIndex" cols="auto">
+                <v-chip variant="outlined" label link @click="editItem.permissionNames = preset.permissions.concat()">
+                  {{ preset.text }}
+                </v-chip>
+              </v-col>
+            </v-row>
+            <template v-for="(group, groupIndex) in permissions" :key="groupIndex">
               <v-list-subheader>{{ group.name }}</v-list-subheader>
               <v-list-item
                 v-for="(item, itemIndex) in group.items"
@@ -149,9 +157,9 @@
                 </template>
                 <v-list-item-title>{{ item.name }}</v-list-item-title>
               </v-list-item>
-            </v-list>
-            <v-divider v-if="groupIndex !== permissions.length - 1"></v-divider>
-          </template>
+              <v-divider v-if="groupIndex !== permissions.length - 1"></v-divider>
+            </template>
+          </v-list>
         </v-card-text>
       </v-card>
     </v-dialog>
@@ -355,40 +363,70 @@ onUserSaveFailed((error: any) => {
 const permissionDialog = ref(false);
 const permissions = [
   {
-    name: t('permission.groups.file'),
+    name: t('user.permission.groups.file'),
     items: [
-      { name: t('permission.fullAccess'), value: PermissionEnum.FILE_OP },
-      { name: t('permission.uploadVideo'), value: PermissionEnum.FILE_UPLOAD_VIDEO },
-      { name: t('permission.uploadImage'), value: PermissionEnum.FILE_UPLOAD_IMAGE },
+      { name: t('user.permission.fullAccess'), value: PermissionEnum.FILE_OP },
+      { name: t('user.permission.uploadVideo'), value: PermissionEnum.FILE_UPLOAD_VIDEO },
+      { name: t('user.permission.uploadImage'), value: PermissionEnum.FILE_UPLOAD_IMAGE },
     ],
   },
   {
-    name: t('permission.groups.media'),
+    name: t('user.permission.groups.media'),
     items: [
-      { name: t('permission.fullAccess'), value: PermissionEnum.MEDIA_OP },
-      { name: t('permission.view'), value: PermissionEnum.MEDIA_VIEW },
+      { name: t('user.permission.fullAccess'), value: PermissionEnum.MEDIA_OP },
+      { name: t('user.permission.view'), value: PermissionEnum.MEDIA_VIEW },
     ],
   },
   {
-    name: t('permission.groups.series'),
+    name: t('user.permission.groups.series'),
     items: [
-      { name: t('permission.fullAccess'), value: PermissionEnum.SERIES_OP },
-      { name: t('permission.view'), value: PermissionEnum.SERIES_VIEW },
+      { name: t('user.permission.fullAccess'), value: PermissionEnum.SERIES_OP },
+      { name: t('user.permission.view'), value: PermissionEnum.SERIES_VIEW },
     ],
   },
   {
-    name: t('permission.groups.subscribe'),
+    name: t('user.permission.groups.subscribe'),
     items: [
-      { name: t('permission.fullAccess'), value: PermissionEnum.SUBSCRIBE_OP },
-      { name: t('permission.view'), value: PermissionEnum.SUBSCRIBE_VIEW },
+      { name: t('user.permission.fullAccess'), value: PermissionEnum.SUBSCRIBE_OP },
+      { name: t('user.permission.view'), value: PermissionEnum.SUBSCRIBE_VIEW },
     ],
   },
   {
-    name: t('permission.groups.live'),
+    name: t('user.permission.groups.live'),
     items: [
-      { name: t('permission.fullAccess'), value: PermissionEnum.LIVE_OP },
-      { name: t('permission.view'), value: PermissionEnum.LIVE_VIEW },
+      { name: t('user.permission.fullAccess'), value: PermissionEnum.LIVE_OP },
+      { name: t('user.permission.view'), value: PermissionEnum.LIVE_VIEW },
     ],
+  },
+];
+const presets = [
+  {
+    text: t('user.permission.presets.administrator'),
+    permissions: [
+      PermissionEnum.FILE_OP,
+      PermissionEnum.MEDIA_OP,
+      PermissionEnum.SERIES_OP,
+      PermissionEnum.SUBSCRIBE_OP,
+      PermissionEnum.LIVE_OP,
+    ],
+  },
+  {
+    text: t('user.permission.presets.user'),
+    permissions: [
+      PermissionEnum.FILE_UPLOAD_IMAGE,
+      PermissionEnum.MEDIA_VIEW,
+      PermissionEnum.SERIES_VIEW,
+      PermissionEnum.SUBSCRIBE_VIEW,
+      PermissionEnum.LIVE_VIEW,
+    ],
+  },
+  {
+    text: t('user.permission.presets.guest'),
+    permissions: [PermissionEnum.MEDIA_VIEW, PermissionEnum.SERIES_VIEW],
+  },
+  {
+    text: t('user.permission.presets.banned'),
+    permissions: [],
   },
 ];
 const {

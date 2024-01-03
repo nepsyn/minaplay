@@ -20,7 +20,13 @@
         <span class="plain-text ml-5 mr-2">{{ message.content }}</span>
       </template>
       <template v-else-if="message.type === 'NetworkImage'">
-        <zoom-img class="ml-5 rounded" :src="message.url" max-width="200px"></zoom-img>
+        <zoom-img
+          class="ml-5 rounded chat-image"
+          :src="message.url"
+          eager
+          max-width="200px"
+          @load="emits('load')"
+        ></zoom-img>
       </template>
       <template v-else>
         <span class="plain-text">{{ t('live.play.unknownChatType') }}</span>
@@ -33,7 +39,7 @@
 import UserAvatar from '@/components/user/UserAvatar.vue';
 import TimeAgo from '@/components/app/TimeAgo.vue';
 import { LiveChat } from '@/api/interfaces/live.interface';
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 import { useApiStore } from '@/store/api';
 import { useI18n } from 'vue-i18n';
 import ZoomImg from '@/components/app/ZoomImg.vue';
@@ -44,6 +50,13 @@ const api = useApiStore();
 const props = defineProps<{
   chat: LiveChat;
 }>();
+
+const emits = defineEmits(['load']);
+onMounted(() => {
+  if (message.value.type !== 'NetworkImage') {
+    emits('load');
+  }
+});
 
 const user = computed(() => props.chat.data.user);
 const message = computed(() => props.chat.data.message);

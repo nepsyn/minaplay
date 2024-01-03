@@ -14,7 +14,7 @@ export function useAxiosPageLoader<
 
   const load = async (query?: Omit<Parameters<T>[0], 'page' | 'size'>) => {
     return await api({
-      ...(query ?? {}),
+      ...query,
       page: page.value,
       size: size.value,
     });

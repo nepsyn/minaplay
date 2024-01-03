@@ -55,7 +55,7 @@ export function useSocketIOConnection<EventMap extends Record<string, [object | 
       socket.on('exception', exceptionHandler);
 
       socket.emit(ev as string, {
-        ...(args ?? {}),
+        ...args,
         sync,
       });
     });

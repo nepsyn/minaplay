@@ -15,12 +15,18 @@
 <script setup lang="ts">
 import { LiveNotify } from '@/api/interfaces/live.interface';
 import { useI18n } from 'vue-i18n';
+import { onMounted } from 'vue';
 
 const { t } = useI18n();
 
 defineProps<{
   notify: LiveNotify;
 }>();
+
+const emits = defineEmits(['load']);
+onMounted(() => {
+  emits('load');
+});
 </script>
 
 <style scoped lang="sass"></style>

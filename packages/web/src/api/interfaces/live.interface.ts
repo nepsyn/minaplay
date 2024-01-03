@@ -16,7 +16,7 @@ export interface LiveEntity {
 
 export interface LiveDto {
   title?: string;
-  password?: string;
+  password?: string | null;
   posterFileId?: string;
 }
 
@@ -107,6 +107,10 @@ export type LiveEventMap = {
   join: [{ id: string; password?: string }, LiveState];
   chat: [{ message: LiveChatText | LiveChatNetworkImage }, undefined];
   messages: [{ start: string; end?: string }, LiveChatEntity[]];
+
+  'stream-server-push': [{ id: string }, ServerPushMediaStream];
+  'stream-third-party': [{ url: string }, ThirdPartyLiveStream];
+  'stop-stream': [undefined, undefined];
 
   'voice-rtp-capabilities': [undefined, RtpCapabilities];
   'voice-get-producers': [undefined, { userId: number; producerId: string }[]];

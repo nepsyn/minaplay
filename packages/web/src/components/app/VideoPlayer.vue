@@ -1,5 +1,5 @@
 <template>
-  <video ref="videoRef" :src="src" :poster="poster" crossorigin="anonymous">
+  <video autoplay ref="videoRef" :src="src" :poster="poster" crossorigin="anonymous">
     <div ref="controlsRef">
       <div class="plyr__controls">
         <div class="plyr__controls__item d-flex align-center">
@@ -12,7 +12,7 @@
             </svg>
           </button>
           <button v-if="live" @click="refresh()" type="button" class="plyr__control" data-plyr="restart">
-            <svg role="presentation">
+            <svg role="presentation" style="scale: 1.2">
               <use xlink:href="#plyr-restart"></use>
             </svg>
           </button>
@@ -44,7 +44,6 @@
           00:00
         </div>
         <v-menu
-          v-if="!live"
           location="top center"
           open-on-hover
           :open-on-click="false"
@@ -79,7 +78,7 @@
           <template #activator="{ props }">
             <button
               v-bind="props"
-              v-if="subtitleFiles.length > 0"
+              v-if="!live && subtitleFiles.length > 0"
               class="plyr__controls__item plyr__control"
               :class="{ 'plyr__control--pressed': renderer !== undefined }"
               type="button"
@@ -89,6 +88,106 @@
               </svg>
               <svg class="icon--not-pressed" aria-hidden="true" focusable="false">
                 <use xlink:href="#plyr-captions-off"></use>
+              </svg>
+            </button>
+          </template>
+        </v-menu>
+
+        <v-menu
+          min-width="240px"
+          location="top center"
+          open-on-hover
+          :open-on-click="false"
+          :close-on-content-click="false"
+          scroll-strategy="close"
+          class="text-center position-fixed"
+          open-delay="0"
+          close-delay="0"
+          :attach="controlsRef"
+          v-model="danmakuMenu"
+          @mouseleave="(e: any) => !e.toElement.classList.contains('danmaku-btn') && (danmakuMenu = false)"
+        >
+          <v-list class="rounded py-0">
+            <v-list-subheader>
+              {{ t('app.player.danmaku.settings') }}
+            </v-list-subheader>
+            <v-list-item density="compact">
+              <template #prepend>
+                <span style="width: 64px" class="text-caption font-weight-bold text-left">
+                  {{ t('app.player.danmaku.fontSize') }}
+                </span>
+              </template>
+              <v-slider
+                class="px-2"
+                color="warning"
+                thumb-size="16"
+                step="1"
+                v-model="danmakuStyle.fontSize"
+                min="12"
+                max="32"
+                hide-details
+                density="compact"
+              ></v-slider>
+              <template #append>
+                <span style="width: 24px" class="text-caption font-weight-bold text-right">
+                  {{ danmakuStyle.fontSize }}px
+                </span>
+              </template>
+            </v-list-item>
+            <v-list-item>
+              <template #prepend>
+                <span style="width: 64px" class="text-caption font-weight-bold text-left">
+                  {{ t('app.player.danmaku.opacity') }}
+                </span>
+              </template>
+              <v-slider
+                class="px-2"
+                color="warning"
+                thumb-size="16"
+                style="width: 120px"
+                step="1"
+                v-model="danmakuStyle.opacity"
+                min="30"
+                max="100"
+                hide-details
+                density="compact"
+              ></v-slider>
+              <template #append>
+                <span style="width: 24px" class="text-caption font-weight-bold text-right">
+                  {{ danmakuStyle.opacity }}%
+                </span>
+              </template>
+            </v-list-item>
+            <v-list-item>
+              <v-checkbox color="primary" hide-details density="compact" v-model="danmakuStyle.shadow">
+                <template #prepend>
+                  <span class="text-caption font-weight-bold text-right">
+                    {{ t('app.player.danmaku.shadow') }}
+                  </span>
+                </template>
+              </v-checkbox>
+            </v-list-item>
+          </v-list>
+          <template #activator="{ props }">
+            <button
+              v-if="live"
+              class="plyr__controls__item plyr__control danmaku-btn d-none d-sm-flex"
+              type="button"
+              v-bind="props"
+              @click="toggleDanmaku(!danmakuShow)"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                style="scale: 1.2"
+                width="18px"
+                height="18px"
+                viewBox="0 0 1024 1024"
+              >
+                <g fill-rule="evenodd" :fill-opacity="danmakuShow ? 1 : 0.5">
+                  <path
+                    d="M853.333333 170.666667a85.333333 85.333333 0 0 1 85.333334 85.333333v512a85.333333 85.333333 0 0 1-85.333334 85.333333H170.666667a85.333333 85.333333 0 0 1-85.333334-85.333333V256a85.333333 85.333333 0 0 1 85.333334-85.333333h682.666666zM394.666667 661.333333a32 32 0 1 0 0 64 32 32 0 0 0 0-64z m362.666666 0H522.666667a32 32 0 0 0 0 64h234.666666a32 32 0 0 0 0-64zM202.666667 480a32 32 0 1 0 0 64 32 32 0 0 0 0-64z m448 0H330.666667a32 32 0 0 0 0 64h320a32 32 0 0 0 0-64zM330.666667 298.666667a32 32 0 1 0 0 64 32 32 0 0 0 0-64z m448 0H458.666667a32 32 0 0 0 0 64h320a32 32 0 0 0 0-64z"
+                  ></path>
+                </g>
               </svg>
             </button>
           </template>
@@ -131,7 +230,7 @@
           type="button"
           @click="pageFullscreen = !pageFullscreen"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 18px; scale: 1.2" viewBox="0 0 24 24">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" style="scale: 1.2" viewBox="0 0 24 24">
             <path :d="pageFullscreen ? mdiArrowCollapseAll : mdiStretchToPageOutline" />
           </svg>
         </button>
@@ -168,6 +267,8 @@ import { FileEntity } from '@/api/interfaces/file.interface';
 import { mdiArrowCollapseAll, mdiStretchToPageOutline } from '@mdi/js';
 import { LiveStream } from '@/api/interfaces/live.interface';
 import MpegTs from 'mpegts.js';
+import Hls from 'hls.js';
+import DanmuJs from 'danmu.js';
 
 const SUBTITLE_EXTENSIONS = ['.ass', '.ssa'];
 const FONT_EXTENSIONS = ['.otf', '.ttf', '.woff'];
@@ -189,6 +290,30 @@ const props = withDefaults(
 const src = ref('');
 const poster = ref('');
 
+const initLive = (url: string) => {
+  if (!URL.canParse(url)) {
+    return;
+  }
+
+  const { pathname } = new URL(url);
+  if (videoRef.value) {
+    if (pathname.endsWith('.flv')) {
+      livePlayer = MpegTs.createPlayer({
+        type: 'flv',
+        isLive: true,
+        url,
+      });
+      livePlayer.attachMediaElement(videoRef.value);
+      livePlayer.load();
+      player?.play();
+    } else if (pathname.endsWith('.m3u8')) {
+      livePlayer = new Hls();
+      livePlayer.loadSource(url);
+      livePlayer.attachMedia(videoRef.value);
+      player?.play();
+    }
+  }
+};
 const loadResource = () => {
   if (player) {
     player.stop();
@@ -210,27 +335,9 @@ const loadResource = () => {
 
   if (props.stream && props.live) {
     if (props.stream.type === 'server-push') {
-      if (props.stream.url?.endsWith('.flv') && videoRef.value) {
-        livePlayer = MpegTs.createPlayer({
-          type: 'flv',
-          isLive: true,
-          url: api.Live.buildStreamPath(props.stream.url),
-        });
-        livePlayer.attachMediaElement(videoRef.value);
-        livePlayer.load();
-        livePlayer.play();
-      }
+      initLive(api.Live.buildStreamPath(props.stream.url));
     } else if (props.stream.type === 'live-stream') {
-      if (props.stream.url?.endsWith('.flv') && videoRef.value) {
-        livePlayer = MpegTs.createPlayer({
-          type: 'flv',
-          isLive: true,
-          url: props.stream.url,
-        });
-        livePlayer.attachMediaElement(videoRef.value);
-        livePlayer.load();
-        livePlayer.play();
-      }
+      initLive(props.stream.url);
     }
   }
 };
@@ -263,7 +370,8 @@ const fontFiles = computed(
 const videoRef = ref<HTMLVideoElement | undefined>(undefined);
 const controlsRef = ref<HTMLElement | undefined>(undefined);
 let player: Plyr | undefined = undefined;
-let livePlayer: MpegTs.Player | undefined = undefined;
+let livePlayer: MpegTs.Player | Hls | undefined = undefined;
+let danmakuPlayer: DanmuJs | undefined = undefined;
 let renderer = shallowRef<JASSUB | undefined>(undefined);
 const currentSubtitle = ref<FileEntity | undefined>(undefined);
 const renderSubtitle = (index: number) => {
@@ -296,18 +404,25 @@ onMounted(async () => {
         global: true,
       },
     });
-
-    loadResource();
-
     player.on('exitfullscreen', () => {
       if (player) {
         pageFullscreen.value = false;
       }
     });
 
+    loadResource();
+
     if (subtitleFiles.value) {
       renderSubtitle(0);
     }
+
+    const danmakuEl = document.createElement('div');
+    danmakuEl.className = 'danmaku-container';
+    player.elements.container?.appendChild(danmakuEl);
+    danmakuPlayer = new DanmuJs({
+      container: danmakuEl,
+      channelSize: 40,
+    });
   }
 });
 onUnmounted(() => {
@@ -316,6 +431,9 @@ onUnmounted(() => {
   }
   if (livePlayer) {
     livePlayer.destroy();
+  }
+  if (danmakuPlayer) {
+    danmakuPlayer.destroy();
   }
   if (player) {
     player.destroy();
@@ -337,10 +455,48 @@ watch(
 );
 
 const refresh = () => {
-  if (livePlayer) {
-    livePlayer.currentTime = livePlayer.buffered.end(0) - 1;
+  loadResource();
+};
+
+const danmakuStyle = ref({
+  fontSize: 24,
+  opacity: 100,
+  shadow: true,
+});
+const danmakuShow = ref(true);
+const danmakuMenu = ref(false);
+const toggleDanmaku = (value: boolean) => {
+  danmakuShow.value = value;
+  danmakuMenu.value = false;
+  if (value) {
+    danmakuPlayer?.setOpacity(1);
+  } else {
+    danmakuPlayer?.setOpacity(0);
   }
 };
+const emitDanmaku = (content: string) => {
+  if (danmakuPlayer) {
+    danmakuPlayer.sendComment({
+      id: Date.now().toString(),
+      mode: 'scroll',
+      start: 0,
+      prior: false,
+      txt: content,
+      duration: 11000 * Math.max(0.7, content.length / 20),
+      style: {
+        color: '#fff',
+        fontSize: `${danmakuStyle.value.fontSize}px`,
+        opacity: (danmakuStyle.value.opacity / 100).toFixed(2),
+        textShadow: danmakuStyle.value.shadow ? '-1px -1px #000, -1px 1px #000, 1px -1px #000, 1px 1px #000' : 'none',
+      },
+    });
+  }
+};
+
+defineExpose({
+  refresh,
+  emitDanmaku,
+});
 </script>
 
 <style lang="sass">
@@ -352,4 +508,9 @@ const refresh = () => {
   height: 100dvh
   z-index: 10007 !important
   background-color: black
+
+.danmaku-container
+  position: absolute
+  width: 100%
+  height: 100%
 </style>

@@ -1,10 +1,10 @@
 <template>
   <div class="d-flex flex-row">
     <template v-if="event.type === 'Notify'">
-      <live-notify-message :notify="event"></live-notify-message>
+      <live-notify-message :notify="event" @load="emits('load')"></live-notify-message>
     </template>
     <template v-else-if="event.type == 'Chat'">
-      <live-chat-message :chat="event"></live-chat-message>
+      <live-chat-message :chat="event" @load="emits('load')"></live-chat-message>
     </template>
   </div>
 </template>
@@ -17,6 +17,8 @@ import LiveNotifyMessage from '@/components/live/LiveNotifyMessage.vue';
 defineProps<{
   event: LiveEvent;
 }>();
+
+const emits = defineEmits(['load']);
 </script>
 
 <style scoped lang="sass"></style>

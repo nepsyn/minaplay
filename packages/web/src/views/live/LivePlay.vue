@@ -30,7 +30,7 @@
               <v-skeleton-loader v-else type="list-item-avatar-two-line" min-width="360px"></v-skeleton-loader>
             </v-container>
             <v-responsive :aspect-ratio="16 / 9" max-height="520" class="rounded-b">
-              <video-player live :stream="state?.stream"></video-player>
+              <video-player ref="playerRef" live :stream="state?.stream"></video-player>
             </v-responsive>
           </v-container>
         </v-col>
@@ -48,7 +48,7 @@
             </div>
             <v-fade-transition leave-absolute>
               <div class="d-flex flex-column flex-grow-1" v-if="tab === 'chat'">
-                <v-container class="scrollable-container">
+                <v-container class="scrollable-container" ref="eventContainerRef">
                   <v-row dense>
                     <v-col v-if="!validated" cols="12">
                       <v-alert type="warning" density="compact" variant="tonal">
@@ -62,7 +62,7 @@
                       </v-alert>
                     </v-col>
                     <v-col v-for="(message, index) in events" :key="index" cols="12">
-                      <live-message :event="message"></live-message>
+                      <live-message :event="message" @load="onMessageLoad"></live-message>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -77,7 +77,8 @@
                       maxlength="20"
                       :placeholder="t('live.play.sendChat')"
                       :prepend-icon="mdiImagePlus"
-                      :disabled="!validated || chatSending"
+                      :disabled="!validated"
+                      :loading="chatSending"
                       v-model.trim="chatText"
                       @keydown.enter="chatText?.length > 0 && sendChat({ type: 'Text', content: chatText })"
                       @click:prepend="selectAndSendImage()"
@@ -191,41 +192,103 @@
                   </v-container>
                 </div>
               </div>
-              <div class="d-flex flex-column" v-else-if="tab === 'settings'">
+              <div class="d-flex flex-column scrollable-container" v-else-if="tab === 'settings'">
                 <v-list class="py-0">
-                  <v-list-item>
-                    <template #prepend>
-                      <span>{{ t('live.entity.title') }}</span>
+                  <v-menu
+                    :close-on-content-click="false"
+                    v-model="updateTitleMenu"
+                    @update:model-value="updateTitleMenu && (edit.title = live?.title)"
+                  >
+                    <v-card>
+                      <v-card-text>
+                        <v-list-subheader class="font-weight-bold">
+                          {{ t('app.actions.edit') }}
+                        </v-list-subheader>
+                        <v-text-field
+                          v-model.trim="edit.title"
+                          autofocus
+                          :label="t('live.entity.title')"
+                          variant="outlined"
+                          :append-icon="mdiCheck"
+                          hide-details
+                          maxlength="40"
+                          density="compact"
+                          :loading="liveUpdating"
+                          @keydown.enter="edit.title && updateLive({ title: edit.title })"
+                          @click:append="edit.title && updateLive({ title: edit.title })"
+                        ></v-text-field>
+                      </v-card-text>
+                    </v-card>
+                    <template #activator="{ props }">
+                      <v-list-item link v-bind="props">
+                        <template #prepend>
+                          <span>{{ t('live.entity.title') }}</span>
+                        </template>
+                        <template #append>
+                          <span class="text-medium-emphasis text-break text-wrap ml-4">
+                            {{ live?.title ?? t('live.unnamed') }}
+                          </span>
+                        </template>
+                      </v-list-item>
                     </template>
-                    <template #append>
-                      <div class="d-flex align-center">
-                        <span class="text-medium-emphasis text-break text-wrap ml-4">
-                          {{ live?.title ?? t('live.play.unnamed') }}
-                        </span>
-                        <v-btn class="ml-1" :icon="mdiPencil" density="comfortable" size="small" variant="text"></v-btn>
-                      </div>
-                    </template>
-                  </v-list-item>
+                  </v-menu>
                   <v-divider></v-divider>
-                  <v-list-item>
-                    <template #prepend>
-                      <span>{{ t('live.entity.password') }}</span>
-                    </template>
-                    <template #append>
-                      <v-row dense class="ml-4">
-                        <v-col class="d-flex justify-end">
-                          <v-btn variant="tonal" color="primary" :prepend-icon="mdiPencil" density="comfortable">
-                            {{ t('app.actions.edit') }}
+                  <v-menu
+                    :close-on-content-click="false"
+                    v-model="updatePasswordMenu"
+                    @update:model-value="updatePasswordMenu && (edit.password = '')"
+                  >
+                    <v-card>
+                      <v-card-text>
+                        <v-list-subheader class="font-weight-bold">
+                          {{ t('app.actions.edit') }}
+                        </v-list-subheader>
+                        <v-text-field
+                          v-model.trim="edit.password"
+                          autofocus
+                          type="password"
+                          :label="t('live.entity.password')"
+                          variant="outlined"
+                          autocomplete="one-time-code"
+                          :append-icon="mdiCheck"
+                          :rules="[(val) => val?.length == 0 || val?.length >= 4 || t('live.play.passwordLengthRule')]"
+                          maxlength="40"
+                          density="compact"
+                          :loading="liveUpdating"
+                          @keydown.enter="edit.password && updateLive({ password: edit.password })"
+                          @click:append="edit.password && updateLive({ password: edit.password })"
+                        ></v-text-field>
+                        <template v-if="live?.hasPassword">
+                          <v-list-subheader class="font-weight-bold">
+                            {{ t('app.or') }}
+                          </v-list-subheader>
+                          <v-btn
+                            variant="tonal"
+                            color="warning"
+                            :loading="liveUpdating"
+                            :prepend-icon="mdiLockOpenVariant"
+                            @click="updateLive({ password: null })"
+                          >
+                            {{ t('live.play.cancelPassword') }}
                           </v-btn>
-                        </v-col>
-                        <v-col v-if="live?.hasPassword" class="d-flex justify-end">
-                          <v-btn variant="tonal" color="error" :prepend-icon="mdiClose" density="comfortable">
-                            {{ t('app.cancel') }}
-                          </v-btn>
-                        </v-col>
-                      </v-row>
+                        </template>
+                      </v-card-text>
+                    </v-card>
+                    <template #activator="{ props }">
+                      <v-list-item link v-bind="props">
+                        <template #prepend>
+                          <span>{{ t('live.entity.password') }}</span>
+                        </template>
+                        <template #append>
+                          <v-icon
+                            class="text-medium-emphasis"
+                            size="small"
+                            :icon="live?.hasPassword ? mdiLock : mdiLockOff"
+                          ></v-icon>
+                        </template>
+                      </v-list-item>
                     </template>
-                  </v-list-item>
+                  </v-menu>
                   <v-divider></v-divider>
                   <v-list-item>
                     <template #prepend>
@@ -243,18 +306,123 @@
                       >
                         <v-btn
                           class="position-absolute"
+                          :loading="posterUploading"
                           style="bottom: 4px; right: 4px"
-                          variant="flat"
+                          variant="tonal"
                           color="white"
                           :icon="mdiCloudUpload"
                           size="small"
                           density="comfortable"
-                          @click.stop
+                          @click.stop="selectAndUploadPoster()"
                         ></v-btn>
                       </zoom-img>
                     </template>
                   </v-list-item>
                   <v-divider></v-divider>
+                  <v-menu
+                    :close-on-content-click="false"
+                    v-model="updateStreamMenu"
+                    @update:model-value="updateStreamMenu && (edit.stream = { ...state?.stream } as any)"
+                  >
+                    <v-card>
+                      <v-card-text>
+                        <v-list-subheader class="font-weight-bold">
+                          {{ t('app.actions.edit') }}
+                        </v-list-subheader>
+                        <v-select
+                          v-model.trim="edit.stream.type"
+                          :label="t('live.play.stream.type')"
+                          variant="outlined"
+                          hide-details
+                          density="compact"
+                          :items="streamTypes"
+                        >
+                        </v-select>
+                        <template v-if="edit.stream.type === 'server-push'">
+                          <v-btn
+                            class="mt-4"
+                            variant="tonal"
+                            color="primary"
+                            :prepend-icon="mdiPlaylistCheck"
+                            :loading="streamSwitching"
+                          >
+                            {{ t('app.actions.select') }} {{ t('app.entities.media') }}
+                          </v-btn>
+                        </template>
+                        <template v-else-if="edit.stream.type === 'live-stream'">
+                          <v-text-field
+                            class="mt-4"
+                            v-model.trim="edit.stream.url"
+                            autofocus
+                            :label="t('live.play.stream.url')"
+                            variant="outlined"
+                            hide-details
+                            density="compact"
+                          ></v-text-field>
+                          <div class="d-flex mt-4">
+                            <v-spacer></v-spacer>
+                            <v-btn
+                              variant="text"
+                              color="primary"
+                              :disabled="!edit.stream.url"
+                              :prepend-icon="mdiCheck"
+                              :loading="streamSwitching"
+                              @click="switchStream()"
+                            >
+                              {{ t('app.actions.save') }}
+                            </v-btn>
+                          </div>
+                        </template>
+                        <template v-if="state?.stream">
+                          <v-list-subheader class="font-weight-bold">
+                            {{ t('app.or') }}
+                          </v-list-subheader>
+                          <v-btn
+                            variant="tonal"
+                            color="warning"
+                            :prepend-icon="mdiCancel"
+                            :loading="streamStopping"
+                            @click="stopStream()"
+                          >
+                            {{ t('live.play.stopStreaming') }}
+                          </v-btn>
+                        </template>
+                      </v-card-text>
+                    </v-card>
+                    <template #activator="{ props }">
+                      <v-list-item link v-bind="props">
+                        <template #prepend>
+                          <span>{{ t('live.entity.stream') }}</span>
+                        </template>
+                        <template #append>
+                          <span class="text-medium-emphasis text-break text-wrap ml-4">
+                            {{ state?.stream?.url || t('live.play.noStream') }}
+                          </span>
+                        </template>
+                      </v-list-item>
+                    </template>
+                  </v-menu>
+                  <v-divider></v-divider>
+                  <v-container class="d-flex align-center justify-center">
+                    <v-menu>
+                      <v-card>
+                        <v-card-title>{{ t('live.play.closeTitle') }}</v-card-title>
+                        <v-card-text>{{ t('live.play.closeConfirm') }}</v-card-text>
+                        <v-card-actions>
+                          <v-spacer></v-spacer>
+                          <v-btn color="primary">{{ t('app.cancel') }}</v-btn>
+                          <v-btn color="error" variant="plain" :loading="roomDisposing" @click="disposeRoom">
+                            {{ t('app.ok') }}
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                      <template #activator="{ props }">
+                        <v-btn variant="tonal" color="error" :prepend-icon="mdiClose" v-bind="props">
+                          {{ t('app.actions.close') }} {{ t('app.entities.live') }}
+                        </v-btn>
+                      </template>
+                    </v-menu>
+                  </v-container>
                 </v-list>
               </div>
             </v-fade-transition>
@@ -294,6 +462,21 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+
+    <v-dialog v-model="disposeDialog" max-width="480px" persistent>
+      <v-card>
+        <v-card-title>{{ t('live.play.disposeTitle') }}</v-card-title>
+        <v-card-text>
+          {{ t('live.play.disposeHint') }}
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="router.replace({ path: '/live' })">
+            {{ t('app.ok') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </to-top-container>
 </template>
 
@@ -304,20 +487,24 @@ import { useApiStore } from '@/store/api';
 import { useRoute, useRouter } from 'vue-router';
 import VideoPlayer from '@/components/app/VideoPlayer.vue';
 import UserAvatar from '@/components/user/UserAvatar.vue';
-import { computed, onUnmounted, ref, shallowRef } from 'vue';
+import { computed, nextTick, onUnmounted, ref, shallowRef } from 'vue';
 import TimeAgo from '@/components/app/TimeAgo.vue';
 import {
+  mdiCancel,
+  mdiCheck,
   mdiClose,
   mdiCloudUpload,
   mdiEmoticonCoolOutline,
   mdiImagePlus,
   mdiLock,
+  mdiLockOff,
+  mdiLockOpenVariant,
   mdiMicrophone,
   mdiMicrophoneOff,
   mdiNavigationVariant,
-  mdiPencil,
   mdiPhone,
   mdiPhoneOff,
+  mdiPlaylistCheck,
   mdiVolumeHigh,
   mdiVolumeOff,
 } from '@mdi/js';
@@ -326,6 +513,7 @@ import {
   LiveChatEntity,
   LiveChatNetworkImage,
   LiveChatText,
+  LiveDto,
   LiveEvent,
   LiveEventMap,
   LiveState,
@@ -343,6 +531,8 @@ import { Producer } from 'mediasoup-client/lib/Producer';
 import ZoomImg from '@/components/app/ZoomImg.vue';
 import LivePosterFallback from '@/assets/live-poster-fallback.png';
 import { selectFile } from '@/utils/utils';
+import { useAxiosRequest } from '@/composables/use-axios-request';
+import { MediaEntity } from '@/api/interfaces/media.interface';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -352,6 +542,7 @@ const toast = useToastStore();
 
 const state = ref<LiveState | undefined>(undefined);
 const live = computed(() => state.value?.live);
+const playerRef = ref<InstanceType<typeof VideoPlayer> | undefined>(undefined);
 
 const { socket, request: emit } = useSocketIOConnection<LiveEventMap>(api.Live.socketPath, {
   extraHeaders: {
@@ -443,6 +634,9 @@ socket.on('member-chat', (data: LiveChatEntity) => {
     type: 'Chat',
     data,
   });
+  if (data.message.type === 'Text' && playerRef.value) {
+    playerRef.value.emitDanmaku(data.message.content);
+  }
 });
 socket.on('member-chat-revoke', (data: { id: string }) => {
   events.value = events.value.filter((event) => event.type === 'Notify' || event.data.id !== data.id);
@@ -487,6 +681,10 @@ socket.on('member-unmute-voice', (data: { id: number }) => {
     state.value.muted.voice = state.value.muted.voice.filter((id) => id !== data.id);
   }
 });
+const disposeDialog = ref(false);
+socket.on('live-dispose', () => {
+  disposeDialog.value = true;
+});
 
 const password = ref('');
 const validated = ref(true);
@@ -523,12 +721,8 @@ onJoinCompleted(async (data) => {
     toast.toastError(t(`error.${error?.code ?? 'other'}`));
   }
 });
-onJoinFailed((error) => {
-  if (error instanceof TimeoutError) {
-    validateError.value = t('error.timeout');
-  } else {
-    validateError.value = t(`error.${error.code}`);
-  }
+onJoinFailed((error: any) => {
+  validateError.value = t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`);
 });
 
 const chatText = ref('');
@@ -544,7 +738,7 @@ onChatSent(() => {
   chatText.value = '';
 });
 onChatSendFailed((error: any) => {
-  toast.toastError(t(`error.${error?.code ?? 'other'}`));
+  toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
 });
 const selectAndSendImage = () => {
   selectFile('image/*', false, async (files) => {
@@ -579,7 +773,18 @@ const selectAndSendImage = () => {
   });
 };
 
+const eventContainerRef = ref<{ $el: HTMLElement } | undefined>(undefined);
 const events = ref<LiveEvent[]>([]);
+const onMessageLoad = () => {
+  nextTick(() => {
+    if (eventContainerRef.value) {
+      const el = eventContainerRef.value.$el;
+      if (el.scrollTop === 0 || (el.scrollTop + el.clientHeight) / el.scrollHeight >= 0.95) {
+        el.scrollTo({ top: el.scrollHeight });
+      }
+    }
+  });
+};
 const push = (message: LiveEvent) => {
   if (events.value.length > 200) {
     events.value.shift();
@@ -749,6 +954,112 @@ const produce = async () => {
     toast.toastError(t('live.play.voice.voiceNotEnabled'));
   }
 };
+
+const edit = ref<LiveDto & { stream: LiveStream }>({ stream: {} as any });
+const selectedMedia = ref<MediaEntity | undefined>(undefined);
+const updateTitleMenu = ref(false);
+const updatePasswordMenu = ref(false);
+const updateStreamMenu = ref(false);
+const {
+  pending: liveUpdating,
+  request: updateLive,
+  onResolved: onLiveUpdated,
+  onRejected: onLiveUpdateFailed,
+} = useAxiosRequest(async (data: LiveDto) => {
+  return await api.Live.update(live.value!.id)(data);
+});
+onLiveUpdated((data) => {
+  if (state.value) {
+    state.value.live = data;
+  }
+  updateTitleMenu.value = false;
+  updatePasswordMenu.value = false;
+});
+onLiveUpdateFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+const posterUploading = ref(false);
+const selectAndUploadPoster = async () => {
+  selectFile('image/*', false, async (files) => {
+    const file = files[0];
+    if (file) {
+      posterUploading.value = true;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => {
+        controller.abort(new TimeoutError());
+      }, 5000);
+      try {
+        const uploadFile = await api.File.uploadImage(file, undefined, controller.signal);
+        const { data } = await api.Live.update(live.value!.id)({ posterFileId: uploadFile.data.id });
+        state.value!.live = data;
+      } catch (error: any) {
+        if (error instanceof TimeoutError) {
+          toast.toastError(t('error.timeout'));
+        } else if (axios.isAxiosError(error)) {
+          toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+        } else {
+          toast.toastError(t(`error.${error?.code ?? 'other'}`));
+        }
+      } finally {
+        posterUploading.value = false;
+        clearTimeout(timeout);
+      }
+    }
+  });
+};
+const streamTypes = [
+  { title: t('live.play.stream.serverPush'), value: 'server-push' },
+  { title: t('live.play.stream.liveStream'), value: 'live-stream' },
+];
+const {
+  pending: streamSwitching,
+  request: switchStream,
+  onResolved: onStreamSwitched,
+  onRejected: onStreamSwitchFailed,
+} = useAsyncTask(async () => {
+  if (edit.value.stream.type === 'server-push') {
+    return await emit('stream-server-push', { id: selectedMedia.value?.id });
+  } else if (edit.value.stream.type === 'live-stream') {
+    return await emit('stream-third-party', { url: edit.value.stream.url });
+  }
+});
+onStreamSwitched((data) => {
+  if (data && state.value) {
+    state.value.stream = data;
+  }
+  updateStreamMenu.value = false;
+});
+onStreamSwitchFailed((error: any) => {
+  toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
+});
+const {
+  pending: streamStopping,
+  request: stopStream,
+  onResolved: onStreamStopped,
+  onRejected: onStreamStopFailed,
+} = useAsyncTask(async () => {
+  return await emit('stop-stream');
+});
+onStreamStopped(() => {
+  if (state.value) {
+    state.value.stream = undefined;
+  }
+  updateStreamMenu.value = false;
+});
+onStreamStopFailed((error: any) => {
+  toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
+});
+
+const {
+  pending: roomDisposing,
+  request: disposeRoom,
+  onRejected: onRoomDisposeFailed,
+} = useAxiosRequest(async () => {
+  return await api.Live.delete(String(route.params.id))();
+});
+onRoomDisposeFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
 
 const tab = ref('chat');
 </script>

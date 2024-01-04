@@ -15,17 +15,12 @@
         <v-sheet v-if="series" border class="pa-6 rounded">
           <v-row>
             <v-col cols="9" class="d-flex flex-column">
-              <span class="text-h5 text-break">{{ series.name }}{{ series.season }}</span>
-              <div class="mt-2">
-                <v-chip
-                  color="primary"
-                  class="me-2 mt-1"
-                  v-for="(tag, index) in series.tags"
-                  :key="index"
-                  label
-                  :text="tag.name"
-                ></v-chip>
-              </div>
+              <span class="text-h5 text-break">{{ `${series.name} ${series.season ?? ''}`.trim() }}</span>
+              <v-row class="mt-1 flex-grow-0" dense>
+                <v-col cols="auto" v-for="(tag, index) in series.tags" :key="index">
+                  <v-chip color="primary" density="comfortable" label :text="tag.name"></v-chip>
+                </v-col>
+              </v-row>
               <v-divider class="my-2"></v-divider>
               <expandable-text
                 class="text-subtitle-1"
@@ -80,9 +75,9 @@
           <multi-items-loader class="px-0 py-3" :loader="episodesLoader" :hide-empty="episodes.length > 0">
             <v-row dense>
               <v-col cols="auto" v-for="episode in episodes" :key="episode.id">
-                <v-btn variant="outlined" @click="router.push({ path: `/episode/${episode.id}` })">{{
-                  episode.no
-                }}</v-btn>
+                <v-btn variant="outlined" @click="router.push({ path: `/episode/${episode.id}` })">
+                  {{ episode.no }}
+                </v-btn>
               </v-col>
             </v-row>
           </multi-items-loader>

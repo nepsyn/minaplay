@@ -129,17 +129,11 @@
                     >
                       {{ `${currentEpisode?.series.name} ${currentEpisode?.series.season ?? ''}`.trim() }}
                     </span>
-                    <div>
-                      <v-chip
-                        color="primary"
-                        class="mb-2 mt-1"
-                        size="x-small"
-                        v-for="(tag, index) in currentEpisode?.series?.tags ?? []"
-                        :key="index"
-                        label
-                        :text="tag.name"
-                      ></v-chip>
-                    </div>
+                    <v-row class="mt-1 flex-grow-0" dense>
+                      <v-col cols="auto" v-for="(tag, index) in currentEpisode?.series?.tags ?? []" :key="index">
+                        <v-chip color="primary" size="x-small" label :text="tag.name"></v-chip>
+                      </v-col>
+                    </v-row>
                     <v-divider class="my-1"></v-divider>
                     <expandable-text
                       :content="currentEpisode?.series?.description ?? t('resource.noDescription')"
@@ -283,7 +277,11 @@ const actions = [
     color: 'info',
     click: () => {
       if (media.value) {
-        copyContent(api.File.buildRawPath(media.value.file!.id, media.value.file!.name))
+        let path = api.File.buildRawPath(media.value.file!.id, media.value.file!.name);
+        if (path.startsWith('/')) {
+          path = `${window.origin}${path}`;
+        }
+        copyContent(path)
           .then(() => {
             toast.toastSuccess(t('utils.copied'));
           })

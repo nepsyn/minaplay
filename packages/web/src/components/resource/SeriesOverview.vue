@@ -66,7 +66,7 @@ defineProps<{
 .note-container
   bottom: 0
   left: 0
-  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.4) 100%)
+  background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.6) 100%)
   color: white
   min-height: 15%
 

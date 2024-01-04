@@ -33,7 +33,7 @@
         v-model:page="page"
         v-model:sort-by="sortBy"
         :headers="headers"
-        :items-length="seriesData?.total ?? 0"
+        :items-length="total"
         :items="seriesData?.items ?? []"
         :loading="loading"
         color="primary"
@@ -243,7 +243,7 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column">
           <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.series') }) }}</span>
-          <span class="font-italic font-weight-bold">{{ editItem.name }}{{ editItem.season }}</span>
+          <span class="font-italic font-weight-bold">{{ `${editItem.name} ${editItem.season ?? ''}`.trim() }}</span>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
@@ -293,11 +293,13 @@ const toast = useToastStore();
 const page = ref(1);
 const size = ref(10);
 const sortBy = ref<any[]>([]);
+const total = ref(0);
 const filters = ref<SeriesQueryDto>({});
 const {
   pending: loading,
   request,
   data: seriesData,
+  onResolved: onSeriesLoaded,
 } = useAxiosRequest(async () => {
   return await api.Series.query({
     ...Object.fromEntries(
@@ -310,6 +312,9 @@ const {
     sort: sortBy.value?.[0]?.key,
     order: sortBy.value[0]?.order?.toUpperCase(),
   });
+});
+onSeriesLoaded((data) => {
+  total.value = data.total;
 });
 const useQuery = debounce(request, 1000);
 

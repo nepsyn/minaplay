@@ -1,8 +1,9 @@
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { StatusEnum } from '@/api/enums/status.enum';
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
+import { MessageSchema } from '@/lang/index';
 
-export default {
+const zh: MessageSchema = {
   app: {
     name: 'MinaPlay',
     ok: '确认',
@@ -32,7 +33,7 @@ export default {
       },
     },
     input: {
-      keyword: '关键字',
+      keyword: '搜索关键字',
       placeholder: '查找 {item}...',
       sort: '排列',
       order: '顺序',
@@ -226,6 +227,7 @@ export default {
     nextTriggerTimes: '触发时间:',
     wrongCronExp: '错误的 CRON 表达式',
     entity: {
+      id: 'ID',
       title: '标题',
       remark: '备注',
       cron: 'CRON 表达式',
@@ -279,6 +281,7 @@ export default {
     title: '订阅规则',
     unnamed: '未命名订阅规则',
     entity: {
+      id: 'ID',
       remark: '备注',
       sources: 'RSS 订阅源',
       user: '创建用户',
@@ -323,7 +326,7 @@ export default {
     entity: {
       title: '标题',
       password: '密码',
-      hasPassword: '是否密码验证',
+      hasPassword: '密码验证',
       poster: '海报',
       user: '创建用户',
       stream: '直播流',
@@ -348,7 +351,7 @@ export default {
       stream: {
         clientSync: '用户同步',
         serverPush: '服务端推流',
-        liveStream: '第三方链接',
+        liveStream: '第三方视频流',
         type: '直播流类型',
         url: '链接',
       },
@@ -439,3 +442,5 @@ export default {
     other: '请求失败！请稍后再试',
   },
 };
+
+export default zh;

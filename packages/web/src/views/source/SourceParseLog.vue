@@ -22,9 +22,7 @@
           :label="t('app.input.order')"
           density="compact"
           v-model="filters.order"
-          :items="[t('app.input.desc'), t('app.input.asc')]"
-          item-title="name"
-          item-value="value"
+          :items="api.orders"
           hide-details
           clearable
           @update:model-value="query"

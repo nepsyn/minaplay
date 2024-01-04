@@ -12,7 +12,7 @@
         :hide-empty="updates.length > 0"
         :auto="updates.length < 12"
       >
-        <v-row>
+        <v-row :dense="display.mdAndDown.value">
           <v-col v-for="episode in updates" :key="episode.id" cols="4" sm="3" md="2">
             <series-overview
               :series="episode.series"
@@ -23,7 +23,7 @@
           </v-col>
         </v-row>
         <template #loading>
-          <v-row>
+          <v-row :dense="display.mdAndDown.value">
             <v-col v-for="index in 12" :key="index" cols="4" sm="3" md="2">
               <v-skeleton-loader type="image,list-item-two-line"></v-skeleton-loader>
             </v-col>
@@ -35,13 +35,13 @@
         <span class="text-h5 ml-3">{{ t('resource.medias') }}</span>
       </div>
       <multi-items-loader :loader="mediasLoader" class="px-0 py-4" :hide-empty="medias.length > 0">
-        <v-row>
+        <v-row :dense="display.mdAndDown.value">
           <v-col v-for="media in medias" :key="media.id" cols="6" sm="4" md="3">
             <media-overview :media="media" @click="router.push({ path: `/media/${media.id}` })"></media-overview>
           </v-col>
         </v-row>
         <template #loading>
-          <v-row>
+          <v-row :dense="display.mdAndDown.value">
             <v-col v-for="index in 12" :key="index" cols="6" sm="4" md="3">
               <v-skeleton-loader type="image,list-item-two-line"></v-skeleton-loader>
             </v-col>
@@ -64,10 +64,12 @@ import { EpisodeQueryDto } from '@/api/interfaces/series.interface';
 import MediaOverview from '@/components/resource/MediaOverview.vue';
 import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 import { useRouter } from 'vue-router';
+import { useDisplay } from 'vuetify';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
 const router = useRouter();
+const display = useDisplay();
 
 const updatesLoader = useAxiosPageLoader(
   async (query: EpisodeQueryDto = {}) => {

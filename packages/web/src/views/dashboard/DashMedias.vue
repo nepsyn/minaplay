@@ -33,7 +33,7 @@
         v-model:page="page"
         v-model:sort-by="sortBy"
         :headers="headers"
-        :items-length="medias?.total ?? 0"
+        :items-length="total"
         :items="medias?.items ?? []"
         :loading="loading"
         color="primary"
@@ -238,11 +238,13 @@ const toast = useToastStore();
 const page = ref(1);
 const size = ref(10);
 const sortBy = ref<any[]>([]);
+const total = ref(0);
 const filters = ref<MediaQueryDto>({});
 const {
   pending: loading,
   request,
   data: medias,
+  onResolved: onMediasLoaded,
 } = useAxiosRequest(async () => {
   return await api.Media.query({
     ...Object.fromEntries(
@@ -255,6 +257,9 @@ const {
     sort: sortBy.value?.[0]?.key,
     order: sortBy.value[0]?.order?.toUpperCase(),
   });
+});
+onMediasLoaded((data) => {
+  total.value = data.total;
 });
 const useQuery = debounce(request, 1000);
 

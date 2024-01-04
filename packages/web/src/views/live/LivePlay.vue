@@ -1,434 +1,430 @@
 <template>
-  <to-top-container class="page-height overflow-auto d-none d-md-flex">
-    <v-container fluid class="d-flex flex-column pa-md-12">
-      <v-row>
-        <v-col md="8">
-          <v-container fluid class="pa-0 border rounded">
-            <v-container class="d-flex flex-row">
-              <template v-if="live">
-                <user-avatar
-                  size="64"
-                  :src="live.user?.avatar && api.File.buildRawPath(live.user.avatar.id, live.user.avatar.name)"
-                ></user-avatar>
-                <v-container class="py-0 d-flex flex-column justify-space-around">
-                  <div class="d-flex align-center">
-                    <span class="text-h6">{{ live.title ?? t('live.unnamed') }}</span>
-                    <v-icon
-                      class="ml-2 text-medium-emphasis"
-                      v-if="live.hasPassword"
-                      :icon="mdiLock"
-                      size="small"
-                    ></v-icon>
-                  </div>
-                  <div class="text-subtitle-2 text-medium-emphasis">
-                    <span>{{ live.user?.username ?? t('user.deleted') }}</span>
-                    ·
-                    <time-ago :time="live.createAt" interval="60000"></time-ago>
-                  </div>
-                </v-container>
-              </template>
-              <v-skeleton-loader v-else type="list-item-avatar-two-line" min-width="360px"></v-skeleton-loader>
+  <to-top-container class="page-height overflow-auto overflow-x-hidden">
+    <v-container fluid class="d-flex flex-column flex-md-row pa-0 pa-md-12 h-100">
+      <v-container fluid class="pa-0 mx-md-2" :class="display.mdAndUp.value ? 'border rounded v-col-8' : undefined">
+        <v-container class="d-none d-md-flex flex-row">
+          <template v-if="live">
+            <user-avatar
+              size="64"
+              :src="live.user?.avatar && api.File.buildRawPath(live.user.avatar.id, live.user.avatar.name)"
+            ></user-avatar>
+            <v-container class="py-0 d-flex flex-column justify-space-around">
+              <div class="d-flex align-center">
+                <span class="text-h6">{{ live.title ?? t('live.unnamed') }}</span>
+                <v-icon class="ml-2 text-medium-emphasis" v-if="live.hasPassword" :icon="mdiLock" size="small"></v-icon>
+              </div>
+              <div class="text-subtitle-2 text-medium-emphasis">
+                <span>{{ live.user?.username ?? t('user.deleted') }}</span>
+                ·
+                <time-ago :time="live.createAt" interval="60000"></time-ago>
+              </div>
             </v-container>
-            <v-responsive :aspect-ratio="16 / 9" max-height="520" class="rounded-b">
-              <video-player ref="playerRef" live :stream="state?.stream"></video-player>
-            </v-responsive>
-          </v-container>
-        </v-col>
-        <v-col md="4">
-          <v-container class="pa-0 border rounded-lg h-100 d-flex flex-column">
-            <div class="d-flex flex-column flex-grow-0">
-              <v-tabs color="primary" grow v-model="tab" class="rounded-t-lg">
-                <v-tab value="chat">{{ t('live.play.tabs.chat') }}</v-tab>
-                <v-tab v-if="validated" value="voice">{{ t('live.play.tabs.voice') }}</v-tab>
-                <v-tab v-if="validated && live?.user?.id === api.user?.id" value="settings">
-                  {{ t('live.play.tabs.settings') }}
-                </v-tab>
-              </v-tabs>
-              <v-divider></v-divider>
-            </div>
-            <v-fade-transition leave-absolute>
-              <div class="d-flex flex-column flex-grow-1" v-if="tab === 'chat'">
-                <v-container class="scrollable-container" ref="eventContainerRef">
-                  <v-row dense>
-                    <v-col v-if="!validated" cols="12">
-                      <v-alert type="warning" density="compact" variant="tonal">
-                        <div class="d-flex flex-row align-center">
-                          <span>{{ t('live.play.validateHint') }}</span>
-                          <v-spacer></v-spacer>
-                          <v-btn @click="validateDialog = true" class="ml-2" color="info" variant="outlined">
-                            {{ t('live.play.validate') }}
-                          </v-btn>
-                        </div>
-                      </v-alert>
-                    </v-col>
-                    <v-col v-for="(message, index) in events" :key="index" cols="12">
-                      <live-message :event="message" @load="onMessageLoad"></live-message>
-                    </v-col>
-                  </v-row>
-                </v-container>
-                <div class="d-flex flex-column flex-grow-0">
-                  <v-divider></v-divider>
-                  <v-container>
-                    <v-text-field
-                      density="compact"
-                      hide-details
-                      variant="outlined"
-                      color="primary"
-                      maxlength="20"
-                      :placeholder="t('live.play.sendChat')"
-                      :prepend-icon="mdiImagePlus"
-                      :disabled="!validated"
-                      :loading="chatSending"
-                      v-model.trim="chatText"
-                      @keydown.enter="chatText?.length > 0 && sendChat({ type: 'Text', content: chatText })"
-                      @click:prepend="selectAndSendImage()"
-                    >
-                      <template #append-inner>
-                        <v-btn
-                          :loading="chatSending"
-                          :disabled="!(chatText?.length > 0)"
-                          variant="plain"
-                          density="comfortable"
-                          :icon="mdiNavigationVariant"
-                          @click="sendChat({ type: 'Text', content: chatText })"
-                        ></v-btn>
-                      </template>
-                    </v-text-field>
-                  </v-container>
-                </div>
-              </div>
-              <div class="d-flex flex-column flex-grow-1" v-else-if="tab === 'voice'">
-                <v-container v-if="voiceMembers.length > 0" class="scrollable-container">
-                  <v-row dense>
-                    <v-col v-for="voice in voiceMembers" :key="voice.user.id" cols="12">
-                      <v-container class="pa-0 d-flex flex-row align-center">
-                        <v-tooltip location="bottom">
-                          {{ voice.user.username }}
-                          <template #activator="{ props }">
-                            <user-avatar
-                              size="50"
-                              v-bind="props"
-                              :src="
-                                voice.user.avatar && api.File.buildRawPath(voice.user.avatar.id, voice.user.avatar.name)
-                              "
-                            ></user-avatar>
-                          </template>
-                        </v-tooltip>
-                        <v-slider
-                          class="mx-4"
-                          color="primary"
-                          density="comfortable"
-                          hide-details
-                          min="0"
-                          max="100"
-                          v-model="voice.volume"
-                          @change="voice.el.volume = voice.volume / 100"
-                          :prepend-icon="voice.volume > 0 ? mdiVolumeHigh : mdiVolumeOff"
-                          @click:prepend="
-                            voice.volume = voice.volume > 0 ? 0 : 100;
-                            voice.el.volume = voice.volume / 100;
-                          "
-                        ></v-slider>
-                      </v-container>
-                    </v-col>
-                  </v-row>
-                </v-container>
-                <v-container v-else class="scrollable-container d-flex flex-column align-center justify-center">
-                  <v-icon :icon="mdiEmoticonCoolOutline" size="100"></v-icon>
-                  <span class="font-italic font-weight-bold mt-4 px-6">{{ t('live.play.voice.single') }}</span>
-                </v-container>
-                <div class="d-flex flex-column flex-grow-0">
-                  <v-divider></v-divider>
-                  <v-container class="d-flex align-center">
-                    <template v-if="producer && !producer.closed && !voiceConnecting">
-                      <v-tooltip location="bottom">
-                        {{ api.user?.username }}
-                        <template #activator="{ props }">
-                          <user-avatar
-                            v-bind="props"
-                            size="48"
-                            :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
-                          ></user-avatar>
-                        </template>
-                      </v-tooltip>
-                      <v-tooltip location="bottom">
-                        {{ producer.paused ? t('live.play.voice.muted') : t('live.play.voice.speaking') }}
-                        <template #activator="{ props }">
-                          <v-btn
-                            variant="flat"
-                            class="text-medium-emphasis"
-                            density="comfortable"
-                            :icon="producer.paused ? mdiMicrophoneOff : mdiMicrophone"
-                            v-bind="props"
-                            @click="producer.paused ? producer.resume() : producer.pause()"
-                          ></v-btn>
-                        </template>
-                      </v-tooltip>
-
+          </template>
+          <v-skeleton-loader v-else type="list-item-avatar-two-line" min-width="360px"></v-skeleton-loader>
+          <div v-if="state" class="d-flex flex-row align-center flex-grow-0 ml-2">
+            <v-icon :icon="mdiAccountMultiple"></v-icon>
+            <span class="ml-2">{{ state.users.length }}</span>
+          </div>
+        </v-container>
+        <v-divider class="py-0 d-flex d-md-none"></v-divider>
+        <v-responsive :aspect-ratio="16 / 9" :class="display.mdAndUp.value ? 'rounded-b' : undefined">
+          <video-player ref="playerRef" live :stream="state?.stream"></video-player>
+        </v-responsive>
+        <v-divider class="py-0 d-flex d-md-none"></v-divider>
+      </v-container>
+      <v-container
+        class="pa-0 mx-md-2 h-100 d-flex flex-column"
+        :class="display.mdAndUp.value ? 'border rounded-lg v-col-4' : undefined"
+      >
+        <div class="d-flex flex-column flex-grow-0">
+          <v-tabs color="primary" grow v-model="tab" :class="display.mdAndUp.value ? 'rounded-t-lg' : undefined">
+            <v-tab value="chat">{{ t('live.play.tabs.chat') }}</v-tab>
+            <v-tab v-if="validated" value="voice">{{ t('live.play.tabs.voice') }}</v-tab>
+            <v-tab v-if="validated && live?.user?.id === api.user?.id" value="settings">
+              {{ t('live.play.tabs.settings') }}
+            </v-tab>
+          </v-tabs>
+          <v-divider></v-divider>
+        </div>
+        <v-fade-transition leave-absolute>
+          <div class="d-flex flex-column flex-grow-1" v-if="tab === 'chat'">
+            <v-container class="scrollable-container" ref="eventContainerRef">
+              <v-row dense>
+                <v-col v-if="!validated" cols="12">
+                  <v-alert type="warning" density="compact" variant="tonal">
+                    <div class="d-flex flex-row align-center">
+                      <span>{{ t('live.play.validateHint') }}</span>
                       <v-spacer></v-spacer>
-                      <v-btn
-                        :loading="voiceConnecting"
-                        variant="plain"
-                        :prepend-icon="mdiPhoneOff"
-                        color="error"
-                        @click="disconnectVoice()"
-                      >
-                        {{ t('live.play.voice.quit') }}
+                      <v-btn @click="validateDialog = true" class="ml-2" color="info" variant="outlined">
+                        {{ t('live.play.validate') }}
                       </v-btn>
-                    </template>
-                    <template v-else>
-                      <v-container class="pa-0 d-flex justify-center align-center">
-                        <v-btn
-                          :loading="voiceConnecting"
-                          variant="tonal"
-                          :prepend-icon="mdiPhone"
-                          color="primary"
-                          @click="connectVoice()"
-                        >
-                          {{ t('live.play.voice.join') }}
-                        </v-btn>
-                      </v-container>
-                    </template>
+                    </div>
+                  </v-alert>
+                </v-col>
+                <v-col v-for="(message, index) in events" :key="index" cols="12">
+                  <live-message :event="message" @load="onMessageLoad"></live-message>
+                </v-col>
+              </v-row>
+            </v-container>
+            <div class="d-flex flex-column flex-grow-0">
+              <v-divider></v-divider>
+              <v-container>
+                <v-text-field
+                  density="compact"
+                  hide-details
+                  variant="outlined"
+                  color="primary"
+                  maxlength="20"
+                  :placeholder="t('live.play.sendChat')"
+                  :prepend-icon="mdiImagePlus"
+                  :disabled="!validated"
+                  :loading="chatSending"
+                  v-model.trim="chatText"
+                  @keydown.enter="chatText?.length > 0 && sendChat({ type: 'Text', content: chatText })"
+                  @click:prepend="selectAndSendImage()"
+                >
+                  <template #append-inner>
+                    <v-btn
+                      :loading="chatSending"
+                      :disabled="!(chatText?.length > 0)"
+                      variant="plain"
+                      density="comfortable"
+                      :icon="mdiNavigationVariant"
+                      @click="sendChat({ type: 'Text', content: chatText })"
+                    ></v-btn>
+                  </template>
+                </v-text-field>
+              </v-container>
+            </div>
+          </div>
+          <div class="d-flex flex-column flex-grow-1" v-else-if="tab === 'voice'">
+            <v-container v-if="voiceMembers.length > 0" class="scrollable-container">
+              <v-row dense>
+                <v-col v-for="voice in voiceMembers" :key="voice.user.id" cols="12">
+                  <v-container class="pa-0 d-flex flex-row align-center">
+                    <v-tooltip location="bottom">
+                      {{ voice.user.username }}
+                      <template #activator="{ props }">
+                        <user-avatar
+                          size="50"
+                          v-bind="props"
+                          :src="
+                            voice.user.avatar && api.File.buildRawPath(voice.user.avatar.id, voice.user.avatar.name)
+                          "
+                        ></user-avatar>
+                      </template>
+                    </v-tooltip>
+                    <v-slider
+                      class="mx-4"
+                      color="primary"
+                      density="comfortable"
+                      hide-details
+                      min="0"
+                      max="100"
+                      v-model="voice.volume"
+                      @change="voice.el.volume = voice.volume / 100"
+                      :prepend-icon="voice.volume > 0 ? mdiVolumeHigh : mdiVolumeOff"
+                      @click:prepend="
+                        voice.volume = voice.volume > 0 ? 0 : 100;
+                        voice.el.volume = voice.volume / 100;
+                      "
+                    ></v-slider>
                   </v-container>
-                </div>
-              </div>
-              <div class="d-flex flex-column scrollable-container" v-else-if="tab === 'settings'">
-                <v-list class="py-0">
-                  <v-menu
-                    :close-on-content-click="false"
-                    v-model="updateTitleMenu"
-                    @update:model-value="updateTitleMenu && (edit.title = live?.title)"
-                  >
-                    <v-card>
-                      <v-card-text>
-                        <v-list-subheader class="font-weight-bold">
-                          {{ t('app.actions.edit') }}
-                        </v-list-subheader>
-                        <v-text-field
-                          v-model.trim="edit.title"
-                          autofocus
-                          :label="t('live.entity.title')"
-                          variant="outlined"
-                          :append-icon="mdiCheck"
-                          hide-details
-                          maxlength="40"
-                          density="compact"
-                          :loading="liveUpdating"
-                          @keydown.enter="edit.title && updateLive({ title: edit.title })"
-                          @click:append="edit.title && updateLive({ title: edit.title })"
-                        ></v-text-field>
-                      </v-card-text>
-                    </v-card>
+                </v-col>
+              </v-row>
+            </v-container>
+            <v-container v-else class="scrollable-container d-flex flex-column align-center justify-center">
+              <v-icon :icon="mdiEmoticonCoolOutline" size="100"></v-icon>
+              <span class="font-italic font-weight-bold mt-4 px-6">{{ t('live.play.voice.single') }}</span>
+            </v-container>
+            <div class="d-flex flex-column flex-grow-0">
+              <v-divider></v-divider>
+              <v-container class="d-flex align-center">
+                <template v-if="producer && !producer.closed && !voiceConnecting">
+                  <v-tooltip location="bottom">
+                    {{ api.user?.username }}
                     <template #activator="{ props }">
-                      <v-list-item link v-bind="props">
-                        <template #prepend>
-                          <span>{{ t('live.entity.title') }}</span>
-                        </template>
-                        <template #append>
-                          <span class="text-medium-emphasis text-break text-wrap ml-4">
-                            {{ live?.title ?? t('live.unnamed') }}
-                          </span>
-                        </template>
-                      </v-list-item>
+                      <user-avatar
+                        v-bind="props"
+                        size="48"
+                        :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
+                      ></user-avatar>
                     </template>
-                  </v-menu>
-                  <v-divider></v-divider>
-                  <v-menu
-                    :close-on-content-click="false"
-                    v-model="updatePasswordMenu"
-                    @update:model-value="updatePasswordMenu && (edit.password = '')"
-                  >
-                    <v-card>
-                      <v-card-text>
-                        <v-list-subheader class="font-weight-bold">
-                          {{ t('app.actions.edit') }}
-                        </v-list-subheader>
-                        <v-text-field
-                          v-model.trim="edit.password"
-                          autofocus
-                          type="password"
-                          :label="t('live.entity.password')"
-                          variant="outlined"
-                          autocomplete="one-time-code"
-                          :append-icon="mdiCheck"
-                          :rules="[(val) => val?.length == 0 || val?.length >= 4 || t('live.play.passwordLengthRule')]"
-                          maxlength="40"
-                          density="compact"
-                          :loading="liveUpdating"
-                          @keydown.enter="edit.password && updateLive({ password: edit.password })"
-                          @click:append="edit.password && updateLive({ password: edit.password })"
-                        ></v-text-field>
-                        <template v-if="live?.hasPassword">
-                          <v-list-subheader class="font-weight-bold">
-                            {{ t('app.or') }}
-                          </v-list-subheader>
-                          <v-btn
-                            variant="tonal"
-                            color="warning"
-                            :loading="liveUpdating"
-                            :prepend-icon="mdiLockOpenVariant"
-                            @click="updateLive({ password: null })"
-                          >
-                            {{ t('live.play.cancelPassword') }}
-                          </v-btn>
-                        </template>
-                      </v-card-text>
-                    </v-card>
+                  </v-tooltip>
+                  <v-tooltip location="bottom">
+                    {{ producer.paused ? t('live.play.voice.muted') : t('live.play.voice.speaking') }}
                     <template #activator="{ props }">
-                      <v-list-item link v-bind="props">
-                        <template #prepend>
-                          <span>{{ t('live.entity.password') }}</span>
-                        </template>
-                        <template #append>
-                          <v-icon
-                            class="text-medium-emphasis"
-                            size="small"
-                            :icon="live?.hasPassword ? mdiLock : mdiLockOff"
-                          ></v-icon>
-                        </template>
-                      </v-list-item>
+                      <v-btn
+                        variant="flat"
+                        class="text-medium-emphasis"
+                        density="comfortable"
+                        :icon="producer.paused ? mdiMicrophoneOff : mdiMicrophone"
+                        v-bind="props"
+                        @click="producer.paused ? producer.resume() : producer.pause()"
+                      ></v-btn>
                     </template>
-                  </v-menu>
-                  <v-divider></v-divider>
-                  <v-list-item>
+                  </v-tooltip>
+
+                  <v-spacer></v-spacer>
+                  <v-btn
+                    :loading="voiceConnecting"
+                    variant="plain"
+                    :prepend-icon="mdiPhoneOff"
+                    color="error"
+                    @click="disconnectVoice()"
+                  >
+                    {{ t('live.play.voice.quit') }}
+                  </v-btn>
+                </template>
+                <template v-else>
+                  <v-container class="pa-0 d-flex justify-center align-center">
+                    <v-btn
+                      :loading="voiceConnecting"
+                      variant="tonal"
+                      :prepend-icon="mdiPhone"
+                      color="primary"
+                      @click="connectVoice()"
+                    >
+                      {{ t('live.play.voice.join') }}
+                    </v-btn>
+                  </v-container>
+                </template>
+              </v-container>
+            </div>
+          </div>
+          <div class="d-flex flex-column scrollable-container" v-else-if="tab === 'settings'">
+            <v-list class="py-0">
+              <v-menu
+                :close-on-content-click="false"
+                v-model="updateTitleMenu"
+                @update:model-value="updateTitleMenu && (edit.title = live?.title)"
+              >
+                <v-card>
+                  <v-card-text>
+                    <v-list-subheader class="font-weight-bold">
+                      {{ t('app.actions.edit') }}
+                    </v-list-subheader>
+                    <v-text-field
+                      v-model.trim="edit.title"
+                      autofocus
+                      :label="t('live.entity.title')"
+                      variant="outlined"
+                      :append-icon="mdiCheck"
+                      hide-details
+                      maxlength="40"
+                      density="compact"
+                      :loading="liveUpdating"
+                      @keydown.enter="edit.title && updateLive({ title: edit.title })"
+                      @click:append="edit.title && updateLive({ title: edit.title })"
+                    ></v-text-field>
+                  </v-card-text>
+                </v-card>
+                <template #activator="{ props }">
+                  <v-list-item link v-bind="props">
                     <template #prepend>
-                      <span>{{ t('live.entity.poster') }}</span>
+                      <span>{{ t('live.entity.title') }}</span>
                     </template>
                     <template #append>
-                      <zoom-img
-                        class="rounded"
-                        min-width="120"
-                        max-width="240"
-                        :aspect-ratio="16 / 9"
-                        :src="
-                          live?.poster ? api.File.buildRawPath(live.poster.id, live.poster.name) : LivePosterFallback
-                        "
-                      >
-                        <v-btn
-                          class="position-absolute"
-                          :loading="posterUploading"
-                          style="bottom: 4px; right: 4px"
-                          variant="tonal"
-                          color="white"
-                          :icon="mdiCloudUpload"
-                          size="small"
-                          density="comfortable"
-                          @click.stop="selectAndUploadPoster()"
-                        ></v-btn>
-                      </zoom-img>
+                      <span class="text-medium-emphasis text-break text-wrap ml-4">
+                        {{ live?.title ?? t('live.unnamed') }}
+                      </span>
                     </template>
                   </v-list-item>
-                  <v-divider></v-divider>
-                  <v-menu
-                    :close-on-content-click="false"
-                    v-model="updateStreamMenu"
-                    @update:model-value="updateStreamMenu && (edit.stream = { ...state?.stream } as any)"
-                  >
-                    <v-card>
-                      <v-card-text>
-                        <v-list-subheader class="font-weight-bold">
-                          {{ t('app.actions.edit') }}
-                        </v-list-subheader>
-                        <v-select
-                          v-model.trim="edit.stream.type"
-                          :label="t('live.play.stream.type')"
-                          variant="outlined"
-                          hide-details
-                          density="compact"
-                          :items="streamTypes"
-                        >
-                        </v-select>
-                        <template v-if="edit.stream.type === 'server-push'">
-                          <v-btn
-                            class="mt-4"
-                            variant="tonal"
-                            color="primary"
-                            :prepend-icon="mdiPlaylistCheck"
-                            :loading="streamSwitching"
-                          >
-                            {{ t('app.actions.select') }} {{ t('app.entities.media') }}
-                          </v-btn>
-                        </template>
-                        <template v-else-if="edit.stream.type === 'live-stream'">
-                          <v-text-field
-                            class="mt-4"
-                            v-model.trim="edit.stream.url"
-                            autofocus
-                            :label="t('live.play.stream.url')"
-                            variant="outlined"
-                            hide-details
-                            density="compact"
-                          ></v-text-field>
-                          <div class="d-flex mt-4">
-                            <v-spacer></v-spacer>
-                            <v-btn
-                              variant="text"
-                              color="primary"
-                              :disabled="!edit.stream.url"
-                              :prepend-icon="mdiCheck"
-                              :loading="streamSwitching"
-                              @click="switchStream()"
-                            >
-                              {{ t('app.actions.save') }}
-                            </v-btn>
-                          </div>
-                        </template>
-                        <template v-if="state?.stream">
-                          <v-list-subheader class="font-weight-bold">
-                            {{ t('app.or') }}
-                          </v-list-subheader>
-                          <v-btn
-                            variant="tonal"
-                            color="warning"
-                            :prepend-icon="mdiCancel"
-                            :loading="streamStopping"
-                            @click="stopStream()"
-                          >
-                            {{ t('live.play.stopStreaming') }}
-                          </v-btn>
-                        </template>
-                      </v-card-text>
-                    </v-card>
-                    <template #activator="{ props }">
-                      <v-list-item link v-bind="props">
-                        <template #prepend>
-                          <span>{{ t('live.entity.stream') }}</span>
-                        </template>
-                        <template #append>
-                          <span class="text-medium-emphasis text-break text-wrap ml-4">
-                            {{ state?.stream?.url || t('live.play.noStream') }}
-                          </span>
-                        </template>
-                      </v-list-item>
+                </template>
+              </v-menu>
+              <v-divider></v-divider>
+              <v-menu
+                :close-on-content-click="false"
+                v-model="updatePasswordMenu"
+                @update:model-value="updatePasswordMenu && (edit.password = '')"
+              >
+                <v-card>
+                  <v-card-text>
+                    <v-list-subheader class="font-weight-bold">
+                      {{ t('app.actions.edit') }}
+                    </v-list-subheader>
+                    <v-text-field
+                      v-model.trim="edit.password"
+                      autofocus
+                      type="password"
+                      :label="t('live.entity.password')"
+                      variant="outlined"
+                      autocomplete="one-time-code"
+                      :append-icon="mdiCheck"
+                      :rules="[(val) => val?.length == 0 || val?.length >= 4 || t('live.play.passwordLengthRule')]"
+                      maxlength="40"
+                      density="compact"
+                      :loading="liveUpdating"
+                      @keydown.enter="edit.password && updateLive({ password: edit.password })"
+                      @click:append="edit.password && updateLive({ password: edit.password })"
+                    ></v-text-field>
+                    <template v-if="live?.hasPassword">
+                      <v-list-subheader class="font-weight-bold">
+                        {{ t('app.or') }}
+                      </v-list-subheader>
+                      <v-btn
+                        variant="tonal"
+                        color="warning"
+                        :loading="liveUpdating"
+                        :prepend-icon="mdiLockOpenVariant"
+                        @click="updateLive({ password: null })"
+                      >
+                        {{ t('live.play.cancelPassword') }}
+                      </v-btn>
                     </template>
-                  </v-menu>
-                  <v-divider></v-divider>
-                  <v-container class="d-flex align-center justify-center">
-                    <v-menu>
-                      <v-card>
-                        <v-card-title>{{ t('live.play.closeTitle') }}</v-card-title>
-                        <v-card-text>{{ t('live.play.closeConfirm') }}</v-card-text>
-                        <v-card-actions>
-                          <v-spacer></v-spacer>
-                          <v-btn color="primary">{{ t('app.cancel') }}</v-btn>
-                          <v-btn color="error" variant="plain" :loading="roomDisposing" @click="disposeRoom">
-                            {{ t('app.ok') }}
-                          </v-btn>
-                        </v-card-actions>
-                      </v-card>
-                      <template #activator="{ props }">
-                        <v-btn variant="tonal" color="error" :prepend-icon="mdiClose" v-bind="props">
-                          {{ t('app.actions.close') }} {{ t('app.entities.live') }}
+                  </v-card-text>
+                </v-card>
+                <template #activator="{ props }">
+                  <v-list-item link v-bind="props">
+                    <template #prepend>
+                      <span>{{ t('live.entity.password') }}</span>
+                    </template>
+                    <template #append>
+                      <v-icon
+                        class="text-medium-emphasis"
+                        size="small"
+                        :icon="live?.hasPassword ? mdiLock : mdiLockOff"
+                      ></v-icon>
+                    </template>
+                  </v-list-item>
+                </template>
+              </v-menu>
+              <v-divider></v-divider>
+              <v-list-item>
+                <template #prepend>
+                  <span>{{ t('live.entity.poster') }}</span>
+                </template>
+                <template #append>
+                  <zoom-img
+                    class="rounded"
+                    min-width="120"
+                    max-width="240"
+                    :aspect-ratio="16 / 9"
+                    :src="live?.poster ? api.File.buildRawPath(live.poster.id, live.poster.name) : LivePosterFallback"
+                  >
+                    <v-btn
+                      class="position-absolute"
+                      :loading="posterUploading"
+                      style="bottom: 4px; right: 4px"
+                      variant="tonal"
+                      color="white"
+                      :icon="mdiCloudUpload"
+                      size="small"
+                      density="comfortable"
+                      @click.stop="selectAndUploadPoster()"
+                    ></v-btn>
+                  </zoom-img>
+                </template>
+              </v-list-item>
+              <v-divider></v-divider>
+              <v-menu
+                :close-on-content-click="false"
+                v-model="updateStreamMenu"
+                @update:model-value="updateStreamMenu && (edit.stream = { ...state?.stream } as any)"
+              >
+                <v-card>
+                  <v-card-text>
+                    <v-list-subheader class="font-weight-bold">
+                      {{ t('app.actions.edit') }}
+                    </v-list-subheader>
+                    <v-select
+                      v-model.trim="edit.stream.type"
+                      :label="t('live.play.stream.type')"
+                      variant="outlined"
+                      hide-details
+                      density="compact"
+                      :items="streamTypes"
+                    >
+                    </v-select>
+                    <template v-if="edit.stream.type === 'server-push'">
+                      <v-btn
+                        class="mt-4"
+                        variant="tonal"
+                        color="primary"
+                        :prepend-icon="mdiPlaylistCheck"
+                        :loading="streamSwitching"
+                      >
+                        {{ t('app.actions.select') }} {{ t('app.entities.media') }}
+                      </v-btn>
+                    </template>
+                    <template v-else-if="edit.stream.type === 'live-stream'">
+                      <v-text-field
+                        class="mt-4"
+                        v-model.trim="edit.stream.url"
+                        autofocus
+                        :label="t('live.play.stream.url')"
+                        variant="outlined"
+                        hide-details
+                        density="compact"
+                      ></v-text-field>
+                      <div class="d-flex mt-4">
+                        <v-spacer></v-spacer>
+                        <v-btn
+                          variant="text"
+                          color="primary"
+                          :disabled="!edit.stream.url"
+                          :prepend-icon="mdiCheck"
+                          :loading="streamSwitching"
+                          @click="switchStream()"
+                        >
+                          {{ t('app.actions.save') }}
                         </v-btn>
-                      </template>
-                    </v-menu>
-                  </v-container>
-                </v-list>
-              </div>
-            </v-fade-transition>
-          </v-container>
-        </v-col>
-      </v-row>
+                      </div>
+                    </template>
+                    <template v-if="state?.stream">
+                      <v-list-subheader class="font-weight-bold">
+                        {{ t('app.or') }}
+                      </v-list-subheader>
+                      <v-btn
+                        variant="tonal"
+                        color="warning"
+                        :prepend-icon="mdiCancel"
+                        :loading="streamStopping"
+                        @click="stopStream()"
+                      >
+                        {{ t('live.play.stopStreaming') }}
+                      </v-btn>
+                    </template>
+                  </v-card-text>
+                </v-card>
+                <template #activator="{ props }">
+                  <v-list-item link v-bind="props">
+                    <template #prepend>
+                      <span>{{ t('live.entity.stream') }}</span>
+                    </template>
+                    <template #append>
+                      <span class="text-medium-emphasis text-break text-wrap ml-4">
+                        {{ state?.stream?.url || t('live.play.noStream') }}
+                      </span>
+                    </template>
+                  </v-list-item>
+                </template>
+              </v-menu>
+              <v-divider></v-divider>
+              <v-container class="d-flex align-center justify-center">
+                <v-menu>
+                  <v-card>
+                    <v-card-title>{{ t('live.play.closeTitle') }}</v-card-title>
+                    <v-card-text>{{ t('live.play.closeConfirm') }}</v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="primary">{{ t('app.cancel') }}</v-btn>
+                      <v-btn color="error" variant="plain" :loading="roomDisposing" @click="disposeRoom">
+                        {{ t('app.ok') }}
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                  <template #activator="{ props }">
+                    <v-btn variant="tonal" color="error" :prepend-icon="mdiClose" v-bind="props">
+                      {{ t('app.actions.close') }} {{ t('app.entities.live') }}
+                    </v-btn>
+                  </template>
+                </v-menu>
+              </v-container>
+            </v-list>
+          </div>
+        </v-fade-transition>
+      </v-container>
     </v-container>
 
     <v-dialog v-model="validateDialog" max-width="480px" transition="dialog-bottom-transition">
@@ -486,10 +482,9 @@ import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { useRoute, useRouter } from 'vue-router';
 import VideoPlayer from '@/components/app/VideoPlayer.vue';
-import UserAvatar from '@/components/user/UserAvatar.vue';
 import { computed, nextTick, onUnmounted, ref, shallowRef } from 'vue';
-import TimeAgo from '@/components/app/TimeAgo.vue';
 import {
+  mdiAccountMultiple,
   mdiCancel,
   mdiCheck,
   mdiClose,
@@ -520,7 +515,6 @@ import {
   LiveStream,
   RoomVoice,
 } from '@/api/interfaces/live.interface';
-import LiveMessage from '@/components/live/LiveMessage.vue';
 import { useToastStore } from '@/store/toast';
 import { useAsyncTask } from '@/composables/use-async-task';
 import { UserEntity } from '@/api/interfaces/user.interface';
@@ -528,17 +522,22 @@ import axios from 'axios';
 import { Device } from 'mediasoup-client';
 import { Transport } from 'mediasoup-client/lib/Transport';
 import { Producer } from 'mediasoup-client/lib/Producer';
-import ZoomImg from '@/components/app/ZoomImg.vue';
-import LivePosterFallback from '@/assets/live-poster-fallback.png';
 import { selectFile } from '@/utils/utils';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { MediaEntity } from '@/api/interfaces/media.interface';
+import { useDisplay } from 'vuetify';
+import LivePosterFallback from '@/assets/live-poster-fallback.png';
+import UserAvatar from '@/components/user/UserAvatar.vue';
+import TimeAgo from '@/components/app/TimeAgo.vue';
+import LiveMessage from '@/components/live/LiveMessage.vue';
+import ZoomImg from '@/components/app/ZoomImg.vue';
 
 const { t } = useI18n();
 const api = useApiStore();
 const route = useRoute();
 const router = useRouter();
 const toast = useToastStore();
+const display = useDisplay();
 
 const state = ref<LiveState | undefined>(undefined);
 const live = computed(() => state.value?.live);
@@ -850,7 +849,7 @@ const connectVoice = async () => {
     });
     producerTransport.value.on('connectionstatechange', (state) => {
       if (state === 'failed') {
-        toast.toastError(t('live.play.voiceConnectFailed'));
+        toast.toastError(t('live.play.voice.voiceConnectFailed'));
         producerTransport.value?.close();
       }
     });
@@ -876,7 +875,6 @@ const connectVoice = async () => {
 
     // current users
     const producers = await emit('voice-get-producers');
-    console.log(producers);
     for (const { userId, producerId } of producers) {
       await consume(userId, producerId);
     }

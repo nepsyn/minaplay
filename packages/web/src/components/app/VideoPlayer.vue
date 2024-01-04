@@ -171,7 +171,7 @@
           <template #activator="{ props }">
             <button
               v-if="live"
-              class="plyr__controls__item plyr__control danmaku-btn d-none d-sm-flex"
+              class="plyr__controls__item plyr__control danmaku-btn"
               type="button"
               v-bind="props"
               @click="toggleDanmaku(!danmakuShow)"
@@ -409,6 +409,12 @@ onMounted(async () => {
       if (player) {
         pageFullscreen.value = false;
       }
+    });
+    player.on('pause', () => {
+      danmakuPlayer?.pause();
+    });
+    player.on('play', () => {
+      danmakuPlayer?.play();
     });
 
     loadResource();

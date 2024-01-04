@@ -8,13 +8,14 @@
     "build": "vue-tsc --noEmit && vite build",
     "lint": "eslint . --fix --ignore-path .gitignore",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "generate-pwa-assets": "pwa-assets-generator --preset minimal src/assets/logo.svg"
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",
-    "@mdi/font": "7.3.67",
-    "@mdi/js": "^7.3.67",
-    "axios": "^1.6.2",
+    "@mdi/font": "7.4.47",
+    "@mdi/js": "^7.4.47",
+    "axios": "^1.6.4",
     "cron-parser": "^4.9.0",
     "danmu.js": "^1.1.13",
     "filesize": "^10.1.0",
@@ -27,27 +28,28 @@
     "pinia": "^2.1.7",
     "plyr": "^3.7.8",
     "roboto-fontface": "*",
-    "socket.io-client": "^4.7.2",
+    "socket.io-client": "^4.7.3",
     "timeago.js": "^4.0.2",
     "ts-ebml": "^2.0.2",
-    "vue": "^3.3.11",
+    "vue": "^3.4.5",
     "vue-i18n": "^9.8.0",
     "vue-router": "^4.2.5",
-    "vuetify": "^3.4.7"
+    "vuetify": "^3.4.9"
   },
   "devDependencies": {
     "@babel/types": "^7.23.6",
-    "@types/node": "^20.10.4",
-    "@vitejs/plugin-vue": "^4.5.2",
+    "@types/node": "^20.10.6",
+    "@vitejs/plugin-vue": "^5.0.2",
     "@vue/eslint-config-typescript": "^12.0.0",
-    "eslint": "^8.55.0",
+    "eslint": "^8.56.0",
     "eslint-plugin-vue": "^9.19.2",
-    "sass": "^1.69.5",
+    "sass": "^1.69.7",
     "typescript": "^5.3.3",
     "unplugin-fonts": "^1.1.1",
-    "vite": "^5.0.8",
+    "vite": "^5.0.10",
+    "vite-plugin-pwa": "^0.17.4",
     "vite-plugin-vuetify": "^2.0.1",
     "vue-cli-plugin-vue-i18n": "~1.0.1",
-    "vue-tsc": "^1.8.25"
+    "vue-tsc": "^1.8.27"
   }
 }

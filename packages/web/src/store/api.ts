@@ -54,8 +54,11 @@ import {
 import { FileEntity, FileQueryDto } from '@/api/interfaces/file.interface';
 import { SystemStatus } from '@/api/interfaces/system.interface';
 import { LiveDto, LiveEntity, LiveQueryDto } from '@/api/interfaces/live.interface';
+import { useI18n } from 'vue-i18n';
 
 export const useApiStore = defineStore('api', () => {
+  const { t } = useI18n();
+
   const user = ref<UserEntity | undefined>(undefined);
   const hasPermission = (...permissions: PermissionEnum[]) => {
     return user.value && permissions.some((name) => user.value?.permissionNames.includes(name));
@@ -121,6 +124,17 @@ export const useApiStore = defineStore('api', () => {
     };
   }
 
+  const orders = [
+    {
+      title: t('app.input.desc'),
+      value: 'DESC',
+    },
+    {
+      title: t('app.input.asc'),
+      value: 'ASC',
+    },
+  ];
+
   const Auth = {
     login: apiPost<AuthData, LoginDto>('/api/v1/auth/login/'),
     logout: apiPost('/api/v1/auth/logout/'),
@@ -144,8 +158,8 @@ export const useApiStore = defineStore('api', () => {
   };
 
   const File = {
-    buildRawPath: (id: string, name?: string) => baseUrl + `/api/v1/file/${id}/raw/${name ?? ''}`,
-    buildDownloadPath: (id: string, name?: string) => baseUrl + `/api/v1/file/${id}/download/${name ?? ''}`,
+    buildRawPath: (id: string, name?: string) => encodeURI(baseUrl + `/api/v1/file/${id}/raw/${name ?? ''}`),
+    buildDownloadPath: (id: string, name?: string) => encodeURI(baseUrl + `/api/v1/file/${id}/download/${name ?? ''}`),
     fetchRaw: (id: string, config?: AxiosRequestConfig) => apiGet(`/api/v1/file/${id}/raw`, config),
     uploadImage: apiUpload<FileEntity>('/api/v1/file/image'),
     uploadVideo: apiUpload<FileEntity>('/api/v1/file/video'),
@@ -223,7 +237,7 @@ export const useApiStore = defineStore('api', () => {
 
   const Live = {
     socketPath: baseUrl + '/live',
-    buildStreamPath: (path: string) => baseUrl + '/api/v1' + path,
+    buildStreamPath: (path: string) => encodeURI(baseUrl + '/api/v1' + path),
     create: apiPost<LiveEntity, LiveDto>(`/api/v1/live`),
     getById: (id: string) => apiGet<LiveEntity>(`/api/v1/live/${id}`),
     query: apiGet<ApiQueryResult<LiveEntity>, LiveQueryDto>(`/api/v1/live`),
@@ -257,6 +271,7 @@ export const useApiStore = defineStore('api', () => {
     setToken,
     user,
     hasPermission,
+    orders,
     Auth,
     User,
     File,

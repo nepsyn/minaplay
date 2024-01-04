@@ -33,7 +33,7 @@
           hide-details
           :label="t('app.entities.series')"
           :items="seriesItems ?? []"
-          :item-title="(item) => `${item.name}${item.season ?? ''}`"
+          :item-title="(item) => `${item.name} ${item.season ?? ''}`.trim()"
           item-value="id"
           :no-data-text="t('app.loader.empty')"
           density="compact"
@@ -54,7 +54,7 @@
         v-model:page="page"
         v-model:sort-by="sortBy"
         :headers="headers"
-        :items-length="episodes?.total ?? 0"
+        :items-length="total"
         :items="episodes?.items ?? []"
         :loading="loading"
         color="primary"
@@ -172,7 +172,7 @@
               color="primary"
               hide-details
               :items="seriesItems ?? []"
-              :item-title="(item) => `${item.name}${item.season ?? ''}`"
+              :item-title="(item) => `${item.name} ${item.season ?? ''}`.trim()"
               return-object
               :no-data-text="t('app.loader.empty')"
               density="compact"
@@ -259,11 +259,13 @@ const display = useDisplay();
 const page = ref(1);
 const size = ref(10);
 const sortBy = ref<any[]>([]);
+const total = ref(0);
 const filters = ref<EpisodeQueryDto>({});
 const {
   pending: loading,
   request,
   data: episodes,
+  onResolved: onEpisodesLoaded,
 } = useAxiosRequest(async () => {
   return await api.Episode.query({
     ...Object.fromEntries(
@@ -276,6 +278,9 @@ const {
     sort: sortBy.value?.[0]?.key,
     order: sortBy.value[0]?.order?.toUpperCase(),
   });
+});
+onEpisodesLoaded((data) => {
+  total.value = data.total;
 });
 const useQuery = debounce(request, 1000);
 

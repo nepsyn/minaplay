@@ -226,6 +226,7 @@ export default {
     nextTriggerTimes: 'Next Trigger Times:',
     wrongCronExp: 'Wrong Cron Expression',
     entity: {
+      id: 'ID',
       title: 'Title',
       remark: 'Remark',
       cron: 'CRON Expression',
@@ -280,6 +281,7 @@ export default {
     title: 'Rules',
     unnamed: 'Unnamed Subscribe Rule',
     entity: {
+      id: 'ID',
       remark: 'Remark',
       sources: 'RSS Sources',
       user: 'User',

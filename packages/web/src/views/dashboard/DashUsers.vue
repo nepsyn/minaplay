@@ -45,7 +45,7 @@
         v-model:page="page"
         v-model:sort-by="sortBy"
         :headers="headers"
-        :items-length="users?.total ?? 0"
+        :items-length="total"
         :items="users?.items ?? []"
         :loading="loading"
         color="primary"
@@ -268,11 +268,13 @@ const display = useDisplay();
 const page = ref(1);
 const size = ref(10);
 const sortBy = ref<any[]>([]);
+const total = ref(0);
 const filters = ref<UserQueryDto>({});
 const {
   pending: loading,
   request,
   data: users,
+  onResolved: onUsersLoaded,
 } = useAxiosRequest(async () => {
   return await api.User.query({
     ...Object.fromEntries(
@@ -285,6 +287,9 @@ const {
     sort: sortBy.value?.[0]?.key,
     order: sortBy.value[0]?.order?.toUpperCase(),
   });
+});
+onUsersLoaded((data) => {
+  total.value = data.total;
 });
 const useQuery = debounce(request, 1000);
 

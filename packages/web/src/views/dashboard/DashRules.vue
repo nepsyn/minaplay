@@ -54,7 +54,7 @@
         v-model:page="page"
         v-model:sort-by="sortBy"
         :headers="headers"
-        :items-length="rules?.total ?? 0"
+        :items-length="total"
         :items="rules?.items ?? []"
         :loading="loading"
         color="primary"
@@ -155,11 +155,13 @@ const toast = useToastStore();
 const page = ref(1);
 const size = ref(10);
 const sortBy = ref<any[]>([]);
+const total = ref(0);
 const filters = ref<RuleQueryDto>({});
 const {
   pending: loading,
   request,
   data: rules,
+  onResolved: onRulesLoaded,
 } = useAxiosRequest(async () => {
   return await api.Rule.query({
     ...Object.fromEntries(
@@ -172,6 +174,9 @@ const {
     sort: sortBy.value?.[0]?.key,
     order: sortBy.value[0]?.order?.toUpperCase(),
   });
+});
+onRulesLoaded((data) => {
+  total.value = data.total;
 });
 const useQuery = debounce(request, 1000);
 

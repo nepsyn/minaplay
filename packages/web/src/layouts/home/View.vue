@@ -189,7 +189,9 @@ const actions = ref([
     click: () => {
       layout.uploadDrawer = !layout.uploadDrawer;
     },
-    show: api.hasPermission(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP, PermissionEnum.FILE_UPLOAD_VIDEO),
+    show: computed(() =>
+      api.hasPermission(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP, PermissionEnum.FILE_UPLOAD_VIDEO),
+    ),
   },
   {
     text: computed(() => (layout.darkMode ? t('layout.actions.light') : t('layout.actions.dark'))),

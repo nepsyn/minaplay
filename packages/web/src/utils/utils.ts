@@ -53,3 +53,7 @@ export function selectFile(accept: string, multiple: boolean, onSelected: (files
   };
   el.click();
 }
+
+export function getFullUrl(uri: string) {
+  return uri.startsWith('/') ? `${window.origin}${uri}` : uri;
+}

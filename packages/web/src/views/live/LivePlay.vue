@@ -194,7 +194,8 @@
           </div>
           <div class="d-flex flex-column scrollable-container" v-else-if="tab === 'settings'">
             <v-list class="py-0">
-              <v-menu
+              <component
+                :is="display.smAndUp.value ? VMenu : VBottomSheet"
                 :close-on-content-click="false"
                 v-model="updateTitleMenu"
                 @update:model-value="updateTitleMenu && (edit.title = live?.title)"
@@ -231,9 +232,10 @@
                     </template>
                   </v-list-item>
                 </template>
-              </v-menu>
+              </component>
               <v-divider></v-divider>
-              <v-menu
+              <component
+                :is="display.smAndUp.value ? VMenu : VBottomSheet"
                 :close-on-content-click="false"
                 v-model="updatePasswordMenu"
                 @update:model-value="updatePasswordMenu && (edit.password = '')"
@@ -288,7 +290,7 @@
                     </template>
                   </v-list-item>
                 </template>
-              </v-menu>
+              </component>
               <v-divider></v-divider>
               <v-list-item>
                 <template #prepend>
@@ -317,7 +319,8 @@
                 </template>
               </v-list-item>
               <v-divider></v-divider>
-              <v-menu
+              <component
+                :is="display.smAndUp.value ? VMenu : VBottomSheet"
                 :close-on-content-click="false"
                 v-model="updateStreamMenu"
                 @update:model-value="updateStreamMenu && (edit.stream = { ...state?.stream } as any)"
@@ -399,7 +402,7 @@
                     </template>
                   </v-list-item>
                 </template>
-              </v-menu>
+              </component>
               <v-divider></v-divider>
               <v-container class="d-flex align-center justify-center">
                 <v-menu>
@@ -522,7 +525,7 @@ import axios from 'axios';
 import { Device } from 'mediasoup-client';
 import { Transport } from 'mediasoup-client/lib/Transport';
 import { Producer } from 'mediasoup-client/lib/Producer';
-import { selectFile } from '@/utils/utils';
+import { getFullUrl, selectFile } from '@/utils/utils';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { MediaEntity } from '@/api/interfaces/media.interface';
 import { useDisplay } from 'vuetify';
@@ -531,6 +534,7 @@ import UserAvatar from '@/components/user/UserAvatar.vue';
 import TimeAgo from '@/components/app/TimeAgo.vue';
 import LiveMessage from '@/components/live/LiveMessage.vue';
 import ZoomImg from '@/components/app/ZoomImg.vue';
+import { VBottomSheet, VMenu } from 'vuetify/components';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -753,7 +757,7 @@ const selectAndSendImage = () => {
         await emit('chat', {
           message: {
             type: 'NetworkImage',
-            url: api.File.buildRawPath(uploadFile.data.id, uploadFile.data.name),
+            url: getFullUrl(api.File.buildRawPath(uploadFile.data.id, uploadFile.data.name)),
           },
         });
       } catch (error: any) {

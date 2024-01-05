@@ -188,7 +188,7 @@ import {
 } from '@mdi/js';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
 import SeriesPosterFallback from '@/assets/banner-portrait.jpeg';
-import { copyContent } from '@/utils/utils';
+import { copyContent, getFullUrl } from '@/utils/utils';
 import { useToastStore } from '@/store/toast';
 import { EpisodeEntity, SeriesQueryDto } from '@/api/interfaces/series.interface';
 import { MediaEntity } from '@/api/interfaces/media.interface';
@@ -277,10 +277,7 @@ const actions = [
     color: 'info',
     click: () => {
       if (media.value) {
-        let path = api.File.buildRawPath(media.value.file!.id, media.value.file!.name);
-        if (path.startsWith('/')) {
-          path = `${window.origin}${path}`;
-        }
+        let path = getFullUrl(api.File.buildRawPath(media.value.file!.id, media.value.file!.name));
         copyContent(path)
           .then(() => {
             toast.toastSuccess(t('utils.copied'));
@@ -297,10 +294,7 @@ const actions = [
     color: 'warning',
     click: () => {
       if (media.value) {
-        let path = api.File.buildRawPath(media.value.file!.id, media.value.file!.name);
-        if (path.startsWith('/')) {
-          path = `${window.origin}${path}`;
-        }
+        let path = getFullUrl(api.File.buildRawPath(media.value.file!.id, media.value.file!.name));
         const a = document.createElement('a');
         a.href = `vlc://${path}`;
         a.click();

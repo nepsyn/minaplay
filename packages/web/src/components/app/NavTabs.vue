@@ -1,5 +1,5 @@
 <template>
-  <div class="border-b">
+  <div class="d-flex flex-row align-center border-b">
     <v-tabs show-arrows color="primary">
       <v-tab
         v-for="(tab, index) in tabs"
@@ -10,6 +10,7 @@
         :text="tab.text"
       ></v-tab>
     </v-tabs>
+    <slot name="append"></slot>
   </div>
 </template>
 

@@ -18,7 +18,37 @@
     </v-navigation-drawer>
     <v-main>
       <v-container class="pa-0 d-flex flex-column page-height">
-        <nav-tabs class="d-flex d-md-none" :tabs="tabs"></nav-tabs>
+        <nav-tabs class="d-flex d-md-none" :tabs="tabs">
+          <template #append>
+            <v-bottom-sheet close-on-content-click scrollable>
+              <v-card>
+                <v-card-text>
+                  <template v-for="(section, index) in sections" :key="index">
+                    <v-list-subheader>{{ section.nav }}</v-list-subheader>
+                    <v-row no-gutters>
+                      <v-col cols="3" v-for="(tab, index) in section.tabs" :key="index">
+                        <v-btn
+                          class="w-100 text-caption text-center"
+                          variant="text"
+                          :color="route.path === tab.to ? 'primary' : undefined"
+                          :prepend-icon="tab.icon"
+                          stacked
+                          :to="tab.to"
+                          replace
+                        >
+                          {{ tab.text }}
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </template>
+                </v-card-text>
+              </v-card>
+              <template #activator="{ props }">
+                <v-btn variant="text" :icon="mdiApps" v-bind="props"></v-btn>
+              </template>
+            </v-bottom-sheet>
+          </template>
+        </nav-tabs>
         <to-top-container class="scrollable-container">
           <router-view v-slot="{ Component }">
             <keep-alive>
@@ -37,6 +67,7 @@ import { useI18n } from 'vue-i18n';
 import {
   mdiAccountMultiple,
   mdiAnimationPlayOutline,
+  mdiApps,
   mdiCodeBraces,
   mdiFileMultipleOutline,
   mdiGaugeFull,
@@ -46,8 +77,10 @@ import {
   mdiViewComfy,
 } from '@mdi/js';
 import NavTabs from '@/components/app/NavTabs.vue';
+import { useRoute } from 'vue-router';
 
 const { t } = useI18n();
+const route = useRoute();
 
 const systemTabs = [
   {

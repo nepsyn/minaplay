@@ -28,6 +28,8 @@ export class LiveVoiceService implements OnModuleInit {
   async onModuleInit() {
     for (let i = 0; i < this.options.mediasoupWorkerNum; i++) {
       const worker = await createWorker({
+        rtcMinPort: this.options.mediasoupRtcMinPort,
+        rtcMaxPort: this.options.mediasoupRtcMaxPort,
         logLevel: 'none',
       });
       worker.on('died', (error: Error) => {
@@ -79,12 +81,7 @@ export class LiveVoiceService implements OnModuleInit {
   async createWebRtcTransport(groupId: string, peerId: number) {
     const group = await this.getVoiceGroup(groupId);
     const transport = await group.router.createWebRtcTransport({
-      listenIps: [
-        {
-          ip: '0.0.0.0',
-          announcedIp: '127.0.0.1',
-        },
-      ],
+      listenIps: ['0.0.0.0'],
       enableTcp: true,
       enableUdp: true,
       preferUdp: true,

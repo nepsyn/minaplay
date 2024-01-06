@@ -113,6 +113,7 @@
 
     <v-dialog
       :class="display.smAndUp.value ? 'w-75' : 'w-100'"
+      close-on-back
       :fullscreen="!display.smAndUp.value"
       v-model="permissionDialog"
       scrollable
@@ -166,6 +167,7 @@
 
     <v-dialog
       :class="display.smAndUp.value ? 'w-75' : 'w-100'"
+      close-on-back
       :fullscreen="!display.smAndUp.value"
       v-model="editDialog"
       scrollable

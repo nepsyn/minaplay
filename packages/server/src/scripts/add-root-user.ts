@@ -5,39 +5,14 @@ import process from 'node:process';
 import { isString } from 'class-validator';
 import { encryptPassword } from '../utils/encrypt-password.util';
 import { PermissionEnum } from '../enums/permission.enum';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../modules/user/user.entity';
 import { Repository } from 'typeorm';
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Permission } from '../modules/authorization/permission.entity';
-
-@Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      expandVariables: true,
-    }),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get('DB_HOST', '127.0.0.1'),
-        port: Number(configService.get('DB_PORT', 3306)),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE', 'minaplay'),
-        entities: ['dist/**/*.entity{.ts,.js}'],
-        retryAttempts: 3,
-      }),
-    }),
-    TypeOrmModule.forFeature([User, Permission]),
-  ],
-})
-class ScriptModule {}
+import { ApplicationScriptModule } from '../common/application.script.module';
 
 export async function addRootUser() {
-  const app = await NestFactory.createApplicationContext(ScriptModule, {
+  const app = await NestFactory.createApplicationContext(ApplicationScriptModule, {
     logger: ['error'],
   });
   const userRepo: Repository<User> = app.get(getRepositoryToken(User));
@@ -78,9 +53,9 @@ export async function addRootUser() {
       userId: id,
       name: PermissionEnum.ROOT_OP,
     });
-    process.stdout.write(`Add root user '${username}' succeed.\n`);
+    process.stdout.write(`Root user '${username}' added successfully.\n`);
   } catch (error) {
-    process.stderr.write(`Add root user '${username}' failed, error: ${error.message}`);
+    process.stderr.write(`Root user '${username}' add failed, error: ${error.message}`);
   }
 
   await app.close();

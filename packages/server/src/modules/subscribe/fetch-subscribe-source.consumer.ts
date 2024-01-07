@@ -1,5 +1,5 @@
 import { Process, Processor } from '@nestjs/bull';
-import { ConsoleLogger, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { SourceService } from './source.service';
 import { Job } from 'bull';
 import { Source } from './source.entity';
@@ -10,11 +10,12 @@ import { StatusEnum } from '../../enums/status.enum';
 import { FeedData } from '@extractus/feed-extractor';
 import { RuleErrorLogService } from './rule-error-log.service';
 import { RuleHooks } from './rule.interface';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 @Injectable()
 @Processor('fetch-subscribe-source')
 export class FetchSubscribeSourceConsumer {
-  private logger = new ConsoleLogger(FetchSubscribeSourceConsumer.name);
+  private logger = new ApplicationLogger(FetchSubscribeSourceConsumer.name);
 
   constructor(
     private sourceService: SourceService,

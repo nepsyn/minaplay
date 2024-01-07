@@ -1,4 +1,4 @@
-import { ConsoleLogger, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { Aria2DownloadTask } from './aria2-download-task';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
@@ -17,6 +17,7 @@ import { randomUUID } from 'crypto';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { Aria2WsClient } from './aria2.ws-client';
 import { isDefined } from 'class-validator';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 @Injectable()
 export class Aria2Service implements OnModuleInit {
@@ -25,7 +26,7 @@ export class Aria2Service implements OnModuleInit {
   private tasks: Map<string, Aria2DownloadTask> = new Map();
 
   private static TRACKER_CACHE_KEY = 'aria2:trackers';
-  private logger = new ConsoleLogger(Aria2Service.name);
+  private logger = new ApplicationLogger(Aria2Service.name);
 
   constructor(
     @Inject(ARIA2_MODULE_OPTIONS_TOKEN) private options: Aria2ModuleOptions,

@@ -1,4 +1,4 @@
-import { ConsoleLogger, Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { MediaModuleOptions } from './media.module.interface';
 import { MEDIA_MODULE_OPTIONS_TOKEN } from './media.module-definition';
 import { MediaService } from './media.service';
@@ -12,10 +12,11 @@ import { FileService } from '../file/file.service';
 import { importESM } from '../../utils/import-esm.util';
 import { MediaMetadata } from '../../interfaces/media.metadata';
 import { File } from '../file/file.entity';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 @Injectable()
 export class MediaFileService {
-  private logger = new ConsoleLogger(MediaFileService.name);
+  private logger = new ApplicationLogger(MediaFileService.name);
 
   constructor(
     @Inject(MEDIA_MODULE_OPTIONS_TOKEN) private options: MediaModuleOptions,

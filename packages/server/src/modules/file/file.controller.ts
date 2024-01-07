@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   Inject,
-  Logger,
   NotFoundException,
   Param,
   Post,
@@ -41,12 +40,13 @@ import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 import { ApiFile } from '../../common/api.file.decorator';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 import { isDefined } from 'class-validator';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 @Controller('file')
 @ApiTags('file')
 @ApiBearerAuth()
 export class FileController {
-  private readonly logger = new Logger(FileController.name);
+  private readonly logger = new ApplicationLogger(FileController.name);
 
   constructor(private fileService: FileService, @Inject(CACHE_MANAGER) private cacheStore: CacheStore) {}
 

@@ -1,8 +1,9 @@
-import { ConsoleLogger, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { LIVE_MODULE_OPTIONS_TOKEN } from './live.module-definition';
 import { LiveModuleOptions } from './live.module.interface';
 import { createWorker, types as MediasoupTypes, version as MEDIASOUP_VERSION } from 'mediasoup';
 import { Interval } from '@nestjs/schedule';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 interface Peer {
   transports: Map<string, MediasoupTypes.Transport>;
@@ -21,7 +22,7 @@ export class LiveVoiceService implements OnModuleInit {
   private nextWorkerIndex = -1;
   private readonly groups = new Map<string, VoiceGroup>();
 
-  private logger = new ConsoleLogger(LiveVoiceService.name);
+  private logger = new ApplicationLogger(LiveVoiceService.name);
 
   constructor(@Inject(LIVE_MODULE_OPTIONS_TOKEN) private options: LiveModuleOptions) {}
 

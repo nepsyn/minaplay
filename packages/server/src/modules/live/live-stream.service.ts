@@ -1,17 +1,18 @@
-import { ConsoleLogger, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { LIVE_MODULE_OPTIONS_TOKEN } from './live.module-definition';
 import { LiveModuleOptions } from './live.module.interface';
 import NodeMediaServer from 'node-media-server';
 import { ChildProcess, spawn } from 'child_process';
 import { generateMD5 } from '../../utils/generate-md5.util';
 import { LIVE_STREAM_DIR } from 'src/constants';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 @Injectable()
 export class LiveStreamService implements OnModuleInit {
   private server: NodeMediaServer;
   private streams: Map<string, ChildProcess> = new Map();
 
-  private logger = new ConsoleLogger(LiveStreamService.name);
+  private logger = new ApplicationLogger(LiveStreamService.name);
 
   constructor(@Inject(LIVE_MODULE_OPTIONS_TOKEN) private options: LiveModuleOptions) {}
 

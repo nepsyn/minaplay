@@ -6,16 +6,18 @@ import input from '@inquirer/input';
 import process from 'node:process';
 import { ApplicationScriptModule } from '../common/application.script.module';
 
-export async function deleteUser() {
+export async function deleteUser(_username?: string) {
   const app = await NestFactory.createApplicationContext(ApplicationScriptModule, {
     logger: ['error'],
   });
   const userRepo: Repository<User> = app.get(getRepositoryToken(User));
 
-  const username = await input({
-    message: 'Input user username:',
-    transformer: (v) => v.trim(),
-  });
+  const username =
+    _username ??
+    (await input({
+      message: 'Input user username:',
+      transformer: (v) => v.trim(),
+    }));
   const user = await userRepo.findOneBy({ username });
   if (!user) {
     process.stderr.write(`User '${username}' not found in database.\n`);
@@ -32,4 +34,6 @@ export async function deleteUser() {
   await app.close();
 }
 
-deleteUser();
+if (require.main === module) {
+  deleteUser();
+}

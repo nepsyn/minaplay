@@ -11,34 +11,40 @@ import { Repository } from 'typeorm';
 import { Permission } from '../modules/authorization/permission.entity';
 import { ApplicationScriptModule } from '../common/application.script.module';
 
-export async function addRootUser() {
+export async function addRootUser(_username?: string, _password?: string) {
   const app = await NestFactory.createApplicationContext(ApplicationScriptModule, {
     logger: ['error'],
   });
   const userRepo: Repository<User> = app.get(getRepositoryToken(User));
   const permissionRepo: Repository<Permission> = app.get(getRepositoryToken(Permission));
 
-  const username = await input({
-    message: 'Input root user username:',
-    validate: (v) => isString(v) && v.length >= 2 && v.length <= 40,
-    transformer: (v) => v.trim(),
-  });
+  const username =
+    _username ??
+    (await input({
+      message: 'Input root user username:',
+      validate: (v) => isString(v) && v.length >= 2 && v.length <= 40,
+      transformer: (v) => v.trim(),
+    }));
   const sameNameUser = await userRepo.findOneBy({ username });
   if (sameNameUser) {
     process.stderr.write(`Duplicated username '${username}' in database.\n`);
     process.exit();
   }
 
-  const pass = await password({
-    message: 'Input root user password:',
-    validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
-    mask: '*',
-  });
-  const passConfirm = await password({
-    message: 'Confirm root user password:',
-    validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
-    mask: '*',
-  });
+  const pass =
+    _password ??
+    (await password({
+      message: 'Input root user password:',
+      validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
+      mask: '*',
+    }));
+  const passConfirm =
+    _password ??
+    (await password({
+      message: 'Confirm root user password:',
+      validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
+      mask: '*',
+    }));
   if (pass !== passConfirm) {
     process.stderr.write('Passwords do not match.\n');
     process.exit();
@@ -61,4 +67,6 @@ export async function addRootUser() {
   await app.close();
 }
 
-addRootUser();
+if (require.main === module) {
+  addRootUser();
+}

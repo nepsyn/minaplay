@@ -39,7 +39,7 @@ export class SystemController {
   })
   async getApplicationLogs() {
     return {
-      logs: ApplicationLogger.getHistoryMessages().join(),
+      logs: ApplicationLogger.getHistoryMessages().join(''),
     };
   }
 

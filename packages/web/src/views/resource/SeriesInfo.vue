@@ -24,7 +24,6 @@
               <v-divider class="my-2"></v-divider>
               <expandable-text
                 class="text-subtitle-1"
-                ratio="0.66"
                 :content="series.description ?? t('resource.noDescription')"
                 style="min-height: 100px"
               ></expandable-text>

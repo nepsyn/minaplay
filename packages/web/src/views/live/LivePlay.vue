@@ -949,7 +949,7 @@ const produce = async () => {
       });
     } catch {
       await disconnectVoice();
-      toast.toastError(t('live.play.voice.voiceNoInputDevice'));
+      toast.toastError(t('live.play.voice.voiceConnectFailed'));
     }
   } else {
     await disconnectVoice();

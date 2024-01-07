@@ -73,6 +73,7 @@ import {
   mdiGaugeFull,
   mdiMultimedia,
   mdiRss,
+  mdiScriptText,
   mdiVideoVintage,
   mdiViewComfy,
 } from '@mdi/js';
@@ -87,6 +88,11 @@ const systemTabs = [
     to: '/dashboard/system',
     icon: mdiGaugeFull,
     text: t('dashboard.system'),
+  },
+  {
+    to: '/dashboard/logs',
+    icon: mdiScriptText,
+    text: t('dashboard.logs'),
   },
 ];
 const moduleTabs = [

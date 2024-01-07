@@ -1,12 +1,13 @@
-import { ArgumentsHost, Catch, HttpException, Logger } from '@nestjs/common';
+import { ArgumentsHost, Catch, HttpException } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 import { Response } from 'express';
 import { QueryFailedError } from 'typeorm';
 import { ErrorCodeEnum } from '../enums/error-code.enum';
+import { ApplicationLogger } from './application.logger.service';
 
 @Catch(Error)
 export class ApplicationExceptionFilter extends BaseExceptionFilter {
-  private readonly logger = new Logger(ApplicationExceptionFilter.name);
+  private readonly logger = new ApplicationLogger(ApplicationExceptionFilter.name);
 
   catch(exception: Error, host: ArgumentsHost): any {
     const response = host.switchToHttp().getResponse<Response>();

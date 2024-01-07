@@ -1,42 +1,92 @@
-import { ConfigService } from '@nestjs/config';
+import { importESM } from './utils/import-esm.util';
+import type { ExecaChildProcess } from 'execa';
+import process from 'node:process';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
-import { MINAPLAY_VERSION } from './constants';
+import { ConfigService } from '@nestjs/config';
 import { SocketIOAdapter } from './common/socket-io.adapter';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { MINAPLAY_VERSION } from './constants';
+import { ProcMessage } from './interfaces/proc-message';
+import { ApplicationLogger } from './common/application.logger.service';
 
-async function bootstrap() {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule);
-  const configService = app.get(ConfigService);
+class MinaPlayApplication {
+  private proc: ExecaChildProcess = undefined;
 
-  // global prefix
-  app.setGlobalPrefix('/api/v1');
+  async createAppProcess() {
+    const { execaNode } = await importESM<typeof import('execa')>('execa');
+    if (this.proc && !this.proc.killed) {
+      this.proc.kill('SIGKILL');
+    }
 
-  // public dir
-  app.useStaticAssets('public');
+    this.proc = execaNode(__filename, ['bootstrap'], {
+      cleanup: true,
+      cwd: process.cwd(),
+      env: process.env,
+      reject: false,
+      all: true,
+    });
+    this.proc.pipeStdout(process.stdout);
+    this.proc.pipeStderr(process.stderr);
 
-  // enable cors
-  if (Number(configService.get('APP_ENABLE_CORS', 0)) === 1) {
-    app.enableCors();
+    this.proc.on('message', (message) => {
+      if (typeof message === 'string') {
+        const data: ProcMessage = JSON.parse(message);
+
+        if (data.type === 'app-restart') {
+          app.createAppProcess();
+        }
+      }
+    });
+    this.proc.on('exit', (code, signal) => {
+      if (signal !== 'SIGKILL') {
+        app.createAppProcess();
+      }
+    });
+
+    await this.proc;
   }
 
-  // use custom socket-io adapter
-  app.useWebSocketAdapter(new SocketIOAdapter(app, configService));
+  async bootstrap() {
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+      logger: new ApplicationLogger(),
+    });
+    const configService = app.get(ConfigService);
 
-  // swagger settings
-  if (configService.get('APP_ENV') === 'dev') {
-    const docOptions = new DocumentBuilder()
-      .setTitle('MinaPlay')
-      .setDescription('MinaPlay api document')
-      .addBearerAuth()
-      .setVersion(MINAPLAY_VERSION)
-      .build();
-    const doc = SwaggerModule.createDocument(app, docOptions);
-    SwaggerModule.setup('doc', app, doc);
+    // global prefix
+    app.setGlobalPrefix('/api/v1');
+
+    // public dir
+    app.useStaticAssets('public');
+
+    // enable cors
+    if (Number(configService.get('APP_ENABLE_CORS', 0)) === 1) {
+      app.enableCors();
+    }
+
+    // use custom socket-io adapter
+    app.useWebSocketAdapter(new SocketIOAdapter(app, configService));
+
+    // swagger settings
+    if (configService.get('APP_ENV') === 'dev') {
+      const docOptions = new DocumentBuilder()
+        .setTitle('MinaPlay')
+        .setDescription('MinaPlay api document')
+        .addBearerAuth()
+        .setVersion(MINAPLAY_VERSION)
+        .build();
+      const doc = SwaggerModule.createDocument(app, docOptions);
+      SwaggerModule.setup('doc', app, doc);
+    }
+
+    await app.listen(configService.get('APP_PORT', 3000), configService.get<string>('APP_HOST', '127.0.0.1'));
   }
-
-  await app.listen(configService.get('APP_PORT', 3000), configService.get<string>('APP_HOST', '127.0.0.1'));
 }
 
-bootstrap();
+const app = new MinaPlayApplication();
+if (process.argv[2] === 'bootstrap') {
+  app.bootstrap();
+} else {
+  app.createAppProcess();
+}

@@ -1,5 +1,7 @@
 export interface LiveModuleOptions {
-  mediasoupWorkerNum?: number;
+  mediasoupRtcMinPort: number;
+  mediasoupRtcMaxPort: number;
+  mediasoupWorkerNum: number;
   mediasoupAudioClockRate?: number;
   mediasoupAudioChannel?: number;
   mediasoupMaxIncomeBitrate?: number;

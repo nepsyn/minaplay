@@ -1,4 +1,4 @@
-import { ConsoleLogger, DynamicModule, ForwardReference, Module, Type } from '@nestjs/common';
+import { DynamicModule, ForwardReference, Module, Type } from '@nestjs/common';
 import path from 'path';
 import fs from 'fs-extra';
 import { MinaPlayPluginConstructor } from '../../interfaces/plugins';
@@ -7,10 +7,11 @@ import { AuthorizationModule } from '../authorization/authorization.module';
 import { UserModule } from '../user/user.module';
 import { PluginController } from './plugin.controller';
 import { getMinaPlayPluginDescriptor, isMinaPlayPlugin } from '../../common/plugin.decorator';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 @Module({})
 export class PluginModule {
-  private static logger = new ConsoleLogger(PluginModule.name);
+  private static logger = new ApplicationLogger(PluginModule.name);
 
   static async registerAsync(): Promise<DynamicModule> {
     const base = path.join(__dirname, '../../plugins');

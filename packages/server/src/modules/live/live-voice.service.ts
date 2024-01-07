@@ -1,8 +1,9 @@
-import { ConsoleLogger, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { LIVE_MODULE_OPTIONS_TOKEN } from './live.module-definition';
 import { LiveModuleOptions } from './live.module.interface';
 import { createWorker, types as MediasoupTypes, version as MEDIASOUP_VERSION } from 'mediasoup';
 import { Interval } from '@nestjs/schedule';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 interface Peer {
   transports: Map<string, MediasoupTypes.Transport>;
@@ -21,13 +22,15 @@ export class LiveVoiceService implements OnModuleInit {
   private nextWorkerIndex = -1;
   private readonly groups = new Map<string, VoiceGroup>();
 
-  private logger = new ConsoleLogger(LiveVoiceService.name);
+  private logger = new ApplicationLogger(LiveVoiceService.name);
 
   constructor(@Inject(LIVE_MODULE_OPTIONS_TOKEN) private options: LiveModuleOptions) {}
 
   async onModuleInit() {
     for (let i = 0; i < this.options.mediasoupWorkerNum; i++) {
       const worker = await createWorker({
+        rtcMinPort: this.options.mediasoupRtcMinPort,
+        rtcMaxPort: this.options.mediasoupRtcMaxPort,
         logLevel: 'none',
       });
       worker.on('died', (error: Error) => {
@@ -79,12 +82,7 @@ export class LiveVoiceService implements OnModuleInit {
   async createWebRtcTransport(groupId: string, peerId: number) {
     const group = await this.getVoiceGroup(groupId);
     const transport = await group.router.createWebRtcTransport({
-      listenIps: [
-        {
-          ip: '0.0.0.0',
-          announcedIp: '127.0.0.1',
-        },
-      ],
+      listenIps: ['0.0.0.0'],
       enableTcp: true,
       enableUdp: true,
       preferUdp: true,

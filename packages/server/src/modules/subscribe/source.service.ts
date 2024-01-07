@@ -1,4 +1,4 @@
-import { ConsoleLogger, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Source } from './source.entity';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
@@ -10,10 +10,11 @@ import { importESM } from '../../utils/import-esm.util';
 import { SubscribeModuleOptions } from './subscribe.module.interface';
 import { SUBSCRIBE_MODULE_OPTIONS_TOKEN } from './subscribe.module-definition';
 import { HttpsProxyAgent } from 'https-proxy-agent';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 @Injectable()
 export class SourceService implements OnModuleInit {
-  private logger = new ConsoleLogger(SourceService.name);
+  private logger = new ApplicationLogger(SourceService.name);
 
   constructor(
     @Inject(SUBSCRIBE_MODULE_OPTIONS_TOKEN)

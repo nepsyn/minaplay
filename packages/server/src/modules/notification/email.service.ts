@@ -1,4 +1,4 @@
-import { ConsoleLogger, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { NotificationModuleOptions } from './notification.module.interface';
 import { NOTIFICATION_MODULE_OPTIONS_TOKEN } from './notification.module-definition';
 import { createTransport, SendMailOptions, Transporter } from 'nodemailer';
@@ -8,13 +8,14 @@ import path from 'path';
 import fs from 'fs-extra';
 import { isDefined } from 'class-validator';
 import { isUndefined } from '@nestjs/common/utils/shared.utils';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 @Injectable()
 export class EmailService implements OnModuleInit {
   private transporter: Transporter;
   private templates: Record<NotificationEventType | string, Handlebars.TemplateDelegate> = {};
 
-  private logger = new ConsoleLogger(EmailService.name);
+  private logger = new ApplicationLogger(EmailService.name);
 
   constructor(@Inject(NOTIFICATION_MODULE_OPTIONS_TOKEN) private options: NotificationModuleOptions) {}
 

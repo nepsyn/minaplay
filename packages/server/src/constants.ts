@@ -1,6 +1,6 @@
 import path from 'path';
 
-export const RESOURCE_DIR = path.join(process.cwd(), 'resources');
+export const RESOURCE_DIR = path.join(process.cwd(), 'data');
 
 export const MINAPLAY_VERSION = require('../package.json').version;
 

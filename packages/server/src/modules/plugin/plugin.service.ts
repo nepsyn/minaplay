@@ -1,14 +1,15 @@
-import { ConsoleLogger, Inject, Injectable, OnModuleInit } from '@nestjs/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ModuleRef } from '@nestjs/core';
 import { MinaPlayPluginConstructor, MinaPlayPluginHooks } from '../../interfaces/plugins';
 import { PluginControl } from './plugin-control';
 import { plainToInstance } from 'class-transformer';
 import { getMinaPlayPluginDescriptor } from '../../common/plugin.decorator';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 @Injectable()
 export class PluginService implements OnModuleInit {
-  private logger = new ConsoleLogger(PluginService.name);
+  private logger = new ApplicationLogger(PluginService.name);
   private controls: PluginControl[] = [];
 
   constructor(private moduleRef: ModuleRef, @Inject('PLUGINS') private plugins: MinaPlayPluginConstructor[]) {}

@@ -1,4 +1,4 @@
-import { ConsoleLogger, Injectable, OnModuleInit } from '@nestjs/common';
+import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, LessThanOrEqual, Repository } from 'typeorm';
 import { File } from './file.entity';
@@ -7,10 +7,11 @@ import { CronJob } from 'cron';
 import fs from 'fs-extra';
 import sharp from 'sharp';
 import path from 'path';
+import { ApplicationLogger } from '../../common/application.logger.service';
 
 @Injectable()
 export class FileService implements OnModuleInit {
-  private logger = new ConsoleLogger(FileService.name);
+  private logger = new ApplicationLogger(FileService.name);
 
   constructor(
     @InjectRepository(File) private fileRepository: Repository<File>,

@@ -1,11 +1,12 @@
-import { ArgumentsHost, Catch, HttpException, Logger } from '@nestjs/common';
+import { ArgumentsHost, Catch, HttpException } from '@nestjs/common';
 import { BaseWsExceptionFilter, WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
 import { ErrorCodeEnum } from '../enums/error-code.enum';
+import { ApplicationLogger } from './application.logger.service';
 
 @Catch(Error)
 export class ApplicationGatewayExceptionFilter extends BaseWsExceptionFilter {
-  private readonly logger = new Logger(ApplicationGatewayExceptionFilter.name);
+  private readonly logger = new ApplicationLogger(ApplicationGatewayExceptionFilter.name);
 
   catch(exception: Error, host: ArgumentsHost) {
     const socket: Socket = host.switchToWs().getClient();

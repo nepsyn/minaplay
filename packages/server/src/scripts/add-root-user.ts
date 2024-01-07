@@ -5,65 +5,46 @@ import process from 'node:process';
 import { isString } from 'class-validator';
 import { encryptPassword } from '../utils/encrypt-password.util';
 import { PermissionEnum } from '../enums/permission.enum';
-import { getRepositoryToken, TypeOrmModule } from '@nestjs/typeorm';
+import { getRepositoryToken } from '@nestjs/typeorm';
 import { User } from '../modules/user/user.entity';
 import { Repository } from 'typeorm';
-import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Permission } from '../modules/authorization/permission.entity';
+import { ApplicationScriptModule } from '../common/application.script.module';
 
-@Module({
-  imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      expandVariables: true,
-    }),
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get('DB_HOST', '127.0.0.1'),
-        port: Number(configService.get('DB_PORT', 3306)),
-        username: configService.get('DB_USERNAME'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE', 'minaplay'),
-        entities: ['dist/**/*.entity{.ts,.js}'],
-        retryAttempts: 3,
-      }),
-    }),
-    TypeOrmModule.forFeature([User, Permission]),
-  ],
-})
-class ScriptModule {}
-
-export async function addRootUser() {
-  const app = await NestFactory.createApplicationContext(ScriptModule, {
+export async function addRootUser(_username?: string, _password?: string) {
+  const app = await NestFactory.createApplicationContext(ApplicationScriptModule, {
     logger: ['error'],
   });
   const userRepo: Repository<User> = app.get(getRepositoryToken(User));
   const permissionRepo: Repository<Permission> = app.get(getRepositoryToken(Permission));
 
-  const username = await input({
-    message: 'Input root user username:',
-    validate: (v) => isString(v) && v.length >= 2 && v.length <= 40,
-    transformer: (v) => v.trim(),
-  });
+  const username =
+    _username ??
+    (await input({
+      message: 'Input root user username:',
+      validate: (v) => isString(v) && v.length >= 2 && v.length <= 40,
+      transformer: (v) => v.trim(),
+    }));
   const sameNameUser = await userRepo.findOneBy({ username });
   if (sameNameUser) {
     process.stderr.write(`Duplicated username '${username}' in database.\n`);
     process.exit();
   }
 
-  const pass = await password({
-    message: 'Input root user password:',
-    validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
-    mask: '*',
-  });
-  const passConfirm = await password({
-    message: 'Confirm root user password:',
-    validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
-    mask: '*',
-  });
+  const pass =
+    _password ??
+    (await password({
+      message: 'Input root user password:',
+      validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
+      mask: '*',
+    }));
+  const passConfirm =
+    _password ??
+    (await password({
+      message: 'Confirm root user password:',
+      validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
+      mask: '*',
+    }));
   if (pass !== passConfirm) {
     process.stderr.write('Passwords do not match.\n');
     process.exit();
@@ -78,12 +59,14 @@ export async function addRootUser() {
       userId: id,
       name: PermissionEnum.ROOT_OP,
     });
-    process.stdout.write(`Add root user '${username}' succeed.\n`);
+    process.stdout.write(`Root user '${username}' added successfully.\n`);
   } catch (error) {
-    process.stderr.write(`Add root user '${username}' failed, error: ${error.message}`);
+    process.stderr.write(`Root user '${username}' add failed, error: ${error.message}`);
   }
 
   await app.close();
 }
 
-addRootUser();
+if (require.main === module) {
+  addRootUser();
+}

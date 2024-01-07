@@ -34,7 +34,7 @@ import { useApiStore } from '@/store/api';
 import { useToastStore } from '@/store/toast';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { computed, ref } from 'vue';
-import { AnsiUp } from 'ansi_up/ansi_up';
+import { AnsiUp } from 'ansi_up';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 
 const { t } = useI18n();

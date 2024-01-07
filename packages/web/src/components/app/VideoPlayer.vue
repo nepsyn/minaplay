@@ -476,9 +476,9 @@ const toggleDanmaku = (value: boolean) => {
   danmakuShow.value = value;
   danmakuMenu.value = false;
   if (value) {
-    danmakuPlayer?.setOpacity(1);
+    danmakuPlayer?.setOpacity('1');
   } else {
-    danmakuPlayer?.setOpacity(0);
+    danmakuPlayer?.setOpacity('0');
   }
 };
 const emitDanmaku = (content: string) => {

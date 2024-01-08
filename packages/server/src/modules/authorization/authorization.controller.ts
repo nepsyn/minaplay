@@ -10,6 +10,7 @@ import {
   ParseIntPipe,
   Post,
   Put,
+  Query,
   SerializeOptions,
   UnauthorizedException,
   UseGuards,
@@ -37,6 +38,11 @@ import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exceptio
 import { CreateUserDto } from './create-user.dto';
 import { RequestIp } from '../../common/request.ip.decorator';
 import { isInt } from 'class-validator';
+import { ActionLogQueryDto } from './action-log-query.dto';
+import { buildQueryOptions } from '../../utils/build-query-options.util';
+import { Between } from 'typeorm';
+import { ActionLog } from './action-log.entity';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 
 @Controller('auth')
 @ApiTags('auth')
@@ -378,5 +384,31 @@ export class AuthorizationController {
   @RequirePermissions(PermissionEnum.ROOT_OP)
   async fetchAllPermissions() {
     return Object.keys(PermissionEnum).map((key) => PermissionEnum[key]);
+  }
+
+  @Get('logs')
+  @ApiOperation({
+    description: '查询操作日志',
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthorizationGuard)
+  @RequirePermissions(PermissionEnum.ROOT_OP)
+  async queryActionLog(@Query() query: ActionLogQueryDto) {
+    const { operatorId, ip, action, start, end } = query;
+    const [result, total] = await this.actionLogService.findAndCount({
+      where: buildQueryOptions<ActionLog>({
+        exact: {
+          operator: { id: operatorId },
+          ip,
+          action,
+          createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
+        },
+      }),
+      skip: query.page * query.size,
+      take: query.size,
+      order: { [query.sort]: query.order },
+    });
+
+    return new ApiPaginationResultDto(result, total, query.page, query.size);
   }
 }

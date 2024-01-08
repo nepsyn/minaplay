@@ -5,6 +5,7 @@
     "test",
     "dist",
     "public",
+    "data",
     "resources",
     "**/*spec.ts"
   ]

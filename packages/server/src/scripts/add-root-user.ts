@@ -10,6 +10,13 @@ import { User } from '../modules/user/user.entity';
 import { Repository } from 'typeorm';
 import { Permission } from '../modules/authorization/permission.entity';
 import { ApplicationScriptModule } from '../common/application.script.module';
+import { File } from '../modules/file/file.entity';
+import { randomUUID } from 'node:crypto';
+import path from 'node:path';
+import { USER_UPLOAD_IMAGE_DIR } from '../constants';
+import { createIdenticon } from '../utils/create-identicon.util';
+import { generateMD5 } from '../utils/generate-md5.util';
+import { FileSourceEnum } from '../enums/file-source.enum';
 
 export async function addRootUser(_username?: string, _password?: string) {
   const app = await NestFactory.createApplicationContext(ApplicationScriptModule, {
@@ -17,6 +24,7 @@ export async function addRootUser(_username?: string, _password?: string) {
   });
   const userRepo: Repository<User> = app.get(getRepositoryToken(User));
   const permissionRepo: Repository<Permission> = app.get(getRepositoryToken(Permission));
+  const fileRepo: Repository<File> = app.get(getRepositoryToken(File));
 
   const username =
     _username ??
@@ -51,9 +59,22 @@ export async function addRootUser(_username?: string, _password?: string) {
   }
 
   try {
+    const filename = randomUUID().replace(/-/g, '') + '.png';
+    const filepath = path.join(USER_UPLOAD_IMAGE_DIR, filename);
+    const { file: identicon, md5 } = await createIdenticon(await generateMD5(username), filepath);
+    const file = await fileRepo.save({
+      filename,
+      name: filename,
+      size: identicon.size,
+      md5,
+      source: FileSourceEnum.AUTO_GENERATED,
+      path: filepath,
+    });
+
     const { id } = await userRepo.save({
       username,
       password: await encryptPassword(pass),
+      avatar: { id: file.id },
     });
     await permissionRepo.save({
       userId: id,
@@ -61,7 +82,7 @@ export async function addRootUser(_username?: string, _password?: string) {
     });
     process.stdout.write(`Root user '${username}' added successfully.\n`);
   } catch (error) {
-    process.stderr.write(`Root user '${username}' add failed, error: ${error.message}`);
+    process.stderr.write(`Root user '${username}' add failed, error: ${error.stack}`);
   }
 
   await app.close();

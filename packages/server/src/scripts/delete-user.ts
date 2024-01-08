@@ -28,7 +28,7 @@ export async function deleteUser(_username?: string) {
     await userRepo.delete({ username });
     process.stdout.write(`User '${username}' deleted successfully.\n`);
   } catch (error) {
-    process.stderr.write(`User '${username}' delete failed, error: ${error.message}`);
+    process.stderr.write(`User '${username}' delete failed, error: ${error.stack}`);
   }
 
   await app.close();

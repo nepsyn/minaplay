@@ -42,7 +42,7 @@ export class LiveVoiceService implements OnModuleInit {
     this.logger.log(`LiveVoice service is running, mediasoup version=${MEDIASOUP_VERSION}`);
   }
 
-  @Interval('mediasoup-workers-status', /* 30 min */ 1800000)
+  @Interval('mediasoup-workers-status', /* 1 day */ 24 * 60 * 60 * 1000)
   async logWorkersStatus() {
     for (const [index, worker] of this.workers.entries()) {
       const usage = await worker.getResourceUsage();
@@ -82,10 +82,13 @@ export class LiveVoiceService implements OnModuleInit {
   async createWebRtcTransport(groupId: string, peerId: number) {
     const group = await this.getVoiceGroup(groupId);
     const transport = await group.router.createWebRtcTransport({
-      listenIps: ['0.0.0.0'],
-      enableTcp: true,
-      enableUdp: true,
-      preferUdp: true,
+      listenInfos: [
+        {
+          protocol: 'udp',
+          ip: '0.0.0.0',
+          announcedIp: this.options.mediasoupAnnouncedIp,
+        },
+      ],
     });
     await transport.setMaxIncomingBitrate(this.options.mediasoupMaxIncomeBitrate);
 

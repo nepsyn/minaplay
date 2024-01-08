@@ -85,8 +85,9 @@ import { ApplicationExceptionFilter } from './common/application.exception.filte
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
+        mediasoupAnnouncedIp: configService.get('MS_ANNOUNCED_IP', '127.0.0.1'),
         mediasoupRtcMinPort: Number(configService.get('MS_RTC_MIN_PORT', 12000)),
-        mediasoupRtcMaxPort: Number(configService.get('MS_RTC_MAX_PORT', 13000)),
+        mediasoupRtcMaxPort: Number(configService.get('MS_RTC_MAX_PORT', 12999)),
         mediasoupWorkerNum: Number(configService.get('MS_WORKERS_NUM', cpus().length)),
         mediasoupAudioClockRate: Number(configService.get('MS_AUDIO_CLOCK_RATE', 48000)),
         mediasoupAudioChannel: Number(configService.get('MS_AUDIO_CHANNELS', 2)),

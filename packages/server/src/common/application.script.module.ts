@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../modules/user/user.entity';
 import { Permission } from '../modules/authorization/permission.entity';
+import { File } from '../modules/file/file.entity';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { Permission } from '../modules/authorization/permission.entity';
         retryAttempts: 3,
       }),
     }),
-    TypeOrmModule.forFeature([User, Permission]),
+    TypeOrmModule.forFeature([User, Permission, File]),
   ],
 })
 export class ApplicationScriptModule {}

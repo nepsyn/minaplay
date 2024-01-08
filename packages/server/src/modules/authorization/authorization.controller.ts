@@ -185,7 +185,6 @@ export class AuthorizationController {
       ip,
       operator: { id: user.id },
       target: { id: user.id },
-      extra: JSON.stringify(data),
     });
 
     await this.userService.save({
@@ -291,7 +290,6 @@ export class AuthorizationController {
       ip,
       operator: { id: operator.id },
       target: { id: user.id },
-      extra: JSON.stringify({ current: data.current }),
     });
 
     await this.userService.save({

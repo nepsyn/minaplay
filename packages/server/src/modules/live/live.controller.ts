@@ -29,13 +29,18 @@ import { Live } from './live.entity';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
 import { isDefined } from 'class-validator';
 import { instanceToPlain } from 'class-transformer';
+import { LiveStreamService } from './live-stream.service';
 
 @Controller('live')
 @UseGuards(AuthorizationGuard)
 @ApiTags('live')
 @ApiBearerAuth()
 export class LiveController {
-  constructor(private liveService: LiveService, private liveGateway: LiveGateway) {}
+  constructor(
+    private liveService: LiveService,
+    private liveStreamService: LiveStreamService,
+    private liveGateway: LiveGateway,
+  ) {}
 
   @Get(':id')
   @ApiOperation({
@@ -139,6 +144,7 @@ export class LiveController {
     if (live) {
       await this.liveService.delete({ id });
       await this.liveGateway.dispose(id);
+      await this.liveStreamService.stopPublish(id);
       await this.liveService.deleteLiveState(id);
     }
 

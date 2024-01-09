@@ -70,7 +70,6 @@ export class LiveStreamService implements OnModuleInit {
       ],
       {
         cleanup: true,
-        shell: true,
       },
     );
     this.streams.set(liveId, cp);

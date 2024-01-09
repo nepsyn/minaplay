@@ -82,13 +82,15 @@ export class LiveVoiceService implements OnModuleInit {
   async createWebRtcTransport(groupId: string, peerId: number) {
     const group = await this.getVoiceGroup(groupId);
     const transport = await group.router.createWebRtcTransport({
-      listenInfos: [
+      listenIps: [
         {
-          protocol: 'udp',
           ip: '0.0.0.0',
           announcedIp: this.options.mediasoupAnnouncedIp,
         },
       ],
+      enableUdp: true,
+      enableTcp: true,
+      preferUdp: true,
     });
     await transport.setMaxIncomingBitrate(this.options.mediasoupMaxIncomeBitrate);
 

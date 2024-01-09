@@ -6,8 +6,8 @@ import zhLocale from './zh';
 export type MessageSchema = typeof enLocale;
 
 const messages = {
-  en: enLocale,
-  zh: zhLocale,
+  'en-US': enLocale,
+  'zh-CN': zhLocale,
 };
 
 const getLocale = () => {
@@ -15,19 +15,14 @@ const getLocale = () => {
   if (cookieLanguage) {
     return cookieLanguage;
   }
-  const language = navigator.language.toLowerCase();
-  const locales = Object.keys(messages);
-  for (const locale of locales) {
-    if (language.indexOf(locale) > -1) {
-      return locale;
-    }
-  }
-  return 'zh';
+
+  const locale = Object.keys(messages).find((value) => value === navigator.language);
+  return locale ?? 'en-US';
 };
 
-export default createI18n<[MessageSchema], 'en' | 'zh'>({
+export default createI18n<[MessageSchema], 'en-US' | 'zh-CN'>({
   legacy: false,
   locale: getLocale(),
-  fallbackLocale: 'en',
+  fallbackLocale: 'en-US',
   messages,
 });

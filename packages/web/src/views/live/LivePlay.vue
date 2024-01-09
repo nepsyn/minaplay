@@ -340,12 +340,14 @@
                     >
                     </v-select>
                     <template v-if="edit.stream.type === 'server-push'">
+                      <media-selector v-model="mediaSelectDialog" @selected="onStreamMediaSelected"></media-selector>
                       <v-btn
                         class="mt-4"
                         variant="tonal"
                         color="primary"
                         :prepend-icon="mdiPlaylistCheck"
                         :loading="streamSwitching"
+                        @click="mediaSelectDialog = true"
                       >
                         {{ t('app.actions.select') }} {{ t('app.entities.media') }}
                       </v-btn>
@@ -535,6 +537,7 @@ import TimeAgo from '@/components/app/TimeAgo.vue';
 import LiveMessage from '@/components/live/LiveMessage.vue';
 import ZoomImg from '@/components/app/ZoomImg.vue';
 import { VBottomSheet, VMenu } from 'vuetify/components';
+import MediaSelector from '@/components/resource/MediaSelector.vue';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -958,7 +961,6 @@ const produce = async () => {
 };
 
 const edit = ref<LiveDto & { stream: LiveStream }>({ stream: {} as any });
-const selectedMedia = ref<MediaEntity | undefined>(undefined);
 const updateTitleMenu = ref(false);
 const updatePasswordMenu = ref(false);
 const updateStreamMenu = ref(false);
@@ -1008,6 +1010,13 @@ const selectAndUploadPoster = async () => {
       }
     }
   });
+};
+
+const mediaSelectDialog = ref(false);
+const selectedMedia = ref<MediaEntity | undefined>(undefined);
+const onStreamMediaSelected = async (media: MediaEntity) => {
+  selectedMedia.value = media;
+  await switchStream();
 };
 const streamTypes = [
   { title: t('live.play.stream.serverPush'), value: 'server-push' },

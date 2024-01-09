@@ -73,10 +73,19 @@
         <v-sheet class="my-4" border rounded>
           <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
             <v-container class="pa-0">
+              <p class="text-subtitle-1">{{ t('rule.info.duplicate') }}</p>
+              <p class="text-caption">{{ t('rule.info.duplicateDescription') }}</p>
+            </v-container>
+            <v-btn class="ml-4" variant="tonal" color="primary" :loading="ruleDuplicating" @click="duplicateRule">
+              {{ t('rule.info.duplicateBtn') }}
+            </v-btn>
+          </v-container>
+          <v-divider></v-divider>
+          <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
+            <v-container class="pa-0">
               <p class="text-subtitle-1">{{ t('rule.info.delete') }}</p>
               <p class="text-caption">{{ t('rule.info.deleteDescription') }}</p>
             </v-container>
-
             <v-dialog width="auto" close-on-content-click>
               <v-card>
                 <v-card-title>{{ t('app.actions.deleteTitle') }}</v-card-title>
@@ -151,6 +160,27 @@ onSaved((data) => {
   ruleLoader.data.value = data;
 });
 onSaveFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const {
+  pending: ruleDuplicating,
+  request: duplicateRule,
+  onResolved: onRuleDuplicated,
+  onRejected: onRuleDuplicateFailed,
+} = useAxiosRequest(async () => {
+  return await api.Rule.create({
+    remark: `${rule.value?.remark || t('rule.unnamed')} ${t('rule.info.copyLabel')}`,
+    code: rule.value?.code,
+    sourceIds: rule.value?.sources.map(({ id }) => id),
+  });
+});
+onRuleDuplicated(async (data) => {
+  toast.toastSuccess(t('app.actions.saveToast'));
+  await router.replace({ path: `/rule/${data.id}` });
+  await ruleLoader.request();
+});
+onRuleDuplicateFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 

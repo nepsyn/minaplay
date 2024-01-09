@@ -16,7 +16,7 @@
 
     <single-item-loader
       ref="logsContainerRef"
-      class="pa-0 mt-3 scrollable-container border rounded"
+      class="pa-0 mt-3 scrollable-container overflow-x-hidden border rounded"
       :loader="logsLoader"
       v-mutate.child="onMutated"
     >
@@ -33,7 +33,7 @@ import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { useToastStore } from '@/store/toast';
 import { useAxiosRequest } from '@/composables/use-axios-request';
-import { computed, ref } from 'vue';
+import { computed, onUpdated, ref } from 'vue';
 import { AnsiUp } from 'ansi_up';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 
@@ -58,6 +58,9 @@ const onMutated = () => {
     el.scrollTo({ top: el.scrollHeight });
   }
 };
+onUpdated(() => {
+  onMutated();
+});
 </script>
 
 <style scoped lang="sass"></style>

@@ -11,7 +11,7 @@
         <v-btn :icon="mdiClose" @click="dialog = false"></v-btn>
         <v-toolbar-title>
           {{ t('app.actions.select') }}
-          {{ t('app.entities.series') }}
+          {{ t('app.entities.media') }}
         </v-toolbar-title>
       </v-toolbar>
       <v-card-text>
@@ -32,10 +32,10 @@
           </v-text-field>
         </v-container>
         <v-container class="mt-4 d-flex flex-column pa-0">
-          <multi-items-loader class="pa-0" auto :loader="seriesLoader">
+          <multi-items-loader class="pa-0" auto :loader="mediasLoader">
             <v-row>
-              <v-col cols="4" sm="3" md="2" v-for="item in series" :key="item.id">
-                <series-overview @click="select(item)" @click.right.prevent :series="item"></series-overview>
+              <v-col cols="6" sm="4" md="3" v-for="item in medias" :key="item.id">
+                <media-overview @click="select(item)" @click.right.prevent :media="item"></media-overview>
               </v-col>
             </v-row>
           </multi-items-loader>
@@ -47,15 +47,15 @@
 
 <script setup lang="ts">
 import { useDisplay } from 'vuetify';
-import { SeriesEntity, SeriesQueryDto } from '@/api/interfaces/series.interface';
-import { computed, Ref, ref } from 'vue';
-import { mdiClose, mdiMagnify } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
-import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { useToastStore } from '@/store/toast';
+import { computed, ref, Ref } from 'vue';
+import { MediaEntity, MediaQueryDto } from '@/api/interfaces/media.interface';
+import { mdiClose, mdiMagnify } from '@mdi/js';
+import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
-import SeriesOverview from '@/components/resource/SeriesOverview.vue';
+import MediaOverview from '@/components/resource/MediaOverview.vue';
 
 const { t } = useI18n();
 const display = useDisplay();
@@ -81,36 +81,36 @@ const dialog = computed({
 });
 
 const emits = defineEmits<{
-  (e: 'selected', item: SeriesEntity): any;
+  (e: 'selected', item: MediaEntity): any;
   (e: 'update:modelValue', value: boolean): any;
 }>();
 
-const select = (item: SeriesEntity) => {
+const select = (item: MediaEntity) => {
   emits('selected', item);
   dialog.value = false;
 };
 
-const filters: Ref<SeriesQueryDto> = ref({
+const filters: Ref<MediaQueryDto> = ref({
   keyword: '',
   sort: 'createAt',
   order: 'DESC',
 });
-const seriesLoader = useAxiosPageLoader(
-  async (query?: SeriesQueryDto) => {
-    return await api.Series.query({
+const mediasLoader = useAxiosPageLoader(
+  async (query?: MediaQueryDto) => {
+    return await api.Media.query({
       ...query,
       ...filters.value,
     });
   },
   { page: 0, size: 12 },
 );
-const series = computed(() => seriesLoader.items.value);
-seriesLoader.onRejected((error: any) => {
+const medias = computed(() => mediasLoader.items.value);
+mediasLoader.onRejected((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 const search = async () => {
-  seriesLoader.reset();
-  await seriesLoader.request();
+  mediasLoader.reset();
+  await mediasLoader.request();
 };
 </script>
 

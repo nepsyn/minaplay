@@ -17,10 +17,10 @@ const props = withDefaults(
   },
 );
 
-const ago = ref(format(new Date(props.time), locale.value));
+const ago = ref(format(new Date(props.time), locale.value.replace(/-/, '_')));
 
 const interval = setInterval(() => {
-  ago.value = format(new Date(props.time), locale.value);
+  ago.value = format(new Date(props.time), locale.value.replace(/-/, '_'));
 }, Number(props.interval));
 
 onUnmounted(() => {

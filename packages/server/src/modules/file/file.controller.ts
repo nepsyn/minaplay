@@ -153,7 +153,7 @@ export class FileController {
 
         return await this.fileService.findOneBy({ id });
       } catch (error) {
-        this.logger.error(error);
+        this.logger.error(error.stack);
         throw buildException(BadRequestException, ErrorCodeEnum.INVALID_FILE);
       }
     } else {

@@ -29,9 +29,8 @@ export class MediaFileService {
 
     const cp = await execa(
       this.options.ffprobePath,
-      ['-i', `"${media.file.path}"`, '-print_format json', '-show_streams'],
+      ['-i', media.file.path, '-print_format', 'json', '-show_streams'],
       {
-        shell: true,
         timeout: 60000,
         reject: false,
       },
@@ -55,9 +54,8 @@ export class MediaFileService {
 
     const cp = await execa(
       this.options.ffmpegPath,
-      ['-y', '-i', `"${media.file.path}"`, '-threads 2', '-ss 00:00:01.000', '-vframes 1', `"${posterFilePath}"`],
+      ['-y', '-i', media.file.path, '-threads', '2', '-ss', '00:00:01.000', '-vframes', '1', posterFilePath],
       {
-        shell: true,
         timeout: 60000,
         reject: false,
       },
@@ -91,15 +89,10 @@ export class MediaFileService {
     for (const [index, subtitle] of subtitles.entries()) {
       const filename = `${subtitle.tags?.title ?? subtitle.index ?? index}.ass`;
       const filepath = path.join(GENERATED_DIR, media.id, filename);
-      const cp = await execa(
-        this.options.ffmpegPath,
-        ['-y', '-i', `"${media.file.path}"`, '-map', `0:s:${index}`, `"${filepath}"`],
-        {
-          shell: true,
-          timeout: 60000,
-          reject: false,
-        },
-      );
+      const cp = await execa(this.options.ffmpegPath, ['-y', '-i', media.file.path, '-map', `0:s:${index}`, filepath], {
+        timeout: 60000,
+        reject: false,
+      });
       if (await fs.exists(filepath)) {
         const stat = await fs.stat(filepath);
         const file = await this.fileService.save({
@@ -123,9 +116,8 @@ export class MediaFileService {
 
       const cp = await execa(
         this.options.ffmpegPath,
-        ['-y', `-dump_attachment:t:${index}`, `"${filepath}"`, '-i', `"${media.file.path}"`],
+        ['-y', `-dump_attachment:t:${index}`, filepath, '-i', media.file.path],
         {
-          shell: true,
           timeout: 60000,
           reject: false,
         },

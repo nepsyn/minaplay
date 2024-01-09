@@ -29,7 +29,11 @@ export class PluginService implements OnModuleInit {
         );
         this.logger.log(`Plugin '${descriptor.id}(${descriptor.version ?? 'unknown version'})' created`);
       } catch (error) {
-        this.logger.error(`Error occurred while creating plugin instance: '${descriptor.id}'`, error.stack);
+        this.logger.error(
+          `Error occurred while creating plugin instance: '${descriptor.id}'`,
+          error.stack,
+          PluginService.name,
+        );
       }
     }
 
@@ -44,7 +48,11 @@ export class PluginService implements OnModuleInit {
     try {
       await control.instance[hook].apply(control.instance, args);
     } catch (error) {
-      this.logger.error(`Error occurred while invoking hook '${hook}' on plugin '${control.id}'`, error.stack);
+      this.logger.error(
+        `Error occurred while invoking hook '${hook}' on plugin '${control.id}'`,
+        error.stack,
+        PluginService.name,
+      );
     }
   }
 

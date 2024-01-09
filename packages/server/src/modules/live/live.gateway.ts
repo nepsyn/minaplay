@@ -328,6 +328,10 @@ export class LiveGateway implements OnGatewayDisconnect {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 
+    if (state.stream?.type === 'server-push') {
+      await this.liveStreamService.stopPublish(socket.data.live.id);
+    }
+
     state.stream = {
       type: 'live-stream',
       url,

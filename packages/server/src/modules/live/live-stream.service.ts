@@ -62,8 +62,7 @@ export class LiveStreamService implements OnModuleInit {
       this.options.streamFfmpegPath,
       [
         '-re',
-        '-i',
-        path,
+        `-i ${path}`,
         '-c copy',
         '-f flv',
         `rtmp://127.0.0.1:${this.options.streamRtmpPort}/live/${streamId}?sign=${sign}`,

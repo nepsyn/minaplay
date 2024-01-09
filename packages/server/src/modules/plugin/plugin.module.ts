@@ -38,7 +38,11 @@ export class PluginModule {
           }
         }
       } catch (error) {
-        this.logger.error(`Error occurred while loading plugin file: ${path.basename(file)}`, error.stack);
+        this.logger.error(
+          `Error occurred while loading plugin file: ${path.basename(file)}`,
+          error.stack,
+          PluginModule.name,
+        );
       }
     }
 

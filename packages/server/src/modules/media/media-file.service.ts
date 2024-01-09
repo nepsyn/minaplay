@@ -31,7 +31,6 @@ export class MediaFileService {
       this.options.ffprobePath,
       ['-i', `"${media.file.path}"`, '-print_format json', '-show_streams'],
       {
-        shell: true,
         timeout: 60000,
         reject: false,
       },
@@ -57,7 +56,6 @@ export class MediaFileService {
       this.options.ffmpegPath,
       ['-y', '-i', `"${media.file.path}"`, '-threads 2', '-ss 00:00:01.000', '-vframes 1', `"${posterFilePath}"`],
       {
-        shell: true,
         timeout: 60000,
         reject: false,
       },
@@ -95,7 +93,6 @@ export class MediaFileService {
         this.options.ffmpegPath,
         ['-y', '-i', `"${media.file.path}"`, '-map', `0:s:${index}`, `"${filepath}"`],
         {
-          shell: true,
           timeout: 60000,
           reject: false,
         },
@@ -125,7 +122,6 @@ export class MediaFileService {
         this.options.ffmpegPath,
         ['-y', `-dump_attachment:t:${index}`, `"${filepath}"`, '-i', `"${media.file.path}"`],
         {
-          shell: true,
           timeout: 60000,
           reject: false,
         },

@@ -2,15 +2,17 @@ import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { LIVE_MODULE_OPTIONS_TOKEN } from './live.module-definition';
 import { LiveModuleOptions } from './live.module.interface';
 import NodeMediaServer from 'node-media-server';
-import { ChildProcess, spawn } from 'child_process';
 import { generateMD5 } from '../../utils/generate-md5.util';
 import { LIVE_STREAM_DIR } from 'src/constants';
 import { ApplicationLogger } from '../../common/application.logger.service';
+import { importESM } from '../../utils/import-esm.util';
+import type { ExecaChildProcess } from 'execa';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class LiveStreamService implements OnModuleInit {
   private server: NodeMediaServer;
-  private streams: Map<string, ChildProcess> = new Map();
+  private streams: Map<string, ExecaChildProcess> = new Map();
 
   private logger = new ApplicationLogger(LiveStreamService.name);
 
@@ -49,28 +51,30 @@ export class LiveStreamService implements OnModuleInit {
     return `${timestamp}-${hash}`;
   }
 
-  private escapePath(path: string) {
-    return path.replace(/\\/g, '\\\\');
-  }
+  async publishVideoFile(liveId: string, path: string) {
+    const { execa } = await importESM<typeof import('execa')>('execa');
 
-  async publishVideoFile(streamId: string, path: string) {
-    await this.stopPublish(streamId);
+    await this.stopPublish(liveId);
 
+    const streamId = randomUUID().replace(/-/, '');
     const sign = await this.generateSign(streamId);
-    const cp = spawn(
-      `"${this.escapePath(this.options.streamFfmpegPath)}"`,
+    const cp = execa(
+      this.options.streamFfmpegPath,
       [
         '-re',
-        `-i "${this.escapePath(path)}"`,
+        `-i ${path}`,
         '-c copy',
         '-f flv',
         `rtmp://127.0.0.1:${this.options.streamRtmpPort}/live/${streamId}?sign=${sign}`,
       ],
       {
-        shell: true,
+        cleanup: true,
       },
     );
-    this.streams.set(streamId, cp);
+    this.streams.set(liveId, cp);
+    cp.catch((error) => {
+      this.logger.error('Server push stream error', error.stack, LiveStreamService.name);
+    });
 
     return {
       rtmp: {
@@ -88,11 +92,11 @@ export class LiveStreamService implements OnModuleInit {
     };
   }
 
-  async stopPublish(streamId: string) {
-    if (this.streams.has(streamId)) {
-      const cp = this.streams.get(streamId);
+  async stopPublish(liveId: string) {
+    if (this.streams.has(liveId)) {
+      const cp = this.streams.get(liveId);
       if (cp && !cp.killed) {
-        cp.kill();
+        cp.kill('SIGTERM');
       }
     }
   }

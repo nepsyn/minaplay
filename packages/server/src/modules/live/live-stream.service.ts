@@ -56,7 +56,7 @@ export class LiveStreamService implements OnModuleInit {
 
     await this.stopPublish(liveId);
 
-    const streamId = randomUUID().replace(/-/, '');
+    const streamId = randomUUID().replace(/-/g, '');
     const sign = await this.generateSign(streamId);
     const cp = execa(
       this.options.streamFfmpegPath,

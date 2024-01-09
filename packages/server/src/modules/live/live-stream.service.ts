@@ -76,7 +76,9 @@ export class LiveStreamService implements OnModuleInit {
     );
     this.streams.set(liveId, cp);
     cp.catch((error) => {
-      this.logger.error('Server push stream error', error.stack, LiveStreamService.name);
+      if (cp.signalCode !== 'SIGTERM') {
+        this.logger.error('Server push stream error', error.stack, LiveStreamService.name);
+      }
     });
 
     return {

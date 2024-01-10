@@ -268,6 +268,7 @@ import { mdiArrowCollapseAll, mdiStretchToPageOutline } from '@mdi/js';
 import { LiveStream } from '@/api/interfaces/live.interface';
 import MpegTs from 'mpegts.js';
 import Hls from 'hls.js';
+import { getFullUrl } from '@/utils/utils';
 // @ts-ignore
 import DanmuJs from 'danmu.js';
 
@@ -282,9 +283,11 @@ const props = withDefaults(
     media?: MediaEntity;
     live?: boolean;
     stream?: LiveStream;
+    ratio?: string;
   }>(),
   {
     live: false,
+    ratio: '16:9',
   },
 );
 
@@ -336,7 +339,7 @@ const loadResource = () => {
 
   if (props.stream && props.live) {
     if (props.stream.type === 'server-push') {
-      initLive(api.Live.buildStreamPath(props.stream.url));
+      initLive(getFullUrl(api.Live.buildStreamPath(props.stream.url)));
     } else if (props.stream.type === 'live-stream') {
       initLive(props.stream.url);
     }
@@ -399,7 +402,7 @@ onMounted(async () => {
     player = new Plyr(videoRef.value, {
       controls: controlsRef.value,
       autoplay: true,
-      ratio: '16:9',
+      ratio: props.ratio,
       clickToPlay: !props.live,
       keyboard: {
         global: true,
@@ -503,6 +506,7 @@ const emitDanmaku = (content: string) => {
 defineExpose({
   refresh,
   emitDanmaku,
+  player,
 });
 </script>
 

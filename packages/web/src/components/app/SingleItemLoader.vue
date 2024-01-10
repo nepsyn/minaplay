@@ -34,8 +34,11 @@ import { useI18n } from 'vue-i18n';
 import { MessageSchema } from '@/lang';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 
 const { t } = useI18n<{ message: MessageSchema }>();
+const router = useRouter();
 
 const props = withDefaults(
   defineProps<{
@@ -43,15 +46,23 @@ const props = withDefaults(
     hideLoading?: boolean;
     hideError?: boolean;
     lazy?: boolean;
+    redirectOnNotFound?: boolean;
   }>(),
   {
     hideLoading: false,
     hideError: false,
     lazy: false,
+    redirectOnNotFound: true,
   },
 );
 
 onMounted(async () => {
+  props.loader.onRejected(async (error: any) => {
+    if (error.response?.data?.code === ErrorCodeEnum.NOT_FOUND) {
+      await router.replace({ path: '/error/not-found' });
+    }
+  });
+
   if (!props.lazy) {
     await props.loader.request();
   }

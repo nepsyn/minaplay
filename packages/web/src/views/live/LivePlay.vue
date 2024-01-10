@@ -1,7 +1,11 @@
 <template>
   <to-top-container class="page-height overflow-auto overflow-x-hidden">
     <v-container fluid class="d-flex flex-column flex-md-row pa-0 pa-md-12 h-100">
-      <v-container fluid class="pa-0 mx-md-2" :class="display.mdAndUp.value ? 'border rounded v-col-8' : undefined">
+      <v-container
+        fluid
+        class="pa-0 mx-md-2 d-flex flex-column"
+        :class="display.mdAndUp.value ? 'border rounded v-col-8' : undefined"
+      >
         <v-container class="d-none d-md-flex flex-row">
           <template v-if="live">
             <user-avatar
@@ -27,7 +31,7 @@
           </div>
         </v-container>
         <v-divider class="py-0 d-flex d-md-none"></v-divider>
-        <v-responsive :aspect-ratio="16 / 9" :class="display.mdAndUp.value ? 'rounded-b' : undefined">
+        <v-responsive class="pa-0 flex-grow-1" :class="display.mdAndUp.value ? 'rounded-b' : undefined">
           <video-player ref="playerRef" live :stream="state?.stream"></video-player>
         </v-responsive>
         <v-divider class="py-0 d-flex d-md-none"></v-divider>
@@ -102,33 +106,33 @@
               <v-row dense>
                 <v-col v-for="voice in voiceMembers" :key="voice.user.id" cols="12">
                   <v-container class="pa-0 d-flex flex-row align-center">
-                    <v-tooltip location="bottom">
-                      {{ voice.user.username }}
-                      <template #activator="{ props }">
-                        <user-avatar
-                          size="50"
-                          v-bind="props"
-                          :src="
-                            voice.user.avatar && api.File.buildRawPath(voice.user.avatar.id, voice.user.avatar.name)
-                          "
-                        ></user-avatar>
-                      </template>
-                    </v-tooltip>
-                    <v-slider
-                      class="mx-4"
-                      color="primary"
-                      density="comfortable"
-                      hide-details
-                      min="0"
-                      max="100"
-                      v-model="voice.volume"
-                      @change="voice.el.volume = voice.volume / 100"
-                      :prepend-icon="voice.volume > 0 ? mdiVolumeHigh : mdiVolumeOff"
-                      @click:prepend="
-                        voice.volume = voice.volume > 0 ? 0 : 100;
-                        voice.el.volume = voice.volume / 100;
-                      "
-                    ></v-slider>
+                    <user-avatar
+                      :class="voice.level > 10 && voice.volume > 0 ? 'avatar-speaking' : undefined"
+                      size="50"
+                      :src="voice.user.avatar && api.File.buildRawPath(voice.user.avatar.id, voice.user.avatar.name)"
+                    ></user-avatar>
+                    <v-container class="pa-0 mx-4 d-flex flex-column justify-space-around">
+                      <span class="px-2 text-body-1 text-medium-emphasis">
+                        {{ voice.user.username }}
+                      </span>
+                      <v-slider
+                        color="primary"
+                        density="comfortable"
+                        hide-details
+                        min="0"
+                        max="100"
+                        thumb-label
+                        step="0.1"
+                        thumb-size="16"
+                        v-model="voice.volume"
+                        @update:model-value="voice.el.volume = voice.volume / 100"
+                        :prepend-icon="voice.volume > 0 ? mdiVolumeHigh : mdiVolumeOff"
+                        @click:prepend="
+                          voice.volume = voice.volume > 0 ? 0 : 100;
+                          voice.el.volume = voice.volume / 100;
+                        "
+                      ></v-slider>
+                    </v-container>
                   </v-container>
                 </v-col>
               </v-row>
@@ -145,6 +149,7 @@
                     {{ api.user?.username }}
                     <template #activator="{ props }">
                       <user-avatar
+                        :class="selfSpeaking ? 'avatar-speaking' : undefined"
                         v-bind="props"
                         size="48"
                         :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
@@ -152,11 +157,11 @@
                     </template>
                   </v-tooltip>
                   <v-tooltip location="bottom">
-                    {{ producer.paused ? t('live.play.voice.muted') : t('live.play.voice.speaking') }}
+                    {{ producer?.paused ? t('live.play.voice.muted') : t('live.play.voice.speaking') }}
                     <template #activator="{ props }">
                       <v-btn
                         variant="flat"
-                        class="text-medium-emphasis"
+                        class="ml-2 text-medium-emphasis"
                         density="comfortable"
                         :icon="producer.paused ? mdiMicrophoneOff : mdiMicrophone"
                         v-bind="props"
@@ -341,16 +346,31 @@
                     </v-select>
                     <template v-if="edit.stream.type === 'server-push'">
                       <media-selector v-model="mediaSelectDialog" @selected="onStreamMediaSelected"></media-selector>
-                      <v-btn
-                        class="mt-4"
-                        variant="tonal"
-                        color="primary"
-                        :prepend-icon="mdiPlaylistCheck"
-                        :loading="streamSwitching"
-                        @click="mediaSelectDialog = true"
-                      >
-                        {{ t('app.actions.select') }} {{ t('app.entities.media') }}
-                      </v-btn>
+                      <series-selector v-model="seriesSelectDialog" @selected="onSeresSelected"></series-selector>
+                      <v-row class="mt-2" dense>
+                        <v-col cols="auto">
+                          <v-btn
+                            variant="tonal"
+                            color="primary"
+                            :prepend-icon="mdiMultimedia"
+                            :loading="streamSwitching"
+                            @click="mediaSelectDialog = true"
+                          >
+                            {{ t('app.actions.select') }} {{ t('app.entities.media') }}
+                          </v-btn>
+                        </v-col>
+                        <v-col cols="auto">
+                          <v-btn
+                            class="ml-2"
+                            variant="tonal"
+                            color="primary"
+                            :prepend-icon="mdiAnimationPlayOutline"
+                            @click="seriesSelectDialog = true"
+                          >
+                            {{ t('app.actions.select') }} {{ t('app.entities.series') }}
+                          </v-btn>
+                        </v-col>
+                      </v-row>
                     </template>
                     <template v-else-if="edit.stream.type === 'live-stream'">
                       <v-text-field
@@ -490,6 +510,7 @@ import VideoPlayer from '@/components/app/VideoPlayer.vue';
 import { computed, nextTick, onUnmounted, ref, shallowRef } from 'vue';
 import {
   mdiAccountMultiple,
+  mdiAnimationPlayOutline,
   mdiCancel,
   mdiCheck,
   mdiClose,
@@ -501,10 +522,10 @@ import {
   mdiLockOpenVariant,
   mdiMicrophone,
   mdiMicrophoneOff,
+  mdiMultimedia,
   mdiNavigationVariant,
   mdiPhone,
   mdiPhoneOff,
-  mdiPlaylistCheck,
   mdiVolumeHigh,
   mdiVolumeOff,
 } from '@mdi/js';
@@ -538,6 +559,9 @@ import LiveMessage from '@/components/live/LiveMessage.vue';
 import ZoomImg from '@/components/app/ZoomImg.vue';
 import { VBottomSheet, VMenu } from 'vuetify/components';
 import MediaSelector from '@/components/resource/MediaSelector.vue';
+import SeriesSelector from '@/components/resource/SeriesSelector.vue';
+import { SeriesEntity } from '@/api/interfaces/series.interface';
+import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -578,6 +602,10 @@ socket.on('connect', async () => {
       await join();
     }
   } catch (error: any) {
+    if (error?.code === ErrorCodeEnum.NOT_FOUND) {
+      await router.replace({ path: '/error/not-found' });
+    }
+
     toast.toastError(t(`error.${error?.code ?? 'other'}`));
   }
 });
@@ -821,11 +849,15 @@ const disconnectVoice = async () => {
     producer.value = undefined;
   }
 
+  for (const voice of voiceMembers.value) {
+    voice.el.pause();
+  }
   voiceMembers.value = [];
 };
+onUnmounted(() => {
+  disconnectVoice();
+});
 const connectVoice = async () => {
-  await disconnectVoice();
-
   voiceConnecting.value = true;
   try {
     if (!device.loaded) {
@@ -857,7 +889,7 @@ const connectVoice = async () => {
     producerTransport.value.on('connectionstatechange', (state) => {
       if (state === 'failed') {
         toast.toastError(t('live.play.voice.voiceConnectFailed'));
-        producerTransport.value?.close();
+        disconnectVoice();
       }
     });
 
@@ -876,7 +908,7 @@ const connectVoice = async () => {
     consumerTransport.value.on('connectionstatechange', (state) => {
       if (state === 'failed') {
         toast.toastError(t('live.play.voice.voiceConnectFailed'));
-        consumerTransport.value?.close();
+        disconnectVoice();
       }
     });
 
@@ -927,18 +959,48 @@ const consume = async (userId: number, producerId: string) => {
       const stream = new MediaStream();
       stream.addTrack(consumer.track);
 
-      const el = new Audio();
-      el.srcObject = stream;
-      el.autoplay = true;
-      el.volume = 1;
-      voiceMembers.value.push({
+      const audio = new Audio();
+      audio.srcObject = stream;
+      audio.autoplay = true;
+      audio.volume = 1;
+
+      const audioCtx = new AudioContext();
+      const source = audioCtx.createMediaStreamSource(stream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+      analyser.connect(audioCtx.destination);
+
+      let interval: any = undefined;
+      audio.addEventListener('play', async () => {
+        await audioCtx.resume();
+        analyser.connect(audioCtx.destination);
+        interval = setInterval(() => {
+          const bufferLength = analyser.frequencyBinCount;
+          const dataArray = new Uint8Array(bufferLength);
+          analyser.getByteFrequencyData(dataArray);
+          control.value.level =
+            dataArray.reduce(function (acc, value) {
+              return acc + value;
+            }, 0) / bufferLength;
+        }, 100);
+      });
+      audio.addEventListener('pause', () => {
+        analyser.disconnect(audioCtx.destination);
+        clearInterval(interval);
+      });
+
+      const control = ref({
         user: state.value?.users.find((user) => user.id === userId) as UserEntity,
-        el,
+        el: audio,
+        level: 0,
         volume: 100,
       });
+      voiceMembers.value.push(control.value);
     }
   }
 };
+const selfSpeaking = ref(false);
 const produce = async () => {
   if (device.canProduce('audio')) {
     try {
@@ -947,8 +1009,30 @@ const produce = async () => {
         video: false,
       });
       const track = stream.getAudioTracks()[0];
+
+      const audioCtx = new AudioContext();
+      const source = audioCtx.createMediaStreamSource(stream);
+      const analyser = audioCtx.createAnalyser();
+      analyser.fftSize = 2048;
+      source.connect(analyser);
+
+      const bufferLength = analyser.frequencyBinCount;
+      const dataArray = new Uint8Array(bufferLength);
+
       producer.value = await producerTransport.value?.produce({
         track,
+      });
+
+      let interval = setInterval(() => {
+        analyser.getByteFrequencyData(dataArray);
+        const level =
+          dataArray.reduce(function (acc, value) {
+            return acc + value;
+          }, 0) / bufferLength;
+        selfSpeaking.value = level > 10 && !producer.value?.paused;
+      }, 100);
+      producer.value?.on('transportclose', () => {
+        clearInterval(interval);
       });
     } catch {
       await disconnectVoice();
@@ -1018,6 +1102,11 @@ const onStreamMediaSelected = async (media: MediaEntity) => {
   selectedMedia.value = media;
   await switchStream();
 };
+const seriesSelectDialog = ref(false);
+const selectedSeries = ref<SeriesEntity | undefined>(undefined);
+const onSeresSelected = async (series: SeriesEntity) => {
+  selectedSeries.value = series;
+};
 const streamTypes = [
   { title: t('live.play.stream.serverPush'), value: 'server-push' },
   { title: t('live.play.stream.liveStream'), value: 'live-stream' },
@@ -1066,6 +1155,7 @@ const {
   request: disposeRoom,
   onRejected: onRoomDisposeFailed,
 } = useAxiosRequest(async () => {
+  await disconnectVoice();
   return await api.Live.delete(String(route.params.id))();
 });
 onRoomDisposeFailed((error: any) => {
@@ -1075,4 +1165,8 @@ onRoomDisposeFailed((error: any) => {
 const tab = ref('chat');
 </script>
 
-<style scoped lang="sass"></style>
+<style scoped lang="sass">
+.avatar-speaking
+  outline: 3px solid rgb(var(--v-theme-success-lighten-2))
+  transition: outline-width 0.1s
+</style>

@@ -30,6 +30,7 @@
         </v-col>
         <v-col cols="12" sm="auto" class="flex-grow-0">
           <v-btn
+            v-if="api.hasPermission(PermissionEnum.LIVE_OP, PermissionEnum.ROOT_OP)"
             height="40"
             color="success"
             variant="flat"
@@ -68,6 +69,7 @@ import { mdiPlus } from '@mdi/js';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import LiveOverview from '@/components/live/LiveOverview.vue';
+import { PermissionEnum } from '@/api/enums/permission.enum';
 
 const { t } = useI18n();
 const api = useApiStore();

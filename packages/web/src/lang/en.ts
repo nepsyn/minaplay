@@ -115,6 +115,11 @@ export default {
         error: 'Unknown error',
       },
     },
+    error: {
+      back: 'Go Back',
+      noPermission: 'No permission to access this page',
+      notFound: 'Page not found',
+    },
   },
   common: {
     download: {

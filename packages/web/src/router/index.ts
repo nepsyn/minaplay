@@ -1,5 +1,6 @@
 import { createRouter, createWebHashHistory, NavigationGuard, RouteRecordRaw } from 'vue-router';
 import { useApiStore } from '@/store/api';
+import { PermissionEnum } from '@/api/enums/permission.enum';
 
 const LoginGuard: NavigationGuard = (to) => {
   const api = useApiStore();
@@ -10,6 +11,18 @@ const LoginGuard: NavigationGuard = (to) => {
       query: {
         redirectUrl: to.fullPath,
       },
+    }
+  );
+};
+
+const PermissionGuard: NavigationGuard = (to) => {
+  const api = useApiStore();
+
+  const permissions = (to.meta?.permissions ?? []) as PermissionEnum[];
+  const valid = api.user === undefined || permissions.length === 0 || api.hasPermission(...permissions);
+  return (
+    valid || {
+      path: '/error/no-permission',
     }
   );
 };
@@ -28,21 +41,33 @@ const routes: RouteRecordRaw[] = [
             path: '/resource',
             name: 'resource',
             component: () => import('@/views/Resource.vue'),
+            meta: {
+              permissions: [PermissionEnum.MEDIA_VIEW, PermissionEnum.MEDIA_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/media/:mediaId',
             name: 'media',
             component: () => import('@/views/resource/MediaPlay.vue'),
+            meta: {
+              permissions: [PermissionEnum.MEDIA_VIEW, PermissionEnum.MEDIA_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/episode/:episodeId',
             name: 'episode',
             component: () => import('@/views/resource/MediaPlay.vue'),
+            meta: {
+              permissions: [PermissionEnum.SERIES_VIEW, PermissionEnum.SERIES_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/series/:seriesId',
             name: 'series',
             component: () => import('@/views/resource/SeriesInfo.vue'),
+            meta: {
+              permissions: [PermissionEnum.SERIES_VIEW, PermissionEnum.SERIES_OP, PermissionEnum.ROOT_OP],
+            },
           },
         ],
       },
@@ -53,10 +78,16 @@ const routes: RouteRecordRaw[] = [
           {
             path: '/live',
             component: () => import('@/views/Live.vue'),
+            meta: {
+              permissions: [PermissionEnum.LIVE_VIEW, PermissionEnum.LIVE_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/live/:id',
             component: () => import('@/views/live/LivePlay.vue'),
+            meta: {
+              permissions: [PermissionEnum.LIVE_VIEW, PermissionEnum.LIVE_OP, PermissionEnum.ROOT_OP],
+            },
           },
         ],
       },
@@ -67,6 +98,9 @@ const routes: RouteRecordRaw[] = [
           {
             path: '/source',
             component: () => import('@/views/Source.vue'),
+            meta: {
+              permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/source/:id',
@@ -77,21 +111,33 @@ const routes: RouteRecordRaw[] = [
                 path: '/source/:id/info',
                 name: 'source-info',
                 component: () => import('@/views/source/SourceInfo.vue'),
+                meta: {
+                  permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+                },
               },
               {
                 path: '/source/:id/raw',
                 name: 'source-raw',
                 component: () => import('@/views/source/SourceRawData.vue'),
+                meta: {
+                  permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+                },
               },
               {
                 path: '/source/:id/log',
                 name: 'source-log',
                 component: () => import('@/views/source/SourceParseLog.vue'),
+                meta: {
+                  permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+                },
               },
               {
                 path: '/source/:id/download',
                 name: 'source-download',
                 component: () => import('@/views/common/SubscribeDownload.vue'),
+                meta: {
+                  permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+                },
               },
             ],
           },
@@ -104,6 +150,9 @@ const routes: RouteRecordRaw[] = [
           {
             path: '/rule',
             component: () => import('@/views/Rule.vue'),
+            meta: {
+              permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/rule/:id',
@@ -114,16 +163,25 @@ const routes: RouteRecordRaw[] = [
                 path: '/rule/:id/info',
                 name: 'rule-info',
                 component: () => import('@/views/rule/RuleInfo.vue'),
+                meta: {
+                  permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+                },
               },
               {
                 path: '/rule/:id/error',
                 name: 'rule-error',
                 component: () => import('@/views/rule/RuleErrorLog.vue'),
+                meta: {
+                  permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+                },
               },
               {
                 path: '/rule/:id/download',
                 name: 'rule-download',
                 component: () => import('@/views/common/SubscribeDownload.vue'),
+                meta: {
+                  permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+                },
               },
             ],
           },
@@ -139,51 +197,81 @@ const routes: RouteRecordRaw[] = [
             path: '/dashboard/system',
             name: 'dash-system',
             component: () => import('@/views/dashboard/app/DashSystem.vue'),
+            meta: {
+              permissions: [PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/dashboard/logs',
             name: 'dash-logs',
             component: () => import('@/views/dashboard/app/DashLogs.vue'),
+            meta: {
+              permissions: [PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/dashboard/user',
             name: 'dash-user',
             component: () => import('@/views/dashboard/modules/DashUsers.vue'),
+            meta: {
+              permissions: [PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/dashboard/source',
             name: 'dash-source',
             component: () => import('@/views/dashboard/modules/DashSources.vue'),
+            meta: {
+              permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/dashboard/rule',
             name: 'dash-rule',
             component: () => import('@/views/dashboard/modules/DashRules.vue'),
+            meta: {
+              permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/dashboard/media',
             name: 'dash-media',
             component: () => import('@/views/dashboard/modules/DashMedias.vue'),
+            meta: {
+              permissions: [PermissionEnum.MEDIA_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/dashboard/series',
             name: 'dash-series',
             component: () => import('@/views/dashboard/modules/DashSeries.vue'),
+            meta: {
+              permissions: [PermissionEnum.SERIES_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/dashboard/episode',
             name: 'dash-episode',
             component: () => import('@/views/dashboard/modules/DashEpisodes.vue'),
+            meta: {
+              permissions: [PermissionEnum.SERIES_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/dashboard/live',
             name: 'dash-live',
             component: () => import('@/views/dashboard/modules/DashLives.vue'),
+            meta: {
+              permissions: [PermissionEnum.LIVE_OP, PermissionEnum.ROOT_OP],
+            },
           },
           {
             path: '/dashboard/file',
             name: 'dash-file',
             component: () => import('@/views/dashboard/modules/DashFiles.vue'),
+            meta: {
+              permissions: [PermissionEnum.FILE_OP, PermissionEnum.ROOT_OP],
+            },
           },
         ],
       },
@@ -191,6 +279,23 @@ const routes: RouteRecordRaw[] = [
         path: '/setting',
         name: 'setting',
         component: () => import('@/views/Setting.vue'),
+      },
+      {
+        name: 'error',
+        path: '/error',
+        redirect: '/error/not-found',
+        children: [
+          {
+            name: 'error-not-found',
+            path: '/error/not-found',
+            component: () => import('@/views/error/NotFound.vue'),
+          },
+          {
+            name: 'error-no-permission',
+            path: '/error/no-permission',
+            component: () => import('@/views/error/NoPermission.vue'),
+          },
+        ],
       },
     ],
     beforeEnter: LoginGuard,
@@ -206,5 +311,7 @@ const router = createRouter({
   history: createWebHashHistory(process.env.BASE_URL),
   routes,
 });
+
+router.beforeEach(PermissionGuard);
 
 export default router;

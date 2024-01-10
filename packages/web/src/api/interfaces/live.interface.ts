@@ -133,5 +133,6 @@ export type LiveEventMap = {
 export interface RoomVoice {
   user: UserEntity;
   el: HTMLAudioElement;
+  level: number;
   volume: number;
 }

@@ -116,6 +116,11 @@ const zh: MessageSchema = {
         error: '未知错误',
       },
     },
+    error: {
+      back: '返回',
+      noPermission: '没有权限访问该页面',
+      notFound: '所访问的页面不存在',
+    },
   },
   common: {
     download: {
@@ -360,7 +365,7 @@ const zh: MessageSchema = {
         url: '链接',
       },
       voice: {
-        single: '您包场了此放映室！',
+        single: '您包场了此语音房间！',
         voiceConnectFailed: '连接放映室语音服务失败',
         voiceNotEnabled: '浏览器录音被禁止',
         join: '加入语音',

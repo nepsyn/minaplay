@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsDateString, IsInt, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class EpisodeDto {
   @ApiProperty({
@@ -19,6 +19,14 @@ export class EpisodeDto {
   @IsOptional()
   @MaxLength(20)
   no?: string;
+
+  @ApiProperty({
+    description: '发布时间',
+    required: false,
+  })
+  @IsDateString()
+  @IsOptional()
+  pubAt?: string;
 
   @ApiProperty({
     description: '所属剧集',

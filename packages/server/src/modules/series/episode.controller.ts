@@ -89,6 +89,7 @@ export class EpisodeController {
 
     const { id } = await this.episodeService.save({
       ...data,
+      pubAt: data.pubAt && new Date(data.pubAt),
       series: { id: data.seriesId },
       media: { id: data.mediaId },
     });
@@ -110,6 +111,7 @@ export class EpisodeController {
     await this.episodeService.save({
       id,
       ...data,
+      pubAt: data.pubAt && new Date(data.pubAt),
       series: { id: data.seriesId },
       media: { id: data.mediaId },
     });

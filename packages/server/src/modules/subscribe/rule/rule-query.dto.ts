@@ -2,7 +2,7 @@ import { Rule } from './rule.entity.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { ApiQueryDto } from '../../common/api.query.dto.js';
+import { ApiQueryDto } from '../../../common/api.query.dto.js';
 
 export class RuleQueryDto extends ApiQueryDto<Rule> {
   @ApiProperty({

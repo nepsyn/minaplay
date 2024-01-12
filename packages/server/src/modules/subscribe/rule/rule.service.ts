@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Rule } from './rule.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { FileService } from '../file/file.service.js';
+import { FileService } from '../../file/file.service.js';
 import IsolatedVM from 'isolated-vm';
 import { RuleHooks } from './rule.interface.js';
 import TypeScript from 'typescript';

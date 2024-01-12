@@ -11,10 +11,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
-import { File } from '../file/file.entity.js';
-import { DownloadItem } from './download-item.entity.js';
+import { File } from '../../file/file.entity.js';
+import { DownloadItem } from '../download-item.entity.js';
 import fs from 'fs-extra';
-import { Source } from './source.entity.js';
+import { Source } from '../source/source.entity.js';
 
 /** 订阅规则 */
 @Entity()

@@ -1,4 +1,4 @@
-import { FetchLog } from './fetch-log.entity.js';
+import { FetchLog } from './fetch-log/fetch-log.entity.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 import { StatusEnum } from '../../enums/status.enum.js';

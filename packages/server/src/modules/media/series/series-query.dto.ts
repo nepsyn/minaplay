@@ -2,7 +2,7 @@ import { Series } from './series.entity.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { ApiQueryDto } from '../../common/api.query.dto.js';
+import { ApiQueryDto } from '../../../common/api.query.dto.js';
 
 export class SeriesQueryDto extends ApiQueryDto<Series> {
   @ApiProperty({

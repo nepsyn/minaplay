@@ -4,18 +4,18 @@ import { DownloadItem } from './download-item.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, In, IsNull, Not, Repository } from 'typeorm';
 import { StatusEnum } from '../../enums/status.enum.js';
 import { Aria2Service } from '../aria2/aria2.service.js';
-import { RuleFileDescriber, RuleFileDescriptor } from './rule.interface.js';
+import { RuleFileDescriber, RuleFileDescriptor } from './rule/rule.interface.js';
 import { VALID_VIDEO_MIME } from '../../constants.js';
-import { RuleErrorLogService } from './rule-error-log.service.js';
+import { RuleErrorLogService } from './rule/rule-error-log.service.js';
 import { MediaService } from '../media/media.service.js';
-import { EpisodeService } from '../series/episode.service.js';
+import { EpisodeService } from '../media/episode/episode.service.js';
 import { MediaFileService } from '../media/media-file.service.js';
 import { FeedEntry } from '@extractus/feed-extractor';
-import { Rule } from './rule.entity.js';
-import { FetchLog } from './fetch-log.entity.js';
-import { Source } from './source.entity.js';
+import { Rule } from './rule/rule.entity.js';
+import { FetchLog } from './fetch-log/fetch-log.entity.js';
+import { Source } from './source/source.entity.js';
 import path from 'node:path';
-import { SeriesService } from '../series/series.service.js';
+import { SeriesService } from '../media/series/series.service.js';
 
 @Injectable()
 export class DownloadItemService implements OnModuleInit {

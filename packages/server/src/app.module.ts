@@ -15,7 +15,6 @@ import { Aria2Module } from './modules/aria2/aria2.module.js';
 import { LiveModule } from './modules/live/live.module.js';
 import { cpus } from 'node:os';
 import { UserModule } from './modules/user/user.module.js';
-import { SeriesModule } from './modules/series/series.module.js';
 import { MediaModule } from './modules/media/media.module.js';
 import { SubscribeModule } from './modules/subscribe/subscribe.module.js';
 import { SystemModule } from './modules/system/system.module.js';
@@ -131,7 +130,6 @@ import { ApplicationExceptionFilter } from './common/application.exception.filte
     }),
     FileModule,
     AuthorizationModule,
-    SeriesModule,
     UserModule,
     SystemModule,
     PluginModule.registerAsync(),

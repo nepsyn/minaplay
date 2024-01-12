@@ -1,10 +1,10 @@
 import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, IsNull, Not } from 'typeorm';
 import { Episode } from './episode.entity.js';
 import { instanceToPlain } from 'class-transformer';
-import { NotificationGateway } from '../notification/notification.gateway.js';
-import { PluginService } from '../plugin/plugin.service.js';
-import { SeriesSubscribeService } from './series-subscribe.service.js';
-import { EmailService } from '../notification/email.service.js';
+import { NotificationGateway } from '../../notification/notification.gateway.js';
+import { PluginService } from '../../plugin/plugin.service.js';
+import { SeriesSubscribeService } from '../series/series-subscribe.service.js';
+import { EmailService } from '../../notification/email.service.js';
 
 @EventSubscriber()
 export class EpisodeEntitySubscriber implements EntitySubscriberInterface<Episode> {

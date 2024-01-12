@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 import { Source } from './source.entity.js';
 import { Transform } from 'class-transformer';
-import { ApiQueryDto } from '../../common/api.query.dto.js';
+import { ApiQueryDto } from '../../../common/api.query.dto.js';
 
 export class SourceQueryDto extends ApiQueryDto<Source> {
   @ApiProperty({

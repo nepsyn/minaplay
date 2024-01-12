@@ -8,10 +8,10 @@ import {
   PrimaryGeneratedColumn,
   Relation,
 } from 'typeorm';
-import { Rule } from './rule.entity.js';
+import { Rule } from './rule/rule.entity.js';
 import { StatusEnum } from '../../enums/status.enum.js';
-import { Source } from './source.entity.js';
-import { FetchLog } from './fetch-log.entity.js';
+import { Source } from './source/source.entity.js';
+import { FetchLog } from './fetch-log/fetch-log.entity.js';
 import { Media } from '../media/media.entity.js';
 import { Exclude, Expose } from 'class-transformer';
 

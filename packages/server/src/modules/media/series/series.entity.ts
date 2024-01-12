@@ -12,9 +12,9 @@ import {
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
 import { SeriesTag } from './series-tag.entity.js';
-import { File } from '../file/file.entity.js';
-import { User } from '../user/user.entity.js';
-import { Episode } from './episode.entity.js';
+import { File } from '../../file/file.entity.js';
+import { User } from '../../user/user.entity.js';
+import { Episode } from '../episode/episode.entity.js';
 import { SeriesSubscribe } from './series-subscribe.entity.js';
 
 /** 剧集 */

@@ -7,8 +7,8 @@ import {
   Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { Series } from './series.entity.js';
-import { Media } from '../media/media.entity.js';
+import { Series } from '../series/series.entity.js';
+import { Media } from '../media.entity.js';
 
 /** 单集 */
 @Entity()

@@ -6,10 +6,10 @@ import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { SubscribeModuleOptions } from './subscribe.module.interface.js';
-import { SUBSCRIBE_MODULE_OPTIONS_TOKEN } from './subscribe.module-definition.js';
+import { SubscribeModuleOptions } from '../subscribe.module.interface.js';
+import { SUBSCRIBE_MODULE_OPTIONS_TOKEN } from '../subscribe.module-definition.js';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import { ApplicationLogger } from '../../common/application.logger.service.js';
+import { ApplicationLogger } from '../../../common/application.logger.service.js';
 import { extract } from '@extractus/feed-extractor';
 
 @Injectable()

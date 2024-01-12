@@ -21,15 +21,15 @@ import { DownloadTaskDto } from './download-task.dto.js';
 import { buildException } from '../../utils/build-exception.util.js';
 import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
 import { StatusEnum } from '../../enums/status.enum.js';
-import { RuleFileDescriber } from './rule.interface.js';
-import { RuleService } from './rule.service.js';
-import { RuleErrorLogService } from './rule-error-log.service.js';
+import { RuleFileDescriber } from './rule/rule.interface.js';
+import { RuleService } from './rule/rule.service.js';
+import { RuleErrorLogService } from './rule/rule-error-log.service.js';
 import { DownloadItemQueryDto } from './download-item-query.dto.js';
 import { buildQueryOptions } from '../../utils/build-query-options.util.js';
 import { DownloadItem } from './download-item.entity.js';
 import { Between, In, IsNull, Not } from 'typeorm';
 import { Aria2Service } from '../aria2/aria2.service.js';
-import { SourceService } from './source.service.js';
+import { SourceService } from './source/source.service.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
 
@@ -72,7 +72,7 @@ export class DownloadItemController {
   @ApiOperation({
     description: '获取下载任务信息',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async getDownloadItemById(@Param('id') id: string) {
     if (!isDefined(id)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);

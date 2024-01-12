@@ -8,9 +8,9 @@ import {
   Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { Media } from './media.entity.js';
-import { User } from '../user/user.entity.js';
-import { Episode } from '../series/episode.entity.js';
+import { Media } from '../media.entity.js';
+import { User } from '../../user/user.entity.js';
+import { Episode } from '../episode/episode.entity.js';
 
 @Entity()
 export class ViewHistory {

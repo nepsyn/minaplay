@@ -1,4 +1,4 @@
-import { Episode } from '../series/episode.entity.js';
+import { Episode } from '../media/episode/episode.entity.js';
 import { Media } from '../media/media.entity.js';
 
 export type NotificationEventMap = {

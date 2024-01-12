@@ -26,8 +26,8 @@ import { MediaDto } from './media.dto.js';
 import { MediaFileService } from './media-file.service.js';
 import { RequestUser } from '../authorization/request.user.decorator.js';
 import { User } from '../user/user.entity.js';
-import { ViewHistoryDto } from './view-history.dto.js';
-import { ViewHistoryService } from './view-history.service.js';
+import { ViewHistoryDto } from './view-history/view-history.dto.js';
+import { ViewHistoryService } from './view-history/view-history.service.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
 

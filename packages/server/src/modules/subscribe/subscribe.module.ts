@@ -1,22 +1,21 @@
 import { Module } from '@nestjs/common';
-import { SourceController } from './source.controller.js';
-import { SourceService } from './source.service.js';
-import { Source } from './source.entity.js';
-import { Rule } from './rule.entity.js';
+import { SourceController } from './source/source.controller.js';
+import { SourceService } from './source/source.service.js';
+import { Source } from './source/source.entity.js';
+import { Rule } from './rule/rule.entity.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FetchLog } from './fetch-log.entity.js';
-import { FetchLogService } from './fetch-log.service.js';
+import { FetchLog } from './fetch-log/fetch-log.entity.js';
+import { FetchLogService } from './fetch-log/fetch-log.service.js';
 import { DownloadItem } from './download-item.entity.js';
-import { RuleService } from './rule.service.js';
+import { RuleService } from './rule/rule.service.js';
 import { DownloadItemService } from './download-item.service.js';
 import { BullModule } from '@nestjs/bull';
-import { FetchSubscribeSourceConsumer } from './fetch-subscribe-source.consumer.js';
+import { FetchSubscribeSourceConsumer } from './fetch-log/fetch-subscribe-source.consumer.js';
 import { FileModule } from '../file/file.module.js';
-import { SeriesModule } from '../series/series.module.js';
-import { RuleController } from './rule.controller.js';
+import { RuleController } from './rule/rule.controller.js';
 import { SubscribeConfigurableModule } from './subscribe.module-definition.js';
-import { RuleErrorLogService } from './rule-error-log.service.js';
-import { RuleErrorLog } from './rule-error-log.entity.js';
+import { RuleErrorLogService } from './rule/rule-error-log.service.js';
+import { RuleErrorLog } from './rule/rule-error-log.entity.js';
 import { DownloadItemController } from './download-item.controller.js';
 
 @Module({
@@ -24,7 +23,6 @@ import { DownloadItemController } from './download-item.controller.js';
     TypeOrmModule.forFeature([Source, Rule, RuleErrorLog, FetchLog, DownloadItem]),
     BullModule.registerQueue({ name: 'fetch-subscribe-source' }),
     FileModule,
-    SeriesModule,
   ],
   providers: [
     SourceService,

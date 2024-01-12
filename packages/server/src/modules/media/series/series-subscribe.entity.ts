@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, Relation } from 'typeorm';
-import { User } from '../user/user.entity.js';
+import { User } from '../../user/user.entity.js';
 import { Series } from './series.entity.js';
 import { Exclude } from 'class-transformer';
 

@@ -12,8 +12,8 @@ import {
 import { Permission } from '../authorization/permission.entity.js';
 import { Exclude, Expose } from 'class-transformer';
 import { File } from '../file/file.entity.js';
-import { Series } from '../series/series.entity.js';
-import { Source } from '../subscribe/source.entity.js';
+import { Series } from '../media/series/series.entity.js';
+import { Source } from '../subscribe/source/source.entity.js';
 import { PermissionEnum } from '../../enums/permission.enum.js';
 
 /** 用户 */

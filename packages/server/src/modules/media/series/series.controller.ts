@@ -14,22 +14,22 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SeriesService } from './series.service.js';
-import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { RequirePermissions } from '../../authorization/require-permissions.decorator.js';
 import { SeriesDto } from './series.dto.js';
-import { RequestUser } from '../authorization/request.user.decorator.js';
-import { User } from '../user/user.entity.js';
+import { RequestUser } from '../../authorization/request.user.decorator.js';
+import { User } from '../../user/user.entity.js';
 import { SeriesQueryDto } from './series-query.dto.js';
 import { Series } from './series.entity.js';
-import { buildException } from '../../utils/build-exception.util.js';
-import { buildQueryOptions } from '../../utils/build-query-options.util.js';
-import { AuthorizationGuard } from '../authorization/authorization.guard.js';
-import { PermissionEnum } from '../../enums/permission.enum.js';
-import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { buildException } from '../../../utils/build-exception.util.js';
+import { buildQueryOptions } from '../../../utils/build-query-options.util.js';
+import { AuthorizationGuard } from '../../authorization/authorization.guard.js';
+import { PermissionEnum } from '../../../enums/permission.enum.js';
+import { ErrorCodeEnum } from '../../../enums/error-code.enum.js';
 import { Between, In } from 'typeorm';
 import { SeriesSubscribeDto } from './series-subscribe.dto.js';
 import { SeriesSubscribeService } from './series-subscribe.service.js';
 import { SeriesTagService } from './series-tag.service.js';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
+import { ApiPaginationResultDto } from '../../../common/api.pagination.result.dto.js';
 
 @Controller('series')
 @UseGuards(AuthorizationGuard)
@@ -46,7 +46,7 @@ export class SeriesController {
   @ApiOperation({
     description: '查看剧集',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
   async getSeriesById(@Param('id', ParseIntPipe) id: number) {
     const series = await this.seriesService.findOneBy({ id });
     if (!series) {
@@ -60,7 +60,7 @@ export class SeriesController {
   @ApiOperation({
     description: '创建剧集',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
   async createSeries(@RequestUser() user: User, @Body() data: SeriesDto) {
     const sameNameSeries = await this.seriesService.findOneBy({ name: data.name, season: data.season });
     if (sameNameSeries) {
@@ -81,7 +81,7 @@ export class SeriesController {
   @ApiOperation({
     description: '查询剧集',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
   async querySeries(@RequestUser() user: User, @Query() query: SeriesQueryDto) {
     const { keyword, name, season, finished, userId, tag: tagName, start, end } = query;
 
@@ -119,7 +119,7 @@ export class SeriesController {
   @ApiOperation({
     description: '修改剧集信息',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
   async updateSeries(@Param('id', ParseIntPipe) id: number, @Body() data: SeriesDto) {
     const series = await this.seriesService.findOneBy({ id });
     if (!series) {
@@ -145,7 +145,7 @@ export class SeriesController {
   @ApiOperation({
     description: '删除剧集',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
   async deleteSeries(@Param('id', ParseIntPipe) id: number) {
     await this.seriesService.delete({ id });
     return {};
@@ -155,7 +155,7 @@ export class SeriesController {
   @ApiOperation({
     description: '获取订阅信息',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
   async getSubscribeInfoBySeriesId(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
     return (await this.seriesSubscribeService.findOneBy({ seriesId: id, userId: user.id })) ?? {};
   }
@@ -164,7 +164,7 @@ export class SeriesController {
   @ApiOperation({
     description: '订阅剧集',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
   async subscribeSeries(
     @RequestUser() user: User,
     @Param('id', ParseIntPipe) id: number,
@@ -186,7 +186,7 @@ export class SeriesController {
   @ApiOperation({
     description: '取消订阅剧集',
   })
-  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SERIES_OP, PermissionEnum.SERIES_VIEW)
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
   async unsubscribeSeries(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
     const series = await this.seriesService.findOneBy({ id });
     if (!series) {

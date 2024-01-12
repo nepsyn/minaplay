@@ -10,10 +10,10 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { User } from '../user/user.entity.js';
-import { FetchLog } from './fetch-log.entity.js';
-import { DownloadItem } from './download-item.entity.js';
-import { Rule } from './rule.entity.js';
+import { User } from '../../user/user.entity.js';
+import { FetchLog } from '../fetch-log/fetch-log.entity.js';
+import { DownloadItem } from '../download-item.entity.js';
+import { Rule } from '../rule/rule.entity.js';
 
 /** 订阅源 */
 @Entity()

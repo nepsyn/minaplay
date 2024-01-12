@@ -1,14 +1,14 @@
 import { Body, Controller, Delete, Get, Post, Query, UseGuards } from '@nestjs/common';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SeriesTagService } from './series-tag.service';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { SeriesTagDto } from './series-tag.dto';
-import { SeriesTagQueryDto } from './series-tag-query.dto';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { SeriesTag } from './series-tag.entity';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { SeriesTagService } from './series-tag.service.js';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { SeriesTagDto } from './series-tag.dto.js';
+import { SeriesTagQueryDto } from './series-tag-query.dto.js';
+import { buildQueryOptions } from '../../utils/build-query-options.util.js';
+import { SeriesTag } from './series-tag.entity.js';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 
 @Controller('series/tag')
 @UseGuards(AuthorizationGuard)

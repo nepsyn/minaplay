@@ -4,24 +4,24 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
 import { BullModule } from '@nestjs/bull';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthorizationModule } from './modules/authorization/authorization.module';
+import { AuthorizationModule } from './modules/authorization/authorization.module.js';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { FileModule } from './modules/file/file.module';
+import { FileModule } from './modules/file/file.module.js';
 import { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-yet';
-import { buildException } from './utils/build-exception.util';
-import { ErrorCodeEnum } from './enums/error-code.enum';
-import { Aria2Module } from './modules/aria2/aria2.module';
-import { LiveModule } from './modules/live/live.module';
-import { cpus } from 'os';
-import { UserModule } from './modules/user/user.module';
-import { SeriesModule } from './modules/series/series.module';
-import { MediaModule } from './modules/media/media.module';
-import { SubscribeModule } from './modules/subscribe/subscribe.module';
-import { SystemModule } from './modules/system/system.module';
-import { NotificationModule } from './modules/notification/notification.module';
-import { PluginModule } from './modules/plugin/plugin.module';
-import { ApplicationExceptionFilter } from './common/application.exception.filter';
+import { buildException } from './utils/build-exception.util.js';
+import { ErrorCodeEnum } from './enums/error-code.enum.js';
+import { Aria2Module } from './modules/aria2/aria2.module.js';
+import { LiveModule } from './modules/live/live.module.js';
+import { cpus } from 'node:os';
+import { UserModule } from './modules/user/user.module.js';
+import { SeriesModule } from './modules/series/series.module.js';
+import { MediaModule } from './modules/media/media.module.js';
+import { SubscribeModule } from './modules/subscribe/subscribe.module.js';
+import { SystemModule } from './modules/system/system.module.js';
+import { NotificationModule } from './modules/notification/notification.module.js';
+import { PluginModule } from './modules/plugin/plugin.module.js';
+import { ApplicationExceptionFilter } from './common/application.exception.filter.js';
 
 @Module({
   imports: [
@@ -144,7 +144,7 @@ import { ApplicationExceptionFilter } from './common/application.exception.filte
           whitelist: true,
           forbidNonWhitelisted: true,
           errorHttpStatusCode: 400,
-          exceptionFactory: () => buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST, 'BAD REQUEST'),
+          exceptionFactory: () => buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST),
         }),
     },
     {

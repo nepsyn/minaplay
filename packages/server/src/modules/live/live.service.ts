@@ -1,8 +1,8 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Live } from './live.entity';
+import { Live } from './live.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { LiveState } from './live.state';
+import { LiveState } from './live-state.insterface.js';
 import { instanceToPlain } from 'class-transformer';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 

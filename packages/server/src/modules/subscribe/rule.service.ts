@@ -1,17 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Rule } from './rule.entity';
+import { Rule } from './rule.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { FileService } from '../file/file.service';
-import { Isolate, Reference } from 'isolated-vm';
-import { RuleHooks } from './rule.interface';
-import { ScriptTarget, transpileModule } from 'typescript';
+import { FileService } from '../file/file.service.js';
+import IsolatedVM from 'isolated-vm';
+import { RuleHooks } from './rule.interface.js';
+import TypeScript from 'typescript';
 
 @Injectable()
 export class RuleService {
   constructor(@InjectRepository(Rule) private ruleRepository: Repository<Rule>, private fileService: FileService) {}
 
-  async buildRuleHook<T extends keyof RuleHooks>(hookName: T, exports: Reference) {
+  async buildRuleHook<T extends keyof RuleHooks>(hookName: T, exports: IsolatedVM.Reference) {
     const hook = await exports.get(hookName, { reference: true });
     if (hook.typeof === 'function') {
       return (...args: Parameters<RuleHooks[T]>) =>
@@ -30,12 +30,12 @@ export class RuleService {
   }
 
   async createRuleVm(code: string) {
-    const vm = new Isolate();
+    const vm = new IsolatedVM.Isolate();
     const context = await vm.createContext();
     const module = await vm.compileModule(
-      transpileModule(code, {
+      TypeScript.transpileModule(code, {
         compilerOptions: {
-          target: ScriptTarget.ES2017,
+          target: TypeScript.ScriptTarget.ES2017,
           esModuleInterop: true,
         },
       }).outputText,

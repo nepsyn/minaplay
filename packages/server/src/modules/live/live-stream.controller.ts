@@ -2,8 +2,8 @@ import { Controller, Get, Inject, Param, Res } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import http from 'node:http';
-import { LIVE_MODULE_OPTIONS_TOKEN } from './live.module-definition';
-import { LiveModuleOptions } from './live.module.interface';
+import { LIVE_MODULE_OPTIONS_TOKEN } from './live.module-definition.js';
+import { LiveModuleOptions } from './live.module.interface.js';
 
 @Controller('live')
 @ApiTags('live')

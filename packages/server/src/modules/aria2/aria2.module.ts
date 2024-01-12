@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { Aria2Service } from './aria2.service';
-import { AuthorizationModule } from '../authorization/authorization.module';
-import { UserModule } from '../user/user.module';
-import { Aria2ConfigurableModule } from './aria2.module-definition';
-import { FileModule } from '../file/file.module';
+import { Aria2Service } from './aria2.service.js';
+import { AuthorizationModule } from '../authorization/authorization.module.js';
+import { UserModule } from '../user/user.module.js';
+import { Aria2ConfigurableModule } from './aria2.module-definition.js';
+import { FileModule } from '../file/file.module.js';
 
 @Module({
   imports: [AuthorizationModule, UserModule, FileModule],

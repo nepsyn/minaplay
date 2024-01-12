@@ -13,23 +13,23 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SeriesService } from './series.service';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { SeriesDto } from './series.dto';
-import { RequestUser } from '../authorization/request.user.decorator';
-import { User } from '../user/user.entity';
-import { SeriesQueryDto } from './series-query.dto';
-import { Series } from './series.entity';
-import { buildException } from '../../utils/build-exception.util';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { ErrorCodeEnum } from '../../enums/error-code.enum';
+import { SeriesService } from './series.service.js';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { SeriesDto } from './series.dto.js';
+import { RequestUser } from '../authorization/request.user.decorator.js';
+import { User } from '../user/user.entity.js';
+import { SeriesQueryDto } from './series-query.dto.js';
+import { Series } from './series.entity.js';
+import { buildException } from '../../utils/build-exception.util.js';
+import { buildQueryOptions } from '../../utils/build-query-options.util.js';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
 import { Between, In } from 'typeorm';
-import { SeriesSubscribeDto } from './series-subscribe.dto';
-import { SeriesSubscribeService } from './series-subscribe.service';
-import { SeriesTagService } from './series-tag.service';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { SeriesSubscribeDto } from './series-subscribe.dto.js';
+import { SeriesSubscribeService } from './series-subscribe.service.js';
+import { SeriesTagService } from './series-tag.service.js';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 
 @Controller('series')
 @UseGuards(AuthorizationGuard)

@@ -7,13 +7,14 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
-import { File } from '../file/file.entity';
-import { DownloadItem } from './download-item.entity';
+import { File } from '../file/file.entity.js';
+import { DownloadItem } from './download-item.entity.js';
 import fs from 'fs-extra';
-import { Source } from './source.entity';
+import { Source } from './source.entity.js';
 
 /** 订阅规则 */
 @Entity()
@@ -33,12 +34,12 @@ export class Rule {
   @ManyToOne(() => File, {
     eager: true,
   })
-  file: File;
+  file: Relation<File>;
 
   /** 下载内容 */
   @Exclude()
   @OneToMany(() => DownloadItem, (download) => download.rule)
-  downloads: Promise<DownloadItem[]>;
+  downloads: Relation<Promise<DownloadItem[]>>;
 
   /** 订阅源 */
   @ManyToMany(() => Source, (source) => source.rules, {
@@ -46,7 +47,7 @@ export class Rule {
     eager: true,
   })
   @JoinTable()
-  sources: Source[];
+  sources: Relation<Source[]>;
 
   @Expose()
   get code() {

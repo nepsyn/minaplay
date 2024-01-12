@@ -1,9 +1,9 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { LIVE_MODULE_OPTIONS_TOKEN } from './live.module-definition';
-import { LiveModuleOptions } from './live.module.interface';
+import { LIVE_MODULE_OPTIONS_TOKEN } from './live.module-definition.js';
+import { LiveModuleOptions } from './live.module.interface.js';
 import { createWorker, types as MediasoupTypes, version as MEDIASOUP_VERSION } from 'mediasoup';
 import { Interval } from '@nestjs/schedule';
-import { ApplicationLogger } from '../../common/application.logger.service';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
 
 interface Peer {
   transports: Map<string, MediasoupTypes.Transport>;

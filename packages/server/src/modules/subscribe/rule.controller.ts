@@ -12,32 +12,32 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RuleService } from './rule.service';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { RequestUser } from '../authorization/request.user.decorator';
-import { User } from '../user/user.entity';
-import { RuleDto } from './rule.dto';
-import { buildException } from '../../utils/build-exception.util';
-import { ErrorCodeEnum } from '../../enums/error-code.enum';
-import { randomUUID } from 'crypto';
-import path from 'path';
-import { SUBSCRIBE_RULE_SOURCE_DIR } from '../../constants';
+import { RuleService } from './rule.service.js';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { RequestUser } from '../authorization/request.user.decorator.js';
+import { User } from '../user/user.entity.js';
+import { RuleDto } from './rule.dto.js';
+import { buildException } from '../../utils/build-exception.util.js';
+import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { randomUUID } from 'node:crypto';
+import path from 'node:path';
+import { SUBSCRIBE_RULE_SOURCE_DIR } from '../../constants.js';
 import fs from 'fs-extra';
-import { generateMD5 } from '../../utils/generate-md5.util';
-import { FileSourceEnum } from '../../enums/file-source.enum';
-import { FileService } from '../file/file.service';
-import { RuleQueryDto } from './rule-query.dto';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { Rule } from './rule.entity';
-import { RuleErrorLog } from './rule-error-log.entity';
-import { RuleErrorLogService } from './rule-error-log.service';
-import { SourceService } from './source.service';
+import { generateMD5 } from '../../utils/generate-md5.util.js';
+import { FileSourceEnum } from '../../enums/file-source.enum.js';
+import { FileService } from '../file/file.service.js';
+import { RuleQueryDto } from './rule-query.dto.js';
+import { buildQueryOptions } from '../../utils/build-query-options.util.js';
+import { Rule } from './rule.entity.js';
+import { RuleErrorLog } from './rule-error-log.entity.js';
+import { RuleErrorLogService } from './rule-error-log.service.js';
+import { SourceService } from './source.service.js';
 import { In } from 'typeorm';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
-import { ApiQueryDto } from '../../common/api.query.dto';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
+import { ApiQueryDto } from '../../common/api.query.dto.js';
 import { isDefined } from 'class-validator';
 
 @Controller('subscribe/rule')

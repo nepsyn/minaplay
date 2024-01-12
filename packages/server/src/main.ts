@@ -1,25 +1,28 @@
-import { importESM } from './utils/import-esm.util';
 import type { ExecaChildProcess } from 'execa';
-import process from 'node:process';
+import { execaNode } from 'execa';
 import { NestFactory } from '@nestjs/core';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { AppModule } from './app.module';
+import { AppModule } from './app.module.js';
 import { ConfigService } from '@nestjs/config';
-import { SocketIOAdapter } from './common/socket-io.adapter';
+import { SocketIOAdapter } from './common/socket-io.adapter.js';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { MINAPLAY_VERSION } from './constants';
-import { ProcMessage } from './interfaces/proc-message';
-import { ApplicationLogger } from './common/application.logger.service';
+import { MINAPLAY_VERSION } from './constants.js';
+import { ProcMessage } from './interfaces/proc-message.js';
+import { ApplicationLogger } from './common/application.logger.service.js';
+import { ConsoleLogger } from '@nestjs/common';
+import { fileURLToPath } from 'node:url';
+import process from 'node:process';
 
 class MinaPlayApplication {
   private proc: ExecaChildProcess = undefined;
+  private logger = new ConsoleLogger(MinaPlayApplication.name);
 
   async createAppProcess() {
-    const { execaNode } = await importESM<typeof import('execa')>('execa');
     if (this.proc && !this.proc.killed) {
       this.proc.kill('SIGKILL');
     }
 
+    const __filename = fileURLToPath(import.meta.url);
     this.proc = execaNode(__filename, ['bootstrap'], {
       cleanup: true,
       cwd: process.cwd(),
@@ -40,8 +43,11 @@ class MinaPlayApplication {
       }
     });
     this.proc.on('exit', (code, signal) => {
-      if (signal !== 'SIGKILL') {
-        app.createAppProcess();
+      if (signal && signal !== 'SIGKILL' && code !== 0) {
+        this.logger.log('MinaPlay app exit, restarting in 5 seconds...');
+        setTimeout(() => {
+          app.createAppProcess();
+        }, 5000);
       }
     });
 
@@ -49,6 +55,11 @@ class MinaPlayApplication {
   }
 
   async bootstrap() {
+    process.on('unhandledRejection', (reason) => {
+      this.logger.error(`Uncaught rejection: ${reason}`);
+      process.exit(-1);
+    });
+
     const app = await NestFactory.create<NestExpressApplication>(AppModule, {
       logger: new ApplicationLogger(),
     });

@@ -10,20 +10,20 @@ import {
   SerializeOptions,
   UseGuards,
 } from '@nestjs/common';
-import { UserService } from './user.service';
+import { UserService } from './user.service.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { buildException } from '../../utils/build-exception.util';
-import { ErrorCodeEnum } from '../../enums/error-code.enum';
-import { UserDto } from './user.dto';
-import { UserQueryDto } from './user-query.dto';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { User } from './user.entity';
-import { RequestUser } from '../authorization/request.user.decorator';
-import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { buildException } from '../../utils/build-exception.util.js';
+import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { UserDto } from './user.dto.js';
+import { UserQueryDto } from './user-query.dto.js';
+import { buildQueryOptions } from '../../utils/build-query-options.util.js';
+import { User } from './user.entity.js';
+import { RequestUser } from '../authorization/request.user.decorator.js';
+import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception.js';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 
 @Controller('user')
 @UseGuards(AuthorizationGuard)

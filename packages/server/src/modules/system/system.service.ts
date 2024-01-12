@@ -1,9 +1,9 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import os from 'node:os';
-import process from 'node:process';
-import { importESM } from '../../utils/import-esm.util';
-import { DATA_DIR } from '../../constants';
+import { DATA_DIR } from '../../constants.js';
 import checkDiskSpace from 'check-disk-space';
+import getFolderSize from 'get-folder-size';
+import process from 'node:process';
 
 @Injectable()
 export class SystemService implements OnModuleInit {
@@ -22,14 +22,14 @@ export class SystemService implements OnModuleInit {
   }
 
   async getDiskUsage() {
-    const { default: GetFolderSize } = await importESM<typeof import('get-folder-size')>('get-folder-size');
-
+    // @ts-ignore
     const diskSpace = await checkDiskSpace(DATA_DIR);
     return {
       disk: diskSpace.diskPath,
       total: diskSpace.size,
       free: diskSpace.free,
-      used: await GetFolderSize.loose(DATA_DIR),
+      // @ts-ignore
+      used: await getFolderSize.loose(DATA_DIR),
     };
   }
 }

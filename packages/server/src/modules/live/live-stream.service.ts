@@ -1,13 +1,13 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { LIVE_MODULE_OPTIONS_TOKEN } from './live.module-definition';
-import { LiveModuleOptions } from './live.module.interface';
+import { LIVE_MODULE_OPTIONS_TOKEN } from './live.module-definition.js';
+import { LiveModuleOptions } from './live.module.interface.js';
 import NodeMediaServer from 'node-media-server';
-import { generateMD5 } from '../../utils/generate-md5.util';
-import { LIVE_STREAM_DIR } from 'src/constants';
-import { ApplicationLogger } from '../../common/application.logger.service';
-import { importESM } from '../../utils/import-esm.util';
+import { LIVE_STREAM_DIR } from '../../constants.js';
+import { generateMD5 } from '../../utils/generate-md5.util.js';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
 import type { ExecaChildProcess } from 'execa';
-import { randomUUID } from 'crypto';
+import { execa } from 'execa';
+import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class LiveStreamService implements OnModuleInit {
@@ -52,8 +52,6 @@ export class LiveStreamService implements OnModuleInit {
   }
 
   async publishVideoFile(liveId: string, path: string) {
-    const { execa } = await importESM<typeof import('execa')>('execa');
-
     await this.stopPublish(liveId);
 
     const streamId = randomUUID().replace(/-/g, '');

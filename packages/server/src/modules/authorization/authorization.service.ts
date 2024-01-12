@@ -1,16 +1,16 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Permission } from './permission.entity';
+import { Permission } from './permission.entity.js';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '../user/user.entity';
+import { User } from '../user/user.entity.js';
 import { instanceToPlain } from 'class-transformer';
-import { UserService } from '../user/user.service';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { EmailService } from '../notification/email.service';
+import { UserService } from '../user/user.service.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { EmailService } from '../notification/email.service.js';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
-import { generateMD5 } from '../../utils/generate-md5.util';
-import { EmailVerifyCache } from './email-verify-cache.interface';
+import { generateMD5 } from '../../utils/generate-md5.util.js';
+import { EmailVerifyCache } from './email-verify-cache.interface.js';
 
 @Injectable()
 export class AuthorizationService {

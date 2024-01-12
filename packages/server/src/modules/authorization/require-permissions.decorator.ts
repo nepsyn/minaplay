@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import { PermissionEnum } from '../../enums/permission.enum';
+import { PermissionEnum } from '../../enums/permission.enum.js';
 
 export const PERMISSIONS_SYMBOL = Symbol('permissions');
 

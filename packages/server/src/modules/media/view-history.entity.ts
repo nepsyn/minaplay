@@ -5,11 +5,12 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { Media } from './media.entity';
-import { User } from '../user/user.entity';
-import { Episode } from '../series/episode.entity';
+import { Media } from './media.entity.js';
+import { User } from '../user/user.entity.js';
+import { Episode } from '../series/episode.entity.js';
 
 @Entity()
 export class ViewHistory {
@@ -22,7 +23,7 @@ export class ViewHistory {
     onDelete: 'CASCADE',
     eager: true,
   })
-  media: Media;
+  media: Relation<Media>;
 
   /** 单集 */
   @ManyToOne(() => Episode, {
@@ -31,14 +32,14 @@ export class ViewHistory {
     eager: true,
   })
   @JoinColumn()
-  episode?: Episode;
+  episode?: Relation<Episode>;
 
   /** 用户 */
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
     eager: true,
   })
-  user: User;
+  user: Relation<User>;
 
   /** 进度 */
   @Column({

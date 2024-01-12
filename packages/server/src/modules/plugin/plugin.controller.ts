@@ -8,13 +8,13 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { PluginService } from './plugin.service';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { buildException } from '../../utils/build-exception.util';
-import { ErrorCodeEnum } from '../../enums/error-code.enum';
+import { PluginService } from './plugin.service.js';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { buildException } from '../../utils/build-exception.util.js';
+import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
 import { isDefined } from 'class-validator';
 
 @Controller('plugins')

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { RuleErrorLog } from './rule-error-log.entity';
+import { RuleErrorLog } from './rule-error-log.entity.js';
 
 @Injectable()
 export class RuleErrorLogService {

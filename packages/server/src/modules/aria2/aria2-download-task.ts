@@ -1,6 +1,6 @@
-import { TypedEventEmitter } from '../../utils/typed-event-emitter';
-import { File } from '../file/file.entity';
-import { Aria2WsClient } from './aria2.ws-client';
+import { TypedEventEmitter } from '../../utils/typed-event-emitter.js';
+import { File } from '../file/file.entity.js';
+import { Aria2WsClient } from './aria2.ws-client.js';
 
 export type Aria2DownloadItemEventMap = {
   complete: (files: File[]) => any;

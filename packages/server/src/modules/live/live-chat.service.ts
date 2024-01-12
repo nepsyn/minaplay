@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { LiveChat } from './live-chat.entity';
-import { Live } from './live.entity';
+import { LiveChat } from './live-chat.entity.js';
+import { Live } from './live.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()

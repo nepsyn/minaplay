@@ -1,6 +1,6 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from '../user/user.entity';
-import { AuthActionEnum } from '../../enums/auth-action.enum';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation } from 'typeorm';
+import { User } from '../user/user.entity.js';
+import { AuthActionEnum } from '../../enums/auth-action.enum.js';
 
 /** 操作日志 */
 @Entity()
@@ -25,14 +25,14 @@ export class ActionLog {
     onDelete: 'CASCADE',
     eager: true,
   })
-  operator: User;
+  operator: Relation<User>;
 
   /** 目标用户 */
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
     eager: true,
   })
-  target: User;
+  target: Relation<User>;
 
   /** 额外参数 */
   @Column({

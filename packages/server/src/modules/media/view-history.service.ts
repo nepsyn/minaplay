@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { ViewHistory } from './view-history.entity';
+import { ViewHistory } from './view-history.entity.js';
 
 @Injectable()
 export class ViewHistoryService {

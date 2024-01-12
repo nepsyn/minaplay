@@ -1,16 +1,16 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
-import { SourceService } from './source.service';
+import { SourceService } from './source.service.js';
 import { Job } from 'bull';
-import { Source } from './source.entity';
-import { FetchLogService } from './fetch-log.service';
-import { RuleService } from './rule.service';
-import { DownloadItemService } from './download-item.service';
-import { StatusEnum } from '../../enums/status.enum';
+import { Source } from './source.entity.js';
+import { FetchLogService } from './fetch-log.service.js';
+import { RuleService } from './rule.service.js';
+import { DownloadItemService } from './download-item.service.js';
+import { StatusEnum } from '../../enums/status.enum.js';
 import { FeedData } from '@extractus/feed-extractor';
-import { RuleErrorLogService } from './rule-error-log.service';
-import { RuleHooks } from './rule.interface';
-import { ApplicationLogger } from '../../common/application.logger.service';
+import { RuleErrorLogService } from './rule-error-log.service.js';
+import { RuleHooks } from './rule.interface.js';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
 
 @Injectable()
 @Processor('fetch-subscribe-source')

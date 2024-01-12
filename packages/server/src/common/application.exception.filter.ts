@@ -2,8 +2,8 @@ import { ArgumentsHost, Catch, HttpException } from '@nestjs/common';
 import { BaseExceptionFilter } from '@nestjs/core';
 import { Response } from 'express';
 import { QueryFailedError } from 'typeorm';
-import { ErrorCodeEnum } from '../enums/error-code.enum';
-import { ApplicationLogger } from './application.logger.service';
+import { ErrorCodeEnum } from '../enums/error-code.enum.js';
+import { ApplicationLogger } from './application.logger.service.js';
 
 @Catch(Error)
 export class ApplicationExceptionFilter extends BaseExceptionFilter {

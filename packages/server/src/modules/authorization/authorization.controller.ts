@@ -16,33 +16,33 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthorizationService } from './authorization.service';
-import { LoginDto } from './login.dto';
+import { AuthorizationService } from './authorization.service.js';
+import { LoginDto } from './login.dto.js';
 import { compare } from 'bcrypt';
-import { UserService } from '../user/user.service';
-import { AuthorizationGuard } from './authorization.guard';
-import { RequestUser } from './request.user.decorator';
-import { User } from '../user/user.entity';
-import { RequirePermissions } from './require-permissions.decorator';
-import { PermissionDto } from './permission.dto';
-import { buildException } from '../../utils/build-exception.util';
-import { ErrorCodeEnum } from '../../enums/error-code.enum';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { ActionLogService } from './action-log.service';
-import { AuthActionEnum } from '../../enums/auth-action.enum';
-import { EmailBindDto } from './email-bind.dto';
-import { EmailVerifyDto } from './email-verify.dto';
-import { ChangePasswordDto } from './change-password.dto';
-import { encryptPassword } from '../../utils/encrypt-password.util';
-import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
-import { CreateUserDto } from './create-user.dto';
-import { RequestIp } from '../../common/request.ip.decorator';
+import { UserService } from '../user/user.service.js';
+import { AuthorizationGuard } from './authorization.guard.js';
+import { RequestUser } from './request.user.decorator.js';
+import { User } from '../user/user.entity.js';
+import { RequirePermissions } from './require-permissions.decorator.js';
+import { PermissionDto } from './permission.dto.js';
+import { buildException } from '../../utils/build-exception.util.js';
+import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { ActionLogService } from './action-log.service.js';
+import { AuthActionEnum } from '../../enums/auth-action.enum.js';
+import { EmailBindDto } from './email-bind.dto.js';
+import { EmailVerifyDto } from './email-verify.dto.js';
+import { ChangePasswordDto } from './change-password.dto.js';
+import { encryptPassword } from '../../utils/encrypt-password.util.js';
+import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception.js';
+import { CreateUserDto } from './create-user.dto.js';
+import { RequestIp } from '../../common/request.ip.decorator.js';
 import { isInt } from 'class-validator';
-import { ActionLogQueryDto } from './action-log-query.dto';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
+import { ActionLogQueryDto } from './action-log-query.dto.js';
+import { buildQueryOptions } from '../../utils/build-query-options.util.js';
 import { Between } from 'typeorm';
-import { ActionLog } from './action-log.entity';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { ActionLog } from './action-log.entity.js';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 
 @Controller('auth')
 @ApiTags('auth')

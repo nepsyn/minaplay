@@ -7,14 +7,15 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
-import { SeriesTag } from './series-tag.entity';
-import { File } from '../file/file.entity';
-import { User } from '../user/user.entity';
-import { Episode } from './episode.entity';
-import { SeriesSubscribe } from './series-subscribe.entity';
+import { SeriesTag } from './series-tag.entity.js';
+import { File } from '../file/file.entity.js';
+import { User } from '../user/user.entity.js';
+import { Episode } from './episode.entity.js';
+import { SeriesSubscribe } from './series-subscribe.entity.js';
 
 /** 剧集 */
 @Entity()
@@ -59,7 +60,7 @@ export class Series {
     eager: true,
     nullable: true,
   })
-  user?: User;
+  user?: Relation<User>;
 
   /** 纵向海报图 */
   @ManyToOne(() => File, {
@@ -67,7 +68,7 @@ export class Series {
     eager: true,
     nullable: true,
   })
-  poster?: File;
+  poster?: Relation<File>;
 
   /** 标签 */
   @ManyToMany(() => SeriesTag, (tag) => tag.series, {
@@ -75,12 +76,12 @@ export class Series {
     eager: true,
   })
   @JoinTable()
-  tags: SeriesTag[];
+  tags: Relation<SeriesTag[]>;
 
   /** 订阅 */
   @Exclude()
   @OneToMany(() => SeriesSubscribe, (subscribe) => subscribe.series)
-  subscribes: SeriesSubscribe[];
+  subscribes: Relation<SeriesSubscribe[]>;
 
   @Expose()
   get subscribe() {
@@ -89,7 +90,7 @@ export class Series {
 
   /** 单集 */
   @OneToMany(() => Episode, (episode) => episode.series)
-  episodes: Episode[];
+  episodes: Relation<Episode[]>;
 
   /** 创建时间 */
   @CreateDateColumn()

@@ -1,7 +1,7 @@
-import { Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import { User } from '../user/user.entity';
+import { Entity, ManyToOne, PrimaryColumn, Relation } from 'typeorm';
+import { User } from '../user/user.entity.js';
 import { Exclude } from 'class-transformer';
-import { PermissionEnum } from '../../enums/permission.enum';
+import { PermissionEnum } from '../../enums/permission.enum.js';
 
 @Entity()
 export class Permission {
@@ -17,7 +17,7 @@ export class Permission {
   @ManyToOne(() => User, (user) => user.permissions, {
     onDelete: 'CASCADE',
   })
-  user: User;
+  user: Relation<User>;
 
   @PrimaryColumn()
   userId: number;

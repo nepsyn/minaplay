@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
-import { FileModule } from '../file/file.module';
-import { AuthorizationModule } from '../authorization/authorization.module';
-import { SystemService } from './system.service';
-import { SystemController } from './system.controller';
+import { FileModule } from '../file/file.module.js';
+import { AuthorizationModule } from '../authorization/authorization.module.js';
+import { SystemService } from './system.service.js';
+import { SystemController } from './system.controller.js';
 
 @Module({
   imports: [FileModule, AuthorizationModule],

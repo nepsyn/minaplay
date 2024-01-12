@@ -15,32 +15,32 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { AuthorizationWsGuard } from '../authorization/authorization.ws.guard';
-import { LiveService } from './live.service';
-import { LiveStateWsInterceptor } from './live-state.ws.interceptor';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
+import { AuthorizationWsGuard } from '../authorization/authorization.ws.guard.js';
+import { LiveService } from './live.service.js';
+import { LiveStateWsInterceptor } from './live-state.ws.interceptor.js';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
 import { RemoteSocket, Server, Socket } from 'socket.io';
-import { buildException } from '../../utils/build-exception.util';
-import { ErrorCodeEnum } from '../../enums/error-code.enum';
-import { LiveAudienceWsGuard } from './live-audience.ws.guard.service';
-import { WsLiveState } from './live-state.ws.decorator';
-import { LiveState } from './live.state';
-import { MinaplayMessage, parseMessage } from './live-chat-message-type';
-import { LiveChatService } from './live-chat.service';
+import { buildException } from '../../utils/build-exception.util.js';
+import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { LiveAudienceWsGuard } from './live-audience.ws.guard.service.js';
+import { WsLiveState } from './live-state.ws.decorator.js';
+import { LiveState } from './live-state.insterface.js';
+import { MinaplayMessage, parseMessage } from './live-chat-message.interface.js';
+import { LiveChatService } from './live-chat.service.js';
 import { Between } from 'typeorm';
-import { RoomOwnerOnly } from './room-owner-only.ws.decorator';
+import { RoomOwnerOnly } from './room-owner-only.ws.decorator.js';
 import { instanceToPlain } from 'class-transformer';
-import { User } from '../user/user.entity';
-import { LiveVoiceService } from './live-voice.service';
+import { User } from '../user/user.entity.js';
+import { LiveVoiceService } from './live-voice.service.js';
 import { types as MediasoupTypes } from 'mediasoup';
-import { LiveStreamService } from './live-stream.service';
-import { VALID_VIDEO_MIME } from '../../constants';
-import { MediaService } from '../media/media.service';
-import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception';
+import { LiveStreamService } from './live-stream.service.js';
+import { VALID_VIDEO_MIME } from '../../constants.js';
+import { MediaService } from '../media/media.service.js';
+import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception.js';
 import { compare } from 'bcrypt';
-import { ApplicationGatewayInterceptor } from '../../common/application.gateway.interceptor';
-import { ApplicationGatewayExceptionFilter } from '../../common/application.gateway.exception.filter';
+import { ApplicationGatewayInterceptor } from '../../common/application.gateway.interceptor.js';
+import { ApplicationGatewayExceptionFilter } from '../../common/application.gateway.exception.filter.js';
 import { isDefined } from 'class-validator';
 
 @WebSocketGateway({

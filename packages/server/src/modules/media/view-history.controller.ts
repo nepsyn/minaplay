@@ -1,15 +1,15 @@
 import { Controller, Delete, Get, Query, UseGuards } from '@nestjs/common';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { RequestUser } from '../authorization/request.user.decorator';
-import { User } from '../user/user.entity';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { ViewHistory } from './view-history.entity';
-import { ViewHistoryService } from './view-history.service';
-import { ApiQueryDto } from '../../common/api.query.dto';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { RequestUser } from '../authorization/request.user.decorator.js';
+import { User } from '../user/user.entity.js';
+import { buildQueryOptions } from '../../utils/build-query-options.util.js';
+import { ViewHistory } from './view-history.entity.js';
+import { ViewHistoryService } from './view-history.service.js';
+import { ApiQueryDto } from '../../common/api.query.dto.js';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 
 @Controller('media/history')
 @UseGuards(AuthorizationGuard)

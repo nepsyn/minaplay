@@ -1,23 +1,23 @@
 import { Module } from '@nestjs/common';
-import { SourceController } from './source.controller';
-import { SourceService } from './source.service';
-import { Source } from './source.entity';
-import { Rule } from './rule.entity';
+import { SourceController } from './source.controller.js';
+import { SourceService } from './source.service.js';
+import { Source } from './source.entity.js';
+import { Rule } from './rule.entity.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { FetchLog } from './fetch-log.entity';
-import { FetchLogService } from './fetch-log.service';
-import { DownloadItem } from './download-item.entity';
-import { RuleService } from './rule.service';
-import { DownloadItemService } from './download-item.service';
+import { FetchLog } from './fetch-log.entity.js';
+import { FetchLogService } from './fetch-log.service.js';
+import { DownloadItem } from './download-item.entity.js';
+import { RuleService } from './rule.service.js';
+import { DownloadItemService } from './download-item.service.js';
 import { BullModule } from '@nestjs/bull';
-import { FetchSubscribeSourceConsumer } from './fetch-subscribe-source.consumer';
-import { FileModule } from '../file/file.module';
-import { SeriesModule } from '../series/series.module';
-import { RuleController } from './rule.controller';
-import { SubscribeConfigurableModule } from './subscribe.module-definition';
-import { RuleErrorLogService } from './rule-error-log.service';
-import { RuleErrorLog } from './rule-error-log.entity';
-import { DownloadItemController } from './download-item.controller';
+import { FetchSubscribeSourceConsumer } from './fetch-subscribe-source.consumer.js';
+import { FileModule } from '../file/file.module.js';
+import { SeriesModule } from '../series/series.module.js';
+import { RuleController } from './rule.controller.js';
+import { SubscribeConfigurableModule } from './subscribe.module-definition.js';
+import { RuleErrorLogService } from './rule-error-log.service.js';
+import { RuleErrorLog } from './rule-error-log.entity.js';
+import { DownloadItemController } from './download-item.controller.js';
 
 @Module({
   imports: [

@@ -1,13 +1,13 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, LessThanOrEqual, Repository } from 'typeorm';
-import { File } from './file.entity';
+import { File } from './file.entity.js';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import fs from 'fs-extra';
 import sharp from 'sharp';
-import path from 'path';
-import { ApplicationLogger } from '../../common/application.logger.service';
+import path from 'node:path';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
 
 @Injectable()
 export class FileService implements OnModuleInit {

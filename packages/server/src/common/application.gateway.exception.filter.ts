@@ -1,8 +1,8 @@
 import { ArgumentsHost, Catch, HttpException } from '@nestjs/common';
 import { BaseWsExceptionFilter, WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { ErrorCodeEnum } from '../enums/error-code.enum';
-import { ApplicationLogger } from './application.logger.service';
+import { ErrorCodeEnum } from '../enums/error-code.enum.js';
+import { ApplicationLogger } from './application.logger.service.js';
 
 @Catch(Error)
 export class ApplicationGatewayExceptionFilter extends BaseWsExceptionFilter {

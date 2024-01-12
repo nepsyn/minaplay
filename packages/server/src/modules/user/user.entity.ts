@@ -6,14 +6,15 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { Permission } from '../authorization/permission.entity';
+import { Permission } from '../authorization/permission.entity.js';
 import { Exclude, Expose } from 'class-transformer';
-import { File } from '../file/file.entity';
-import { Series } from '../series/series.entity';
-import { Source } from '../subscribe/source.entity';
-import { PermissionEnum } from '../../enums/permission.enum';
+import { File } from '../file/file.entity.js';
+import { Series } from '../series/series.entity.js';
+import { Source } from '../subscribe/source.entity.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
 
 /** 用户 */
 @Entity()
@@ -65,24 +66,24 @@ export class User {
   @OneToMany(() => Permission, (permission) => permission.user, {
     eager: true,
   })
-  permissions: Permission[];
+  permissions: Relation<Permission[]>;
 
   /** 创建的剧集 */
   @Exclude()
   @OneToMany(() => Series, (series) => series.user)
-  series: Series[];
+  series: Relation<Series[]>;
 
   /** 创建的订阅源 */
   @Exclude()
   @OneToMany(() => Source, (source) => source.user)
-  sources: Source[];
+  sources: Relation<Source[]>;
 
   /** 头像文件 */
   @ManyToOne(() => File, {
     eager: true,
     nullable: true,
   })
-  avatar?: File;
+  avatar?: Relation<File>;
 
   /** 创建时间 */
   @CreateDateColumn()

@@ -1,15 +1,15 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Permission } from './permission.entity';
-import { AuthorizationService } from './authorization.service';
-import { AuthorizationController } from './authorization.controller';
-import { JwtStrategy } from './jwt.strategy';
+import { Permission } from './permission.entity.js';
+import { AuthorizationService } from './authorization.service.js';
+import { AuthorizationController } from './authorization.controller.js';
+import { JwtStrategy } from './jwt.strategy.js';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
-import { UserModule } from '../user/user.module';
-import { ActionLog } from './action-log.entity';
-import { ActionLogService } from './action-log.service';
+import { UserModule } from '../user/user.module.js';
+import { ActionLog } from './action-log.entity.js';
+import { ActionLogService } from './action-log.service.js';
 
 @Module({
   imports: [

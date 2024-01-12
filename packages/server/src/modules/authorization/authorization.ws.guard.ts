@@ -2,13 +2,13 @@ import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { WsException } from '@nestjs/websockets';
 import { Socket } from 'socket.io';
-import { UserService } from '../user/user.service';
-import { AuthorizationService } from './authorization.service';
-import { buildException } from '../../utils/build-exception.util';
-import { ErrorCodeEnum } from '../../enums/error-code.enum';
-import { PERMISSIONS_SYMBOL } from './require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { User } from '../user/user.entity';
+import { UserService } from '../user/user.service.js';
+import { AuthorizationService } from './authorization.service.js';
+import { buildException } from '../../utils/build-exception.util.js';
+import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { PERMISSIONS_SYMBOL } from './require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { User } from '../user/user.entity.js';
 
 @Injectable()
 export class AuthorizationWsGuard implements CanActivate {

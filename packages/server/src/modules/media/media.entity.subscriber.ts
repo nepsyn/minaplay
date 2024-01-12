@@ -1,7 +1,7 @@
 import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent } from 'typeorm';
-import { NotificationGateway } from '../notification/notification.gateway';
-import { PluginService } from '../plugin/plugin.service';
-import { Media } from './media.entity';
+import { NotificationGateway } from '../notification/notification.gateway.js';
+import { PluginService } from '../plugin/plugin.service.js';
+import { Media } from './media.entity.js';
 import { instanceToPlain } from 'class-transformer';
 
 @EventSubscriber()

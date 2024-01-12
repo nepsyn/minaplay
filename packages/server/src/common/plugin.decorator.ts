@@ -1,4 +1,4 @@
-import { MinaPlayPluginConstructor, MinaPlayPluginDescriptor } from '../interfaces/plugins';
+import { MinaPlayPluginConstructor, MinaPlayPluginDescriptor } from '../interfaces/plugins.js';
 import { Injectable } from '@nestjs/common';
 import { isDefined } from 'class-validator';
 

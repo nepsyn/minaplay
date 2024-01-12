@@ -1,5 +1,5 @@
-import { CreateDateColumn, Entity, ManyToMany, PrimaryColumn, UpdateDateColumn } from 'typeorm';
-import { Series } from './series.entity';
+import { CreateDateColumn, Entity, ManyToMany, PrimaryColumn, Relation, UpdateDateColumn } from 'typeorm';
+import { Series } from './series.entity.js';
 
 /** 剧集标签 */
 @Entity()
@@ -12,7 +12,7 @@ export class SeriesTag {
   @ManyToMany(() => Series, (series) => series.tags, {
     onDelete: 'CASCADE',
   })
-  series: Promise<Series[]>;
+  series: Relation<Promise<Series[]>>;
 
   /** 创建时间 */
   @CreateDateColumn()

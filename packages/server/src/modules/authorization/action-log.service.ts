@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { ActionLog } from './action-log.entity';
+import { ActionLog } from './action-log.entity.js';
 
 @Injectable()
 export class ActionLogService {

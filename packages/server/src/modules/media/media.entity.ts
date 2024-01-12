@@ -6,11 +6,12 @@ import {
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { File } from '../file/file.entity';
-import { DownloadItem } from '../subscribe/download-item.entity';
+import { File } from '../file/file.entity.js';
+import { DownloadItem } from '../subscribe/download-item.entity.js';
 
 @Entity()
 export class Media {
@@ -42,7 +43,7 @@ export class Media {
     nullable: true,
     eager: true,
   })
-  download?: DownloadItem;
+  download?: Relation<DownloadItem>;
 
   /** 封面图片 */
   @ManyToOne(() => File, {
@@ -50,7 +51,7 @@ export class Media {
     nullable: true,
     eager: true,
   })
-  poster?: File;
+  poster?: Relation<File>;
 
   /**对应文件 */
   @ManyToOne(() => File, {
@@ -58,7 +59,7 @@ export class Media {
     nullable: true,
     eager: true,
   })
-  file?: File;
+  file?: Relation<File>;
 
   /** 元数据 */
   @Exclude()
@@ -76,7 +77,7 @@ export class Media {
   @JoinTable({
     name: 'media_attachment_files',
   })
-  attachments: File[];
+  attachments: Relation<File[]>;
 
   /** 创建时间 */
   @CreateDateColumn()

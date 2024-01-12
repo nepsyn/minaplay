@@ -1,5 +1,5 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { Rule } from './rule.entity';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation } from 'typeorm';
+import { Rule } from './rule.entity.js';
 
 @Entity()
 export class RuleErrorLog {
@@ -23,7 +23,7 @@ export class RuleErrorLog {
   @ManyToOne(() => Rule, {
     onDelete: 'CASCADE',
   })
-  rule: Rule;
+  rule: Relation<Rule>;
 
   /** 创建时间 */
   @CreateDateColumn()

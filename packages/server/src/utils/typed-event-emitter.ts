@@ -1,4 +1,4 @@
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 
 type EventMap = Record<string | symbol, (...args: any[]) => any>;
 type EventKey<T extends EventMap> = Extract<keyof T, string | symbol> | string | symbol;

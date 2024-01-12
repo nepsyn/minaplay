@@ -1,19 +1,21 @@
 import { DynamicModule, ForwardReference, Module, Type } from '@nestjs/common';
-import path from 'path';
+import path from 'node:path';
 import fs from 'fs-extra';
-import { MinaPlayPluginConstructor } from '../../interfaces/plugins';
-import { PluginService } from './plugin.service';
-import { AuthorizationModule } from '../authorization/authorization.module';
-import { UserModule } from '../user/user.module';
-import { PluginController } from './plugin.controller';
-import { getMinaPlayPluginDescriptor, isMinaPlayPlugin } from '../../common/plugin.decorator';
-import { ApplicationLogger } from '../../common/application.logger.service';
+import { MinaPlayPluginConstructor } from '../../interfaces/plugins.js';
+import { PluginService } from './plugin.service.js';
+import { AuthorizationModule } from '../authorization/authorization.module.js';
+import { UserModule } from '../user/user.module.js';
+import { PluginController } from './plugin.controller.js';
+import { getMinaPlayPluginDescriptor, isMinaPlayPlugin } from '../../common/plugin.decorator.js';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
+import { fileURLToPath } from 'node:url';
 
 @Module({})
 export class PluginModule {
   private static logger = new ApplicationLogger(PluginModule.name);
 
   static async registerAsync(): Promise<DynamicModule> {
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const base = path.join(__dirname, '../../plugins');
     await fs.ensureDir(base);
 

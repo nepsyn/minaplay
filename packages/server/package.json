@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "author": "Nepsyn",
   "license": "MIT",
+  "type": "module",
   "scripts": {
     "build": "nest build",
     "start": "nest start",

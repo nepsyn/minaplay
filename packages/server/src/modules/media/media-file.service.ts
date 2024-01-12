@@ -1,18 +1,18 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { MediaModuleOptions } from './media.module.interface';
-import { MEDIA_MODULE_OPTIONS_TOKEN } from './media.module-definition';
-import { MediaService } from './media.service';
-import { Media } from './media.entity';
+import { MediaModuleOptions } from './media.module.interface.js';
+import { MEDIA_MODULE_OPTIONS_TOKEN } from './media.module-definition.js';
+import { MediaService } from './media.service.js';
+import { Media } from './media.entity.js';
 import fs from 'fs-extra';
-import { GENERATED_DIR } from '../../constants';
+import { GENERATED_DIR } from '../../constants.js';
 import path from 'node:path';
-import { generateMD5 } from '../../utils/generate-md5.util';
-import { FileSourceEnum } from '../../enums/file-source.enum';
-import { FileService } from '../file/file.service';
-import { importESM } from '../../utils/import-esm.util';
-import { MediaMetadata } from '../../interfaces/media.metadata';
-import { File } from '../file/file.entity';
-import { ApplicationLogger } from '../../common/application.logger.service';
+import { generateMD5 } from '../../utils/generate-md5.util.js';
+import { FileSourceEnum } from '../../enums/file-source.enum.js';
+import { FileService } from '../file/file.service.js';
+import { MediaMetadata } from '../../interfaces/media.metadata.js';
+import { File } from '../file/file.entity.js';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
+import { execa } from 'execa';
 
 @Injectable()
 export class MediaFileService {
@@ -25,8 +25,6 @@ export class MediaFileService {
   ) {}
 
   async generateMediaMetadata(media: Media) {
-    const { execa } = await importESM<typeof import('execa')>('execa');
-
     const cp = await execa(
       this.options.ffprobePath,
       ['-i', media.file.path, '-print_format', 'json', '-show_streams'],
@@ -45,8 +43,6 @@ export class MediaFileService {
   }
 
   async generateMediaPosterFile(media: Media) {
-    const { execa } = await importESM<typeof import('execa')>('execa');
-
     // 计算缩略图路径
     const posterFileName = 'poster.png';
     const posterFilePath = path.join(GENERATED_DIR, media.id, posterFileName);
@@ -80,8 +76,6 @@ export class MediaFileService {
   }
 
   async extractMediaFiles(media: Media, metadata: MediaMetadata) {
-    const { execa } = await importESM<typeof import('execa')>('execa');
-
     const files: File[] = [];
     await fs.ensureDir(path.join(GENERATED_DIR, media.id));
 

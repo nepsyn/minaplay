@@ -1,6 +1,14 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Series } from './series.entity';
-import { Media } from '../media/media.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Relation,
+  UpdateDateColumn,
+} from 'typeorm';
+import { Series } from './series.entity.js';
+import { Media } from '../media/media.entity.js';
 
 /** 单集 */
 @Entity()
@@ -26,14 +34,14 @@ export class Episode {
     onDelete: 'CASCADE',
     eager: true,
   })
-  media: Media;
+  media: Relation<Media>;
 
   /** 剧集 */
   @ManyToOne(() => Series, (series) => series.episodes, {
     onDelete: 'CASCADE',
     eager: true,
   })
-  series: Series;
+  series: Relation<Series>;
 
   /** 发布时间 */
   @Column({

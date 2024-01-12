@@ -1,6 +1,6 @@
 import { HttpException } from '@nestjs/common';
 import { WsException } from '@nestjs/websockets';
-import { ErrorCodeEnum } from '../enums/error-code.enum';
+import { ErrorCodeEnum } from '../enums/error-code.enum.js';
 
 type NestJsExceptionConstructor = {
   new (errorObject: object): HttpException | WsException;

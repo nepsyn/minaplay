@@ -1,10 +1,9 @@
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../modules/user/user.entity';
+import { User } from '../modules/user/user.entity.js';
 import { NestFactory } from '@nestjs/core';
 import { Repository } from 'typeorm';
 import input from '@inquirer/input';
-import process from 'node:process';
-import { ApplicationScriptModule } from '../common/application.script.module';
+import { ApplicationScriptModule } from '../common/application.script.module.js';
 
 export async function deleteUser(_username?: string) {
   const app = await NestFactory.createApplicationContext(ApplicationScriptModule, {

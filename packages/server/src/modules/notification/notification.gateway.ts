@@ -1,10 +1,10 @@
 import { ClassSerializerInterceptor, UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import { OnGatewayConnection, WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import { AuthorizationWsGuard } from '../authorization/authorization.ws.guard';
+import { AuthorizationWsGuard } from '../authorization/authorization.ws.guard.js';
 import { Server, Socket } from 'socket.io';
-import { NotificationEventMap, NotificationEventType } from './notification-events.interface';
-import { ApplicationGatewayExceptionFilter } from '../../common/application.gateway.exception.filter';
-import { ApplicationGatewayInterceptor } from '../../common/application.gateway.interceptor';
+import { NotificationEventMap, NotificationEventType } from './notification-events.interface.js';
+import { ApplicationGatewayExceptionFilter } from '../../common/application.gateway.exception.filter.js';
+import { ApplicationGatewayInterceptor } from '../../common/application.gateway.interceptor.js';
 
 @WebSocketGateway({
   namespace: 'notification',

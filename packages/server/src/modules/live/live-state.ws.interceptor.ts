@@ -1,6 +1,6 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Socket } from 'socket.io';
-import { LiveService } from './live.service';
+import { LiveService } from './live.service.js';
 import { tap } from 'rxjs';
 
 @Injectable()

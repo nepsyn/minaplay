@@ -11,25 +11,25 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { LiveService } from './live.service';
+import { LiveService } from './live.service.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { buildException } from '../../utils/build-exception.util';
-import { ErrorCodeEnum } from '../../enums/error-code.enum';
-import { LiveDto } from './live.dto';
-import { RequestUser } from '../authorization/request.user.decorator';
-import { User } from '../user/user.entity';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
-import { LiveGateway } from './live.gateway';
-import { encryptPassword } from '../../utils/encrypt-password.util';
-import { LiveQueryDto } from './live-query.dto';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { Live } from './live.entity';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { buildException } from '../../utils/build-exception.util.js';
+import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { LiveDto } from './live.dto.js';
+import { RequestUser } from '../authorization/request.user.decorator.js';
+import { User } from '../user/user.entity.js';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
+import { LiveGateway } from './live.gateway.js';
+import { encryptPassword } from '../../utils/encrypt-password.util.js';
+import { LiveQueryDto } from './live-query.dto.js';
+import { buildQueryOptions } from '../../utils/build-query-options.util.js';
+import { Live } from './live.entity.js';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
 import { instanceToPlain } from 'class-transformer';
-import { LiveStreamService } from './live-stream.service';
+import { LiveStreamService } from './live-stream.service.js';
 
 @Controller('live')
 @UseGuards(AuthorizationGuard)

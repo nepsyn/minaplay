@@ -1,4 +1,4 @@
-import { MinaPlayPluginConstructor, MinaPlayPluginDescriptor, MinaPlayPluginHooks } from '../../interfaces/plugins';
+import { MinaPlayPluginConstructor, MinaPlayPluginDescriptor, MinaPlayPluginHooks } from '../../interfaces/plugins.js';
 import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
 import { Exclude, Expose } from 'class-transformer';
 

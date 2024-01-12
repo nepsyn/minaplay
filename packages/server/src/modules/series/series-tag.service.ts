@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SeriesTag } from './series-tag.entity';
+import { SeriesTag } from './series-tag.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()

@@ -1,8 +1,16 @@
 import { Exclude } from 'class-transformer';
 import fs from 'fs-extra';
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { User } from '../user/user.entity';
-import { FileSourceEnum } from '../../enums/file-source.enum';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Relation,
+  UpdateDateColumn,
+} from 'typeorm';
+import { User } from '../user/user.entity.js';
+import { FileSourceEnum } from '../../enums/file-source.enum.js';
 
 /** 文件实体 */
 @Entity()
@@ -61,7 +69,7 @@ export class File {
     onDelete: 'SET NULL',
     nullable: true,
   })
-  user?: User;
+  user?: Relation<User>;
 
   /** 创建时间 */
   @CreateDateColumn()

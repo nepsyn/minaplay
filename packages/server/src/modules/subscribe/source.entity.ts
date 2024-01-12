@@ -6,13 +6,14 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  Relation,
   UpdateDateColumn,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
-import { User } from '../user/user.entity';
-import { FetchLog } from './fetch-log.entity';
-import { DownloadItem } from './download-item.entity';
-import { Rule } from './rule.entity';
+import { User } from '../user/user.entity.js';
+import { FetchLog } from './fetch-log.entity.js';
+import { DownloadItem } from './download-item.entity.js';
+import { Rule } from './rule.entity.js';
 
 /** 订阅源 */
 @Entity()
@@ -55,17 +56,17 @@ export class Source {
   @ManyToMany(() => Rule, (rule) => rule.sources, {
     onDelete: 'CASCADE',
   })
-  rules: Promise<Rule[]>;
+  rules: Relation<Promise<Rule[]>>;
 
   /** 更新记录 */
   @Exclude()
   @OneToMany(() => FetchLog, (log) => log.source)
-  logs: Promise<FetchLog[]>;
+  logs: Relation<Promise<FetchLog[]>>;
 
   /** 下载内容 */
   @Exclude()
   @OneToMany(() => DownloadItem, (download) => download.source)
-  downloads: Promise<DownloadItem[]>;
+  downloads: Relation<Promise<DownloadItem[]>>;
 
   /** 创建用户 */
   @ManyToOne(() => User, (user) => user.sources, {
@@ -73,7 +74,7 @@ export class Source {
     eager: true,
     nullable: true,
   })
-  user?: User;
+  user?: Relation<User>;
 
   /** 创建时间 */
   @CreateDateColumn()

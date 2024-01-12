@@ -12,27 +12,27 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { SourceService } from './source.service';
+import { SourceService } from './source.service.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { SourceDto } from './source.dto';
-import { buildException } from '../../utils/build-exception.util';
-import { ErrorCodeEnum } from '../../enums/error-code.enum';
-import { RequestUser } from '../authorization/request.user.decorator';
-import { User } from '../user/user.entity';
-import { SourceQueryDto } from './source-query.dto';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { Source } from './source.entity';
-import { FetchLogService } from './fetch-log.service';
-import { FetchLogQueryDto } from './fetch-log-query.dto';
-import { FetchLog } from './fetch-log.entity';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { SourceDto } from './source.dto.js';
+import { buildException } from '../../utils/build-exception.util.js';
+import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { RequestUser } from '../authorization/request.user.decorator.js';
+import { User } from '../user/user.entity.js';
+import { SourceQueryDto } from './source-query.dto.js';
+import { buildQueryOptions } from '../../utils/build-query-options.util.js';
+import { Source } from './source.entity.js';
+import { FetchLogService } from './fetch-log.service.js';
+import { FetchLogQueryDto } from './fetch-log-query.dto.js';
+import { FetchLog } from './fetch-log.entity.js';
 import { Between } from 'typeorm';
-import { DownloadItemQueryDto } from './download-item-query.dto';
-import { DownloadItemService } from './download-item.service';
-import { DownloadItem } from './download-item.entity';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { DownloadItemQueryDto } from './download-item-query.dto.js';
+import { DownloadItemService } from './download-item.service.js';
+import { DownloadItem } from './download-item.entity.js';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
 import { CronTime } from 'cron';
 

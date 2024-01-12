@@ -1,6 +1,6 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn } from 'typeorm';
-import { User } from '../user/user.entity';
-import { Series } from './series.entity';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryColumn, Relation } from 'typeorm';
+import { User } from '../user/user.entity.js';
+import { Series } from './series.entity.js';
 import { Exclude } from 'class-transformer';
 
 /** 剧集订阅 */
@@ -10,7 +10,7 @@ export class SeriesSubscribe {
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
   })
-  user: User;
+  user: Relation<User>;
 
   @Exclude()
   @PrimaryColumn()
@@ -20,7 +20,7 @@ export class SeriesSubscribe {
   @ManyToOne(() => Series, {
     onDelete: 'CASCADE',
   })
-  series: Series;
+  series: Relation<Series>;
 
   @Exclude()
   @PrimaryColumn()

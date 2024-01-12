@@ -11,24 +11,24 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { MediaService } from './media.service';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
+import { MediaService } from './media.service.js';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { buildException } from '../../utils/build-exception.util';
-import { ErrorCodeEnum } from '../../enums/error-code.enum';
-import { MediaQueryDto } from './media-query.dto';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { buildException } from '../../utils/build-exception.util.js';
+import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { MediaQueryDto } from './media-query.dto.js';
+import { buildQueryOptions } from '../../utils/build-query-options.util.js';
 import { Between } from 'typeorm';
-import { Media } from './media.entity';
-import { MediaDto } from './media.dto';
-import { MediaFileService } from './media-file.service';
-import { RequestUser } from '../authorization/request.user.decorator';
-import { User } from '../user/user.entity';
-import { ViewHistoryDto } from './view-history.dto';
-import { ViewHistoryService } from './view-history.service';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { Media } from './media.entity.js';
+import { MediaDto } from './media.dto.js';
+import { MediaFileService } from './media-file.service.js';
+import { RequestUser } from '../authorization/request.user.decorator.js';
+import { User } from '../user/user.entity.js';
+import { ViewHistoryDto } from './view-history.dto.js';
+import { ViewHistoryService } from './view-history.service.js';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
 
 @Controller('media')

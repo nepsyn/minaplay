@@ -1,23 +1,24 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { Aria2DownloadTask } from './aria2-download-task';
+import { Aria2DownloadTask } from './aria2-download-task.js';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
-import { ARIA2_MODULE_OPTIONS_TOKEN } from './aria2.module-definition';
-import { Aria2ModuleOptions } from './aria2.module.interface';
-import { ARIA2_DOWNLOAD_DIR } from '../../constants';
+import { ARIA2_MODULE_OPTIONS_TOKEN } from './aria2.module-definition.js';
+import { Aria2ModuleOptions } from './aria2.module.interface.js';
+import { ARIA2_DOWNLOAD_DIR } from '../../constants.js';
 import fs from 'fs-extra';
-import { FileService } from '../file/file.service';
-import { generateMD5 } from '../../utils/generate-md5.util';
-import path from 'path';
-import { FileSourceEnum } from '../../enums/file-source.enum';
-import { File } from '../file/file.entity';
-import { importESM } from '../../utils/import-esm.util';
-import { randomUUID } from 'crypto';
+import { FileService } from '../file/file.service.js';
+import { generateMD5 } from '../../utils/generate-md5.util.js';
+import path from 'node:path';
+import fetch from 'node-fetch';
+import { FileSourceEnum } from '../../enums/file-source.enum.js';
+import { File } from '../file/file.entity.js';
+import { randomUUID } from 'node:crypto';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import { Aria2WsClient } from './aria2.ws-client';
+import { Aria2WsClient } from './aria2.ws-client.js';
 import { isDefined } from 'class-validator';
-import { ApplicationLogger } from '../../common/application.logger.service';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
+import { fileTypeFromFile } from 'file-type';
 
 @Injectable()
 export class Aria2Service implements OnModuleInit {
@@ -87,8 +88,6 @@ export class Aria2Service implements OnModuleInit {
   }
 
   private async onDownloadComplete({ gid }: { gid: string }) {
-    const { fileTypeFromFile } = await importESM<typeof import('file-type')>('file-type');
-
     const status = await this.client.tellStatus(gid);
     const parentGid = typeof status.following === 'string' ? status.following : gid;
     const task = this.tasks.get(parentGid);
@@ -235,7 +234,6 @@ export class Aria2Service implements OnModuleInit {
   }
 
   private async updateBtTrackers() {
-    const { default: fetch } = await importESM<typeof import('node-fetch')>('node-fetch');
     try {
       const response = await fetch(this.options.trackerListUrl, {
         agent: this.options.httpProxy && new HttpsProxyAgent(this.options.httpProxy),

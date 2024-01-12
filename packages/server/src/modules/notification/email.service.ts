@@ -1,14 +1,15 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { NotificationModuleOptions } from './notification.module.interface';
-import { NOTIFICATION_MODULE_OPTIONS_TOKEN } from './notification.module-definition';
+import { NotificationModuleOptions } from './notification.module.interface.js';
+import { NOTIFICATION_MODULE_OPTIONS_TOKEN } from './notification.module-definition.js';
 import { createTransport, SendMailOptions, Transporter } from 'nodemailer';
-import { NotificationEventMap, NotificationEventType } from './notification-events.interface';
+import { NotificationEventMap, NotificationEventType } from './notification-events.interface.js';
 import Handlebars from 'handlebars';
-import path from 'path';
+import path from 'node:path';
 import fs from 'fs-extra';
 import { isDefined } from 'class-validator';
-import { isUndefined } from '@nestjs/common/utils/shared.utils';
-import { ApplicationLogger } from '../../common/application.logger.service';
+import { isUndefined } from '@nestjs/common/utils/shared.utils.js';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
+import { fileURLToPath } from 'node:url';
 
 @Injectable()
 export class EmailService implements OnModuleInit {
@@ -42,6 +43,7 @@ export class EmailService implements OnModuleInit {
   }
 
   private async compileTemplate(event: NotificationEventType | string) {
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const candidates = [`${event}.${this.options.appEnv}.handlebars`, `${event}.handlebars`].map((name) =>
       path.join(__dirname, '../../../templates', name),
     );

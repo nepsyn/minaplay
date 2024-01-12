@@ -1,5 +1,5 @@
 import { ConfigurableModuleBuilder } from '@nestjs/common';
-import { SubscribeModuleOptions } from './subscribe.module.interface';
+import { SubscribeModuleOptions } from './subscribe.module.interface.js';
 
 export const {
   ConfigurableModuleClass: SubscribeConfigurableModule,

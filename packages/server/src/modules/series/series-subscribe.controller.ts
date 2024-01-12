@@ -1,15 +1,15 @@
 import { Controller, Delete, Get, Query, UseGuards } from '@nestjs/common';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { SeriesSubscribeService } from './series-subscribe.service';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { RequestUser } from '../authorization/request.user.decorator';
-import { User } from '../user/user.entity';
-import { SeriesSubscribe } from './series-subscribe.entity';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { ApiQueryDto } from '../../common/api.query.dto';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { SeriesSubscribeService } from './series-subscribe.service.js';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { RequestUser } from '../authorization/request.user.decorator.js';
+import { User } from '../user/user.entity.js';
+import { SeriesSubscribe } from './series-subscribe.entity.js';
+import { buildQueryOptions } from '../../utils/build-query-options.util.js';
+import { ApiQueryDto } from '../../common/api.query.dto.js';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 
 @Controller('series/subscribe')
 @UseGuards(AuthorizationGuard)

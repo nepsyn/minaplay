@@ -1,5 +1,5 @@
-import { User } from '../user/user.entity';
-import { Live } from './live.entity';
+import { User } from '../user/user.entity.js';
+import { Live } from './live.entity.js';
 
 export interface ServerPushMediaStream {
   type: 'server-push';

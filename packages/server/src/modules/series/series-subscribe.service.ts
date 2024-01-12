@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { SeriesSubscribe } from './series-subscribe.entity';
+import { SeriesSubscribe } from './series-subscribe.entity.js';
 
 @Injectable()
 export class SeriesSubscribeService {

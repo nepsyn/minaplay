@@ -1,5 +1,5 @@
 import { ConfigurableModuleBuilder } from '@nestjs/common';
-import { LiveModuleOptions } from './live.module.interface';
+import { LiveModuleOptions } from './live.module.interface.js';
 
 export const { ConfigurableModuleClass: LiveConfigurableModule, MODULE_OPTIONS_TOKEN: LIVE_MODULE_OPTIONS_TOKEN } =
   new ConfigurableModuleBuilder<LiveModuleOptions>({ moduleName: 'Live' })

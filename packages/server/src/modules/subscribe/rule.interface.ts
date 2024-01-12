@@ -1,5 +1,5 @@
 import { FeedEntry } from '@extractus/feed-extractor';
-import { File } from '../file/file.entity';
+import { File } from '../file/file.entity.js';
 
 export interface RuleEntryValidator {
   (entry: FeedEntry): boolean | Promise<boolean>;

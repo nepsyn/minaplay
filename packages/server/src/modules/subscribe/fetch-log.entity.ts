@@ -1,8 +1,8 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Source } from './source.entity';
+import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Relation } from 'typeorm';
+import { Source } from './source.entity.js';
 import { Exclude } from 'class-transformer';
-import { DownloadItem } from './download-item.entity';
-import { StatusEnum } from '../../enums/status.enum';
+import { DownloadItem } from './download-item.entity.js';
+import { StatusEnum } from '../../enums/status.enum.js';
 
 /** 订阅解析日志 */
 @Entity()
@@ -15,12 +15,12 @@ export class FetchLog {
   @ManyToOne(() => Source, (source) => source.logs, {
     onDelete: 'CASCADE',
   })
-  source: Source;
+  source: Relation<Source>;
 
   /** 下载项目 */
   @Exclude()
   @OneToMany(() => DownloadItem, (download) => download.log)
-  downloads: DownloadItem[];
+  downloads: Relation<DownloadItem[]>;
 
   /** 状态 */
   @Column({

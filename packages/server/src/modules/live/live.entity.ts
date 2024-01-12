@@ -1,7 +1,15 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { File } from '../file/file.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  Relation,
+  UpdateDateColumn,
+} from 'typeorm';
+import { File } from '../file/file.entity.js';
 import { Exclude, Expose } from 'class-transformer';
-import { User } from '../user/user.entity';
+import { User } from '../user/user.entity.js';
 import { isDefined } from 'class-validator';
 
 /** 直播房间 */
@@ -35,7 +43,7 @@ export class Live {
     eager: true,
     nullable: true,
   })
-  poster?: File;
+  poster?: Relation<File>;
 
   /** 创建用户 */
   @ManyToOne(() => User, {
@@ -43,7 +51,7 @@ export class Live {
     eager: true,
     nullable: true,
   })
-  user?: User;
+  user?: Relation<User>;
 
   /** 创建时间 */
   @CreateDateColumn()

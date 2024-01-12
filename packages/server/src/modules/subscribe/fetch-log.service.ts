@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FetchLog } from './fetch-log.entity';
+import { FetchLog } from './fetch-log.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()

@@ -1,9 +1,9 @@
-import { File } from './file.entity';
+import { File } from './file.entity.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
-import { FileSourceEnum } from '../../enums/file-source.enum';
+import { FileSourceEnum } from '../../enums/file-source.enum.js';
 import { Transform } from 'class-transformer';
-import { ApiQueryDto } from '../../common/api.query.dto';
+import { ApiQueryDto } from '../../common/api.query.dto.js';
 
 export class FileQueryDto extends ApiQueryDto<File> {
   @ApiProperty({

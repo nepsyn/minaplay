@@ -1,17 +1,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Media } from './media.entity';
-import { MediaService } from './media.service';
-import { MediaController } from './media.controller';
-import { FileModule } from '../file/file.module';
-import { MediaConfigurableModule } from './media.module-definition';
-import { AuthorizationModule } from '../authorization/authorization.module';
-import { UserModule } from '../user/user.module';
-import { MediaFileService } from './media-file.service';
-import { ViewHistory } from './view-history.entity';
-import { ViewHistoryService } from './view-history.service';
-import { ViewHistoryController } from './view-history.controller';
-import { MediaEntitySubscriber } from './media.entity.subscriber';
+import { Media } from './media.entity.js';
+import { MediaService } from './media.service.js';
+import { MediaController } from './media.controller.js';
+import { FileModule } from '../file/file.module.js';
+import { MediaConfigurableModule } from './media.module-definition.js';
+import { AuthorizationModule } from '../authorization/authorization.module.js';
+import { UserModule } from '../user/user.module.js';
+import { MediaFileService } from './media-file.service.js';
+import { ViewHistory } from './view-history.entity.js';
+import { ViewHistoryService } from './view-history.service.js';
+import { ViewHistoryController } from './view-history.controller.js';
+import { MediaEntitySubscriber } from './media.entity.subscriber.js';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Media, ViewHistory]), FileModule, AuthorizationModule, UserModule],

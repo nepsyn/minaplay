@@ -1,5 +1,5 @@
-import { Readable } from 'stream';
-import { createHash } from 'crypto';
+import { Readable } from 'node:stream';
+import { createHash } from 'node:crypto';
 
 export function generateMD5(chunk: Readable | string): Promise<string> {
   return new Promise<string>((resolve) => {

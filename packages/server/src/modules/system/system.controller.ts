@@ -1,14 +1,13 @@
 import { Controller, Get, Post, Res, UseGuards, UseInterceptors } from '@nestjs/common';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { SystemService } from './system.service';
-import { MINAPLAY_VERSION } from '../../constants';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { SystemService } from './system.service.js';
+import { MINAPLAY_VERSION } from '../../constants.js';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
-import process from 'node:process';
 import { Response } from 'express';
-import { ApplicationLogger } from '../../common/application.logger.service';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
 
 @Controller('system')
 @UseGuards(AuthorizationGuard)

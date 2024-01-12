@@ -1,8 +1,8 @@
-import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation } from 'typeorm';
 import { Exclude, Expose } from 'class-transformer';
-import { Live } from './live.entity';
-import { User } from '../user/user.entity';
-import { MinaplayMessage, MinaplayMessageType, parseMessage } from './live-chat-message-type';
+import { Live } from './live.entity.js';
+import { User } from '../user/user.entity.js';
+import { MinaplayMessage, MinaplayMessageType, parseMessage } from './live-chat-message.interface.js';
 
 @Entity()
 export class LiveChat {
@@ -14,14 +14,14 @@ export class LiveChat {
   @ManyToOne(() => Live, {
     onDelete: 'CASCADE',
   })
-  live: Live;
+  live: Relation<Live>;
 
   /** 发送用户 */
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
     eager: true,
   })
-  user: User;
+  user: Relation<User>;
 
   /** 消息类型 */
   @Exclude()

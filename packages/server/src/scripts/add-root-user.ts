@@ -1,22 +1,21 @@
 import { NestFactory } from '@nestjs/core';
 import input from '@inquirer/input';
 import password from '@inquirer/password';
-import process from 'node:process';
 import { isString } from 'class-validator';
-import { encryptPassword } from '../utils/encrypt-password.util';
-import { PermissionEnum } from '../enums/permission.enum';
+import { encryptPassword } from '../utils/encrypt-password.util.js';
+import { PermissionEnum } from '../enums/permission.enum.js';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { User } from '../modules/user/user.entity';
+import { User } from '../modules/user/user.entity.js';
 import { Repository } from 'typeorm';
-import { Permission } from '../modules/authorization/permission.entity';
-import { ApplicationScriptModule } from '../common/application.script.module';
-import { File } from '../modules/file/file.entity';
+import { Permission } from '../modules/authorization/permission.entity.js';
+import { ApplicationScriptModule } from '../common/application.script.module.js';
+import { File } from '../modules/file/file.entity.js';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
-import { USER_UPLOAD_IMAGE_DIR } from '../constants';
-import { createIdenticon } from '../utils/create-identicon.util';
-import { generateMD5 } from '../utils/generate-md5.util';
-import { FileSourceEnum } from '../enums/file-source.enum';
+import { USER_UPLOAD_IMAGE_DIR } from '../constants.js';
+import { createIdenticon } from '../utils/create-identicon.util.js';
+import { generateMD5 } from '../utils/generate-md5.util.js';
+import { FileSourceEnum } from '../enums/file-source.enum.js';
 
 export async function addRootUser(_username?: string, _password?: string) {
   const app = await NestFactory.createApplicationContext(ApplicationScriptModule, {

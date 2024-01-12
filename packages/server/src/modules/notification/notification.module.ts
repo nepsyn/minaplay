@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
-import { NotificationConfigurableModule } from './notification.module-definition';
-import { EmailService } from './email.service';
-import { NotificationGateway } from './notification.gateway';
-import { AuthorizationModule } from '../authorization/authorization.module';
-import { UserModule } from '../user/user.module';
+import { NotificationConfigurableModule } from './notification.module-definition.js';
+import { EmailService } from './email.service.js';
+import { NotificationGateway } from './notification.gateway.js';
+import { AuthorizationModule } from '../authorization/authorization.module.js';
+import { UserModule } from '../user/user.module.js';
 
 @Module({
   imports: [AuthorizationModule, UserModule],

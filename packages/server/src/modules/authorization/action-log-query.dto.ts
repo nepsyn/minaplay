@@ -1,9 +1,9 @@
-import { ApiQueryDto } from '../../common/api.query.dto';
-import { ActionLog } from './action-log.entity';
+import { ApiQueryDto } from '../../common/api.query.dto.js';
+import { ActionLog } from './action-log.entity.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsInt, IsOptional, IsString } from 'class-validator';
 import { Transform } from 'class-transformer';
-import { AuthActionEnum } from '../../enums/auth-action.enum';
+import { AuthActionEnum } from '../../enums/auth-action.enum.js';
 
 export class ActionLogQueryDto extends ApiQueryDto<ActionLog> {
   @ApiProperty({

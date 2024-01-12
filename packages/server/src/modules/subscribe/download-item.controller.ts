@@ -12,25 +12,25 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthorizationGuard } from '../authorization/authorization.guard';
+import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { DownloadItemService } from './download-item.service';
-import { RequirePermissions } from '../authorization/require-permissions.decorator';
-import { PermissionEnum } from '../../enums/permission.enum';
-import { DownloadTaskDto } from './download-task.dto';
-import { buildException } from '../../utils/build-exception.util';
-import { ErrorCodeEnum } from '../../enums/error-code.enum';
-import { StatusEnum } from '../../enums/status.enum';
-import { RuleFileDescriber } from './rule.interface';
-import { RuleService } from './rule.service';
-import { RuleErrorLogService } from './rule-error-log.service';
-import { DownloadItemQueryDto } from './download-item-query.dto';
-import { buildQueryOptions } from '../../utils/build-query-options.util';
-import { DownloadItem } from './download-item.entity';
+import { DownloadItemService } from './download-item.service.js';
+import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
+import { DownloadTaskDto } from './download-task.dto.js';
+import { buildException } from '../../utils/build-exception.util.js';
+import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { StatusEnum } from '../../enums/status.enum.js';
+import { RuleFileDescriber } from './rule.interface.js';
+import { RuleService } from './rule.service.js';
+import { RuleErrorLogService } from './rule-error-log.service.js';
+import { DownloadItemQueryDto } from './download-item-query.dto.js';
+import { buildQueryOptions } from '../../utils/build-query-options.util.js';
+import { DownloadItem } from './download-item.entity.js';
 import { Between, In, IsNull, Not } from 'typeorm';
-import { Aria2Service } from '../aria2/aria2.service';
-import { SourceService } from './source.service';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto';
+import { Aria2Service } from '../aria2/aria2.service.js';
+import { SourceService } from './source.service.js';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
 
 @Controller('subscribe/download')

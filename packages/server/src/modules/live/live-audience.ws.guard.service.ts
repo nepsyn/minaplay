@@ -1,7 +1,7 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { Reflector } from '@nestjs/core';
-import { ROOM_OWNER_ONLY_SYMBOL } from './room-owner-only.ws.decorator';
+import { ROOM_OWNER_ONLY_SYMBOL } from './room-owner-only.ws.decorator.js';
 import { isDefined } from 'class-validator';
 
 @Injectable()

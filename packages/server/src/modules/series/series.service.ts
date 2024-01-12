@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Series } from './series.entity';
+import { Series } from './series.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, In, Repository } from 'typeorm';
-import { File } from '../file/file.entity';
-import { FileService } from '../file/file.service';
+import { File } from '../file/file.entity.js';
+import { FileService } from '../file/file.service.js';
 import { isDefined } from 'class-validator';
 
 @Injectable()

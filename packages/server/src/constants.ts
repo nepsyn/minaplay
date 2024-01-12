@@ -1,8 +1,11 @@
-import path from 'path';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import fs from 'fs-extra';
 
 export const DATA_DIR = path.join(process.cwd(), 'data');
 
-export const MINAPLAY_VERSION = require('../package.json').version;
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+export const MINAPLAY_VERSION = fs.readJSONSync(path.join(__dirname, '../package.json')).version;
 
 export const USER_UPLOAD_IMAGE_DIR = path.join(DATA_DIR, 'upload/image');
 export const USER_UPLOAD_VIDEO_DIR = path.join(DATA_DIR, 'upload/video');

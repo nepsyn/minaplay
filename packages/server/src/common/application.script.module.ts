@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../modules/user/user.entity';
-import { Permission } from '../modules/authorization/permission.entity';
-import { File } from '../modules/file/file.entity';
+import { User } from '../modules/user/user.entity.js';
+import { Permission } from '../modules/authorization/permission.entity.js';
+import { File } from '../modules/file/file.entity.js';
 
 @Module({
   imports: [

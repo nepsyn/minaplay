@@ -1,9 +1,18 @@
-import { Column, CreateDateColumn, Entity, Index, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { Rule } from './rule.entity';
-import { StatusEnum } from '../../enums/status.enum';
-import { Source } from './source.entity';
-import { FetchLog } from './fetch-log.entity';
-import { Media } from '../media/media.entity';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  Relation,
+} from 'typeorm';
+import { Rule } from './rule.entity.js';
+import { StatusEnum } from '../../enums/status.enum.js';
+import { Source } from './source.entity.js';
+import { FetchLog } from './fetch-log.entity.js';
+import { Media } from '../media/media.entity.js';
 import { Exclude, Expose } from 'class-transformer';
 
 /** 订阅解析元素 */
@@ -38,7 +47,7 @@ export class DownloadItem {
     nullable: true,
     eager: true,
   })
-  source?: Source;
+  source?: Relation<Source>;
 
   /** 命中规则 */
   @ManyToOne(() => Rule, (rule) => rule.downloads, {
@@ -46,7 +55,7 @@ export class DownloadItem {
     nullable: true,
     eager: true,
   })
-  rule?: Rule;
+  rule?: Relation<Rule>;
 
   /** 解析记录 */
   @ManyToOne(() => FetchLog, {
@@ -54,11 +63,11 @@ export class DownloadItem {
     nullable: true,
     eager: true,
   })
-  log?: FetchLog;
+  log?: Relation<FetchLog>;
 
   /** 对应文件列表 */
   @OneToMany(() => Media, (media) => media.download)
-  medias: Media[];
+  medias: Relation<Media[]>;
 
   /** 下载状态 */
   @Column({

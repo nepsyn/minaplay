@@ -1,5 +1,5 @@
 import { ConfigurableModuleBuilder } from '@nestjs/common';
-import { NotificationModuleOptions } from './notification.module.interface';
+import { NotificationModuleOptions } from './notification.module.interface.js';
 
 export const {
   ConfigurableModuleClass: NotificationConfigurableModule,

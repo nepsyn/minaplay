@@ -1,5 +1,5 @@
 import fs from 'fs-extra';
-import { generateMD5 } from './generate-md5.util';
+import { generateMD5 } from './generate-md5.util.js';
 import sharp from 'sharp';
 
 export async function createIdenticon(hash: string, path: string) {

@@ -1,16 +1,16 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Source } from './source.entity';
+import { Source } from './source.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
-import { importESM } from '../../utils/import-esm.util';
-import { SubscribeModuleOptions } from './subscribe.module.interface';
-import { SUBSCRIBE_MODULE_OPTIONS_TOKEN } from './subscribe.module-definition';
+import { SubscribeModuleOptions } from './subscribe.module.interface.js';
+import { SUBSCRIBE_MODULE_OPTIONS_TOKEN } from './subscribe.module-definition.js';
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import { ApplicationLogger } from '../../common/application.logger.service';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
+import { extract } from '@extractus/feed-extractor';
 
 @Injectable()
 export class SourceService implements OnModuleInit {
@@ -57,8 +57,6 @@ export class SourceService implements OnModuleInit {
   }
 
   async readSource(url: string) {
-    const { extract } = await importESM<typeof import('@extractus/feed-extractor')>('@extractus/feed-extractor');
-
     return await extract(
       url,
       {

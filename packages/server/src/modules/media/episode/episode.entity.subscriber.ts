@@ -2,7 +2,6 @@ import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, Is
 import { Episode } from './episode.entity.js';
 import { instanceToPlain } from 'class-transformer';
 import { NotificationGateway } from '../../notification/notification.gateway.js';
-import { PluginService } from '../../plugin/plugin.service.js';
 import { SeriesSubscribeService } from '../series/series-subscribe.service.js';
 import { EmailService } from '../../notification/email.service.js';
 
@@ -13,7 +12,6 @@ export class EpisodeEntitySubscriber implements EntitySubscriberInterface<Episod
     private seriesSubscribeService: SeriesSubscribeService,
     private notificationGateway: NotificationGateway,
     private emailService: EmailService,
-    private pluginService: PluginService,
   ) {
     dataSource.subscribers.push(this);
   }
@@ -27,7 +25,6 @@ export class EpisodeEntitySubscriber implements EntitySubscriberInterface<Episod
       episode: instanceToPlain(event.entity) as Episode,
       time: new Date(),
     });
-    await this.pluginService.emitAllEnabled('onNewEpisode', event.entity.id);
 
     if (event.entity.series) {
       const [subscribes] = await this.seriesSubscribeService.findAndCount({

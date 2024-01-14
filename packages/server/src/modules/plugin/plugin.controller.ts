@@ -16,6 +16,7 @@ import { PermissionEnum } from '../../enums/permission.enum.js';
 import { buildException } from '../../utils/build-exception.util.js';
 import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
 import { isDefined } from 'class-validator';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 
 @Controller('plugins')
 @UseGuards(AuthorizationGuard)
@@ -30,7 +31,8 @@ export class PluginController {
     description: '获取所有插件信息',
   })
   async getAllPluginControls() {
-    return this.pluginService.getAllControls();
+    const controls = this.pluginService.getAllControls();
+    return new ApiPaginationResultDto(controls, controls.length, 0, -1);
   }
 
   @Post(':id/enable')

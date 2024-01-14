@@ -1,8 +1,7 @@
-import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
+import { ModuleMetadata } from '@nestjs/common';
 
-export interface MinaPlayPluginDescriptor {
+export interface MinaPlayPluginDescriptor extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   id: string;
-  imports?: (Type | DynamicModule | Promise<DynamicModule> | ForwardReference)[];
   version?: string;
   description?: string;
   author?: string;
@@ -13,10 +12,4 @@ export interface MinaPlayPluginHooks {
   onEnabled?();
 
   onDisabled?();
-
-  onNewMedia?(mediaId: string);
-
-  onNewEpisode?(seriesId: number);
 }
-
-export type MinaPlayPluginConstructor = new (...args: any) => MinaPlayPluginHooks;

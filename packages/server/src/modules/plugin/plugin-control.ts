@@ -1,13 +1,10 @@
-import { MinaPlayPluginConstructor, MinaPlayPluginDescriptor, MinaPlayPluginHooks } from '../../interfaces/plugins.js';
-import { DynamicModule, ForwardReference, Type } from '@nestjs/common';
+import { MinaPlayPluginDescriptor, MinaPlayPluginHooks } from '../../interfaces/plugins.js';
+import { Type } from '@nestjs/common';
 import { Exclude, Expose } from 'class-transformer';
 
 export class PluginControl implements MinaPlayPluginDescriptor {
   @Expose()
   id: string;
-
-  @Exclude({ toPlainOnly: true })
-  imports?: (Type | DynamicModule | Promise<DynamicModule> | ForwardReference)[];
 
   @Expose()
   version?: string;
@@ -22,10 +19,10 @@ export class PluginControl implements MinaPlayPluginDescriptor {
   repo?: string;
 
   @Exclude({ toPlainOnly: true })
-  instance: MinaPlayPluginHooks;
+  services: MinaPlayPluginHooks[];
 
   @Exclude({ toPlainOnly: true })
-  type: MinaPlayPluginConstructor;
+  type: Type;
 
   @Expose()
   enabled: boolean;

@@ -4,9 +4,7 @@ import { NestFactory } from '@nestjs/core';
 import { Repository } from 'typeorm';
 import input from '@inquirer/input';
 import { ApplicationScriptModule } from '../common/application.script.module.js';
-import { fileURLToPath } from 'node:url';
 import process from 'node:process';
-import path from 'node:path';
 
 export async function deleteUser() {
   const app = await NestFactory.createApplicationContext(ApplicationScriptModule, {
@@ -34,6 +32,4 @@ export async function deleteUser() {
   await app.close();
 }
 
-if (path.basename(fileURLToPath(import.meta.url)) === path.basename(process.argv[1])) {
-  deleteUser();
-}
+deleteUser();

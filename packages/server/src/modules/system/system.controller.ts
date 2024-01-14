@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Res, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
@@ -6,7 +6,6 @@ import { PermissionEnum } from '../../enums/permission.enum.js';
 import { SystemService } from './system.service.js';
 import { MINAPLAY_VERSION } from '../../constants.js';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
-import { Response } from 'express';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
 
 @Controller('system')
@@ -40,14 +39,5 @@ export class SystemController {
     return {
       logs: ApplicationLogger.getHistoryMessages().join(''),
     };
-  }
-
-  @Post('restart')
-  @ApiOperation({
-    description: '重启应用程序',
-  })
-  async restartApplication(@Res() res: Response) {
-    res.json({});
-    process.send(JSON.stringify({ type: 'app-restart' }));
   }
 }

@@ -123,7 +123,7 @@ import { ApplicationExceptionFilter } from './common/application.exception.filte
     AuthorizationModule,
     UserModule,
     SystemModule,
-    PluginModule.registerAsync(),
+    PluginModule,
   ],
   providers: [
     {

@@ -1,32 +1,76 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
-import { ModuleRef } from '@nestjs/core';
-import { MinaPlayPluginConstructor, MinaPlayPluginHooks } from '../../interfaces/plugins.js';
+import { Injectable, OnModuleInit, Type } from '@nestjs/common';
+import { LazyModuleLoader } from '@nestjs/core';
+import { MinaPlayPluginHooks } from '../../interfaces/plugins.js';
 import { PluginControl } from './plugin-control.js';
-import { plainToInstance } from 'class-transformer';
-import { getMinaPlayPluginDescriptor } from '../../common/plugin.decorator.js';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
+import { getMinaPlayPluginDescriptor, isMinaPlayPlugin } from '../../common/plugin.decorator.js';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
+import path from 'node:path';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import fs from 'fs-extra';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class PluginService implements OnModuleInit {
   private logger = new ApplicationLogger(PluginService.name);
   private controls: PluginControl[] = [];
 
-  constructor(private moduleRef: ModuleRef, @Inject('PLUGINS') private plugins: MinaPlayPluginConstructor[]) {}
+  constructor(private lazyModuleLoader: LazyModuleLoader) {}
+
+  private async findPlugins() {
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const base = path.join(__dirname, '../../plugins');
+    await fs.ensureDir(base);
+
+    const files = fs
+      .readdirSync(base, { withFileTypes: true })
+      .filter((file) => file.isDirectory())
+      .flatMap((dir) => fs.readdirSync(path.join(dir.path, dir.name), { withFileTypes: true }))
+      .filter((file) => file.isFile() && file.name.endsWith('.plugin.js'))
+      .map((file) => pathToFileURL(path.join(file.path, file.name)).href);
+
+    const plugins: Type[] = [];
+    for (const file of files) {
+      try {
+        const module: object = await import(file);
+        for (const attr of Object.values(module)) {
+          if (isMinaPlayPlugin(attr)) {
+            plugins.push(attr);
+          }
+        }
+      } catch (error) {
+        this.logger.error(
+          `Error occurred while loading plugin file: ${path.basename(file)}`,
+          error.stack,
+          PluginService.name,
+        );
+      }
+    }
+
+    return plugins;
+  }
 
   async onModuleInit() {
-    for (const attr of this.plugins) {
-      const descriptor = getMinaPlayPluginDescriptor(attr);
+    const plugins = await this.findPlugins();
+    for (const plugin of plugins) {
+      const descriptor = getMinaPlayPluginDescriptor(plugin);
       try {
-        const instance = await this.moduleRef.create(attr);
-        this.controls.push(
-          plainToInstance(PluginControl, {
-            ...descriptor,
-            instance,
-            type: attr,
-            enabled: true,
-          }),
-        );
+        const module = await this.lazyModuleLoader.load(() => plugin);
+        const services: MinaPlayPluginHooks[] = [];
+        for (const provider of descriptor.providers ?? []) {
+          if (typeof provider === 'function') {
+            const service = await module.get(provider);
+            services.push(service);
+          }
+        }
+
+        const control = plainToInstance(PluginControl, {
+          ...descriptor,
+          enabled: true,
+        });
+        control.services = services;
+        control.type = plugin;
+        this.controls.push(control);
+
         this.logger.log(`Plugin '${descriptor.id}(${descriptor.version ?? 'unknown version'})' created`);
       } catch (error) {
         this.logger.error(
@@ -46,7 +90,9 @@ export class PluginService implements OnModuleInit {
     ...args: Parameters<MinaPlayPluginHooks[T]>
   ) {
     try {
-      await control.instance[hook].apply(control.instance, args);
+      for (const service of control.services) {
+        await service[hook]?.apply(service, args);
+      }
     } catch (error) {
       this.logger.error(
         `Error occurred while invoking hook '${hook}' on plugin '${control.id}'`,
@@ -80,6 +126,6 @@ export class PluginService implements OnModuleInit {
   }
 
   getAllControls() {
-    return new ApiPaginationResultDto(this.controls, this.controls.length, 0, -1);
+    return this.controls;
   }
 }

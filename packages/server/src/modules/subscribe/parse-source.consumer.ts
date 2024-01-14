@@ -20,7 +20,7 @@ export class ParseSourceConsumer {
 
   constructor(
     private sourceService: SourceService,
-    private fetchLogService: ParseLogService,
+    private parseLogService: ParseLogService,
     private ruleService: RuleService,
     private ruleErrorLogService: RuleErrorLogService,
     private downloadService: DownloadService,
@@ -43,7 +43,7 @@ export class ParseSourceConsumer {
     const validRules = rules.filter((rule) => rule.file.isExist);
 
     // save initial log
-    const log = await this.fetchLogService.save({
+    const log = await this.parseLogService.save({
       source: { id: source.id },
       status: validRules.length > 0 ? StatusEnum.PENDING : StatusEnum.SUCCESS,
     });
@@ -57,13 +57,13 @@ export class ParseSourceConsumer {
     let data: FeedData;
     try {
       data = await this.sourceService.readSource(source.url);
-      await this.fetchLogService.save({
+      await this.parseLogService.save({
         id: log.id,
         source: { id: source.id },
         status: StatusEnum.SUCCESS,
       });
     } catch (error) {
-      await this.fetchLogService.save({
+      await this.parseLogService.save({
         id: log.id,
         source: { id: source.id },
         status: StatusEnum.FAILED,

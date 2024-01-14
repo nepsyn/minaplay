@@ -5,22 +5,22 @@ import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'type
 
 @Injectable()
 export class ParseLogService {
-  constructor(@InjectRepository(ParseLog) private fetchLogRepository: Repository<ParseLog>) {}
+  constructor(@InjectRepository(ParseLog) private parseLogRepository: Repository<ParseLog>) {}
 
   async save(log: DeepPartial<ParseLog>) {
-    return await this.fetchLogRepository.save(log);
+    return await this.parseLogRepository.save(log);
   }
 
   async findOneBy(where: FindOptionsWhere<ParseLog>) {
-    return await this.fetchLogRepository.findOneBy(where);
+    return await this.parseLogRepository.findOneBy(where);
   }
 
   async findAndCount(options?: FindManyOptions<ParseLog>) {
-    return await this.fetchLogRepository.findAndCount(options);
+    return await this.parseLogRepository.findAndCount(options);
   }
 
   async delete(where: FindOptionsWhere<ParseLog>) {
-    const result = await this.fetchLogRepository.delete(where);
+    const result = await this.parseLogRepository.delete(where);
     return result.affected > 0;
   }
 }

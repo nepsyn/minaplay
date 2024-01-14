@@ -195,7 +195,7 @@ export class SourceController {
     description: '获取订阅源解析日志',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async getFetchLogsBySourceId(@Param('id', ParseIntPipe) id: number, @Query() query: ParseLogQueryDto) {
+  async getParseLogsBySourceId(@Param('id', ParseIntPipe) id: number, @Query() query: ParseLogQueryDto) {
     const source = await this.sourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -223,7 +223,7 @@ export class SourceController {
     description: '删除所有订阅源解析日志',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async deleteFetchLogsBySourceId(@Param('id', ParseIntPipe) id: number) {
+  async deleteParseLogsBySourceId(@Param('id', ParseIntPipe) id: number) {
     const source = await this.sourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);

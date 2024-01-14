@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsOptional, IsString, MaxLength } from 'class-validator';
 
-export class DownloadTaskDto {
+export class DownloadItemDto {
   @ApiProperty({
     description: '下载链接',
   })
@@ -14,7 +14,7 @@ export class DownloadTaskDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)
-  title?: string;
+  name?: string;
 
   @ApiProperty({
     description: '订阅源ID',

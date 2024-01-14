@@ -1,10 +1,10 @@
-import { FetchLog } from './fetch-log.entity.js';
+import { ParseLog } from './parse-log.entity.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsOptional } from 'class-validator';
 import { StatusEnum } from '../../../enums/status.enum.js';
 import { ApiQueryDto } from '../../../common/api.query.dto.js';
 
-export class FetchLogQueryDto extends ApiQueryDto<FetchLog> {
+export class ParseLogQueryDto extends ApiQueryDto<ParseLog> {
   @ApiProperty({
     description: '状态',
     required: false,

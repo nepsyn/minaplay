@@ -4,10 +4,6 @@ type EventMap = Record<string | symbol, (...args: any[]) => any>;
 type EventKey<T extends EventMap> = Extract<keyof T, string | symbol> | string | symbol;
 
 export class TypedEventEmitter<T extends EventMap = {}> extends EventEmitter {
-  constructor(options?) {
-    super(options);
-  }
-
   addListener<K extends EventKey<T>>(eventName: K, listener: T[K]): this {
     return super.addListener(eventName, listener);
   }

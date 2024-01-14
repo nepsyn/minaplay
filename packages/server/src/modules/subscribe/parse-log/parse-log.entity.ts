@@ -1,12 +1,12 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn, Relation } from 'typeorm';
 import { Source } from '../source/source.entity.js';
 import { Exclude } from 'class-transformer';
-import { DownloadItem } from '../download-item.entity.js';
 import { StatusEnum } from '../../../enums/status.enum.js';
+import { DownloadItem } from '../download/download-item.entity.js';
 
 /** 订阅解析日志 */
 @Entity()
-export class FetchLog {
+export class ParseLog {
   /** id */
   @PrimaryGeneratedColumn('uuid')
   id: string;

@@ -16,8 +16,9 @@ import { USER_UPLOAD_IMAGE_DIR } from '../constants.js';
 import { createIdenticon } from '../utils/create-identicon.util.js';
 import { generateMD5 } from '../utils/generate-md5.util.js';
 import { FileSourceEnum } from '../enums/file-source.enum.js';
+import process from 'node:process';
 
-export async function addRootUser(_username?: string, _password?: string) {
+export async function addRootUser() {
   const app = await NestFactory.createApplicationContext(ApplicationScriptModule, {
     logger: ['error'],
   });
@@ -25,33 +26,27 @@ export async function addRootUser(_username?: string, _password?: string) {
   const permissionRepo: Repository<Permission> = app.get(getRepositoryToken(Permission));
   const fileRepo: Repository<File> = app.get(getRepositoryToken(File));
 
-  const username =
-    _username ??
-    (await input({
-      message: 'Input root user username:',
-      validate: (v) => isString(v) && v.length >= 2 && v.length <= 40,
-      transformer: (v) => v.trim(),
-    }));
+  const username = await input({
+    message: 'Input root user username:',
+    validate: (v) => isString(v) && v.length >= 2 && v.length <= 40,
+    transformer: (v) => v.trim(),
+  });
   const sameNameUser = await userRepo.findOneBy({ username });
   if (sameNameUser) {
     process.stderr.write(`Duplicated username '${username}' in database.\n`);
     process.exit();
   }
 
-  const pass =
-    _password ??
-    (await password({
-      message: 'Input root user password:',
-      validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
-      mask: '*',
-    }));
-  const passConfirm =
-    _password ??
-    (await password({
-      message: 'Confirm root user password:',
-      validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
-      mask: '*',
-    }));
+  const pass = await password({
+    message: 'Input root user password:',
+    validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
+    mask: '*',
+  });
+  const passConfirm = await password({
+    message: 'Confirm root user password:',
+    validate: (v) => isString(v) && v.length >= 6 && v.length <= 40,
+    mask: '*',
+  });
   if (pass !== passConfirm) {
     process.stderr.write('Passwords do not match.\n');
     process.exit();
@@ -87,6 +82,4 @@ export async function addRootUser(_username?: string, _password?: string) {
   await app.close();
 }
 
-if (require.main === module) {
-  addRootUser();
-}
+addRootUser();

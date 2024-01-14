@@ -21,7 +21,7 @@ export class SourceService implements OnModuleInit {
     private options: SubscribeModuleOptions,
     @InjectRepository(Source) private sourceRepository: Repository<Source>,
     private scheduleRegistry: SchedulerRegistry,
-    @InjectQueue('fetch-subscribe-source') private fetchSubscribeSourceQueue: Queue,
+    @InjectQueue('parse-source') private fetchSubscribeSourceQueue: Queue,
   ) {}
 
   static buildFetchJobName(id: number) {

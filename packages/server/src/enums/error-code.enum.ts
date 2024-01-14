@@ -42,6 +42,8 @@ export enum ErrorCodeEnum {
   INVALID_SUBSCRIBE_SOURCE_FORMAT = 0x0501,
   /** 订阅规则代码错误 */
   INVALID_SUBSCRIBE_RULE_CODE = 0x0502,
+  /** 重复下载 */
+  DUPLICATED_DOWNLOAD_ITEM = 0x0503,
 
   /** 用户被禁止发言 */
   USER_CHAT_MUTED = 0x0601,

@@ -25,16 +25,16 @@ import { User } from '../../user/user.entity.js';
 import { SourceQueryDto } from './source-query.dto.js';
 import { buildQueryOptions } from '../../../utils/build-query-options.util.js';
 import { Source } from './source.entity.js';
-import { FetchLogService } from '../fetch-log/fetch-log.service.js';
-import { FetchLogQueryDto } from '../fetch-log/fetch-log-query.dto.js';
-import { FetchLog } from '../fetch-log/fetch-log.entity.js';
 import { Between } from 'typeorm';
-import { DownloadItemQueryDto } from '../download-item-query.dto.js';
-import { DownloadItemService } from '../download-item.service.js';
-import { DownloadItem } from '../download-item.entity.js';
 import { ApiPaginationResultDto } from '../../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
 import { CronTime } from 'cron';
+import { ParseLogService } from '../parse-log/parse-log.service.js';
+import { DownloadService } from '../download/download.service.js';
+import { ParseLog } from '../parse-log/parse-log.entity.js';
+import { DownloadItemQueryDto } from '../download/download-item-query.dto.js';
+import { DownloadItem } from '../download/download-item.entity.js';
+import { ParseLogQueryDto } from '../parse-log/parse-log-query.dto.js';
 
 @Controller('subscribe/source')
 @UseGuards(AuthorizationGuard)
@@ -43,8 +43,8 @@ import { CronTime } from 'cron';
 export class SourceController {
   constructor(
     private sourceService: SourceService,
-    private fetchLogService: FetchLogService,
-    private downloadItemService: DownloadItemService,
+    private parseLogService: ParseLogService,
+    private downloadService: DownloadService,
   ) {}
 
   @Post()
@@ -195,15 +195,15 @@ export class SourceController {
     description: '获取订阅源解析日志',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async getFetchLogsBySourceId(@Param('id', ParseIntPipe) id: number, @Query() query: FetchLogQueryDto) {
+  async getFetchLogsBySourceId(@Param('id', ParseIntPipe) id: number, @Query() query: ParseLogQueryDto) {
     const source = await this.sourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
     const { status, start, end } = query;
-    const [result, total] = await this.fetchLogService.findAndCount({
-      where: buildQueryOptions<FetchLog>({
+    const [result, total] = await this.parseLogService.findAndCount({
+      where: buildQueryOptions<ParseLog>({
         exact: {
           source: { id },
           status,
@@ -229,7 +229,7 @@ export class SourceController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    await this.fetchLogService.delete({
+    await this.parseLogService.delete({
       source: { id },
     });
     return {};
@@ -247,10 +247,10 @@ export class SourceController {
     }
 
     const { keyword, url, ruleId, logId, start, end, status } = query;
-    const [result, total] = await this.downloadItemService.findAndCount({
+    const [result, total] = await this.downloadService.findAndCount({
       where: buildQueryOptions<DownloadItem>({
         keyword,
-        keywordProperties: (entity) => [entity.title, entity.url],
+        keywordProperties: (entity) => [entity.name, entity.url],
         exact: {
           url,
           source: { id },

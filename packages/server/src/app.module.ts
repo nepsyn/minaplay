@@ -11,7 +11,6 @@ import { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-yet';
 import { buildException } from './utils/build-exception.util.js';
 import { ErrorCodeEnum } from './enums/error-code.enum.js';
-import { Aria2Module } from './modules/aria2/aria2.module.js';
 import { LiveModule } from './modules/live/live.module.js';
 import { cpus } from 'node:os';
 import { UserModule } from './modules/user/user.module.js';
@@ -66,20 +65,6 @@ import { ApplicationExceptionFilter } from './common/application.exception.filte
         migrationsRun: configService.get('APP_ENV') !== 'dev',
       }),
     }),
-    Aria2Module.registerAsync({
-      inject: [ConfigService],
-      isGlobal: true,
-      useFactory: (configService: ConfigService) => ({
-        rpcHost: configService.get('ARIA2_RPC_HOST', '127.0.0.1'),
-        rpcPort: Number(configService.get('ARIA2_RPC_PORT', 6800)),
-        rpcPath: configService.get('ARIA2_RPC_PATH', '/jsonrpc'),
-        rpcSecret: configService.get('ARIA2_RPC_SECRET'),
-        autoUpdateTracker: Number(configService.get('ARIA2_AUTO_UPDATE_TRACKER', 0)) === 1,
-        trackerListUrl: configService.get('ARIA2_TRACKER_LIST_URL'),
-        expireHours: Number(configService.get('ARIA2_EXPIRE_HOURS', 0)) || 0,
-        httpProxy: configService.get('APP_FETCH_HTTP_PROXY', undefined),
-      }),
-    }),
     LiveModule.registerAsync({
       inject: [ConfigService],
       isGlobal: true,
@@ -110,7 +95,13 @@ import { ApplicationExceptionFilter } from './common/application.exception.filte
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
-        httpProxy: configService.get('APP_FETCH_HTTP_PROXY', undefined),
+        rpcHost: configService.get('ARIA2_RPC_HOST', '127.0.0.1'),
+        rpcPort: Number(configService.get('ARIA2_RPC_PORT', 6800)),
+        rpcPath: configService.get('ARIA2_RPC_PATH', '/jsonrpc'),
+        rpcSecret: configService.get('ARIA2_RPC_SECRET'),
+        trackerAutoUpdate: Number(configService.get('ARIA2_AUTO_UPDATE_TRACKER', 0)) === 1,
+        trackerUpdateUrl: configService.get('ARIA2_TRACKER_LIST_URL'),
+        httpProxy: configService.get('APP_HTTP_PROXY', undefined),
       }),
     }),
     NotificationModule.registerAsync({

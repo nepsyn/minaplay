@@ -11,9 +11,9 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { User } from '../../user/user.entity.js';
-import { FetchLog } from '../fetch-log/fetch-log.entity.js';
-import { DownloadItem } from '../download-item.entity.js';
 import { Rule } from '../rule/rule.entity.js';
+import { ParseLog } from '../parse-log/parse-log.entity.js';
+import { DownloadItem } from '../download/download-item.entity.js';
 
 /** 订阅源 */
 @Entity()
@@ -60,8 +60,8 @@ export class Source {
 
   /** 更新记录 */
   @Exclude()
-  @OneToMany(() => FetchLog, (log) => log.source)
-  logs: Relation<Promise<FetchLog[]>>;
+  @OneToMany(() => ParseLog, (log) => log.source)
+  logs: Relation<Promise<ParseLog[]>>;
 
   /** 下载内容 */
   @Exclude()

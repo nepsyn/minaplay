@@ -1,11 +1,11 @@
-import { FetchLog } from './fetch-log/fetch-log.entity.js';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
-import { StatusEnum } from '../../enums/status.enum.js';
+import { StatusEnum } from '../../../enums/status.enum.js';
 import { Transform } from 'class-transformer';
-import { ApiQueryDto } from '../../common/api.query.dto.js';
+import { ApiQueryDto } from '../../../common/api.query.dto.js';
+import { DownloadItem } from './download-item.entity.js';
 
-export class DownloadItemQueryDto extends ApiQueryDto<FetchLog> {
+export class DownloadItemQueryDto extends ApiQueryDto<DownloadItem> {
   @ApiProperty({
     description: '查询关键字',
     required: false,

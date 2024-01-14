@@ -11,7 +11,7 @@ import {
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { File } from '../file/file.entity.js';
-import { DownloadItem } from '../subscribe/download-item.entity.js';
+import { DownloadItem } from '../subscribe/download/download-item.entity.js';
 
 @Entity()
 export class Media {

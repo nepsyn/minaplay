@@ -1,25 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { FetchLog } from './fetch-log.entity.js';
+import { ParseLog } from './parse-log.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 
 @Injectable()
-export class FetchLogService {
-  constructor(@InjectRepository(FetchLog) private fetchLogRepository: Repository<FetchLog>) {}
+export class ParseLogService {
+  constructor(@InjectRepository(ParseLog) private fetchLogRepository: Repository<ParseLog>) {}
 
-  async save(log: DeepPartial<FetchLog>) {
+  async save(log: DeepPartial<ParseLog>) {
     return await this.fetchLogRepository.save(log);
   }
 
-  async findOneBy(where: FindOptionsWhere<FetchLog>) {
+  async findOneBy(where: FindOptionsWhere<ParseLog>) {
     return await this.fetchLogRepository.findOneBy(where);
   }
 
-  async findAndCount(options?: FindManyOptions<FetchLog>) {
+  async findAndCount(options?: FindManyOptions<ParseLog>) {
     return await this.fetchLogRepository.findAndCount(options);
   }
 
-  async delete(where: FindOptionsWhere<FetchLog>) {
+  async delete(where: FindOptionsWhere<ParseLog>) {
     const result = await this.fetchLogRepository.delete(where);
     return result.affected > 0;
   }

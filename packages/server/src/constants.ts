@@ -9,8 +9,8 @@ export const MINAPLAY_VERSION = fs.readJSONSync(path.join(__dirname, '../package
 
 export const USER_UPLOAD_IMAGE_DIR = path.join(DATA_DIR, 'upload/image');
 export const USER_UPLOAD_VIDEO_DIR = path.join(DATA_DIR, 'upload/video');
-export const ARIA2_DOWNLOAD_DIR = path.join(DATA_DIR, 'download');
-export const SUBSCRIBE_RULE_SOURCE_DIR = path.join(DATA_DIR, 'rule');
+export const DOWNLOAD_DIR = path.join(DATA_DIR, 'download');
+export const RULE_CODE_DIR = path.join(DATA_DIR, 'rule');
 export const GENERATED_DIR = path.join(DATA_DIR, 'generated');
 export const LIVE_STREAM_DIR = path.join(DATA_DIR, 'live');
 

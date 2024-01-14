@@ -1,32 +1,33 @@
 import { Process, Processor } from '@nestjs/bull';
 import { Injectable } from '@nestjs/common';
-import { SourceService } from '../source/source.service.js';
+import { SourceService } from './source/source.service.js';
 import { Job } from 'bull';
-import { Source } from '../source/source.entity.js';
-import { FetchLogService } from './fetch-log.service.js';
-import { RuleService } from '../rule/rule.service.js';
-import { DownloadItemService } from '../download-item.service.js';
-import { StatusEnum } from '../../../enums/status.enum.js';
+import { Source } from './source/source.entity.js';
+import { ParseLogService } from './parse-log/parse-log.service.js';
+import { RuleService } from './rule/rule.service.js';
+import { StatusEnum } from '../../enums/status.enum.js';
 import { FeedData } from '@extractus/feed-extractor';
-import { RuleErrorLogService } from '../rule/rule-error-log.service.js';
-import { RuleHooks } from '../rule/rule.interface.js';
-import { ApplicationLogger } from '../../../common/application.logger.service.js';
+import { RuleErrorLogService } from './rule/rule-error-log.service.js';
+import { RuleHooks } from './rule/rule.interface.js';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
+import { DownloadService } from './download/download.service.js';
+import { generateMD5 } from '../../utils/generate-md5.util.js';
 
 @Injectable()
-@Processor('fetch-subscribe-source')
-export class FetchSubscribeSourceConsumer {
-  private logger = new ApplicationLogger(FetchSubscribeSourceConsumer.name);
+@Processor('parse-source')
+export class ParseSourceConsumer {
+  private logger = new ApplicationLogger(ParseSourceConsumer.name);
 
   constructor(
     private sourceService: SourceService,
-    private fetchLogService: FetchLogService,
+    private fetchLogService: ParseLogService,
     private ruleService: RuleService,
     private ruleErrorLogService: RuleErrorLogService,
-    private downloadItemService: DownloadItemService,
+    private downloadService: DownloadService,
   ) {}
 
   @Process()
-  async fetchSubscribeSource(job: Job<Source>) {
+  async parseSubscribeSource(job: Job<Source>) {
     const { id } = job.data;
     // find source
     const source = await this.sourceService.findOneBy({ id });
@@ -95,7 +96,7 @@ export class FetchSubscribeSourceConsumer {
       }
 
       for (const entry of validEntries) {
-        const sameItem = await this.downloadItemService.findOneBy({ title: entry.title });
+        const sameItem = await this.downloadService.findOneBy({ hash: await generateMD5(entry.enclosure.url) });
         if (sameItem) {
           continue;
         }
@@ -114,7 +115,7 @@ export class FetchSubscribeSourceConsumer {
           break;
         }
 
-        await this.downloadItemService.addAutoDownloadItemTask(entry, {
+        await this.downloadService.createAutoDownloadTask(entry, {
           describeFn: hooks.describe,
           rule,
           source,
@@ -125,7 +126,7 @@ export class FetchSubscribeSourceConsumer {
       }
     }
     this.logger.log(
-      `Fetch subscribe source ${source.title ?? source.remark ?? source.url} done, ${count} entry(s) downloading`,
+      `Parse subscribe source ${source.title ?? source.remark ?? source.url} done, ${count} entry(s) downloading`,
     );
   }
 }

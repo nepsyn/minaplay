@@ -12,26 +12,25 @@ import {
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { AuthorizationGuard } from '../authorization/authorization.guard.js';
+import { AuthorizationGuard } from '../../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { DownloadItemService } from './download-item.service.js';
-import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
-import { PermissionEnum } from '../../enums/permission.enum.js';
-import { DownloadTaskDto } from './download-task.dto.js';
-import { buildException } from '../../utils/build-exception.util.js';
-import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
-import { StatusEnum } from '../../enums/status.enum.js';
-import { RuleFileDescriber } from './rule/rule.interface.js';
-import { RuleService } from './rule/rule.service.js';
-import { RuleErrorLogService } from './rule/rule-error-log.service.js';
+import { RequirePermissions } from '../../authorization/require-permissions.decorator.js';
+import { PermissionEnum } from '../../../enums/permission.enum.js';
+import { buildException } from '../../../utils/build-exception.util.js';
+import { ErrorCodeEnum } from '../../../enums/error-code.enum.js';
+import { StatusEnum } from '../../../enums/status.enum.js';
 import { DownloadItemQueryDto } from './download-item-query.dto.js';
-import { buildQueryOptions } from '../../utils/build-query-options.util.js';
+import { buildQueryOptions } from '../../../utils/build-query-options.util.js';
 import { DownloadItem } from './download-item.entity.js';
-import { Between, In, IsNull, Not } from 'typeorm';
-import { Aria2Service } from '../aria2/aria2.service.js';
-import { SourceService } from './source/source.service.js';
-import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
+import { Between, In } from 'typeorm';
+import { ApiPaginationResultDto } from '../../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
+import { DownloadService } from './download.service.js';
+import { DownloadItemDto } from './download-item.dto.js';
+import { RuleFileDescriber } from '../rule/rule.interface.js';
+import { RuleService } from '../rule/rule.service.js';
+import { RuleErrorLogService } from '../rule/rule-error-log.service.js';
+import { generateMD5 } from '../../../utils/generate-md5.util.js';
 
 @Controller('subscribe/download')
 @UseGuards(AuthorizationGuard)
@@ -39,11 +38,9 @@ import { isDefined } from 'class-validator';
 @ApiBearerAuth()
 export class DownloadItemController {
   constructor(
-    private downloadItemService: DownloadItemService,
-    private sourceService: SourceService,
+    private downloadService: DownloadService,
     private ruleService: RuleService,
     private ruleErrorLogService: RuleErrorLogService,
-    private aria2Service: Aria2Service,
   ) {}
 
   @Post()
@@ -51,11 +48,18 @@ export class DownloadItemController {
     description: '添加下载任务',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async createDownloadTask(@Body() data: DownloadTaskDto) {
-    const [, item] = await this.downloadItemService.addAutoDownloadItemTask(
+  async createDownloadTask(@Body() data: DownloadItemDto) {
+    const sameHashItem = await this.downloadService.findOneBy({
+      hash: await generateMD5(data.url),
+    });
+    if (sameHashItem) {
+      throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATED_DOWNLOAD_ITEM);
+    }
+
+    const { itemId } = await this.downloadService.createAutoDownloadTask(
       {
-        id: data.title,
-        title: data.title ?? data.url,
+        id: data.name,
+        title: data.name ?? data.url,
         enclosure: {
           url: data.url,
         },
@@ -65,7 +69,7 @@ export class DownloadItemController {
       },
     );
 
-    return await this.downloadItemService.findOneBy({ id: item.id });
+    return await this.downloadService.findOneBy({ id: itemId });
   }
 
   @Get(':id')
@@ -78,7 +82,7 @@ export class DownloadItemController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    const item = await this.downloadItemService.findOneBy({ id });
+    const item = await this.downloadService.findOneBy({ id });
     if (!item) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
@@ -97,7 +101,7 @@ export class DownloadItemController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    const item = await this.downloadItemService.findOneBy({ id });
+    const item = await this.downloadService.findOneBy({ id });
     if (!item) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
@@ -119,7 +123,7 @@ export class DownloadItemController {
       }
     }
 
-    const [, { id: itemId }] = await this.downloadItemService.addAutoDownloadItemTask(JSON.parse(item.entry), {
+    const { itemId } = await this.downloadService.createAutoDownloadTask(JSON.parse(item.entry), {
       item,
       describeFn: describe,
       rule: item.rule,
@@ -127,7 +131,7 @@ export class DownloadItemController {
       log: item.log,
     });
 
-    return await this.downloadItemService.findOneBy({ id: itemId });
+    return await this.downloadService.findOneBy({ id: itemId });
   }
 
   @Post(':id/pause')
@@ -141,22 +145,22 @@ export class DownloadItemController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    const item = await this.downloadItemService.findOneBy({
+    const item = await this.downloadService.findOneBy({
       id,
-      gid: Not(IsNull()),
       status: StatusEnum.PENDING,
     });
     if (!item) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    await this.downloadItemService.save({
-      id: item.id,
-      status: StatusEnum.PAUSED,
-    });
-    await this.aria2Service.pauseBy(item.gid);
-
-    return await this.downloadItemService.findOneBy({ id: item.id });
+    const task = await this.downloadService.getTaskByItemId(item.id);
+    if (task) {
+      await task.pause();
+      return await this.downloadService.findOneBy({ id: item.id });
+    } else {
+      await this.downloadService.delete({ id: item.id });
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
   }
 
   @Post(':id/unpause')
@@ -170,22 +174,22 @@ export class DownloadItemController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    const item = await this.downloadItemService.findOneBy({
+    const item = await this.downloadService.findOneBy({
       id,
-      gid: Not(IsNull()),
       status: StatusEnum.PAUSED,
     });
     if (!item) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    await this.downloadItemService.save({
-      id: item.id,
-      status: StatusEnum.PENDING,
-    });
-    await this.aria2Service.unpauseBy(item.gid);
-
-    return await this.downloadItemService.findOneBy({ id: item.id });
+    const task = await this.downloadService.getTaskByItemId(item.id);
+    if (task) {
+      await task.unpause();
+      return await this.downloadService.findOneBy({ id: item.id });
+    } else {
+      await this.downloadService.delete({ id: item.id });
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
   }
 
   @Post(':id/cancel')
@@ -199,23 +203,22 @@ export class DownloadItemController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    const item = await this.downloadItemService.findOneBy({
+    const item = await this.downloadService.findOneBy({
       id,
-      gid: Not(IsNull()),
       status: In([StatusEnum.PENDING, StatusEnum.PAUSED]),
     });
     if (!item) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    await this.downloadItemService.save({
-      id: item.id,
-      status: StatusEnum.FAILED,
-      error: 'User canceled',
-    });
-    await this.aria2Service.removeBy(item.gid);
-
-    return await this.downloadItemService.findOneBy({ id: item.id });
+    const task = await this.downloadService.getTaskByItemId(item.id);
+    if (task) {
+      await task.remove();
+      return await this.downloadService.findOneBy({ id: item.id });
+    } else {
+      await this.downloadService.delete({ id: item.id });
+      throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
+    }
   }
 
   @Get()
@@ -225,10 +228,10 @@ export class DownloadItemController {
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async queryDownloadItem(@Query() query: DownloadItemQueryDto) {
     const { keyword, url, sourceId, ruleId, logId, start, end, status } = query;
-    const [result, total] = await this.downloadItemService.findAndCount({
+    const [result, total] = await this.downloadService.findAndCount({
       where: buildQueryOptions<DownloadItem>({
         keyword,
-        keywordProperties: (entity) => [entity.title, entity.url],
+        keywordProperties: (entity) => [entity.name, entity.url],
         exact: {
           url,
           source: { id: sourceId },
@@ -256,7 +259,7 @@ export class DownloadItemController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    await this.downloadItemService.delete({ id });
+    await this.downloadService.delete({ id });
     return {};
   }
 }

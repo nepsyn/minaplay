@@ -4,19 +4,20 @@ import { NestFactory } from '@nestjs/core';
 import { Repository } from 'typeorm';
 import input from '@inquirer/input';
 import { ApplicationScriptModule } from '../common/application.script.module.js';
+import { fileURLToPath } from 'node:url';
+import process from 'node:process';
+import path from 'node:path';
 
-export async function deleteUser(_username?: string) {
+export async function deleteUser() {
   const app = await NestFactory.createApplicationContext(ApplicationScriptModule, {
     logger: ['error'],
   });
   const userRepo: Repository<User> = app.get(getRepositoryToken(User));
 
-  const username =
-    _username ??
-    (await input({
-      message: 'Input user username:',
-      transformer: (v) => v.trim(),
-    }));
+  const username = await input({
+    message: 'Input user username:',
+    transformer: (v) => v.trim(),
+  });
   const user = await userRepo.findOneBy({ username });
   if (!user) {
     process.stderr.write(`User '${username}' not found in database.\n`);
@@ -33,6 +34,6 @@ export async function deleteUser(_username?: string) {
   await app.close();
 }
 
-if (require.main === module) {
+if (path.basename(fileURLToPath(import.meta.url)) === path.basename(process.argv[1])) {
   deleteUser();
 }

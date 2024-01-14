@@ -24,7 +24,7 @@ import { buildException } from '../../../utils/build-exception.util.js';
 import { ErrorCodeEnum } from '../../../enums/error-code.enum.js';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
-import { SUBSCRIBE_RULE_SOURCE_DIR } from '../../../constants.js';
+import { RULE_CODE_DIR } from '../../../constants.js';
 import fs from 'fs-extra';
 import { generateMD5 } from '../../../utils/generate-md5.util.js';
 import { FileSourceEnum } from '../../../enums/file-source.enum.js';
@@ -63,8 +63,8 @@ export class RuleController {
     }
 
     const filename = randomUUID().replace(/-/g, '') + '.ts';
-    const filepath = path.join(SUBSCRIBE_RULE_SOURCE_DIR, filename);
-    await fs.ensureDir(SUBSCRIBE_RULE_SOURCE_DIR);
+    const filepath = path.join(RULE_CODE_DIR, filename);
+    await fs.ensureDir(RULE_CODE_DIR);
     await fs.writeFile(filepath, data.code);
     const fileStat = await fs.stat(filepath);
     const file = await this.fileService.save({
@@ -144,7 +144,7 @@ export class RuleController {
     }
 
     if (data.code) {
-      await fs.ensureDir(SUBSCRIBE_RULE_SOURCE_DIR);
+      await fs.ensureDir(RULE_CODE_DIR);
       await fs.writeFile(rule.file.path, data.code);
       const fileStat = await fs.stat(rule.file.path);
       await this.fileService.save({

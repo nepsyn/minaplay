@@ -34,7 +34,7 @@ export class DownloadTask extends TypedEventEmitter<DownloadTaskEventMap> {
     });
   }
 
-  async remove() {
+  async remove(): Promise<Aria2DownloadStatus> {
     return new Promise(async (resolve) => {
       this.once('stop', (status) => resolve(status));
       await aria2.forceRemove(this.conn, (await this.getFollowedGid()) ?? this.taskId);

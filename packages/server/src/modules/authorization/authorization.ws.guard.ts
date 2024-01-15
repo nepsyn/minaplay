@@ -6,7 +6,7 @@ import { UserService } from '../user/user.service.js';
 import { AuthorizationService } from './authorization.service.js';
 import { buildException } from '../../utils/build-exception.util.js';
 import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
-import { PERMISSIONS_SYMBOL } from './require-permissions.decorator.js';
+import { REQUIRE_PERMISSIONS_KEY } from './require-permissions.decorator.js';
 import { PermissionEnum } from '../../enums/permission.enum.js';
 import { User } from '../user/user.entity.js';
 
@@ -43,7 +43,7 @@ export class AuthorizationWsGuard implements CanActivate {
     }
 
     // 所需要权限
-    const permissions = this.reflector.get<PermissionEnum[]>(PERMISSIONS_SYMBOL, context.getHandler());
+    const permissions = this.reflector.get<PermissionEnum[]>(REQUIRE_PERMISSIONS_KEY, context.getHandler());
     if (permissions && permissions.length > 0) {
       if (!permissions.some((p) => socket.data.user.permissionNames.includes(p))) {
         throw buildException(WsException, ErrorCodeEnum.NO_PERMISSION);

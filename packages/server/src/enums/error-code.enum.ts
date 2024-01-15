@@ -12,6 +12,8 @@ export enum ErrorCodeEnum {
   NO_SYNC_FIELD = 0x0005,
   /** 请求资源不存在 */
   NOT_FOUND = 0x0006,
+  /** 处理超时 */
+  TIMEOUT = 0x0007,
 
   /** 用户名或密码错误 */
   WRONG_USERNAME_OR_PASSWORD = 0x0101,

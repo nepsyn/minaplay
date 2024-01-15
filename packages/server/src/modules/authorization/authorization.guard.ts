@@ -2,7 +2,7 @@ import { CanActivate, ExecutionContext, HttpException, Injectable, UnauthorizedE
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception.js';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { PERMISSIONS_SYMBOL } from './require-permissions.decorator.js';
+import { REQUIRE_PERMISSIONS_KEY } from './require-permissions.decorator.js';
 import { User } from '../user/user.entity.js';
 import { buildException } from '../../utils/build-exception.util.js';
 import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
@@ -25,7 +25,7 @@ export class AuthorizationGuard extends AuthGuard('jwt') implements CanActivate 
       }
     }
 
-    const permissions = this.reflector.get<PermissionEnum[]>(PERMISSIONS_SYMBOL, context.getHandler());
+    const permissions = this.reflector.get<PermissionEnum[]>(REQUIRE_PERMISSIONS_KEY, context.getHandler());
     if (permissions && permissions.length > 0) {
       const user: User = context.switchToHttp().getRequest().user;
       if (!user) {

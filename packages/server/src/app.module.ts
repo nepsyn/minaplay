@@ -20,6 +20,7 @@ import { SystemModule } from './modules/system/system.module.js';
 import { NotificationModule } from './modules/notification/notification.module.js';
 import { PluginModule } from './modules/plugin/plugin.module.js';
 import { ApplicationExceptionFilter } from './common/application.exception.filter.js';
+import { ApplicationTimeoutInterceptor } from './common/application.timeout.interceptor.js';
 
 @Module({
   imports: [
@@ -143,6 +144,10 @@ import { ApplicationExceptionFilter } from './common/application.exception.filte
     {
       provide: APP_INTERCEPTOR,
       useClass: ClassSerializerInterceptor,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ApplicationTimeoutInterceptor,
     },
   ],
 })

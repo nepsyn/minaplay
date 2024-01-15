@@ -1,8 +1,8 @@
-import { MinaPlayPluginDescriptor, MinaPlayPluginHooks } from '../../interfaces/plugins.js';
+import { MinaPlayPluginHooks } from '../../interfaces/plugins.js';
 import { Type } from '@nestjs/common';
 import { Exclude, Expose } from 'class-transformer';
 
-export class PluginControl implements MinaPlayPluginDescriptor {
+export class PluginControl {
   @Expose()
   id: string;
 
@@ -18,12 +18,12 @@ export class PluginControl implements MinaPlayPluginDescriptor {
   @Expose()
   repo?: string;
 
-  @Exclude({ toPlainOnly: true })
-  services: MinaPlayPluginHooks[];
-
-  @Exclude({ toPlainOnly: true })
-  type: Type;
-
   @Expose()
   enabled: boolean;
+
+  @Exclude()
+  services: MinaPlayPluginHooks[];
+
+  @Exclude()
+  type: Type;
 }

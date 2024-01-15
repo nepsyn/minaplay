@@ -7,7 +7,6 @@ import { ApplicationLogger } from '../../common/application.logger.service.js';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import fs from 'fs-extra';
-import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class PluginService implements OnModuleInit {
@@ -63,12 +62,16 @@ export class PluginService implements OnModuleInit {
           }
         }
 
-        const control = plainToInstance(PluginControl, {
-          ...descriptor,
+        const control = Object.assign(new PluginControl(), {
+          id: descriptor.id,
+          version: descriptor.version,
+          description: descriptor.description,
+          author: descriptor.author,
+          repo: descriptor.repo,
           enabled: true,
+          services,
+          type: plugin,
         });
-        control.services = services;
-        control.type = plugin;
         this.controls.push(control);
 
         this.logger.log(`Plugin '${descriptor.id}(${descriptor.version ?? 'unknown version'})' created`);

@@ -2,31 +2,58 @@ import { FeedEntry } from '@extractus/feed-extractor';
 import { File } from '../../file/file.entity.js';
 
 export interface RuleEntryValidator {
+  /**
+   * Validate an RSS feed entry, Returns whether MinaPlay should download this entry
+   * @param entry Original RSS feed entry
+   */
   (entry: FeedEntry): boolean | Promise<boolean>;
 }
 
 export interface RuleMediaDescriptor {
+  /** Name of this media */
   name?: string;
+  /** Description of this media */
   description?: string;
+  /** Indicate that whether this media is public visible */
   isPublic?: boolean;
 }
 
-export interface RuleEpisodeDescriptor {
-  series: string;
+export interface RuleSeriesDescriptor {
+  /** Name of the series this media file belongs to */
+  name: string;
+  /** Season name of the series this media file belongs to */
   season?: string;
+}
 
-  title?: string;
+export interface RuleEpisodeDescriptor {
+  /** Title of this episode */
+  title: string;
+  /** Number of this episode */
   no?: string;
+  /** Publish date of this episode */
   pubAt?: Date;
 }
 
 export interface RuleFileDescriptor {
+  /** Media descriptor */
   media?: RuleMediaDescriptor;
+  /** Series descriptor */
+  series?: RuleSeriesDescriptor;
+  /** Episode descriptor */
   episode?: RuleEpisodeDescriptor;
+
+  /** Indicates whether to overwrite the original episode when episode of the same 'title' & 'no' exists in MinaPlay */
+  overwriteEpisode?: boolean;
 }
 
 export interface RuleFileDescriber {
-  (entry: FeedEntry, file: File): RuleFileDescriptor | Promise<RuleFileDescriptor>;
+  /**
+   * Describe a downloaded media file
+   * @param entry Original RSS feed entry
+   * @param file Media file
+   * @param files Media files in the same download task
+   */
+  (entry: FeedEntry, file: File, files: File[]): RuleFileDescriptor | Promise<RuleFileDescriptor>;
 }
 
 export interface RuleHooks {

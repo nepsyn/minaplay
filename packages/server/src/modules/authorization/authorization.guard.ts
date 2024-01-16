@@ -25,7 +25,10 @@ export class AuthorizationGuard extends AuthGuard('jwt') implements CanActivate 
       }
     }
 
-    const permissions = this.reflector.get<PermissionEnum[]>(REQUIRE_PERMISSIONS_KEY, context.getHandler());
+    const permissions = this.reflector.getAllAndMerge<PermissionEnum[]>(REQUIRE_PERMISSIONS_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     if (permissions && permissions.length > 0) {
       const user: User = context.switchToHttp().getRequest().user;
       if (!user) {

@@ -111,7 +111,7 @@ export class RuleController {
     if (sourceId) {
       const source = await this.sourceService.findOneBy({ id: sourceId });
       if (source) {
-        const rules = await source.rules;
+        const rules = (await source.rules) ?? [];
         idCondition = In(rules.map(({ id }) => id));
       }
     }

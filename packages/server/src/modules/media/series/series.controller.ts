@@ -89,7 +89,7 @@ export class SeriesController {
     if (tagName) {
       const tag = await this.seriesTagService.findOneBy({ name: tagName });
       if (tag) {
-        const series = await tag.series;
+        const series = (await tag.series) ?? [];
         idCondition = In(series.map(({ id }) => id));
       }
     }

@@ -144,6 +144,17 @@
             ></v-text-field>
           </v-container>
           <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('episode.entity.pubAt') }}</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              v-model="editItem.pubAt"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
             <span class="text-body-1 font-weight-bold">{{ t('series.entity.description') }}</span>
             <v-textarea
               class="mt-2"
@@ -329,6 +340,11 @@ const headers = ref([
     key: 'season',
   },
   {
+    title: t('series.entity.pubAt'),
+    key: 'pubAt',
+    value: (row: any) => new Date(row.pubAt).toLocaleDateString(locale.value),
+  },
+  {
     title: t('series.entity.count'),
     key: 'count',
     value: (row: any) => row.count || t('app.unknown'),
@@ -370,6 +386,7 @@ const {
   return handler({
     name: series.name,
     season: series.season,
+    pubAt: series.pubAt,
     description: series.description,
     count: series.count,
     finished: series.finished,

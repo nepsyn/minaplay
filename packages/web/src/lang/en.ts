@@ -1,6 +1,7 @@
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { StatusEnum } from '@/api/enums/status.enum';
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
+import { AuthActionEnum } from '@/api/enums/auth-action.enum';
 
 export default {
   app: {
@@ -164,11 +165,13 @@ export default {
     },
   },
   series: {
+    seasonLabel: 'Season {season}',
     entity: {
       name: 'Name',
       description: 'Description',
       poster: 'Poster',
       season: 'Season',
+      pubAt: 'Publish Date',
       tags: 'Tags',
       count: 'Total Episode Count',
       finished: 'Finished',
@@ -182,7 +185,7 @@ export default {
       no: 'No.',
       series: 'Series',
       media: 'Media',
-      pubAt: 'Publish At',
+      pubAt: 'Publish Time',
       createAt: 'Create At',
     },
   },
@@ -324,7 +327,7 @@ export default {
     },
     source: {
       [FileSourceEnum.AUTO_GENERATED]: 'Auto Generate',
-      [FileSourceEnum.ARIA2_DOWNLOAD]: 'Auto Download',
+      [FileSourceEnum.DOWNLOAD]: 'Auto Download',
       [FileSourceEnum.USER_UPLOAD]: 'User Upload',
       other: 'Unknown Source',
     },
@@ -389,6 +392,23 @@ export default {
       },
     },
   },
+  actionLog: {
+    entity: {
+      ip: 'IP',
+      action: 'Action',
+      operator: 'Operator',
+      target: 'Target',
+      createAt: 'Create At',
+    },
+    actions: {
+      [AuthActionEnum.LOGIN]: 'LOGIN',
+      [AuthActionEnum.LOGOUT]: 'LOGOUT',
+      [AuthActionEnum.REFRESH]: 'REFRESH TOKEN',
+      [AuthActionEnum.GRANT]: 'GRANT PERMISSIONS',
+      [AuthActionEnum.BIND_EMAIL]: 'BIND EMAIL',
+      [AuthActionEnum.CHANGE_PASSWORD]: 'CHANGE PASSWORD',
+    },
+  },
   dashboard: {
     nav: {
       application: 'Application',
@@ -396,6 +416,7 @@ export default {
     },
     system: 'System',
     logs: 'Application Logs',
+    actionLogs: 'Auth Action Logs',
     user: 'Users',
     source: 'Sources',
     rule: 'Rules',
@@ -442,12 +463,13 @@ export default {
     [ErrorCodeEnum.DUPLICATE_SERIES]: 'Duplicated series name',
     [ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT]: 'Subscribe source format is invalid RSS',
     [ErrorCodeEnum.INVALID_SUBSCRIBE_RULE_CODE]: 'Subscribe rule code is invalid',
+    [ErrorCodeEnum.DUPLICATED_DOWNLOAD_ITEM]: 'Duplicated download item',
     [ErrorCodeEnum.USER_CHAT_MUTED]: 'User chat is muted by room owner',
     [ErrorCodeEnum.USER_VOICE_MUTED]: 'User voice is muted by room owner',
     [ErrorCodeEnum.VOICE_SERVICE_ESTABLISH_FAILED]: 'User voice initialize failed',
     [ErrorCodeEnum.WRONG_LIVE_PASSWORD]: 'Wrong live password',
     [ErrorCodeEnum.DUPLICATED_CONNECTION]: 'Duplicated live connection',
-    timeout: 'Request timeout! Please try again later',
+    [ErrorCodeEnum.TIMEOUT]: 'Request timeout! Please try again later',
     other: 'Request failed! Please try again later',
   },
 };

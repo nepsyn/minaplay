@@ -34,7 +34,7 @@ const props = withDefaults(
 
 onMounted(() => {
   editor = monaco.editor.create(editorRef.value!, {
-    value: props.value,
+    model: monaco.editor.createModel(props.value, props.language),
     language: props.language,
     readOnly: props.readonly,
     minimap: {

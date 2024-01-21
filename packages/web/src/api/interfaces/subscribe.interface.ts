@@ -64,7 +64,7 @@ export interface RuleErrorLogEntity {
   createAt: Date;
 }
 
-export interface FetchLogEntity {
+export interface ParseLogEntity {
   /** id */
   id: string;
   /** 订阅源 */
@@ -77,7 +77,7 @@ export interface FetchLogEntity {
   createAt: Date;
 }
 
-export interface FetchLogQueryDto extends ApiQueryDto<FetchLogEntity> {
+export interface ParseLogQueryDto extends ApiQueryDto<ParseLogEntity> {
   status?: StatusEnum;
   start?: Date;
   end?: Date;
@@ -87,15 +87,17 @@ export interface DownloadItemEntity {
   /** id */
   id: string;
   /** 项目标题 */
-  title: string;
+  name: string;
   /** 下载链接 */
   url: string;
+  /** 下载链接哈希 */
+  hash: string;
   /** 所属订阅源 */
   source: SourceEntity;
   /** 命中规则 */
   rule: RuleEntity;
   /** 解析记录 */
-  log?: FetchLogEntity;
+  log?: ParseLogEntity;
   /** 下载状态 */
   status: StatusEnum;
   /** 错误内容 */
@@ -105,7 +107,7 @@ export interface DownloadItemEntity {
 }
 
 export interface DownloadItemDto {
-  title?: string;
+  name?: string;
   url: string;
   sourceId?: number;
 }

@@ -67,7 +67,7 @@ import { useApiStore } from '@/store/api';
 import { useRoute } from 'vue-router';
 import { useToastStore } from '@/store/toast';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
-import { FetchLogQueryDto, RuleErrorLogEntity } from '@/api/interfaces/subscribe.interface';
+import { ParseLogQueryDto, RuleErrorLogEntity } from '@/api/interfaces/subscribe.interface';
 import { ApiQueryDto } from '@/api/interfaces/common.interface';
 import { computed, ref } from 'vue';
 import { useAxiosRequest } from '@/composables/use-axios-request';
@@ -88,7 +88,7 @@ const logsLoader = useAxiosPageLoader(
 );
 const logs = computed(() => logsLoader.items.value);
 
-const filters = ref<Partial<FetchLogQueryDto>>({
+const filters = ref<Partial<ParseLogQueryDto>>({
   order: 'DESC',
 });
 const query = () => {

@@ -65,6 +65,7 @@
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import { useI18n } from 'vue-i18n';
 import {
+  mdiAccountKey,
   mdiAccountMultiple,
   mdiAnimationPlayOutline,
   mdiApps,
@@ -93,6 +94,11 @@ const systemTabs = [
     to: '/dashboard/logs',
     icon: mdiScriptText,
     text: t('dashboard.logs'),
+  },
+  {
+    to: '/dashboard/action-logs',
+    icon: mdiAccountKey,
+    text: t('dashboard.actionLogs'),
   },
 ];
 const moduleTabs = [

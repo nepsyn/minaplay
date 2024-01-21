@@ -2,6 +2,7 @@ import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { StatusEnum } from '@/api/enums/status.enum';
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
 import { MessageSchema } from '@/lang/index';
+import { AuthActionEnum } from '@/api/enums/auth-action.enum';
 
 const zh: MessageSchema = {
   app: {
@@ -165,11 +166,13 @@ const zh: MessageSchema = {
     },
   },
   series: {
+    seasonLabel: '第{season}季',
     entity: {
       name: '名称',
       description: '描述',
       poster: '海报',
       season: '季度',
+      pubAt: '发布日期',
       tags: '标签',
       count: '总集数',
       finished: '是否完结',
@@ -324,7 +327,7 @@ const zh: MessageSchema = {
     },
     source: {
       [FileSourceEnum.AUTO_GENERATED]: '自动生成',
-      [FileSourceEnum.ARIA2_DOWNLOAD]: '自动下载',
+      [FileSourceEnum.DOWNLOAD]: '自动下载',
       [FileSourceEnum.USER_UPLOAD]: '用户上传',
       other: '未知来源',
     },
@@ -389,6 +392,23 @@ const zh: MessageSchema = {
       },
     },
   },
+  actionLog: {
+    entity: {
+      ip: 'IP',
+      action: '操作',
+      operator: '操作用户',
+      target: '对象用户',
+      createAt: '创建时间',
+    },
+    actions: {
+      [AuthActionEnum.LOGIN]: '登录',
+      [AuthActionEnum.LOGOUT]: '登出',
+      [AuthActionEnum.REFRESH]: '刷新令牌',
+      [AuthActionEnum.GRANT]: '授予权限',
+      [AuthActionEnum.BIND_EMAIL]: '绑定邮箱',
+      [AuthActionEnum.CHANGE_PASSWORD]: '更改密码',
+    },
+  },
   dashboard: {
     nav: {
       application: '应用程序',
@@ -396,6 +416,7 @@ const zh: MessageSchema = {
     },
     system: '系统',
     logs: '程序日志',
+    actionLogs: '敏感操作日志',
     user: '用户',
     source: 'RSS 订阅源',
     rule: '订阅规则',
@@ -442,12 +463,13 @@ const zh: MessageSchema = {
     [ErrorCodeEnum.DUPLICATE_SERIES]: '剧集已存在',
     [ErrorCodeEnum.INVALID_SUBSCRIBE_SOURCE_FORMAT]: '订阅源内容不是合法的 RSS 格式',
     [ErrorCodeEnum.INVALID_SUBSCRIBE_RULE_CODE]: '订阅规则错误',
+    [ErrorCodeEnum.DUPLICATED_DOWNLOAD_ITEM]: '下载项目已存在',
     [ErrorCodeEnum.USER_CHAT_MUTED]: '用户已被管理员禁言',
     [ErrorCodeEnum.USER_VOICE_MUTED]: '用户已被管理员静音',
     [ErrorCodeEnum.VOICE_SERVICE_ESTABLISH_FAILED]: '放映室语音服务初始化失败',
     [ErrorCodeEnum.WRONG_LIVE_PASSWORD]: '放映室密码错误',
     [ErrorCodeEnum.DUPLICATED_CONNECTION]: '存在多个放映室连接',
-    timeout: '请求超时！请稍后再试',
+    [ErrorCodeEnum.TIMEOUT]: '请求超时！请稍后再试',
     other: '请求失败！请稍后再试',
   },
 };

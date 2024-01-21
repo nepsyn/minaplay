@@ -166,6 +166,17 @@
             ></v-text-field>
           </v-container>
           <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('episode.entity.pubAt') }}</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              hide-details
+              color="primary"
+              density="compact"
+              v-model="editItem.pubAt"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
             <span class="text-body-1 font-weight-bold">{{ t('episode.entity.series') }}</span>
             <v-autocomplete
               class="mt-2"
@@ -395,6 +406,7 @@ const {
   return handler({
     title: episode.title,
     no: episode.no,
+    pubAt: episode.pubAt,
     seriesId: episode.series?.id,
     mediaId: episode.media?.id,
   });

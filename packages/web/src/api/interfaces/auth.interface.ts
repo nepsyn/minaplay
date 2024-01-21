@@ -1,5 +1,7 @@
 import { UserEntity } from './user.interface';
 import { PermissionEnum } from '@/api/enums/permission.enum';
+import { AuthActionEnum } from '@/api/enums/auth-action.enum';
+import { ApiQueryDto } from '@/api/interfaces/common.interface';
 
 export interface LoginDto {
   username: string;
@@ -44,4 +46,22 @@ export interface AuthData extends UserEntity {
 
 export interface PermissionDto {
   permissionNames: PermissionEnum[];
+}
+
+export interface ActionLogEntity {
+  id: string;
+  ip?: string;
+  action: AuthActionEnum;
+  operator: UserEntity;
+  target: UserEntity;
+  extra?: string;
+  createAt: Date;
+}
+
+export interface ActionLogQueryDto extends ApiQueryDto<ActionLogEntity> {
+  operatorId?: number;
+  ip?: string;
+  action?: AuthActionEnum;
+  start?: Date;
+  end?: Date;
 }

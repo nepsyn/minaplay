@@ -2,6 +2,8 @@ import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import axios, { AxiosProgressEvent, AxiosRequestConfig } from 'axios';
 import {
+  ActionLogEntity,
+  ActionLogQueryDto,
   AuthData,
   ChangePasswordData,
   ChangePasswordDto,
@@ -20,8 +22,8 @@ import {
   DownloadItemEntity,
   DownloadItemQueryDto,
   FeedData,
-  FetchLogEntity,
-  FetchLogQueryDto,
+  ParseLogEntity,
+  ParseLogQueryDto,
   RuleDto,
   RuleEntity,
   RuleErrorLogEntity,
@@ -149,6 +151,7 @@ export const useApiStore = defineStore('api', () => {
     grantUser: (id: number) => apiPut<UserEntity, PermissionDto>(`/api/v1/auth/user/${id}/permission`),
     deleteUser: (id: number) => apiDelete(`/api/v1/auth/user/${id}`),
     getAllPermissions: apiGet<PermissionEnum[]>('/api/v1/auth/permission'),
+    queryActionLogs: apiGet<ApiQueryResult<ActionLogEntity>, ActionLogQueryDto>('/api/v1/auth/logs'),
   };
 
   const User = {
@@ -175,9 +178,9 @@ export const useApiStore = defineStore('api', () => {
     delete: (id: number) => apiDelete(`/api/v1/subscribe/source/${id}`),
     fetchRawData: (id: number) => apiGet<FeedData>(`/api/v1/subscribe/source/${id}/raw`),
     invokeFetchJobById: (id: number) => apiPost(`/api/v1/subscribe/source/${id}/run`),
-    getFetchLogsById: (id: number) =>
-      apiGet<ApiQueryResult<FetchLogEntity>, FetchLogQueryDto>(`/api/v1/subscribe/source/${id}/log`),
-    clearFetchLogsById: (id: number) => apiDelete(`/api/v1/subscribe/source/${id}/log`),
+    getParseLogsById: (id: number) =>
+      apiGet<ApiQueryResult<ParseLogEntity>, ParseLogQueryDto>(`/api/v1/subscribe/source/${id}/log`),
+    clearParseLogsById: (id: number) => apiDelete(`/api/v1/subscribe/source/${id}/log`),
     getDownloadItemsById: (id: number) =>
       apiGet<ApiQueryResult<DownloadItemEntity>, DownloadItemQueryDto>(`/api/v1/subscribe/source/${id}/download`),
     clearDownloadItemsById: (id: number) => apiDelete(`/api/v1/subscribe/source/${id}/download`),

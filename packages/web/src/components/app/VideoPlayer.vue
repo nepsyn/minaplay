@@ -226,7 +226,7 @@
           </svg>
         </a>
         <button
-          class="plyr__controls__item plyr__control d-none d-sm-flex"
+          class="plyr__controls__item plyr__control d-none d-sm-flex page-fullscreen-btn"
           type="button"
           @click="pageFullscreen = !pageFullscreen"
         >
@@ -524,4 +524,7 @@ defineExpose({
   position: absolute
   width: 100%
   height: 100%
+
+.plyr:fullscreen .page-fullscreen-btn
+  display: none !important
 </style>

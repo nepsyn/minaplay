@@ -10,6 +10,8 @@ const messages = {
   'zh-CN': zhLocale,
 };
 
+export type MessageLocale = keyof typeof messages;
+
 const getLocale = () => {
   const cookieLanguage = sessionStorage.getItem('language');
   if (cookieLanguage) {

@@ -793,7 +793,7 @@ const selectAndSendImage = () => {
         });
       } catch (error: any) {
         if (error instanceof TimeoutError) {
-          toast.toastError(t('error.timeout'));
+          toast.toastError(t(`error.${ErrorCodeEnum.TIMEOUT}`));
         } else if (axios.isAxiosError(error)) {
           toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
         } else {
@@ -931,7 +931,7 @@ const connectVoice = async () => {
     await produce();
   } catch (error: any) {
     if (error instanceof TimeoutError) {
-      toast.toastError(t('error.timeout'));
+      toast.toastError(t(`error.${ErrorCodeEnum.TIMEOUT}`));
     } else {
       toast.toastError(t(`error.${error?.code ?? 'other'}`));
     }
@@ -969,7 +969,6 @@ const consume = async (userId: number, producerId: string) => {
       const analyser = audioCtx.createAnalyser();
       analyser.fftSize = 2048;
       source.connect(analyser);
-      analyser.connect(audioCtx.destination);
 
       let interval: any = undefined;
       audio.addEventListener('play', async () => {
@@ -1082,7 +1081,7 @@ const selectAndUploadPoster = async () => {
         state.value!.live = data;
       } catch (error: any) {
         if (error instanceof TimeoutError) {
-          toast.toastError(t('error.timeout'));
+          toast.toastError(t(`error.${ErrorCodeEnum.TIMEOUT}`));
         } else if (axios.isAxiosError(error)) {
           toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
         } else {

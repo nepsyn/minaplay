@@ -124,16 +124,17 @@
                   </v-col>
                   <v-col cols="8" class="d-flex flex-column">
                     <span
-                      class="text-body-1 font-weight-bold text-break clickable series-title"
+                      class="text-body-1 font-weight-bold text-break cursor-pointer series-title"
                       @click="router.push({ path: `/series/${currentEpisode?.series.id}` })"
                     >
-                      {{ `${currentEpisode?.series.name} ${currentEpisode?.series.season ?? ''}`.trim() }}
+                      {{ currentEpisode?.series.name }}
                     </span>
-                    <v-row class="mt-1 flex-grow-0" dense>
-                      <v-col cols="auto" v-for="(tag, index) in currentEpisode?.series?.tags ?? []" :key="index">
-                        <v-chip color="primary" size="x-small" label :text="tag.name"></v-chip>
-                      </v-col>
-                    </v-row>
+                    <span
+                      v-if="currentEpisode?.series.season"
+                      class="text-body-2 text-medium-emphasis text-break cursor-pointer"
+                    >
+                      {{ t('series.seasonLabel', { season: currentEpisode?.series.season }) }}
+                    </span>
                     <v-divider class="my-1"></v-divider>
                     <expandable-text
                       :content="currentEpisode?.series?.description ?? t('resource.noDescription')"

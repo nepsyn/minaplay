@@ -1,6 +1,6 @@
 <template>
   <v-alert variant="tonal" :color="downloadItemProps.color" :icon="downloadItemProps.icon">
-    <p class="text-subtitle-1 font-weight-bold" v-text="item.title"></p>
+    <p class="text-subtitle-1 font-weight-bold" v-text="item.name"></p>
     <div v-if="item.url" class="d-flex flex-row align-center">
       <span class="text-caption text-truncate" v-text="item.url"></span>
       <v-tooltip>

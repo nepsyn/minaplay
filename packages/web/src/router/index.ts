@@ -58,7 +58,7 @@ const routes: RouteRecordRaw[] = [
             name: 'episode',
             component: () => import('@/views/resource/MediaPlay.vue'),
             meta: {
-              permissions: [PermissionEnum.SERIES_VIEW, PermissionEnum.SERIES_OP, PermissionEnum.ROOT_OP],
+              permissions: [PermissionEnum.MEDIA_VIEW, PermissionEnum.MEDIA_OP, PermissionEnum.ROOT_OP],
             },
           },
           {
@@ -66,7 +66,7 @@ const routes: RouteRecordRaw[] = [
             name: 'series',
             component: () => import('@/views/resource/SeriesInfo.vue'),
             meta: {
-              permissions: [PermissionEnum.SERIES_VIEW, PermissionEnum.SERIES_OP, PermissionEnum.ROOT_OP],
+              permissions: [PermissionEnum.MEDIA_VIEW, PermissionEnum.MEDIA_OP, PermissionEnum.ROOT_OP],
             },
           },
         ],
@@ -210,6 +210,14 @@ const routes: RouteRecordRaw[] = [
             },
           },
           {
+            path: '/dashboard/action-logs',
+            name: 'dash-action-logs',
+            component: () => import('@/views/dashboard/app/DashActionLogs.vue'),
+            meta: {
+              permissions: [PermissionEnum.ROOT_OP],
+            },
+          },
+          {
             path: '/dashboard/user',
             name: 'dash-user',
             component: () => import('@/views/dashboard/modules/DashUsers.vue'),
@@ -246,7 +254,7 @@ const routes: RouteRecordRaw[] = [
             name: 'dash-series',
             component: () => import('@/views/dashboard/modules/DashSeries.vue'),
             meta: {
-              permissions: [PermissionEnum.SERIES_OP, PermissionEnum.ROOT_OP],
+              permissions: [PermissionEnum.MEDIA_OP, PermissionEnum.ROOT_OP],
             },
           },
           {
@@ -254,7 +262,7 @@ const routes: RouteRecordRaw[] = [
             name: 'dash-episode',
             component: () => import('@/views/dashboard/modules/DashEpisodes.vue'),
             meta: {
-              permissions: [PermissionEnum.SERIES_OP, PermissionEnum.ROOT_OP],
+              permissions: [PermissionEnum.MEDIA_OP, PermissionEnum.ROOT_OP],
             },
           },
           {

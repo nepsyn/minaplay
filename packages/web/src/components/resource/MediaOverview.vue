@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="d-flex flex-column rounded-lg pa-0 clickable media-container">
+  <v-container fluid class="d-flex flex-column rounded-lg pa-0 cursor-pointer media-container">
     <v-img
       :aspect-ratio="16 / 9"
       cover

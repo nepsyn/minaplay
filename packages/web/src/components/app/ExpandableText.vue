@@ -1,7 +1,7 @@
 <template>
   <div>
     <span class="text-pre-wrap text-break" v-text="displayContent"></span>
-    <span v-if="content.length > Number(min)" class="text-info clickable" @click.stop="expanded = !expanded">
+    <span v-if="content.length > Number(min)" class="text-info cursor-pointer" @click.stop="expanded = !expanded">
       {{ expanded ? t('app.actions.collapse') : t('app.actions.more') }}
     </span>
   </div>

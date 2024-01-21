@@ -385,13 +385,6 @@ const permissions = [
     ],
   },
   {
-    name: t('user.permission.groups.series'),
-    items: [
-      { name: t('user.permission.fullAccess'), value: PermissionEnum.SERIES_OP },
-      { name: t('user.permission.view'), value: PermissionEnum.SERIES_VIEW },
-    ],
-  },
-  {
     name: t('user.permission.groups.subscribe'),
     items: [
       { name: t('user.permission.fullAccess'), value: PermissionEnum.SUBSCRIBE_OP },
@@ -409,27 +402,20 @@ const permissions = [
 const presets = [
   {
     text: t('user.permission.presets.administrator'),
-    permissions: [
-      PermissionEnum.FILE_OP,
-      PermissionEnum.MEDIA_OP,
-      PermissionEnum.SERIES_OP,
-      PermissionEnum.SUBSCRIBE_OP,
-      PermissionEnum.LIVE_OP,
-    ],
+    permissions: [PermissionEnum.FILE_OP, PermissionEnum.MEDIA_OP, PermissionEnum.SUBSCRIBE_OP, PermissionEnum.LIVE_OP],
   },
   {
     text: t('user.permission.presets.user'),
     permissions: [
       PermissionEnum.FILE_UPLOAD_IMAGE,
       PermissionEnum.MEDIA_VIEW,
-      PermissionEnum.SERIES_VIEW,
       PermissionEnum.SUBSCRIBE_VIEW,
       PermissionEnum.LIVE_VIEW,
     ],
   },
   {
     text: t('user.permission.presets.guest'),
-    permissions: [PermissionEnum.MEDIA_VIEW, PermissionEnum.SERIES_VIEW],
+    permissions: [PermissionEnum.MEDIA_VIEW],
   },
   {
     text: t('user.permission.presets.banned'),

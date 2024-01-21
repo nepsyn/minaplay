@@ -1,7 +1,7 @@
 <template>
   <v-container
     fluid
-    class="pa-0 d-flex flex-column justify-center position-relative rounded-lg clickable series-container"
+    class="pa-0 d-flex flex-column justify-center position-relative rounded-lg cursor-pointer series-container"
   >
     <div class="position-relative">
       <v-img
@@ -17,25 +17,27 @@
 
       <div
         v-if="label"
-        class="position-absolute d-flex justify-end pa-1 text-caption bg-error rounded-te-lg rounded-bs text-break text-wrap text-center clickable label-container"
+        class="position-absolute d-flex justify-end pa-1 text-caption bg-error rounded-te-lg rounded-bs text-break text-wrap text-center cursor-pointer label-container"
       >
         {{ label }}
       </div>
 
       <div
         v-if="note"
-        class="position-absolute d-flex w-100 justify-center align-center pa-1 text-caption font-weight-bold rounded-b-lg text-break text-wrap text-center note-container clickable"
+        class="position-absolute d-flex w-100 justify-center align-center pa-1 text-caption font-weight-bold rounded-b-lg text-break text-wrap text-center note-container cursor-pointer"
       >
         {{ note }}
       </div>
     </div>
 
-    <span
-      class="mt-2 mb-1 px-1 clickable series-title font-weight-bold text-truncate text-center"
-      :title="`${series.name} ${series.season ?? ''}`.trim()"
-    >
-      {{ `${series.name} ${series.season ?? ''}`.trim() }}
-    </span>
+    <div class="mt-2 mb-1 px-1 cursor-pointer d-flex flex-column">
+      <span class="series-title font-weight-bold text-truncate" :title="series.name">
+        {{ series.name }}
+      </span>
+      <span v-if="series.season" class="text-caption text-medium-emphasis">
+        {{ t('series.seasonLabel', { season: series.season }) }}
+      </span>
+    </div>
   </v-container>
 </template>
 
@@ -43,7 +45,9 @@
 import { SeriesEntity } from '@/api/interfaces/series.interface';
 import { useApiStore } from '@/store/api';
 import SeriesCoverFallback from '@/assets/banner-portrait.jpeg';
+import { useI18n } from 'vue-i18n';
 
+const { t } = useI18n();
 const api = useApiStore();
 
 defineProps<{
@@ -57,7 +61,7 @@ defineProps<{
 .series-title
   overflow: hidden
   font-size: 1rem
-  line-height: 1.5rem
+  line-height: 1.2rem
   transition: color 0.5s
 
 .series-container:hover .series-title

@@ -86,7 +86,7 @@
             <user-avatar
               v-bind="props"
               v-if="api.user"
-              class="clickable"
+              class="cursor-pointer"
               :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar?.id, api.user?.avatar?.name)"
               size="40"
             >

@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid class="rounded-lg pa-0 clickable media-container">
+  <v-container fluid class="rounded-lg pa-0 cursor-pointer media-container">
     <v-row no-gutters>
       <v-col cols="4">
         <v-img

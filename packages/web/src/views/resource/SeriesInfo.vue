@@ -15,7 +15,10 @@
         <v-sheet v-if="series" border class="pa-6 rounded">
           <v-row>
             <v-col cols="9" class="d-flex flex-column">
-              <span class="text-h5 text-break">{{ `${series.name} ${series.season ?? ''}`.trim() }}</span>
+              <span class="text-h5 text-break">{{ series.name }}</span>
+              <span v-if="series.season" class="text-body-2 text-medium-emphasis text-break">
+                {{ t('series.seasonLabel', { season: series.season }) }}
+              </span>
               <v-row class="mt-1 flex-grow-0" dense>
                 <v-col cols="auto" v-for="(tag, index) in series.tags" :key="index">
                   <v-chip color="primary" density="comfortable" label :text="tag.name"></v-chip>

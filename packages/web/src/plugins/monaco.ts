@@ -18,7 +18,8 @@ self.MonacoEnvironment = {
   },
 };
 
-monaco.languages.typescript.typescriptDefaults.setExtraLibs([{ content: RuleDeclarationCode }]);
+monaco.languages.typescript.typescriptDefaults.addExtraLib(RuleDeclarationCode);
+monaco.editor.createModel(RuleDeclarationCode, 'typescript', monaco.Uri.parse('ts:rule.d.ts'));
 monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
   ...monaco.languages.typescript.javascriptDefaults.getDiagnosticsOptions(),
   noSemanticValidation: false,

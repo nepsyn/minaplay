@@ -14,11 +14,6 @@ export enum PermissionEnum {
   /** 媒体查看 */
   MEDIA_VIEW = 'MEDIA:VIEW',
 
-  /** 剧集管理 */
-  SERIES_OP = 'SERIES:*',
-  /** 剧集查看 */
-  SERIES_VIEW = 'SERIES:VIEW',
-
   /** 订阅管理 */
   SUBSCRIBE_OP = 'SUBSCRIBE:*',
   /** 订阅查看 */

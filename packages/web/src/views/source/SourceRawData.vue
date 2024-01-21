@@ -205,11 +205,11 @@ const {
   pending: downloadCreating,
   request: createDownload,
   onResolved: onDownloadCreated,
-  onRejected: onDonwloadCreateFailed,
+  onRejected: onDownloadCreateFailed,
 } = useAxiosRequest(async (entry: FeedEntry) => {
   currentEntry.value = entry;
   return await api.Download.create({
-    title: entry.title ?? entry.id,
+    name: entry.title ?? entry.id,
     url: entry.enclosure.url,
     sourceId: Number(route.params.id),
   });
@@ -217,7 +217,7 @@ const {
 onDownloadCreated(() => {
   toast.toastSuccess(t('source.raw.downloadCreated'));
 });
-onDonwloadCreateFailed((error: any) => {
+onDownloadCreateFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 

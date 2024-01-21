@@ -85,7 +85,7 @@ import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { computed, ref } from 'vue';
 import { StatusEnum } from '@/api/enums/status.enum';
 import { mdiAlertCircle, mdiCheckCircle, mdiClock, mdiDelete, mdiHelpCircle } from '@mdi/js';
-import { FetchLogQueryDto } from '@/api/interfaces/subscribe.interface';
+import { ParseLogQueryDto } from '@/api/interfaces/subscribe.interface';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useToastStore } from '@/store/toast';
 
@@ -95,8 +95,8 @@ const route = useRoute();
 const toast = useToastStore();
 
 const logsLoader = useAxiosPageLoader(
-  async (query: FetchLogQueryDto = {}) => {
-    return await api.Source.getFetchLogsById(Number(route.params.id))({
+  async (query: ParseLogQueryDto = {}) => {
+    return await api.Source.getParseLogsById(Number(route.params.id))({
       ...query,
       status: filters.value.status,
       order: filters.value.order,
@@ -137,7 +137,7 @@ const logs = computed(() =>
   }),
 );
 
-const filters = ref<Partial<FetchLogQueryDto>>({
+const filters = ref<Partial<ParseLogQueryDto>>({
   status: undefined,
   order: 'DESC',
 });
@@ -167,7 +167,7 @@ const {
   onResolved: onLogsCleared,
   onRejected: onLogsClearFailed,
 } = useAxiosRequest(async () => {
-  return await api.Source.clearFetchLogsById(Number(route.params.id))();
+  return await api.Source.clearParseLogsById(Number(route.params.id))();
 });
 onLogsCleared(() => {
   logsLoader.reset(true);

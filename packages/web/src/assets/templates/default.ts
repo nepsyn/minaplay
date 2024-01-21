@@ -1,8 +1,8 @@
 const hooks: RuleHooks = {
-  validate(entry) {
+  validate: (entry) => {
     return false;
   },
-  describe(entry, file) {
+  describe: (entry, file, files) => {
     return {};
   },
 };

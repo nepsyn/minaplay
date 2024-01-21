@@ -10,6 +10,8 @@ export interface SeriesEntity {
   name: string;
   /** 剧集季度 */
   season?: string;
+  /** 发布时间 */
+  pubAt?: Date;
   /** 剧集是否已完结 */
   finished?: boolean;
   /** 完整剧集单集数量 */
@@ -98,6 +100,7 @@ export interface EpisodeEntity {
 export interface EpisodeDto {
   title?: string;
   no?: string;
+  pubAt?: string;
   seriesId?: number;
   mediaId?: string;
 }

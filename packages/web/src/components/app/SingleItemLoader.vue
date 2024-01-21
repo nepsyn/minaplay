@@ -10,7 +10,7 @@
       <v-container class="d-flex flex-row justify-center align-center text-body-2">
         <v-icon :icon="mdiEmoticonDeadOutline"></v-icon>
         <span class="mx-2">{{ t('app.loader.error') }}</span>
-        <a class="text-decoration-none text-primary clickable" @click="loader.request()">
+        <a class="text-decoration-none text-primary cursor-pointer" @click="loader.request()">
           {{ t('app.loader.retryBtn') }}
         </a>
       </v-container>
@@ -19,7 +19,7 @@
       <v-container class="d-flex flex-row justify-center align-center text-body-2">
         <v-icon :icon="mdiHelpCircleOutline"></v-icon>
         <span class="mx-2">{{ t('app.loader.notLoaded') }}</span>
-        <a class="text-decoration-none text-primary clickable" @click="loader.request()">
+        <a class="text-decoration-none text-primary cursor-pointer" @click="loader.request()">
           {{ t('app.loader.loadBtn') }}
         </a>
       </v-container>

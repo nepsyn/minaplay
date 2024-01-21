@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsInt, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsDateString, IsInt, IsNumberString, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
 
 export class EpisodeDto {
   @ApiProperty({
@@ -15,7 +15,7 @@ export class EpisodeDto {
     description: '单集编号',
     required: false,
   })
-  @IsString()
+  @IsNumberString()
   @IsOptional()
   @MaxLength(20)
   no?: string;

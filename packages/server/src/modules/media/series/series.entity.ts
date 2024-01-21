@@ -34,6 +34,13 @@ export class Series {
   })
   season?: string;
 
+  /** 发布时间 */
+  @Column({
+    type: 'datetime',
+    nullable: true,
+  })
+  pubAt?: Date;
+
   /** 剧集是否已完结 */
   @Column({
     default: false,

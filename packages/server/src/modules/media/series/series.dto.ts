@@ -1,5 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsArray, IsBoolean, IsNumber, IsOptional, IsString, IsUUID, MaxLength, MinLength } from 'class-validator';
+import {
+  IsArray,
+  IsBoolean,
+  IsDateString,
+  IsNumber,
+  IsNumberString,
+  IsOptional,
+  IsString,
+  IsUUID,
+  MaxLength,
+  MinLength,
+} from 'class-validator';
 
 export class SeriesDto {
   @ApiProperty({
@@ -25,9 +36,17 @@ export class SeriesDto {
     required: false,
   })
   @IsOptional()
-  @IsString()
+  @IsNumberString()
   @MaxLength(20)
   season?: string;
+
+  @ApiProperty({
+    description: '发布时间',
+    required: false,
+  })
+  @IsDateString()
+  @IsOptional()
+  pubAt?: string;
 
   @ApiProperty({
     description: '完整单集数量',

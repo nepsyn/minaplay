@@ -21,7 +21,7 @@ import { UserDto } from './user.dto.js';
 import { UserQueryDto } from './user-query.dto.js';
 import { buildQueryOptions } from '../../utils/build-query-options.util.js';
 import { User } from './user.entity.js';
-import { RequestUser } from '../authorization/request.user.decorator.js';
+import { RequestUser } from '../../common/request.user.decorator.js';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 

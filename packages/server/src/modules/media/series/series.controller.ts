@@ -16,7 +16,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { SeriesService } from './series.service.js';
 import { RequirePermissions } from '../../authorization/require-permissions.decorator.js';
 import { SeriesDto } from './series.dto.js';
-import { RequestUser } from '../../authorization/request.user.decorator.js';
+import { RequestUser } from '../../../common/request.user.decorator.js';
 import { User } from '../../user/user.entity.js';
 import { SeriesQueryDto } from './series-query.dto.js';
 import { Series } from './series.entity.js';

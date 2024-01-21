@@ -24,7 +24,7 @@ import { User } from '../user/user.entity.js';
 import { FileService } from './file.service.js';
 import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
-import { RequestUser } from '../authorization/request.user.decorator.js';
+import { RequestUser } from '../../common/request.user.decorator.js';
 import { buildException } from '../../utils/build-exception.util.js';
 import { generateMD5 } from '../../utils/generate-md5.util.js';
 import { ErrorCodeEnum } from '../../enums/error-code.enum.js';

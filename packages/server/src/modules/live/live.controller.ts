@@ -18,7 +18,7 @@ import { PermissionEnum } from '../../enums/permission.enum.js';
 import { buildException } from '../../utils/build-exception.util.js';
 import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
 import { LiveDto } from './live.dto.js';
-import { RequestUser } from '../authorization/request.user.decorator.js';
+import { RequestUser } from '../../common/request.user.decorator.js';
 import { User } from '../user/user.entity.js';
 import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { LiveGateway } from './live.gateway.js';

@@ -21,7 +21,7 @@ import { LoginDto } from './login.dto.js';
 import { compare } from 'bcrypt';
 import { UserService } from '../user/user.service.js';
 import { AuthorizationGuard } from './authorization.guard.js';
-import { RequestUser } from './request.user.decorator.js';
+import { RequestUser } from '../../common/request.user.decorator.js';
 import { User } from '../user/user.entity.js';
 import { RequirePermissions } from './require-permissions.decorator.js';
 import { PermissionDto } from './permission.dto.js';

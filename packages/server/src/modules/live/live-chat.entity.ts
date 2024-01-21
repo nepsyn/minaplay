@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Re
 import { Exclude, Expose } from 'class-transformer';
 import { Live } from './live.entity.js';
 import { User } from '../user/user.entity.js';
-import { MinaplayMessage, MinaplayMessageType, parseMessage } from './live-chat-message.interface.js';
+import { MinaplayMessage, MinaplayMessageType, parseMessage } from '../../common/application.message.js';
 
 @Entity()
 export class LiveChat {

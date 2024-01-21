@@ -17,7 +17,7 @@ import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RuleService } from './rule.service.js';
 import { RequirePermissions } from '../../authorization/require-permissions.decorator.js';
 import { PermissionEnum } from '../../../enums/permission.enum.js';
-import { RequestUser } from '../../authorization/request.user.decorator.js';
+import { RequestUser } from '../../../common/request.user.decorator.js';
 import { User } from '../../user/user.entity.js';
 import { RuleDto } from './rule.dto.js';
 import { buildException } from '../../../utils/build-exception.util.js';

@@ -1,5 +1,5 @@
 import { ClassConstructor, Expose, plainToInstance } from 'class-transformer';
-import { Equals, IsString, IsUrl, Length, validateSync } from 'class-validator';
+import { Equals, IsHexColor, IsOptional, IsString, IsUrl, Length, validateSync } from 'class-validator';
 
 interface TypedMessage {
   type: MinaplayMessageType;
@@ -10,6 +10,12 @@ export class Text implements TypedMessage {
   @Expose()
   @Equals('Text')
   type: 'Text';
+
+  /** 颜色 */
+  @Expose()
+  @IsHexColor()
+  @IsOptional()
+  color?: string;
 
   /** 文本内容 */
   @Expose()

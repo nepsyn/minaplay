@@ -1,12 +1,16 @@
 import { Injectable, OnModuleInit, Type } from '@nestjs/common';
 import { LazyModuleLoader } from '@nestjs/core';
-import { MinaPlayPluginHooks } from '../../interfaces/plugins.js';
+import { MinaPlayCommandResult, MinaPlayPluginHooks, PluginCommandMetadata } from './plugin.interface.js';
 import { PluginControl } from './plugin-control.js';
-import { getMinaPlayPluginDescriptor, isMinaPlayPlugin } from '../../common/plugin.decorator.js';
+import { getMinaPlayPluginMetadata, isMinaPlayPlugin } from './plugin.decorator.js';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import fs from 'fs-extra';
+import { MINAPLAY_COMMAND_KEY } from './plugin-command.decorator.js';
+import { Argument, CommanderError, Option } from 'commander';
+import { isString } from 'class-validator';
+import { Text } from '../../common/application.message.js';
 
 @Injectable()
 export class PluginService implements OnModuleInit {
@@ -48,40 +52,65 @@ export class PluginService implements OnModuleInit {
     return plugins;
   }
 
+  async registerPlugin(plugin: Type) {
+    const metadata = getMinaPlayPluginMetadata(plugin);
+    try {
+      // initialize services
+      const module = await this.lazyModuleLoader.load(() => plugin);
+      const commands: Map<string, PluginCommandMetadata> = new Map();
+      const services: MinaPlayPluginHooks[] = [];
+      for (const provider of metadata.providers ?? []) {
+        if (typeof provider === 'function') {
+          // commands
+          const commandsMetadata: Map<string, PluginCommandMetadata> = Reflect.getMetadata(
+            MINAPLAY_COMMAND_KEY,
+            provider,
+          );
+          if (commandsMetadata) {
+            for (const [bin, commandMetadata] of commandsMetadata.entries()) {
+              commands.set(bin, commandMetadata);
+              this.logger.log(`Plugin '${metadata.id}' registered command '${bin}'`);
+            }
+          }
+
+          const service = await module.get(provider);
+          services.push(service);
+        }
+      }
+
+      if (this.getControl(metadata.id)) {
+        this.logger.error(`Error occurred while creating plugin instance: Duplicated plugin id '${metadata.id}'`);
+        return;
+      }
+
+      const control = Object.assign(new PluginControl(), {
+        id: metadata.id,
+        version: metadata.version,
+        description: metadata.description,
+        author: metadata.author,
+        repo: metadata.repo,
+        enabled: true,
+        services,
+        type: plugin,
+        module,
+        commands,
+      });
+      this.controls.push(control);
+
+      this.logger.log(`Plugin '${metadata.id}(${metadata.version ?? 'unknown version'})' registered`);
+    } catch (error) {
+      this.logger.error(
+        `Error occurred while creating plugin instance: '${metadata.id}'`,
+        error.stack,
+        PluginService.name,
+      );
+    }
+  }
+
   async onModuleInit() {
     const plugins = await this.findPlugins();
     for (const plugin of plugins) {
-      const descriptor = getMinaPlayPluginDescriptor(plugin);
-      try {
-        const module = await this.lazyModuleLoader.load(() => plugin);
-        const services: MinaPlayPluginHooks[] = [];
-        for (const provider of descriptor.providers ?? []) {
-          if (typeof provider === 'function') {
-            const service = await module.get(provider);
-            services.push(service);
-          }
-        }
-
-        const control = Object.assign(new PluginControl(), {
-          id: descriptor.id,
-          version: descriptor.version,
-          description: descriptor.description,
-          author: descriptor.author,
-          repo: descriptor.repo,
-          enabled: true,
-          services,
-          type: plugin,
-        });
-        this.controls.push(control);
-
-        this.logger.log(`Plugin '${descriptor.id}(${descriptor.version ?? 'unknown version'})' created`);
-      } catch (error) {
-        this.logger.error(
-          `Error occurred while creating plugin instance: '${descriptor.id}'`,
-          error.stack,
-          PluginService.name,
-        );
-      }
+      await this.registerPlugin(plugin);
     }
 
     await this.emitAllEnabled('onEnabled');
@@ -103,6 +132,10 @@ export class PluginService implements OnModuleInit {
         PluginService.name,
       );
     }
+  }
+
+  get enabledPluginControls() {
+    return this.controls.filter((control) => control.enabled);
   }
 
   async emitAllEnabled<T extends keyof MinaPlayPluginHooks>(hook: T, ...args: Parameters<MinaPlayPluginHooks[T]>) {
@@ -128,7 +161,87 @@ export class PluginService implements OnModuleInit {
     return control;
   }
 
+  getCommandMetadataAndArgv(command: string, control: PluginControl) {
+    let root = control.commands;
+    let metadata: PluginCommandMetadata | undefined = undefined;
+    const argv = command.split(/\s+/);
+    for (const arg of argv.concat()) {
+      if (root.has(arg)) {
+        metadata = root.get(arg);
+        root = root.get(arg).subcommands;
+        argv.shift();
+      } else {
+        break;
+      }
+    }
+    return [metadata, argv] as const;
+  }
+
+  async runCommand(command: string): Promise<MinaPlayCommandResult[]> {
+    const results: MinaPlayCommandResult[] = [];
+    for (const control of this.enabledPluginControls) {
+      const [metadata, argv] = this.getCommandMetadataAndArgv(command, control);
+      if (metadata) {
+        const service = await control.module.get(metadata.type);
+
+        try {
+          const program = metadata.program.parse(argv, { from: 'user' });
+          const opts = program.opts();
+          const args = program.processedArgs.concat();
+          const params = [];
+          metadata.args.concat().forEach(({ index, instance }) => {
+            if (instance instanceof Argument) {
+              params[index] = args.shift();
+            } else if (instance instanceof Option) {
+              params[index] = opts[instance.attributeName()];
+            } else {
+              params[index] = program;
+            }
+          });
+
+          let messages = await service[metadata.key](...params);
+          if (isString(messages)) {
+            messages = [Object.assign(new Text(), { type: 'Text', content: messages })];
+          } else if (messages.type) {
+            messages = [messages];
+          }
+
+          results.push({
+            control,
+            result: messages,
+          });
+        } catch (error) {
+          if (error instanceof CommanderError) {
+            if (['commander.help', 'commander.helpDisplayed'].includes(error.code)) {
+              results.push({
+                control,
+                result: [Object.assign(new Text(), { type: 'Text', content: metadata.program.helpInformation() })],
+              });
+            } else {
+              results.push({
+                control,
+                error: error.message,
+              });
+            }
+          } else {
+            this.logger.error(
+              `Error occurred while running command '${command}' on plugin '${control.id}'`,
+              error.stack,
+              PluginService.name,
+            );
+          }
+        }
+      }
+    }
+
+    return results;
+  }
+
   getAllControls() {
     return this.controls;
+  }
+
+  getControl(id: string) {
+    return this.controls.find((control) => control.id === id);
   }
 }

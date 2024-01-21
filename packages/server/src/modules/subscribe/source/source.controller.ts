@@ -20,7 +20,7 @@ import { PermissionEnum } from '../../../enums/permission.enum.js';
 import { SourceDto } from './source.dto.js';
 import { buildException } from '../../../utils/build-exception.util.js';
 import { ErrorCodeEnum } from '../../../enums/error-code.enum.js';
-import { RequestUser } from '../../authorization/request.user.decorator.js';
+import { RequestUser } from '../../../common/request.user.decorator.js';
 import { User } from '../../user/user.entity.js';
 import { SourceQueryDto } from './source-query.dto.js';
 import { buildQueryOptions } from '../../../utils/build-query-options.util.js';

@@ -1,6 +1,7 @@
-import { MinaPlayPluginHooks } from '../../interfaces/plugins.js';
+import { MinaPlayPluginHooks, PluginCommandMetadata } from './plugin.interface.js';
 import { Type } from '@nestjs/common';
 import { Exclude, Expose } from 'class-transformer';
+import { ModuleRef } from '@nestjs/core';
 
 export class PluginControl {
   @Expose()
@@ -26,4 +27,10 @@ export class PluginControl {
 
   @Exclude()
   type: Type;
+
+  @Exclude()
+  module: ModuleRef;
+
+  @Exclude()
+  commands: Map<string, PluginCommandMetadata>;
 }

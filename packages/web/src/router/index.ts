@@ -287,6 +287,19 @@ const routes: RouteRecordRaw[] = [
         path: '/setting',
         name: 'setting',
         component: () => import('@/views/Setting.vue'),
+        redirect: '/setting/app',
+        children: [
+          {
+            path: '/setting/app',
+            name: 'setting-app',
+            component: () => import('@/views/setting/SettingApp.vue'),
+          },
+          {
+            path: '/setting/profile',
+            name: 'setting-profile',
+            component: () => import('@/views/setting/SettingProfile.vue'),
+          },
+        ],
       },
       {
         name: 'error',

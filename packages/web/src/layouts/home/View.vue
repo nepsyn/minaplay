@@ -52,7 +52,13 @@
               <v-container fluid class="py-0 d-flex flex-column">
                 <span class="text-h6 text-truncate">{{ api.user!.username }}</span>
                 <v-container fluid class="pa-0">
-                  <v-btn variant="tonal" color="primary" size="x-small" :prepend-icon="mdiPencil">
+                  <v-btn
+                    variant="tonal"
+                    color="primary"
+                    size="x-small"
+                    :prepend-icon="mdiPencil"
+                    @click="router.push({ path: '/setting/profile' })"
+                  >
                     {{ t('layout.user.edit') }}
                   </v-btn>
                 </v-container>
@@ -194,7 +200,7 @@ const actions = ref([
     ),
   },
   {
-    text: computed(() => (layout.darkMode ? t('layout.actions.light') : t('layout.actions.dark'))),
+    text: computed(() => (layout.darkMode ? t('layout.light') : t('layout.dark'))),
     icon: computed(() => (layout.darkMode ? mdiWeatherSunny : mdiWeatherNight)),
     click: () => {
       layout.toggleDarkMode(!layout.darkMode);

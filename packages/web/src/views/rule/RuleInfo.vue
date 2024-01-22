@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-0">
+  <v-container class="pa-0 pb-12">
     <span class="text-h4">{{ t('rule.sections.info') }}</span>
     <single-item-loader class="px-0 py-2 mt-4" :loader="ruleLoader">
       <div class="d-flex flex-column">
@@ -80,7 +80,7 @@
               {{ t('rule.info.duplicateBtn') }}
             </v-btn>
           </v-container>
-          <v-divider></v-divider>
+          <v-divider class="ml-4"></v-divider>
           <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
             <v-container class="pa-0">
               <p class="text-subtitle-1">{{ t('rule.info.delete') }}</p>

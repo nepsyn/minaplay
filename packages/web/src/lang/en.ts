@@ -11,6 +11,7 @@ export default {
     on: 'ON',
     off: 'OFF',
     unknown: 'Unknown',
+    auto: 'Auto',
     or: 'Or',
     loader: {
       loading: 'Loading...',
@@ -80,9 +81,9 @@ export default {
   },
   layout: {
     sections: 'Sections',
+    dark: 'Dark Mode',
+    light: 'Light Mode',
     actions: {
-      dark: 'Dark Mode',
-      light: 'Light Mode',
       upload: 'Upload Media Files',
       github: 'Github',
     },
@@ -425,6 +426,30 @@ export default {
     episode: 'Episodes',
     live: 'Lives',
     file: 'Files',
+  },
+  settings: {
+    title: 'Settings',
+    sections: {
+      app: 'App Configs',
+      profile: 'User Profile',
+    },
+    app: {
+      ui: 'UI Interface',
+      language: 'Default Language',
+      languageDescription: 'MinaPlay UI interface default language, refresh page to apply.',
+      theme: 'Default Theme',
+      themeDescription: 'MinaPlay UI interface default theme, refresh page to apply.',
+      common: 'Common',
+      subtitle: 'Show Subtitle Automatically',
+      subtitleDescription: 'Display video subtitles by default.',
+      danmaku: 'Show Danmaku Automatically',
+      danmakuDescription: 'Play live danmaku by default.',
+      joinVoice: 'Join Live Voice Automatically',
+      joinVoiceDescription: 'Join live voice room by default.',
+    },
+    profile: {
+      basic: 'Basic Info',
+    },
   },
   login: {
     username: 'Username',

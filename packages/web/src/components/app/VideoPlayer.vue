@@ -50,7 +50,6 @@
           scroll-strategy="close"
           class="text-center position-fixed"
           open-delay="0"
-          close-delay="0"
           :attach="controlsRef"
         >
           <v-list class="rounded py-0" density="compact">
@@ -102,7 +101,6 @@
           scroll-strategy="close"
           class="text-center position-fixed"
           open-delay="0"
-          close-delay="0"
           :attach="controlsRef"
           v-model="danmakuMenu"
           @mouseleave="(e: any) => !e.toElement.classList.contains('danmaku-btn') && (danmakuMenu = false)"
@@ -271,11 +269,13 @@ import Hls from 'hls.js';
 import { getFullUrl } from '@/utils/utils';
 // @ts-ignore
 import DanmuJs from 'danmu.js';
+import { useSettingsStore } from '@/store/settings';
 
 const SUBTITLE_EXTENSIONS = ['.ass', '.ssa'];
 const FONT_EXTENSIONS = ['.otf', '.ttf', '.woff'];
 
 const { t } = useI18n();
+const { settings } = useSettingsStore();
 const api = useApiStore();
 
 const props = withDefaults(
@@ -422,7 +422,7 @@ onMounted(async () => {
 
     loadResource();
 
-    if (subtitleFiles.value) {
+    if (subtitleFiles.value && settings.showSubtitle) {
       renderSubtitle(0);
     }
 
@@ -473,7 +473,7 @@ const danmakuStyle = ref({
   opacity: 100,
   shadow: true,
 });
-const danmakuShow = ref(true);
+const danmakuShow = ref(settings.showDanmaku);
 const danmakuMenu = ref(false);
 const toggleDanmaku = (value: boolean) => {
   danmakuShow.value = value;

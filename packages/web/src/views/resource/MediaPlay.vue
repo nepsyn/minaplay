@@ -16,7 +16,7 @@
                   color="info"
                   :prepend-icon="mdiArrowLeft"
                   @click="toEpisode(-1)"
-                  :disabled="!hasEpisode(-1)"
+                  :disabled="!hasEpisode(1)"
                 >
                   {{ t('resource.episode.previous') }}
                 </v-btn>
@@ -71,14 +71,18 @@
               <span class="text-h6 ml-3">{{ t('resource.medias') }}</span>
             </div>
             <multi-items-loader class="px-0 py-3" :loader="recommendsLoader" :hide-empty="recommends.length > 0" auto>
-              <template v-for="recommend in recommends" :key="recommend.id">
-                <media-overview-landscape
-                  @click="router.push({ path: `/media/${recommend.id}` })"
-                  v-if="recommend.id !== route.params.mediaId"
-                  class="mb-3"
-                  :media="recommend"
-                ></media-overview-landscape>
+              <template #empty>
+                <v-container class="d-flex flex-column justify-center align-center text-body-2">
+                  <span class="text-medium-emphasis"> {{ t('app.loader.empty') }} </span>
+                </v-container>
               </template>
+              <media-overview-landscape
+                v-for="recommend in recommends"
+                :key="recommend.id"
+                @click="router.push({ path: `/media/${recommend.id}` })"
+                class="mb-3"
+                :media="recommend"
+              ></media-overview-landscape>
             </multi-items-loader>
           </div>
           <div class="d-flex flex-column flex-sm-column-reverse">
@@ -151,6 +155,11 @@
               <span class="text-h6 ml-3">{{ t('resource.series') }}</span>
             </div>
             <multi-items-loader class="px-0 py-3" :loader="seriesLoader" :hide-empty="series.length > 0">
+              <template #empty>
+                <v-container class="d-flex flex-column justify-center align-center text-body-2">
+                  <span class="text-medium-emphasis"> {{ t('app.loader.empty') }} </span>
+                </v-container>
+              </template>
               <v-row>
                 <v-col v-for="item in series" :key="item.id" cols="4">
                   <series-overview
@@ -243,7 +252,9 @@ const recommendsLoader = useAxiosPageLoader(
   },
   { page: 0, size: 12 },
 );
-const recommends = computed(() => recommendsLoader.items.value);
+const recommends = computed(() => {
+  return (recommendsLoader.items.value ?? []).filter((media) => media.id !== route.params.mediaId);
+});
 
 const episodesLoader = useAxiosPageLoader(
   async (query = {}) => {
@@ -269,7 +280,9 @@ const seriesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 12 },
 );
-const series = computed(() => seriesLoader.items.value);
+const series = computed(() => {
+  return (seriesLoader.items.value ?? []).filter((series) => series.id !== currentEpisode.value?.series?.id);
+});
 
 const actions = [
   {

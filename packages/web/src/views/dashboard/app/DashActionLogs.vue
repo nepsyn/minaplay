@@ -57,24 +57,10 @@
         :items-per-page-text="t('app.loader.itemsPerPage')"
         :page-text="t('app.loader.pageText', { page, max: Math.ceil((logs?.total ?? 0) / size) })"
         :items-per-page-options="[10, 25, 50]"
-        expand-on-click
-        hover
         item-value="id"
         @update:options="request()"
         density="compact"
       >
-        <template #expanded-row="{ item }">
-          <tr>
-            <td :colspan="headers.length">
-              <v-row class="py-2" v-if="item.permissionNames.length > 0" dense>
-                <v-col cols="auto" v-for="name in item.permissionNames" :key="name">
-                  <v-chip color="info" density="comfortable" label>{{ name }}</v-chip>
-                </v-col>
-              </v-row>
-              <span v-else class="text-subtitle-2 font-weight-bold">{{ t('user.noPermissions') }}</span>
-            </td>
-          </tr>
-        </template>
         <template #item.operator="{ item }">
           <v-tooltip>
             {{ item.operator.username }}

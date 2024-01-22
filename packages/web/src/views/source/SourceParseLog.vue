@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-0">
+  <v-container class="pa-0 pb-12">
     <span class="text-h4">{{ t('source.sections.log') }}</span>
     <v-row class="py-2 mt-3" dense>
       <v-col cols="6" sm="4">

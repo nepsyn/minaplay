@@ -562,8 +562,10 @@ import MediaSelector from '@/components/resource/MediaSelector.vue';
 import SeriesSelector from '@/components/resource/SeriesSelector.vue';
 import { SeriesEntity } from '@/api/interfaces/series.interface';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
+import { useSettingsStore } from '@/store/settings';
 
 const { t } = useI18n();
+const { settings } = useSettingsStore();
 const api = useApiStore();
 const route = useRoute();
 const router = useRouter();
@@ -753,6 +755,11 @@ onJoinCompleted(async (data) => {
     }
   } catch (error: any) {
     toast.toastError(t(`error.${error?.code ?? 'other'}`));
+  }
+
+  // auto join live voice
+  if (settings.autoJoinVoice) {
+    await connectVoice();
   }
 });
 onJoinFailed((error: any) => {

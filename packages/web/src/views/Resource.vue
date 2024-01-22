@@ -8,7 +8,6 @@
       <multi-items-loader
         :loader="updatesLoader"
         class="px-0 py-4"
-        hide-load-more
         :hide-empty="updates.length > 0"
         :auto="updates.length < 12"
       >

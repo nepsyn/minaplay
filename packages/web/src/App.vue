@@ -16,17 +16,23 @@ import { onBeforeMount, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import * as monaco from 'monaco-editor';
+import { useSettingsStore } from '@/store/settings';
 
 const toast = useToastStore();
 const { t } = useI18n();
+const { settings } = useSettingsStore();
 const layout = useLayoutStore();
 const api = useApiStore();
 const router = useRouter();
 const route = useRoute();
 
 try {
-  const themeMedia = matchMedia('(prefers-color-scheme: dark)');
-  layout.toggleDarkMode(themeMedia.matches);
+  if (settings.theme === 'auto') {
+    const themeMedia = matchMedia('(prefers-color-scheme: dark)');
+    layout.toggleDarkMode(themeMedia.matches);
+  } else {
+    layout.toggleDarkMode(settings.theme === 'dark');
+  }
 } catch {}
 
 watch(
@@ -64,5 +70,10 @@ onBeforeMount(async () => {
       );
     }
   }
+});
+
+onBeforeMount(() => {
+  const i18n = useI18n();
+  i18n.locale.value = settings.locale;
 });
 </script>

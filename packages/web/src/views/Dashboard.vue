@@ -65,7 +65,6 @@
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import { useI18n } from 'vue-i18n';
 import {
-  mdiAccountKey,
   mdiAccountMultiple,
   mdiAnimationPlayOutline,
   mdiApps,
@@ -75,6 +74,7 @@ import {
   mdiMultimedia,
   mdiRss,
   mdiScriptText,
+  mdiShieldKey,
   mdiVideoVintage,
   mdiViewComfy,
 } from '@mdi/js';
@@ -97,7 +97,7 @@ const systemTabs = [
   },
   {
     to: '/dashboard/action-logs',
-    icon: mdiAccountKey,
+    icon: mdiShieldKey,
     text: t('dashboard.actionLogs'),
   },
 ];

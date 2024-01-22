@@ -4,12 +4,8 @@ declare interface FileEntity {
   size: number;
   md5: string;
   mimetype?: string;
-  source: 'USER_UPLOAD' | 'DOWNLOAD' | 'AUTO_GENERATED';
   path: string;
-  expireAt?: Date;
   createAt: Date;
-  updateAt: Date;
-  isExist: boolean;
 }
 
 declare interface FeedEntry {

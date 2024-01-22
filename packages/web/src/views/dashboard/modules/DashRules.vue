@@ -144,7 +144,7 @@ import { RuleEntity, RuleQueryDto, SourceQueryDto } from '@/api/interfaces/subsc
 import BlankFavicon from '@/assets/blank-favicon.png';
 import { useRouter } from 'vue-router';
 import { useToastStore } from '@/store/toast';
-import DefaultTemplateCode from '@/assets/templates/default.ts?raw';
+import DefaultTemplateCode from '@/api/templates/default.ts?raw';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 
 const { t, locale } = useI18n();

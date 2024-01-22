@@ -67,7 +67,7 @@ import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useRouter } from 'vue-router';
 import { useToastStore } from '@/store/toast';
-import DefaultTemplateCode from '@/assets/templates/default.ts?raw';
+import DefaultTemplateCode from '@/api/templates/default.ts?raw';
 import RuleOverview from '@/components/rule/RuleOverview.vue';
 
 const { t } = useI18n();

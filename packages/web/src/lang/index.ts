@@ -5,26 +5,16 @@ import zhLocale from './zh';
 
 export type MessageSchema = typeof enLocale;
 
-const messages = {
+export const LANGUAGES = {
   'en-US': enLocale,
   'zh-CN': zhLocale,
 };
 
-export type MessageLocale = keyof typeof messages;
-
-const getLocale = () => {
-  const cookieLanguage = sessionStorage.getItem('language');
-  if (cookieLanguage) {
-    return cookieLanguage;
-  }
-
-  const locale = Object.keys(messages).find((value) => value === navigator.language);
-  return locale ?? 'en-US';
-};
+export type MessageLocale = keyof typeof LANGUAGES;
 
 export default createI18n<[MessageSchema], 'en-US' | 'zh-CN'>({
   legacy: false,
-  locale: getLocale(),
+  locale: 'en-US',
   fallbackLocale: 'en-US',
-  messages,
+  messages: LANGUAGES,
 });

@@ -1,5 +1,5 @@
 <template>
-  <v-container class="pa-0 flex-grow-1 d-flex flex-column">
+  <v-container class="pa-0 pb-12 flex-grow-1 d-flex flex-column">
     <span class="text-h4">{{ t('source.sections.raw') }}</span>
     <v-row dense class="flex-grow-0 py-2 mt-3">
       <v-col cols="12" sm="auto" class="flex-grow-1">

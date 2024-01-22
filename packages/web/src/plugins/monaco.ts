@@ -2,7 +2,7 @@ import * as monaco from 'monaco-editor';
 import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
 import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
 import TypeScriptWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-import RuleDeclarationCode from '@/assets/templates/rule.d.ts?raw';
+import RuleDeclarationCode from '@/api/templates/rule.d.ts?raw';
 
 self.MonacoEnvironment = {
   getWorker: function (_, label) {
@@ -18,7 +18,9 @@ self.MonacoEnvironment = {
   },
 };
 
-monaco.languages.typescript.typescriptDefaults.addExtraLib(RuleDeclarationCode);
+monaco.languages.typescript.typescriptDefaults.setExtraLibs([
+  { content: RuleDeclarationCode, filePath: 'ts:rule.d.ts' },
+]);
 monaco.editor.createModel(RuleDeclarationCode, 'typescript', monaco.Uri.parse('ts:rule.d.ts'));
 monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
   ...monaco.languages.typescript.javascriptDefaults.getDiagnosticsOptions(),

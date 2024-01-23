@@ -1,7 +1,7 @@
-import { ModuleMetadata } from '@nestjs/common';
+import { InjectionToken, ModuleMetadata, ValueProvider } from '@nestjs/common';
 import { Argument, Command, Option } from 'commander';
-import { MinaplayMessage } from '../../common/application.message.js';
 import { PluginControl } from './plugin-control.js';
+import { MinaPlayMessage } from '../../common/application.message.js';
 
 export interface MinaPlayPluginMetadata extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   id: string;
@@ -17,41 +17,64 @@ export interface MinaPlayPluginHooks {
   onDisabled?(): any;
 }
 
-export interface PluginCommandArgMetadata {
+export interface MinaPlayPluginMessage {
+  control: PluginControl;
+  messages: MinaPlayMessage[];
+}
+
+export interface MinaPlayMessagePreprocessor {
+  injects?: InjectionToken[];
+  factory: (...args: any) => ValueProvider[] | undefined | Promise<ValueProvider[] | undefined>;
+}
+export interface MinaPlayMessageValidator {
+  injects?: InjectionToken[];
+  factory: (...args: any) => boolean | Promise<boolean>;
+}
+
+export interface MinaPlayParamMetadata {
   index: number;
-  instance: Option | Argument | 'program';
+  token: InjectionToken;
 }
 
-export interface PluginCommandMetadata {
-  program: Command;
+export interface MinaPlayMessageListenerMetadata {
+  preprocessors: MinaPlayMessagePreprocessor[];
+  validators: MinaPlayMessageValidator[];
   type: Function;
-  key: PropertyKey;
-  args: PluginCommandArgMetadata[];
-  subcommands?: Map<string, PluginCommandMetadata>;
+  key: string | symbol;
+  params: MinaPlayParamMetadata[];
 }
 
-export interface PluginCommandOptions {
+export interface MinaPlayMessageListenerOptions {
+  preprocessors?: MinaPlayMessagePreprocessor[];
+  validators?: MinaPlayMessageValidator[];
+}
+
+export interface MinaPlayCommanderArgMetadata {
+  index: number;
+  instance: Option | Argument;
+}
+
+export interface MinaPlayCommandMetadata {
+  program: Command;
+  subcommands?: Map<string, MinaPlayCommandMetadata>;
+}
+
+export interface MinaPlayCommandOptions {
   aliases?: string[];
   description?: string;
   parents?: string[];
   factory?: (program: Command) => Command;
 }
 
-export interface PluginCommandOptionOptions {
+export interface MinaPlayCommandOptionOptions {
   description?: string;
   default?: any;
   factory?: (option: Option) => Option;
 }
 
-export interface PluginCommandArgumentOptions {
+export interface MinaPlayCommandArgumentOptions {
   description?: string;
   required?: boolean;
   default?: any;
   factory?: (option: Argument) => Argument;
-}
-
-export interface MinaPlayCommandResult {
-  control: PluginControl;
-  result?: MinaplayMessage[];
-  error?: string;
 }

@@ -26,7 +26,7 @@ import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
 import { LiveAudienceWsGuard } from './live-audience.ws.guard.service.js';
 import { WsLiveState } from './live-state.ws.decorator.js';
 import { LiveState } from './live-state.insterface.js';
-import { MinaplayMessage, parseMessage } from '../../common/application.message.js';
+import { MinaPlayMessage, parseMessage } from '../../common/application.message.js';
 import { LiveChatService } from './live-chat.service.js';
 import { Between } from 'typeorm';
 import { RoomOwnerOnly } from './room-owner-only.ws.decorator.js';
@@ -151,7 +151,7 @@ export class LiveGateway implements OnGatewayDisconnect {
   async handleChat(
     @ConnectedSocket() socket: Socket,
     @WsLiveState() state: LiveState,
-    @MessageBody('message') message: MinaplayMessage,
+    @MessageBody('message') message: MinaPlayMessage,
   ) {
     if (state.muted.chat.includes(socket.data.user.id)) {
       throw buildException(WsException, ErrorCodeEnum.USER_CHAT_MUTED);

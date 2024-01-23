@@ -1,8 +1,3 @@
-import {
-  CommanderProgram,
-  MinaPlayCommand,
-  MinaPlayCommandArgument,
-} from '../../../modules/plugin/plugin-command.decorator.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../../modules/user/user.entity.js';
 import { Permission } from '../../../modules/authorization/permission.entity.js';
@@ -13,6 +8,12 @@ import { PermissionEnum } from '../../../enums/permission.enum.js';
 import { Injectable } from '@nestjs/common';
 import { ApplicationLogger } from '../../../common/application.logger.service.js';
 import { Command } from 'commander';
+import {
+  MinaPlayCommand,
+  MinaPlayCommandArgument,
+  MinaPlayPluginInject,
+} from '../../../modules/plugin/plugin.decorator.js';
+import { PluginChatSession } from '../../../modules/plugin/plugin-chat-session.js';
 
 @Injectable()
 export class UserManagerCommand {
@@ -24,7 +25,7 @@ export class UserManagerCommand {
   ) {}
 
   @MinaPlayCommand('um')
-  async handleUm(@CommanderProgram() program: Command) {
+  async handleUm(@MinaPlayPluginInject() program: Command) {
     return program.helpInformation();
   }
 
@@ -74,18 +75,29 @@ export class UserManagerCommand {
       description: 'Username of this root user',
     })
     username: string,
+    @MinaPlayPluginInject() chat: PluginChatSession,
   ) {
     const user = await this.userRepository.findOneBy({ username });
     if (!user) {
       return `User '${username}' not found in database`;
     }
 
+    await chat.send(`Are you sure to delete user '${username}' ? (Y/n)`);
     try {
-      await this.userRepository.delete({ username });
-      return `User '${username}' deleted`;
-    } catch (error) {
-      this.logger.error(`User '${username}' delete failed`, error.stack, UserManagerCommand.name);
-      return `User '${username}' delete failed`;
+      const resp = await chat.receive();
+      if (resp.type === 'Text' && resp.content.trim().toLowerCase() === 'y') {
+        try {
+          await this.userRepository.delete({ username });
+          return `User '${username}' deleted`;
+        } catch (error) {
+          this.logger.error(`User '${username}' delete failed`, error.stack, UserManagerCommand.name);
+          return `User '${username}' delete failed`;
+        }
+      } else {
+        return `User '${username}' delete canceled`;
+      }
+    } catch {
+      return `User '${username}' delete canceled`;
     }
   }
 }

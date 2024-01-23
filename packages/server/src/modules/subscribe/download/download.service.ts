@@ -118,7 +118,7 @@ export class DownloadService implements OnModuleInit {
     const status = await aria2.tellStatus(this.conn, gid);
     const task = this.tasks.get(status.following ?? gid);
     if (task) {
-      await this.save({ id: task.itemId, status: StatusEnum.FAILED, error: 'Cancelled' });
+      await this.save({ id: task.itemId, status: StatusEnum.FAILED, error: 'Canceled' });
       task.emit('stop', status);
       this.tasks.delete(task.taskId);
     }

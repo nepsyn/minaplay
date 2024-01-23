@@ -9,13 +9,14 @@ import { ConnectedSocket, MessageBody, SubscribeMessage, WebSocketGateway } from
 import { AuthorizationWsGuard } from '../authorization/authorization.ws.guard.js';
 import { ApplicationGatewayExceptionFilter } from '../../common/application.gateway.exception.filter.js';
 import { ApplicationGatewayInterceptor } from '../../common/application.gateway.interceptor.js';
-import { Socket } from 'socket.io';
-import { MinaplayMessage, parseMessage } from '../../common/application.message.js';
+import { MinaPlayMessage, parseMessage } from '../../common/application.message.js';
 import { buildException } from '../../utils/build-exception.util.js';
 import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
 import { PluginService } from './plugin.service.js';
 import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
 import { PermissionEnum } from '../../enums/permission.enum.js';
+import { Socket } from 'socket.io';
+import { instanceToPlain } from 'class-transformer';
 
 @WebSocketGateway({
   namespace: 'plugin',
@@ -26,18 +27,17 @@ import { PermissionEnum } from '../../enums/permission.enum.js';
 export class PluginGateway {
   constructor(private pluginService: PluginService) {}
 
-  @SubscribeMessage('command')
+  @SubscribeMessage('console')
   @RequirePermissions(PermissionEnum.ROOT_OP)
-  async handleCommand(@ConnectedSocket() socket: Socket, @MessageBody() body: MinaplayMessage) {
+  async handleCommand(@ConnectedSocket() socket: Socket, @MessageBody() body: MinaPlayMessage) {
     const message = parseMessage(body);
     if (!message) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    if (message.type !== 'Text') {
-      return;
+    const results = await this.pluginService.handleMessage(message, socket);
+    if (results.length > 0) {
+      socket.emit('console', instanceToPlain(results));
     }
-
-    return await this.pluginService.runCommand(message.content);
   }
 }

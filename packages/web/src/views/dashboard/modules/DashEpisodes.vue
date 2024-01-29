@@ -33,7 +33,7 @@
           hide-details
           :label="t('app.entities.series')"
           :items="seriesItems ?? []"
-          :item-title="(item) => `${item.name} ${item.season ?? ''}`.trim()"
+          item-title="name"
           item-value="id"
           :no-data-text="t('app.loader.empty')"
           density="compact"
@@ -41,7 +41,12 @@
           v-model.number="filters.seriesId"
           v-model:search="seriesKeyword"
           clearable
-          :item-props="() => ({ density: 'comfortable' })"
+          :item-props="
+            (item) => ({
+              density: 'comfortable',
+              subtitle: item.season && t('series.seasonLabel', { season: item.season }),
+            })
+          "
           @focus.once="loadSeries()"
           @update:model-value="request()"
           @update:search="!filters.seriesId && useSeriesQuery(seriesKeyword)"
@@ -184,7 +189,7 @@
               color="primary"
               hide-details
               :items="seriesItems ?? []"
-              :item-title="(item) => `${item.name} ${item.season ?? ''}`.trim()"
+              item-title="name"
               return-object
               :no-data-text="t('app.loader.empty')"
               density="compact"
@@ -192,7 +197,12 @@
               v-model="editItem.series"
               v-model:search="editSeriesKeyword"
               clearable
-              :item-props="() => ({ density: 'comfortable' })"
+              :item-props="
+                (item) => ({
+                  density: 'comfortable',
+                  subtitle: item.season && t('series.seasonLabel', { season: item.season }),
+                })
+              "
               @focus.once="loadSeries()"
               @update:search="!editItem.series && useSeriesQuery(editSeriesKeyword)"
             ></v-autocomplete>

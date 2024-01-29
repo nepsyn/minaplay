@@ -11,15 +11,10 @@
             <p class="text-caption">{{ t('settings.app.languageDescription') }}</p>
           </v-container>
         </v-container>
-        <v-combobox
-          :items="languages"
-          v-model="settings.locale"
-          hide-details
-          density="compact"
-          variant="outlined"
-          :return-object="false"
-        >
-        </v-combobox>
+        <v-container class="pa-0">
+          <v-select :items="languages" v-model="settings.locale" hide-details density="compact" variant="outlined">
+          </v-select>
+        </v-container>
       </v-container>
       <v-divider class="ml-4"></v-divider>
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
@@ -30,15 +25,10 @@
             <p class="text-caption">{{ t('settings.app.themeDescription') }}</p>
           </v-container>
         </v-container>
-        <v-combobox
-          :items="themes"
-          v-model="settings.theme"
-          hide-details
-          density="compact"
-          variant="outlined"
-          :return-object="false"
-        >
-        </v-combobox>
+        <v-container class="pa-0">
+          <v-select :items="themes" v-model="settings.theme" hide-details density="compact" variant="outlined">
+          </v-select>
+        </v-container>
       </v-container>
     </v-sheet>
     <v-sheet class="mt-6 rounded-lg border">

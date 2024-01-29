@@ -255,7 +255,7 @@
         </v-card-title>
         <v-card-text class="d-flex flex-column">
           <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.series') }) }}</span>
-          <span class="font-italic font-weight-bold">{{ `${editItem.name} ${editItem.season ?? ''}`.trim() }}</span>
+          <span class="font-italic font-weight-bold">{{ editItem.name }}</span>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>

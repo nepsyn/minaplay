@@ -65,18 +65,19 @@
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import { useI18n } from 'vue-i18n';
 import {
-  mdiAccountMultiple,
+  mdiAccountMultipleOutline,
   mdiAnimationPlayOutline,
   mdiApps,
   mdiCodeBraces,
   mdiFileMultipleOutline,
   mdiGaugeFull,
   mdiMultimedia,
+  mdiPuzzleOutline,
   mdiRss,
-  mdiScriptText,
-  mdiShieldKey,
+  mdiScriptTextOutline,
+  mdiShieldKeyOutline,
   mdiVideoVintage,
-  mdiViewComfy,
+  mdiViewComfyOutline,
 } from '@mdi/js';
 import NavTabs from '@/components/app/NavTabs.vue';
 import { useRoute } from 'vue-router';
@@ -92,19 +93,24 @@ const systemTabs = [
   },
   {
     to: '/dashboard/logs',
-    icon: mdiScriptText,
+    icon: mdiScriptTextOutline,
     text: t('dashboard.logs'),
   },
   {
     to: '/dashboard/action-logs',
-    icon: mdiShieldKey,
+    icon: mdiShieldKeyOutline,
     text: t('dashboard.actionLogs'),
+  },
+  {
+    to: '/dashboard/plugins',
+    icon: mdiPuzzleOutline,
+    text: t('dashboard.plugins'),
   },
 ];
 const moduleTabs = [
   {
     to: '/dashboard/user',
-    icon: mdiAccountMultiple,
+    icon: mdiAccountMultipleOutline,
     text: t('dashboard.user'),
   },
   {
@@ -129,7 +135,7 @@ const moduleTabs = [
   },
   {
     to: '/dashboard/episode',
-    icon: mdiViewComfy,
+    icon: mdiViewComfyOutline,
     text: t('dashboard.episode'),
   },
   {

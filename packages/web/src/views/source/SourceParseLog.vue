@@ -22,7 +22,7 @@
           :label="t('app.input.order')"
           density="compact"
           v-model="filters.order"
-          :items="api.orders"
+          :items="orders"
           hide-details
           clearable
           @update:model-value="query"
@@ -93,6 +93,17 @@ const { t, locale } = useI18n();
 const api = useApiStore();
 const route = useRoute();
 const toast = useToastStore();
+
+const orders = [
+  {
+    title: t('app.input.desc'),
+    value: 'DESC',
+  },
+  {
+    title: t('app.input.asc'),
+    value: 'ASC',
+  },
+];
 
 const logsLoader = useAxiosPageLoader(
   async (query: ParseLogQueryDto = {}) => {

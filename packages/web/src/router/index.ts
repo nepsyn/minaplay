@@ -218,6 +218,14 @@ const routes: RouteRecordRaw[] = [
             },
           },
           {
+            path: '/dashboard/plugins',
+            name: 'dash-plugins',
+            component: () => import('@/views/dashboard/app/DashPlugins.vue'),
+            meta: {
+              permissions: [PermissionEnum.ROOT_OP],
+            },
+          },
+          {
             path: '/dashboard/user',
             name: 'dash-user',
             component: () => import('@/views/dashboard/modules/DashUsers.vue'),

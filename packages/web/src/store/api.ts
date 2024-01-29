@@ -56,11 +56,9 @@ import {
 import { FileEntity, FileQueryDto } from '@/api/interfaces/file.interface';
 import { SystemStatus } from '@/api/interfaces/system.interface';
 import { LiveDto, LiveEntity, LiveQueryDto } from '@/api/interfaces/live.interface';
-import { useI18n } from 'vue-i18n';
+import { PluginControl } from '@/api/interfaces/plugin.interface';
 
 export const useApiStore = defineStore('api', () => {
-  const { t } = useI18n();
-
   const user = ref<UserEntity | undefined>(undefined);
   const hasPermission = (...permissions: PermissionEnum[]) => {
     return user.value && permissions.some((name) => user.value?.permissionNames.includes(name));
@@ -125,17 +123,6 @@ export const useApiStore = defineStore('api', () => {
       });
     };
   }
-
-  const orders = [
-    {
-      title: t('app.input.desc'),
-      value: 'DESC',
-    },
-    {
-      title: t('app.input.asc'),
-      value: 'ASC',
-    },
-  ];
 
   const Auth = {
     login: apiPost<AuthData, LoginDto>('/api/v1/auth/login/'),
@@ -270,13 +257,18 @@ export const useApiStore = defineStore('api', () => {
     restart: apiPost('/api/v1/system/restart'),
   };
 
+  const Plugin = {
+    getAll: apiGet<ApiQueryResult<PluginControl>>('/api/v1/plugins'),
+    enable: (id: string) => apiPost<PluginControl>(`/api/v1/plugins/${id}/enable`),
+    disable: (id: string) => apiPost<PluginControl>(`/api/v1/plugins/${id}/disable`),
+  };
+
   return {
     isLogin,
     getToken,
     setToken,
     user,
     hasPermission,
-    orders,
     Auth,
     User,
     File,
@@ -291,5 +283,6 @@ export const useApiStore = defineStore('api', () => {
     Media,
     ViewHistory,
     System,
+    Plugin,
   };
 });

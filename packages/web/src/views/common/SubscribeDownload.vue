@@ -34,7 +34,7 @@
           :label="t('app.input.order')"
           density="compact"
           v-model="filters.order"
-          :items="api.orders"
+          :items="orders"
           hide-details
           clearable
           @update:model-value="query"
@@ -84,6 +84,17 @@ import DownloadItemOverview from '@/components/source/DownloadItemOverview.vue';
 const { t } = useI18n();
 const api = useApiStore();
 const route = useRoute();
+
+const orders = [
+  {
+    title: t('app.input.desc'),
+    value: 'DESC',
+  },
+  {
+    title: t('app.input.asc'),
+    value: 'ASC',
+  },
+];
 
 const downloadsLoader = useAxiosPageLoader(
   async (query: DownloadItemQueryDto = {}) => {

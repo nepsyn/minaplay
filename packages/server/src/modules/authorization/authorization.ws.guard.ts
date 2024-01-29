@@ -33,14 +33,11 @@ export class AuthorizationWsGuard implements CanActivate {
       throw buildException(WsException, ErrorCodeEnum.INVALID_TOKEN);
     }
 
-    if (!socket.data.user) {
-      const user = await this.userService.findOneBy({ id: payload.id });
-      if (!user || user.ticket !== payload.ticket) {
-        throw buildException(WsException, ErrorCodeEnum.INVALID_TOKEN);
-      }
-
-      socket.data.user = user;
+    const user = await this.userService.findOneBy({ id: payload.id });
+    if (!user || user.ticket !== payload.ticket) {
+      throw buildException(WsException, ErrorCodeEnum.INVALID_TOKEN);
     }
+    socket.data.user = user;
 
     // 所需要权限
     const permissions = this.reflector.getAllAndMerge<PermissionEnum[]>(REQUIRE_PERMISSIONS_KEY, [

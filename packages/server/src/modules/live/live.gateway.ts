@@ -23,7 +23,7 @@ import { PermissionEnum } from '../../enums/permission.enum.js';
 import { RemoteSocket, Server, Socket } from 'socket.io';
 import { buildException } from '../../utils/build-exception.util.js';
 import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
-import { LiveAudienceWsGuard } from './live-audience.ws.guard.service.js';
+import { LiveAudienceWsGuard } from './live-audience.ws.guard.js';
 import { WsLiveState } from './live-state.ws.decorator.js';
 import { LiveState } from './live-state.insterface.js';
 import { MinaPlayMessage, parseMessage } from '../../common/application.message.js';

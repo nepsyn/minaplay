@@ -1,29 +1,17 @@
-import { Injectable, InjectionToken, OnModuleInit, Type, ValueProvider } from '@nestjs/common';
+import { Injectable, OnModuleInit, Type } from '@nestjs/common';
 import { LazyModuleLoader } from '@nestjs/core';
-import {
-  MinaPlayCommandMetadata,
-  MinaPlayMessageListenerMetadata,
-  MinaPlayParamMetadata,
-  MinaPlayPluginHooks,
-  MinaPlayPluginMessage,
-} from './plugin.interface.js';
+import { MinaPlayCommandMetadata, MinaPlayMessageListenerMetadata, MinaPlayPluginHooks } from './plugin.interface.js';
 import { PluginControl } from './plugin-control.js';
 import { getMinaPlayPluginMetadata, isMinaPlayPlugin } from './plugin.decorator.js';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import fs from 'fs-extra';
-import { isArray, isString } from 'class-validator';
-import { MinaPlayMessage, Text } from '../../common/application.message.js';
-import { User } from '../user/user.entity.js';
-import {
-  MESSAGE_TOKEN,
-  MINAPLAY_COMMAND_METADATA,
-  MINAPLAY_LISTENER_METADATA,
-  PROGRAM_ROOT_TOKEN,
-} from './constants.js';
+import { MinaPlayMessage } from '../../common/application.message.js';
+import { MINAPLAY_COMMAND_METADATA, MINAPLAY_LISTENER_METADATA } from './constants.js';
 import { Socket } from 'socket.io';
-import { PluginChatSession } from './plugin-chat-session.js';
+import { PluginChatContext } from './plugin-chat-context.js';
+import { instanceToPlain } from 'class-transformer';
 
 @Injectable()
 export class PluginService implements OnModuleInit {
@@ -68,7 +56,7 @@ export class PluginService implements OnModuleInit {
     const metadata = getMinaPlayPluginMetadata(plugin);
     try {
       // initialize services
-      const module = await this.lazyModuleLoader.load(() => plugin);
+      const module = await this.lazyModuleLoader.load(() => plugin, { logger: false });
       const commands: Map<string, MinaPlayCommandMetadata> = new Map();
       const listeners: MinaPlayMessageListenerMetadata[] = [];
       const services: MinaPlayPluginHooks[] = [];
@@ -117,6 +105,7 @@ export class PluginService implements OnModuleInit {
         module,
         commands,
         listeners,
+        contexts: new Map(),
       });
       this.controls.push(control);
 
@@ -184,127 +173,27 @@ export class PluginService implements OnModuleInit {
     return control;
   }
 
-  private async createRuntimeParams(
-    control: PluginControl,
-    container: Map<InjectionToken, any>,
-    metadata: MinaPlayMessageListenerMetadata | InjectionToken[],
-  ) {
-    const params = [];
-    const tokens: MinaPlayParamMetadata[] = isArray(metadata)
-      ? metadata.map((value, index) => ({ index, token: value }))
-      : metadata.params;
-    for (const { index, token } of tokens) {
-      if (container.has(token)) {
-        params[index] = container.get(token);
-      } else {
-        try {
-          params[index] = control.module.get(token);
-        } catch {
-          if (!isArray(metadata)) {
-            this.logger.warn(
-              `Unable to resolve dependency type on ${metadata.type.name}#${String(metadata.key)} at index ${index}`,
-            );
-          }
-        }
-      }
-    }
-    return params;
-  }
-
-  private async emitPluginListeners(message: MinaPlayMessage, control: PluginControl, socket: Socket) {
-    const messages: MinaPlayMessage[] = [];
-    for (const metadata of control.listeners) {
-      const result = await this.emitListener(message, control, metadata, socket);
-      if (isString(result)) {
-        messages.push(new Text(result));
-      } else if ('type' in messages) {
-        messages.push(result);
-      } else if (isArray(result)) {
-        messages.push(...result);
-      }
-    }
-    return messages;
-  }
-
-  private async emitListener(
-    message: MinaPlayMessage,
-    control: PluginControl,
-    metadata: MinaPlayMessageListenerMetadata,
-    socket: Socket,
-  ) {
-    const service = control.module.get(metadata.type);
-
-    const container = new Map<InjectionToken, any>();
-    // initial deps
-    container.set(MESSAGE_TOKEN, message);
-    container.set(Socket, socket);
-    container.set(User, socket.data.user);
-    container.set(PluginChatSession, new PluginChatSession(socket, control));
-    container.set(PROGRAM_ROOT_TOKEN, control.commands);
-
-    const preprocessProviders: ValueProvider[] = [];
-    for (const { injects, factory } of metadata.preprocessors) {
-      try {
-        const params = await this.createRuntimeParams(control, container, injects);
-        const providers = (await factory(...params)) ?? [];
-        preprocessProviders.push(...providers);
-      } catch (error) {
-        this.logger.error(
-          `Error occurred while running preprocessor of ${metadata.type.name}#${String(metadata.key)}`,
-          error.stack,
-          PluginService.name,
-        );
-        return;
-      }
-    }
-    for (const { provide, useValue } of preprocessProviders) {
-      if (!container.has(provide)) {
-        container.set(provide, useValue);
-      }
-    }
-
-    for (const { injects, factory } of metadata.validators) {
-      try {
-        const params = await this.createRuntimeParams(control, container, injects);
-        const valid = await factory(...params);
-        if (!valid) {
-          return;
-        }
-      } catch (error) {
-        this.logger.error(
-          `Error occurred while running validator of ${metadata.type.name}#${String(metadata.key)}`,
-          error.stack,
-          PluginService.name,
-        );
-        return;
-      }
-    }
-
-    try {
-      const params = await this.createRuntimeParams(control, container, metadata);
-      return await service[metadata.key](...params);
-    } catch (error) {
-      this.logger.error(
-        `Error occurred while running message listener '${control.type.name}#${String(metadata.key)}'`,
-        error.stack,
-        PluginService.name,
-      );
-    }
-  }
-
-  async handleMessage(message: MinaPlayMessage, socket: Socket): Promise<MinaPlayPluginMessage[]> {
-    const controls = this.enabledPluginControls;
-    const results = await Promise.allSettled(
-      controls.map((control) => this.emitPluginListeners(message, control, socket)),
+  async handleGatewayMessage(message: MinaPlayMessage, socket: Socket) {
+    const contexts = this.enabledPluginControls.map((control) => {
+      const context = control.contexts.get(socket.data.user.id) ?? new PluginChatContext(socket.data.user, control);
+      control.contexts.set(socket.data.user.id, context);
+      return context;
+    });
+    await Promise.allSettled(
+      contexts.map(async (context) => {
+        context.removeAllListeners('send');
+        context.on('send', async (messages: MinaPlayMessage[]) => {
+          socket.emit(
+            'console',
+            instanceToPlain({
+              plugin: context.control,
+              messages,
+            }),
+          );
+        });
+        await context.handleMessage(message);
+      }),
     );
-    return results
-      .map((result, index) => {
-        return {
-          control: controls[index],
-          messages: result.status === 'fulfilled' ? result.value : undefined,
-        };
-      })
-      .filter(({ messages }) => messages?.length > 0);
   }
 
   getAllControls() {

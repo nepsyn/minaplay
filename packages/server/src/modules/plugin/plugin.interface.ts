@@ -59,7 +59,7 @@ export interface MinaPlayCommandMetadata {
   subcommands?: Map<string, MinaPlayCommandMetadata>;
 }
 
-export interface MinaPlayCommandOptions {
+export interface MinaPlayCommandOptions extends MinaPlayMessageListenerOptions {
   aliases?: string[];
   description?: string;
   parents?: string[];

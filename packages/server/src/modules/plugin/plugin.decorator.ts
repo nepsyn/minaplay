@@ -19,7 +19,7 @@ import {
   MINAPLAY_COMMAND_METADATA,
   MINAPLAY_LISTENER_METADATA,
   MINAPLAY_PLUGIN_METADATA,
-  PARAMS_METADATA,
+  PARAM_ARGS_METADATA,
 } from './constants.js';
 import { extendArrayMetadata } from '@nestjs/common/utils/extend-metadata.util.js';
 import { PluginCommandPreprocessor } from './plugin-preprocessors.js';
@@ -59,7 +59,7 @@ export function MinaPlayMessageListener(options: MinaPlayMessageListenerOptions 
     }
 
     const paramsMetadata: MinaPlayParamMetadata[] =
-      Reflect.getMetadata(PARAMS_METADATA, target.constructor, propertyKey) ?? [];
+      Reflect.getMetadata(PARAM_ARGS_METADATA, target.constructor, propertyKey) ?? [];
     extendArrayMetadata<MinaPlayMessageListenerMetadata[]>(
       MINAPLAY_LISTENER_METADATA,
       [
@@ -99,7 +99,7 @@ export function MinaPlayCommand(bin: string, options: MinaPlayCommandOptions = {
       Reflect.getMetadata(MINAPLAY_COMMAND_ARG_METADATA, target.constructor, propertyKey) ?? [];
     argsMetadata.sort((a, b) => a.index - b.index);
     const paramsMetadata: MinaPlayParamMetadata[] =
-      Reflect.getMetadata(PARAMS_METADATA, target.constructor, propertyKey) ?? [];
+      Reflect.getMetadata(PARAM_ARGS_METADATA, target.constructor, propertyKey) ?? [];
     let argIndex = 0;
     for (const arg of argsMetadata) {
       if (arg.instance instanceof Argument) {
@@ -110,14 +110,14 @@ export function MinaPlayCommand(bin: string, options: MinaPlayCommandOptions = {
         paramsMetadata.push({ index: arg.index, token: `${COMMAND_OPTIONS_TOKEN}:${arg.instance.attributeName()}` });
       }
     }
-    Reflect.defineMetadata(PARAMS_METADATA, paramsMetadata, target.constructor, propertyKey);
+    Reflect.defineMetadata(PARAM_ARGS_METADATA, paramsMetadata, target.constructor, propertyKey);
 
     // decorate this handler by @MinaPlayMessageListener
     Reflect.decorate(
       [
         MinaPlayMessageListener({
-          preprocessors: [PluginCommandPreprocessor()],
-          validators: [PluginCommandValidator(program)],
+          preprocessors: [PluginCommandPreprocessor(program)].concat(options.preprocessors ?? []),
+          validators: [PluginCommandValidator()].concat(options.validators ?? []),
         }),
       ],
       target,
@@ -173,9 +173,9 @@ export function MinaPlayPluginInject(token?: InjectionToken): ParameterDecorator
     }
 
     const paramsMetadata: MinaPlayParamMetadata[] =
-      Reflect.getMetadata(PARAMS_METADATA, target.constructor, propertyKey) ?? [];
+      Reflect.getMetadata(PARAM_ARGS_METADATA, target.constructor, propertyKey) ?? [];
     Reflect.defineMetadata(
-      PARAMS_METADATA,
+      PARAM_ARGS_METADATA,
       [...paramsMetadata, { index: parameterIndex, token: type }],
       target.constructor,
       propertyKey,
@@ -238,6 +238,6 @@ export function MinaPlayCommandArgument(arg: string, options: MinaPlayCommandArg
   };
 }
 
-export function MinaPlayUserMessage(): ParameterDecorator {
+export function MinaPlayChatMessage(): ParameterDecorator {
   return MinaPlayPluginInject(MESSAGE_TOKEN);
 }

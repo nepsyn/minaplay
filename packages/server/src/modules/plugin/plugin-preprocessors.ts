@@ -6,14 +6,15 @@ import {
   PROGRAM_ROOT_TOKEN,
   PROGRAM_TOKEN,
 } from './constants.js';
-import { CommanderError } from 'commander';
-import { MinaPlayMessage } from '../../common/application.message.js';
+import { Command, CommanderError } from 'commander';
+import { MinaPlayMessage, Text } from '../../common/application.message.js';
 import { ValueProvider } from '@nestjs/common';
+import { PluginChatContext } from './plugin-chat-context.js';
 
-export function PluginCommandPreprocessor(): MinaPlayMessagePreprocessor {
+export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePreprocessor {
   return {
-    injects: [MESSAGE_TOKEN, PROGRAM_ROOT_TOKEN],
-    factory(message: MinaPlayMessage, root: Map<string, MinaPlayCommandMetadata>) {
+    injects: [MESSAGE_TOKEN, PROGRAM_ROOT_TOKEN, PluginChatContext],
+    async factory(message: MinaPlayMessage, root: Map<string, MinaPlayCommandMetadata>, context: PluginChatContext) {
       const providers: ValueProvider[] = [];
 
       // check message type
@@ -33,13 +34,19 @@ export function PluginCommandPreprocessor(): MinaPlayMessagePreprocessor {
           break;
         }
       }
-      if (!metadata) {
-        return;
+      if (!metadata || metadata.program !== command) {
+        providers.push(
+          {
+            provide: PROGRAM_TOKEN,
+            useValue: undefined,
+          },
+          {
+            provide: CommanderError,
+            useValue: undefined,
+          },
+        );
+        return providers;
       }
-      providers.push({
-        provide: PROGRAM_TOKEN,
-        useValue: metadata.program,
-      });
 
       // parse args
       try {
@@ -55,6 +62,10 @@ export function PluginCommandPreprocessor(): MinaPlayMessagePreprocessor {
             provide: COMMAND_ARGUMENTS_TOKEN,
             useValue: args,
           },
+          {
+            provide: CommanderError,
+            useValue: undefined,
+          },
           ...Object.keys(opts).map((key) => ({
             provide: `${COMMAND_OPTIONS_TOKEN}:${key}`,
             useValue: opts[key],
@@ -66,11 +77,21 @@ export function PluginCommandPreprocessor(): MinaPlayMessagePreprocessor {
         );
       } catch (error) {
         if (error instanceof CommanderError) {
-          providers.push({
-            provide: CommanderError,
-            useValue: error,
-          });
+          if (['commander.help', 'commander.helpDisplayed'].includes(error.code)) {
+            await context.send(new Text(metadata.program.helpInformation()));
+          } else {
+            await context.send(new Text(error.message, '#B00020'));
+          }
         }
+        providers.push({
+          provide: CommanderError,
+          useValue: error,
+        });
+      } finally {
+        providers.push({
+          provide: PROGRAM_TOKEN,
+          useValue: metadata.program,
+        });
       }
 
       return providers;

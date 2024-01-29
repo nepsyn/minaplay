@@ -2,6 +2,7 @@ import { MinaPlayCommandMetadata, MinaPlayMessageListenerMetadata, MinaPlayPlugi
 import { Type } from '@nestjs/common';
 import { Exclude, Expose } from 'class-transformer';
 import { ModuleRef } from '@nestjs/core';
+import { PluginChatContext } from './plugin-chat-context.js';
 
 export class PluginControl {
   @Expose()
@@ -36,4 +37,7 @@ export class PluginControl {
 
   @Exclude()
   listeners: MinaPlayMessageListenerMetadata[];
+
+  @Exclude()
+  contexts: Map<number, PluginChatContext>;
 }

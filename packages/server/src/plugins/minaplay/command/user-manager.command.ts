@@ -13,7 +13,7 @@ import {
   MinaPlayCommandArgument,
   MinaPlayPluginInject,
 } from '../../../modules/plugin/plugin.decorator.js';
-import { PluginChatSession } from '../../../modules/plugin/plugin-chat-session.js';
+import { PluginChatContext } from '../../../modules/plugin/plugin-chat-context.js';
 
 @Injectable()
 export class UserManagerCommand {
@@ -75,7 +75,7 @@ export class UserManagerCommand {
       description: 'Username of this root user',
     })
     username: string,
-    @MinaPlayPluginInject() chat: PluginChatSession,
+    @MinaPlayPluginInject() chat: PluginChatContext,
   ) {
     const user = await this.userRepository.findOneBy({ username });
     if (!user) {

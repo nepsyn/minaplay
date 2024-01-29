@@ -15,11 +15,20 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
   return {
     injects: [MESSAGE_TOKEN, PROGRAM_ROOT_TOKEN, PluginChatContext],
     async factory(message: MinaPlayMessage, root: Map<string, MinaPlayCommandMetadata>, context: PluginChatContext) {
-      const providers: ValueProvider[] = [];
+      const providers: ValueProvider[] = [
+        {
+          provide: PROGRAM_TOKEN,
+          useValue: undefined,
+        },
+        {
+          provide: CommanderError,
+          useValue: undefined,
+        },
+      ];
 
       // check message type
       if (message.type !== 'Text') {
-        return;
+        return providers;
       }
 
       // find handler Command node
@@ -35,16 +44,6 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
         }
       }
       if (!metadata || metadata.program !== command) {
-        providers.push(
-          {
-            provide: PROGRAM_TOKEN,
-            useValue: undefined,
-          },
-          {
-            provide: CommanderError,
-            useValue: undefined,
-          },
-        );
         return providers;
       }
 
@@ -53,7 +52,11 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
         const program = metadata.program.parse(argv, { from: 'user' });
         const opts = Object.assign({}, program.opts());
         const args = program.processedArgs.concat();
-        providers.push(
+        return [
+          {
+            provide: PROGRAM_TOKEN,
+            useValue: metadata.program,
+          },
           {
             provide: COMMAND_OPTIONS_TOKEN,
             useValue: opts,
@@ -74,7 +77,7 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
             provide: `${COMMAND_ARGUMENTS_TOKEN}:${index}`,
             useValue: value,
           })),
-        );
+        ];
       } catch (error) {
         if (error instanceof CommanderError) {
           if (['commander.help', 'commander.helpDisplayed'].includes(error.code)) {
@@ -83,18 +86,18 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
             await context.send(new Text(error.message, '#B00020'));
           }
         }
-        providers.push({
-          provide: CommanderError,
-          useValue: error,
-        });
-      } finally {
-        providers.push({
-          provide: PROGRAM_TOKEN,
-          useValue: metadata.program,
-        });
-      }
 
-      return providers;
+        return [
+          {
+            provide: PROGRAM_TOKEN,
+            useValue: metadata.program,
+          },
+          {
+            provide: CommanderError,
+            useValue: error,
+          },
+        ];
+      }
     },
   };
 }

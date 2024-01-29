@@ -117,7 +117,7 @@ export class PluginChatContext extends TypedEventEmitter<PluginChatContextEventM
       } catch (error) {
         this.logger.error(
           `Error occurred while running preprocessor of ` +
-            `${metadata.type.name}#${String(metadata.key)} at index ${index}`,
+            `${metadata.type.name}#${String(metadata.key)} at parameter index ${index}`,
           error.stack,
           this.context,
         );
@@ -137,7 +137,7 @@ export class PluginChatContext extends TypedEventEmitter<PluginChatContextEventM
       } catch (error) {
         this.logger.error(
           `Error occurred while running validator of ` +
-            `${metadata.type.name}#${String(metadata.key)} at index ${index}`,
+            `${metadata.type.name}#${String(metadata.key)} at parameter index ${index}`,
           error.stack,
           this.context,
         );

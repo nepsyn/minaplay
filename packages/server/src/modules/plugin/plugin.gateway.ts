@@ -17,6 +17,7 @@ import { PermissionEnum } from '../../enums/permission.enum.js';
 import { Socket } from 'socket.io';
 import { ApplicationGatewayInterceptor } from '../../common/application.gateway.interceptor.js';
 import { PluginControl } from './plugin-control.js';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @WebSocketGateway({
   namespace: 'plugin',
@@ -40,6 +41,8 @@ export class PluginGateway {
 
   @SubscribeMessage('commands')
   @RequirePermissions(PermissionEnum.ROOT_OP)
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60 * 1000)
   async handleCommands() {
     const programs = new Map<string, { control: PluginControl; description: string }[]>();
     for (const control of this.pluginService.enabledPluginControls) {

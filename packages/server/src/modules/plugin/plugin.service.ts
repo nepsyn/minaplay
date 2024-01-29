@@ -192,6 +192,7 @@ export class PluginService implements OnModuleInit {
           );
         });
         await context.handleMessage(message);
+        context.control.contexts.delete(socket.data.user.id);
       }),
     );
   }

@@ -24,7 +24,9 @@ export class UserManagerCommand {
     @InjectRepository(Permission) private permissionRepository: Repository<Permission>,
   ) {}
 
-  @MinaPlayCommand('um')
+  @MinaPlayCommand('um', {
+    description: 'manage users in MinaPlay',
+  })
   async handleUm(@MinaPlayPluginInject() program: Command) {
     return program.helpInformation();
   }

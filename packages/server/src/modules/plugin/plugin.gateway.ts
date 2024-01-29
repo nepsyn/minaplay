@@ -16,6 +16,7 @@ import { RequirePermissions } from '../authorization/require-permissions.decorat
 import { PermissionEnum } from '../../enums/permission.enum.js';
 import { Socket } from 'socket.io';
 import { ApplicationGatewayInterceptor } from '../../common/application.gateway.interceptor.js';
+import { PluginControl } from './plugin-control.js';
 
 @WebSocketGateway({
   namespace: 'plugin',
@@ -28,12 +29,29 @@ export class PluginGateway {
 
   @SubscribeMessage('console')
   @RequirePermissions(PermissionEnum.ROOT_OP)
-  async handleCommand(@ConnectedSocket() socket: Socket, @MessageBody() body: MinaPlayMessage) {
+  async handleConsole(@ConnectedSocket() socket: Socket, @MessageBody() body: MinaPlayMessage) {
     const message = parseMessage(body);
     if (!message) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
     this.pluginService.handleGatewayMessage(message, socket);
+  }
+
+  @SubscribeMessage('commands')
+  @RequirePermissions(PermissionEnum.ROOT_OP)
+  async handleCommands() {
+    const programs = new Map<string, { control: PluginControl; description: string }[]>();
+    for (const control of this.pluginService.enabledPluginControls) {
+      for (const [bin, command] of control.commands) {
+        const desc = programs.get(bin) ?? [];
+        desc.push({
+          control,
+          description: command.program.description(),
+        });
+        programs.set(bin, desc);
+      }
+    }
+    return programs;
   }
 }

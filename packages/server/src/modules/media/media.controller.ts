@@ -30,6 +30,7 @@ import { ViewHistoryDto } from './view-history/view-history.dto.js';
 import { ViewHistoryService } from './view-history/view-history.service.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
+import { RequestTimeout } from '../../common/request.timeout.decorator.js';
 
 @Controller('media')
 @UseGuards(AuthorizationGuard)
@@ -92,6 +93,7 @@ export class MediaController {
     description: '创建媒体',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
+  @RequestTimeout(30 * 1000)
   async createMedia(@Body() data: MediaDto) {
     if (!isDefined(data.name) || !isDefined(data.fileId)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);

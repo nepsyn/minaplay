@@ -30,8 +30,6 @@ import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
 import { PermissionEnum } from '../../enums/permission.enum.js';
 import { ActionLogService } from './action-log.service.js';
 import { AuthActionEnum } from '../../enums/auth-action.enum.js';
-import { EmailBindDto } from './email-bind.dto.js';
-import { EmailVerifyDto } from './email-verify.dto.js';
 import { ChangePasswordDto } from './change-password.dto.js';
 import { encryptPassword } from '../../utils/encrypt-password.util.js';
 import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exception.js';
@@ -79,62 +77,6 @@ export class AuthorizationController {
     });
 
     return await this.authService.login(user);
-  }
-
-  @Post('email/bind')
-  @ApiOperation({
-    description: '绑定邮箱发送验证邮件',
-  })
-  @ApiBearerAuth()
-  @UseGuards(AuthorizationGuard)
-  @HttpCode(200)
-  async sendBindingEmail(@Body() data: EmailBindDto, @RequestUser() user: User) {
-    const sameEmailUser = await this.userService.findOneBy({ email: data.email });
-    if (sameEmailUser) {
-      throw buildException(BadRequestException, ErrorCodeEnum.EMAIL_ALREADY_OCCUPIED);
-    }
-
-    const key = await this.authService.sendVerifyEmail(data.email, user);
-    return {
-      email: data.email,
-      key,
-    };
-  }
-
-  @Post('email/verify')
-  @ApiOperation({
-    description: '验证邮箱地址',
-  })
-  @ApiBearerAuth()
-  @UseGuards(AuthorizationGuard)
-  @HttpCode(200)
-  async verifyBindingEmail(@Body() data: EmailVerifyDto, @RequestUser() user: User, @RequestIp() ip: string) {
-    const cache = await this.authService.verifyEmail(data.key, (cache) => {
-      return cache.userId === user.id && cache.code === data.code;
-    });
-    if (!cache) {
-      throw buildException(BadRequestException, ErrorCodeEnum.WRONG_EMAIL_VERIFY_CODE);
-    }
-
-    const log = {
-      old: user.email,
-      current: cache.email,
-    };
-
-    await this.userService.save({
-      id: user.id,
-      email: cache.email,
-    });
-
-    await this.actionLogService.save({
-      action: AuthActionEnum.BIND_EMAIL,
-      ip,
-      operator: { id: user.id },
-      target: { id: user.id },
-      extra: JSON.stringify(log),
-    });
-
-    return log;
   }
 
   @Post('refresh')

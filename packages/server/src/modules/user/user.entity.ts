@@ -32,20 +32,10 @@ export class User {
   })
   username: string;
 
-  /** 邮箱 */
-  @Expose({ groups: ['profile'] })
-  @Index({
-    unique: true,
-  })
-  @Column({
-    nullable: true,
-  })
-  email: string;
-
   /** 允许通知 */
   @Expose({ groups: ['profile'] })
   @Column({
-    default: false,
+    default: true,
   })
   notify: boolean;
 

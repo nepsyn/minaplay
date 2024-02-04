@@ -109,14 +109,18 @@ import { ApplicationTimeoutInterceptor } from './common/application.timeout.inte
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
-        emailEnabled: Number(configService.get('EMAIL_ENABLED', 0)) === 1,
-        smtpHost: configService.get('SMTP_HOST'),
-        smtpPort: Number(configService.get('SMTP_PORT')),
-        smtpSecure: Number(configService.get('SMTP_SECURE', 0)) === 1,
-        smtpUser: configService.get('SMTP_USER'),
-        smtpPassword: configService.get('SMTP_PASSWORD'),
-        emailOrigin: configService.get('EMAIL_ORIGIN'),
-        emailSubject: configService.get('EMAIL_SUBJECT'),
+        // ws
+        wsEnabled: Number(configService.get('NOTIFY_WS', 0)) === 1,
+        // email
+        emailEnabled: Number(configService.get('NOTIFY_EMAIL', 0)) === 1,
+        emailSmtpHost: configService.get('NOTIFY_EMAIL_SMTP_HOST'),
+        emailSmtpPort: Number(configService.get('NOTIFY_EMAIL_SMTP_PORT')),
+        emailSmtpSecure: Number(configService.get('NOTIFY_EMAIL_SMTP_SECURE', 0)) === 1,
+        emailSmtpUser: configService.get('NOTIFY_EMAIL_SMTP_USER'),
+        emailSmtpPassword: configService.get('NOTIFY_EMAIL_SMTP_PASSWORD'),
+        emailOrigin: configService.get('NOTIFY_EMAIL_ORIGIN'),
+        emailSubject: configService.get('NOTIFY_EMAIL_SUBJECT'),
+        // others
         appEnv: configService.get('APP_ENV', 'dev'),
       }),
     }),

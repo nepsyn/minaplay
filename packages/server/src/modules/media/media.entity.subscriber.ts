@@ -1,11 +1,11 @@
 import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent } from 'typeorm';
-import { NotificationGateway } from '../notification/notification.gateway.js';
 import { Media } from './media.entity.js';
-import { instanceToPlain } from 'class-transformer';
+import { NotificationService } from '../notification/notification.service.js';
+import { NotificationEventEnum } from '../../enums/notification-event.enum.js';
 
 @EventSubscriber()
 export class MediaEntitySubscriber implements EntitySubscriberInterface<Media> {
-  constructor(dataSource: DataSource, private notificationGateway: NotificationGateway) {
+  constructor(dataSource: DataSource, private notificationService: NotificationService) {
     dataSource.subscribers.push(this);
   }
 
@@ -14,8 +14,8 @@ export class MediaEntitySubscriber implements EntitySubscriberInterface<Media> {
   }
 
   async afterInsert(event: InsertEvent<Media>) {
-    await this.notificationGateway.notify('new-media', {
-      media: instanceToPlain(event.entity) as Media,
+    await this.notificationService.notify(NotificationEventEnum.NEW_MEDIA, {
+      media: event.entity,
       time: new Date(),
     });
   }

@@ -1,12 +1,14 @@
 export interface NotificationModuleOptions {
+  // ws
+  wsEnabled: boolean;
+
+  // email
   emailEnabled: boolean;
-
-  smtpHost: string;
-  smtpPort: number;
-  smtpSecure?: boolean;
-  smtpUser: string;
-  smtpPassword: string;
-
+  emailSmtpHost: string;
+  emailSmtpPort: number;
+  emailSmtpSecure?: boolean;
+  emailSmtpUser: string;
+  emailSmtpPassword: string;
   emailOrigin?: string;
   emailSubject?: string;
 

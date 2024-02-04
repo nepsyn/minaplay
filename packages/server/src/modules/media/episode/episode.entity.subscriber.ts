@@ -1,18 +1,11 @@
-import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent, IsNull, Not } from 'typeorm';
+import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent } from 'typeorm';
 import { Episode } from './episode.entity.js';
-import { instanceToPlain } from 'class-transformer';
-import { NotificationGateway } from '../../notification/notification.gateway.js';
-import { SeriesSubscribeService } from '../series/series-subscribe.service.js';
-import { EmailService } from '../../notification/email.service.js';
+import { NotificationService } from '../../notification/notification.service.js';
+import { NotificationEventEnum } from '../../../enums/notification-event.enum.js';
 
 @EventSubscriber()
 export class EpisodeEntitySubscriber implements EntitySubscriberInterface<Episode> {
-  constructor(
-    dataSource: DataSource,
-    private seriesSubscribeService: SeriesSubscribeService,
-    private notificationGateway: NotificationGateway,
-    private emailService: EmailService,
-  ) {
+  constructor(dataSource: DataSource, private notificationService: NotificationService) {
     dataSource.subscribers.push(this);
   }
 
@@ -21,35 +14,9 @@ export class EpisodeEntitySubscriber implements EntitySubscriberInterface<Episod
   }
 
   async afterInsert(event: InsertEvent<Episode>) {
-    await this.notificationGateway.notify('new-episode', {
-      episode: instanceToPlain(event.entity) as Episode,
+    await this.notificationService.notify(NotificationEventEnum.NEW_EPISODE, {
+      episode: event.entity,
       time: new Date(),
     });
-
-    if (event.entity.series) {
-      const [subscribes] = await this.seriesSubscribeService.findAndCount({
-        where: {
-          seriesId: event.entity.series.id,
-          notify: true,
-          user: {
-            email: Not(IsNull()),
-            notify: true,
-          },
-        },
-        relations: {
-          user: true,
-        },
-      });
-      if (subscribes.length > 0) {
-        await this.emailService.notify(
-          'new-episode',
-          {
-            episode: instanceToPlain(event.entity) as Episode,
-            time: new Date(),
-          },
-          subscribes.map(({ user }) => String(user.email)),
-        );
-      }
-    }
   }
 }

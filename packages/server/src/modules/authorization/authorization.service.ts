@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Permission } from './permission.entity.js';
 import { Repository } from 'typeorm';
@@ -7,18 +7,12 @@ import { User } from '../user/user.entity.js';
 import { instanceToPlain } from 'class-transformer';
 import { UserService } from '../user/user.service.js';
 import { PermissionEnum } from '../../enums/permission.enum.js';
-import { EmailService } from '../notification/email.service.js';
-import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
-import { generateMD5 } from '../../utils/generate-md5.util.js';
-import { EmailVerifyCache } from './email-verify-cache.interface.js';
 
 @Injectable()
 export class AuthorizationService {
   constructor(
     private jwtService: JwtService,
     private userService: UserService,
-    private emailService: EmailService,
-    @Inject(CACHE_MANAGER) private cacheStore: CacheStore,
     @InjectRepository(Permission) private permissionRepository: Repository<Permission>,
   ) {}
 
@@ -37,56 +31,6 @@ export class AuthorizationService {
       ...instanceToPlain(user, { groups: ['profile'] }),
       token,
     };
-  }
-
-  async sendVerifyEmail(to: string, user: User) {
-    const key = await generateMD5(to);
-    const token = `email:${key}`;
-    if (await this.cacheStore.get(token)) {
-      const cache = await this.cacheStore.get<EmailVerifyCache>(token);
-      if (Date.now() - cache.lastSendTimestamp < 60 * 1000) {
-        return key;
-      }
-    }
-
-    const code = Math.round(Math.random() * (999999 - 100000) + 100000).toString();
-    await this.emailService.notify('verify-code', { code }, to);
-    await this.cacheStore.set<EmailVerifyCache>(
-      token,
-      {
-        userId: user.id,
-        email: to,
-        code,
-        lastSendTimestamp: Date.now(),
-        secureTimes: 5,
-      },
-      30 * 60 * 1000,
-    );
-
-    return key;
-  }
-
-  async verifyEmail(key: string, predicate: (cache: EmailVerifyCache) => boolean | Promise<boolean>) {
-    const token = `email:${key}`;
-    const cache = await this.cacheStore.get<EmailVerifyCache>(token);
-
-    if (!cache) {
-      return undefined;
-    }
-
-    const valid = await predicate(cache);
-    if (!valid) {
-      cache.secureTimes--;
-      if (cache.secureTimes > 0) {
-        await this.cacheStore.set(token, cache, 30 * 60 * 1000);
-      } else {
-        await this.cacheStore.del(token);
-      }
-
-      return undefined;
-    }
-
-    return cache;
   }
 
   async updateTicket(id: number, ticket: string) {

@@ -41,9 +41,11 @@ import { ApiFile } from '../../common/api.file.decorator.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
+import { RequestTimeout } from '../../common/request.timeout.decorator.js';
 
 @Controller('file')
 @ApiTags('file')
+@RequestTimeout(0)
 @ApiBearerAuth()
 export class FileController {
   private readonly logger = new ApplicationLogger(FileController.name);

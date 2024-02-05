@@ -10,16 +10,21 @@ export class ApplicationTimeoutInterceptor implements NestInterceptor {
   constructor(private reflector: Reflector) {}
 
   async intercept(context: ExecutionContext, next: CallHandler): Promise<Observable<any>> {
-    const ms = this.reflector.get<number>(REQUEST_TIMEOUT_KEY, context.getHandler()) ?? 5000;
+    const ms =
+      this.reflector.getAllAndOverride<number>(REQUEST_TIMEOUT_KEY, [context.getHandler(), context.getClass()]) ?? 5000;
 
-    return next.handle().pipe(
-      timeout(ms),
-      catchError((error) => {
-        if (error instanceof TimeoutError) {
-          return throwError(() => buildException(RequestTimeoutException, ErrorCodeEnum.TIMEOUT));
-        }
-        return throwError(() => error);
-      }),
-    );
+    if (ms > 0) {
+      return next.handle().pipe(
+        timeout(ms),
+        catchError((error) => {
+          if (error instanceof TimeoutError) {
+            return throwError(() => buildException(RequestTimeoutException, ErrorCodeEnum.TIMEOUT));
+          }
+          return throwError(() => error);
+        }),
+      );
+    } else {
+      return next.handle();
+    }
   }
 }

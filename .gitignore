@@ -8,10 +8,12 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+data
 dist
-dist-ssr
+dev-dist
 *.local
 
+ormconfig.js
 .env
 .env.production
 .env.development

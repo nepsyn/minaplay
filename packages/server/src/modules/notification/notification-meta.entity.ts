@@ -13,6 +13,7 @@ import { Exclude, plainToInstance } from 'class-transformer';
 import { NotificationServiceEnum } from '../../enums/notification-service.enum.js';
 import { Type } from '@nestjs/common';
 import { NotificationSubscribe } from './notification-subscribe.entity.js';
+import { isObject } from 'class-validator';
 
 /** 通知服务配置 */
 @Entity()
@@ -65,7 +66,8 @@ export class NotificationMeta {
 
   getConfig<T>(type: Type<T>): T | undefined {
     try {
-      return plainToInstance(type, JSON.parse(this.config));
+      const config = JSON.parse(this.config);
+      return plainToInstance(type, isObject(config) ? config : {});
     } catch {
       return undefined;
     }

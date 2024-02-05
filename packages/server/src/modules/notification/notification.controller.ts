@@ -86,6 +86,9 @@ export class NotificationController {
       throw buildException(NotImplementedException, ErrorCodeEnum.NOT_IMPLEMENTED);
     }
 
+    await this.notificationSubscribeService.delete({
+      metaId: id,
+    });
     for (const name of data.subscribes) {
       await this.notificationSubscribeService.save({
         metaId: id,

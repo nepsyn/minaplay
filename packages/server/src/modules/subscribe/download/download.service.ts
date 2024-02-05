@@ -295,7 +295,7 @@ export class DownloadService implements OnModuleInit {
         await this.mediaFileService.generateMediaFiles(media);
 
         // save series
-        if (descriptor.series.name) {
+        if (descriptor.series?.name) {
           let series = await this.seriesService.findOneBy({
             name: descriptor.series.name,
             season: descriptor.series.season,
@@ -308,14 +308,15 @@ export class DownloadService implements OnModuleInit {
           }
 
           let episode = await this.episodeService.findOneBy({
-            title: descriptor.episode.title ?? entry.title,
-            no: descriptor.episode.no,
+            title: descriptor.episode?.title ?? entry.title,
+            no: descriptor.episode?.no,
           });
           // duplicated episode
           if (episode) {
             if (descriptor.overwriteEpisode ?? true) {
               await this.episodeService.save({
                 id: episode.id,
+                title: entry.title,
                 ...descriptor.episode,
                 pubAt: Date.parse(String(entry.published)) ? new Date(entry.published) : undefined,
                 media: { id: media.id },

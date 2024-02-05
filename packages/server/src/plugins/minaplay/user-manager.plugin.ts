@@ -12,6 +12,7 @@ import { UserManagerCommand } from './command/user-manager.command.js';
   description: 'Manage users in MinaPlay',
   author: 'MinaPlay',
   repo: 'https://github.com/nepsyn/minaplay',
+  license: 'AGPL-3.0',
   imports: [TypeOrmModule.forFeature([User, Permission])],
   providers: [CreateDefaultRootUserService, UserManagerCommand],
 })

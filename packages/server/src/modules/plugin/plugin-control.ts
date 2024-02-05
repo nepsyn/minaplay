@@ -21,6 +21,9 @@ export class PluginControl {
   repo?: string;
 
   @Expose()
+  license?: string;
+
+  @Expose()
   enabled: boolean;
 
   @Exclude()
@@ -34,6 +37,11 @@ export class PluginControl {
 
   @Exclude()
   commands: Map<string, MinaPlayCommandMetadata>;
+
+  @Expose()
+  get programs() {
+    return [...this.commands.keys()];
+  }
 
   @Exclude()
   listeners: MinaPlayMessageListenerMetadata[];

@@ -9,6 +9,7 @@ export interface MinaPlayPluginMetadata extends Pick<ModuleMetadata, 'imports' |
   description?: string;
   author?: string;
   repo?: string;
+  license?: string;
 }
 
 export interface MinaPlayPluginHooks {

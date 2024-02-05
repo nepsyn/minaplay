@@ -99,6 +99,7 @@ export class PluginService implements OnModuleInit {
         description: metadata.description,
         author: metadata.author,
         repo: metadata.repo,
+        license: metadata.license,
         enabled: true,
         services,
         type: plugin,

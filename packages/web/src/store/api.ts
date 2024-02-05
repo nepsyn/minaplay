@@ -143,7 +143,7 @@ export const useApiStore = defineStore('api', () => {
 
   const User = {
     getProfileById: (id: number) => apiGet<UserEntity>(`/api/v1/user/${id}/profile`),
-    modifyProfileById: (id: number) => apiGet<UserEntity, UserDto>(`/api/v1/user/${id}/profile`),
+    modifyProfileById: (id: number) => apiPut<UserEntity, UserDto>(`/api/v1/user/${id}/profile`),
     query: apiGet<ApiQueryResult<UserEntity>, UserQueryDto>('/api/v1/user'),
   };
 

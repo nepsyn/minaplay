@@ -267,7 +267,7 @@ const episodesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 24 },
 );
-const episodes = computed<EpisodeEntity[]>(() => episodesLoader.items.value);
+const { items: episodes } = episodesLoader;
 currentEpisodeLoader.onResolved(() => {
   if (!episodesLoader.loaded.value) {
     episodesLoader.request();

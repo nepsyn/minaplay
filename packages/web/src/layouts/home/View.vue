@@ -139,7 +139,6 @@ import {
   mdiCodeBracesBox,
   mdiCog,
   mdiDotsVertical,
-  mdiGithub,
   mdiMovieOpenPlay,
   mdiPencil,
   mdiRssBox,
@@ -149,7 +148,6 @@ import {
   mdiWeatherSunny,
 } from '@mdi/js';
 import { MessageSchema } from '@/lang';
-import { openUrl } from '@/utils/utils';
 import { useApiStore } from '@/store/api';
 import UserAvatar from '@/components/user/UserAvatar.vue';
 import { useAxiosRequest } from '@/composables/use-axios-request';
@@ -204,14 +202,6 @@ const actions = ref([
     icon: computed(() => (layout.darkMode ? mdiWeatherSunny : mdiWeatherNight)),
     click: () => {
       layout.toggleDarkMode(!layout.darkMode);
-    },
-    show: true,
-  },
-  {
-    text: t('layout.actions.github'),
-    icon: mdiGithub,
-    click: () => {
-      openUrl('https://github.com/nepsyn/minaplay');
     },
     show: true,
   },

@@ -104,7 +104,7 @@ const mediasLoader = useAxiosPageLoader(
   },
   { page: 0, size: 12 },
 );
-const medias = computed(() => mediasLoader.items.value);
+const { items: medias } = mediasLoader;
 mediasLoader.onRejected((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });

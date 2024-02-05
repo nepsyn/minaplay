@@ -14,6 +14,8 @@ export enum ErrorCodeEnum {
   NOT_FOUND = 0x0006,
   /** 处理超时 */
   TIMEOUT = 0x0007,
+  /** 未实现 */
+  NOT_IMPLEMENTED = 0x0008,
 
   /** 用户名或密码错误 */
   WRONG_USERNAME_OR_PASSWORD = 0x0101,
@@ -25,10 +27,6 @@ export enum ErrorCodeEnum {
   INVALID_TOKEN = 0x0104,
   /** 用户名已被使用 */
   USERNAME_ALREADY_OCCUPIED = 0x0105,
-  /** 邮箱已被使用 */
-  EMAIL_ALREADY_OCCUPIED = 0x0106,
-  /** 邮箱验证码错误 */
-  WRONG_EMAIL_VERIFY_CODE = 0x0107,
 
   /** 错误的文件内容 */
   INVALID_FILE = 0x0301,
@@ -57,4 +55,9 @@ export enum ErrorCodeEnum {
   WRONG_LIVE_PASSWORD = 0x0604,
   /** 存在多个连接 */
   DUPLICATED_CONNECTION = 0x0605,
+
+  /** 重复的通知服务 */
+  DUPLICATED_NOTIFICATION_SERVICE = 0x0701,
+  /** 邮箱验证码错误 */
+  WRONG_EMAIL_VERIFY_CODE = 0x0702,
 }

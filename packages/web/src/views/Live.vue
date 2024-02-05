@@ -57,7 +57,7 @@
 
 <script setup lang="ts">
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { useApiStore } from '@/store/api';
 import { useRouter } from 'vue-router';
 import { useI18n } from 'vue-i18n';
@@ -97,7 +97,7 @@ const livesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 120 },
 );
-const lives = computed(() => livesLoader.items.value);
+const { items: lives } = livesLoader;
 
 const filters = ref<Partial<LiveQueryDto>>({
   keyword: '',

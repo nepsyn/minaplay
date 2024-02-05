@@ -50,7 +50,7 @@ import { useApiStore } from '@/store/api';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import SourceOverview from '@/components/source/SourceOverview.vue';
 import { SourceEntity, SourceQueryDto } from '@/api/interfaces/subscribe.interface';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { mdiPlus } from '@mdi/js';
 import { debounce } from '@/utils/utils';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
@@ -72,7 +72,7 @@ const sourcesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 120 },
 );
-const sources = computed(() => sourcesLoader.items.value);
+const { items: sources } = sourcesLoader;
 
 const keyword = ref('');
 const useQuery = debounce(() => {

@@ -170,7 +170,7 @@ const sourceLoader = useAxiosRequest(async () => {
 sourceLoader.onResolved((data) => {
   edit.value = { ...data };
 });
-const source = computed(() => sourceLoader.data.value);
+const { data: source } = sourceLoader;
 const edit = ref(source.value);
 
 const {

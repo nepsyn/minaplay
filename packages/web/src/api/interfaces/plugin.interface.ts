@@ -4,5 +4,7 @@ export interface PluginControl {
   description?: string;
   author?: string;
   repo?: string;
+  license?: string;
   enabled: boolean;
+  programs: string[];
 }

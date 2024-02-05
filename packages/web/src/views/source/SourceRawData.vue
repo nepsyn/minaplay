@@ -193,7 +193,7 @@ const toast = useToastStore();
 const rawDataLoader = useAxiosRequest(async () => {
   return await api.Source.fetchRawData(Number(route.params.id))();
 });
-const rawData = computed(() => rawDataLoader.data.value);
+const { data: rawData } = rawDataLoader;
 const rawDataText = computed(() => (rawData.value ? JSON.stringify(rawData.value, null, 2) : ''));
 
 const tab = ref(0);

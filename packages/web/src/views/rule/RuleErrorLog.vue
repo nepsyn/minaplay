@@ -69,7 +69,7 @@ import { useToastStore } from '@/store/toast';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { ParseLogQueryDto, RuleErrorLogEntity } from '@/api/interfaces/subscribe.interface';
 import { ApiQueryDto } from '@/api/interfaces/common.interface';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 
 const { t, locale } = useI18n();
@@ -97,7 +97,7 @@ const logsLoader = useAxiosPageLoader(
   },
   { page: 0, size: 20 },
 );
-const logs = computed(() => logsLoader.items.value);
+const { items: logs } = logsLoader;
 
 const filters = ref<Partial<ParseLogQueryDto>>({
   order: 'DESC',

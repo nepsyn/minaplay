@@ -1,5 +1,5 @@
 <template>
-  <div ref="editorRef"></div>
+  <div class="editor" ref="editorRef"></div>
 </template>
 
 <script setup lang="ts">
@@ -78,4 +78,8 @@ defineExpose({
 });
 </script>
 
-<style scoped lang="sass"></style>
+<style scoped lang="sass">
+.editor
+  resize: vertical
+  overflow: auto
+</style>

@@ -23,7 +23,7 @@ export interface UserEntity {
 
 export interface UserDto {
   avatarFileId?: string;
-  notify: boolean;
+  notify?: boolean;
 }
 
 export interface UserQueryDto extends ApiQueryDto<UserEntity> {

@@ -169,7 +169,6 @@ const actionOptions = [
   { title: t(`actionLog.actions.${AuthActionEnum.LOGOUT}`), value: AuthActionEnum.LOGOUT },
   { title: t(`actionLog.actions.${AuthActionEnum.REFRESH}`), value: AuthActionEnum.REFRESH },
   { title: t(`actionLog.actions.${AuthActionEnum.GRANT}`), value: AuthActionEnum.GRANT },
-  { title: t(`actionLog.actions.${AuthActionEnum.BIND_EMAIL}`), value: AuthActionEnum.BIND_EMAIL },
   { title: t(`actionLog.actions.${AuthActionEnum.CHANGE_PASSWORD}`), value: AuthActionEnum.CHANGE_PASSWORD },
 ];
 const headers = ref([

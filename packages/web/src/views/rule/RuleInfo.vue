@@ -116,7 +116,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { useAxiosRequest } from '@/composables/use-axios-request';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { useApiStore } from '@/store/api';
 import { useRoute, useRouter } from 'vue-router';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
@@ -136,7 +136,7 @@ const ruleLoader = useAxiosRequest(async () => {
 ruleLoader.onResolved((data) => {
   edit.value = { ...data, sourceIds: data.sources.map(({ id }) => id) };
 });
-const rule = computed(() => ruleLoader.data.value);
+const { data: rule } = ruleLoader;
 const edit = ref({ ...rule.value, sourceIds: rule.value?.sources.map(({ id }) => id) ?? [] });
 
 const sourcesLoader = useAxiosRequest(async () => {

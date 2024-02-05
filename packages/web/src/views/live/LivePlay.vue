@@ -980,7 +980,6 @@ const consume = async (userId: number, producerId: string) => {
       let interval: any = undefined;
       audio.addEventListener('play', async () => {
         await audioCtx.resume();
-        analyser.connect(audioCtx.destination);
         interval = setInterval(() => {
           const bufferLength = analyser.frequencyBinCount;
           const dataArray = new Uint8Array(bufferLength);
@@ -991,8 +990,8 @@ const consume = async (userId: number, producerId: string) => {
             }, 0) / bufferLength;
         }, 100);
       });
-      audio.addEventListener('pause', () => {
-        analyser.disconnect(audioCtx.destination);
+      audio.addEventListener('pause', async () => {
+        await audioCtx.suspend();
         clearInterval(interval);
       });
 

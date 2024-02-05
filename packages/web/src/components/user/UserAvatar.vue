@@ -14,7 +14,7 @@ withDefaults(
 
 <template>
   <v-avatar :size="size">
-    <v-img :src="src">
+    <v-img :src="src" cover>
       <template #placeholder>
         <v-icon :size="size" :icon="mdiAccountCircle"></v-icon>
       </template>

@@ -18,7 +18,6 @@
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { useAxiosRequest } from '@/composables/use-axios-request';
-import { computed } from 'vue';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 
 const { t } = useI18n();
@@ -27,7 +26,7 @@ const api = useApiStore();
 const statusLoader = useAxiosRequest(async () => {
   return await api.System.getStatus();
 });
-const status = computed(() => statusLoader.data.value);
+const { data: status } = statusLoader;
 </script>
 
 <style scoped lang="sass"></style>

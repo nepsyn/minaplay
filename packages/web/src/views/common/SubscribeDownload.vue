@@ -74,7 +74,7 @@ import { useApiStore } from '@/store/api';
 import { useRoute } from 'vue-router';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { DownloadItemEntity, DownloadItemQueryDto } from '@/api/interfaces/subscribe.interface';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { debounce } from '@/utils/utils';
 import { StatusEnum } from '@/api/enums/status.enum';
 import { mdiRefresh } from '@mdi/js';
@@ -108,7 +108,7 @@ const downloadsLoader = useAxiosPageLoader(
   },
   { page: 0, size: 20 },
 );
-const downloads = computed(() => downloadsLoader.items.value);
+const { items: downloads } = downloadsLoader;
 
 const filters = ref<Partial<DownloadItemQueryDto>>({
   keyword: '',

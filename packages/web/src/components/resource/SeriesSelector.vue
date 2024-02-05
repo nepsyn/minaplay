@@ -104,7 +104,7 @@ const seriesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 12 },
 );
-const series = computed(() => seriesLoader.items.value);
+const { items: series } = seriesLoader;
 seriesLoader.onRejected((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });

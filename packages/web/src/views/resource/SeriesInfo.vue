@@ -103,7 +103,6 @@ import ExpandableText from '@/components/app/ExpandableText.vue';
 import { mdiMotionPlayOutline, mdiPlay, mdiViewComfy } from '@mdi/js';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
-import { EpisodeEntity } from '@/api/interfaces/series.interface';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -126,7 +125,7 @@ const episodesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 24 },
 );
-const episodes = computed<EpisodeEntity[]>(() => episodesLoader.items.value);
+const { items: episodes } = episodesLoader;
 </script>
 
 <style scoped lang="sass"></style>

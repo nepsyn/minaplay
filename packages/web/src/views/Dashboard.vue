@@ -77,7 +77,7 @@ import {
   mdiScriptTextOutline,
   mdiShieldKeyOutline,
   mdiVideoVintage,
-  mdiViewComfyOutline,
+  mdiViewComfy,
 } from '@mdi/js';
 import NavTabs from '@/components/app/NavTabs.vue';
 import { useRoute } from 'vue-router';
@@ -135,7 +135,7 @@ const moduleTabs = [
   },
   {
     to: '/dashboard/episode',
-    icon: mdiViewComfyOutline,
+    icon: mdiViewComfy,
     text: t('dashboard.episode'),
   },
   {

@@ -58,7 +58,7 @@
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import { useI18n } from 'vue-i18n';
 import { mdiPlus } from '@mdi/js';
-import { computed, ref } from 'vue';
+import { ref } from 'vue';
 import { debounce } from '@/utils/utils';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { RuleQueryDto } from '@/api/interfaces/subscribe.interface';
@@ -96,7 +96,7 @@ const rulesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 120 },
 );
-const rules = computed(() => rulesLoader.items.value);
+const { items: rules } = rulesLoader;
 
 const filters = ref<Partial<RuleQueryDto>>({
   keyword: '',

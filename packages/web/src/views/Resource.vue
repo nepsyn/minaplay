@@ -3,7 +3,7 @@
     <v-container class="d-flex flex-column py-md-12">
       <div class="d-flex flex-row align-center">
         <v-icon :icon="mdiUpdate" size="x-large"></v-icon>
-        <span class="text-h5 ml-3">{{ t('resource.updates') }}</span>
+        <span class="text-h5 ml-3">{{ t('resource.seriesUpdates') }}</span>
       </div>
       <multi-items-loader
         :loader="updatesLoader"
@@ -31,7 +31,7 @@
       </multi-items-loader>
       <div class="d-flex flex-row align-center mt-6">
         <v-icon :icon="mdiMultimedia" size="x-large"></v-icon>
-        <span class="text-h5 ml-3">{{ t('resource.medias') }}</span>
+        <span class="text-h5 ml-3">{{ t('resource.mediaUpdates') }}</span>
       </div>
       <multi-items-loader :loader="mediasLoader" class="px-0 py-4" :hide-empty="medias.length > 0">
         <v-row :dense="display.mdAndDown.value">
@@ -97,5 +97,5 @@ const mediasLoader = useAxiosPageLoader(
   },
   { page: 0, size: 12 },
 );
-const medias = computed(() => mediasLoader.items.value);
+const { items: medias } = mediasLoader;
 </script>

@@ -8,6 +8,7 @@
             variant="outlined"
             density="compact"
             color="primary"
+            :prepend-inner-icon="mdiMagnify"
             hide-details
             :label="t('app.input.keyword')"
             :placeholder="t('app.input.placeholder', { item: t('app.entities.live') })"
@@ -65,7 +66,7 @@ import { LiveQueryDto } from '@/api/interfaces/live.interface';
 import { debounce } from '@/utils/utils';
 import { useToastStore } from '@/store/toast';
 import { useAxiosRequest } from '@/composables/use-axios-request';
-import { mdiPlus } from '@mdi/js';
+import { mdiMagnify, mdiPlus } from '@mdi/js';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import LiveOverview from '@/components/live/LiveOverview.vue';

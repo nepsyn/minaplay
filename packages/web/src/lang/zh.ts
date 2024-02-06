@@ -82,7 +82,7 @@ const zh: MessageSchema = {
     },
   },
   layout: {
-    sections: '板块',
+    sections: '菜单',
     dark: '夜间模式',
     light: '昼间模式',
     actions: {
@@ -412,6 +412,7 @@ const zh: MessageSchema = {
     },
   },
   plugin: {
+    openConsole: '打开插件控制台',
     official: '官方插件',
     program: '提供命令: {program}',
     enabled: '已启用',
@@ -492,7 +493,7 @@ const zh: MessageSchema = {
   error: {
     [ErrorCodeEnum.BAD_REQUEST]: '请求失败！参数错误',
     [ErrorCodeEnum.INTERNAL_SERVER_ERROR]: '请求失败！服务器繁忙',
-    [ErrorCodeEnum.QUERY_FAILED]: '请求失败！对象被引用',
+    [ErrorCodeEnum.QUERY_FAILED]: '请求失败！参数错误',
     [ErrorCodeEnum.UNKNOWN_ERROR]: '请求失败！未知错误',
     [ErrorCodeEnum.NO_SYNC_FIELD]: '请求失败！无同步字段',
     [ErrorCodeEnum.NOT_FOUND]: '请求失败！所访问的资源不存在',

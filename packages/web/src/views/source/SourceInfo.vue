@@ -53,7 +53,7 @@
           :item-props="(item) => ({ density: 'comfortable', subtitle: item.name })"
         >
           <template #prepend-inner>
-            <v-tooltip>
+            <v-tooltip location="bottom">
               <pre class="text-caption">{{ nextTriggerTimes ?? t('source.wrongCronExp') }}</pre>
               <template #activator="{ props }">
                 <v-icon v-bind="props" :color="nextTriggerTimes ? undefined : 'error'" :icon="mdiClockOutline"></v-icon>

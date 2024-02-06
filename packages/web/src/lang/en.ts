@@ -412,6 +412,7 @@ export default {
     },
   },
   plugin: {
+    openConsole: 'Open Plugins Console',
     official: 'Official Plugin',
     program: 'Provide Program: {program}',
     enabled: 'Enabled',

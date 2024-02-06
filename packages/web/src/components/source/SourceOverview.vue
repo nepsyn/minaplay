@@ -34,29 +34,23 @@
     </v-card-title>
     <v-card-subtitle class="text-break text-wrap">{{ source.url }}</v-card-subtitle>
     <v-card-text class="py-1">
-      <div class="d-flex align-center">
-        <span class="text-subtitle-1">{{ source.cron }}</span>
-        <div v-if="source.enabled" class="ml-2 d-flex align-center">
-          <v-tooltip location="bottom">
-            <pre class="text-caption">{{ nextTriggerTimes ?? t('source.wrongCronExp') }}</pre>
-            <template #activator="{ props }">
-              <v-icon
-                v-bind="props"
-                :color="nextTriggerTimes ? undefined : 'error'"
-                size="small"
-                :icon="mdiClockOutline"
-              ></v-icon>
-            </template>
-          </v-tooltip>
-        </div>
-      </div>
+      <span class="text-subtitle-1">{{ source.cron }}</span>
     </v-card-text>
-    <v-card-actions class="d-flex align-center">
+    <v-divider></v-divider>
+    <v-card-text class="d-flex flex-row align-center py-2">
+      <div v-if="source.enabled" class="d-flex align-center">
+        <v-tooltip location="bottom">
+          <pre class="text-caption">{{ nextTriggerTimes ?? t('source.wrongCronExp') }}</pre>
+          <template #activator="{ props }">
+            <v-icon v-bind="props" :color="nextTriggerTimes ? 'success' : 'error'" :icon="mdiClock"></v-icon>
+          </template>
+        </v-tooltip>
+      </div>
       <v-spacer></v-spacer>
-      <v-btn variant="text" color="primary" @click="router.push({ path: `/source/${source.id}` })">
+      <v-btn variant="outlined" density="comfortable" @click="router.push({ path: `/source/${source.id}` })">
         {{ t('app.actions.edit') }}
       </v-btn>
-    </v-card-actions>
+    </v-card-text>
   </v-card>
 </template>
 
@@ -64,7 +58,7 @@
 import { SourceEntity } from '@/api/interfaces/subscribe.interface';
 import { useI18n } from 'vue-i18n';
 import BlankFavicon from '@/assets/blank-favicon.png';
-import { mdiClockOutline, mdiPause, mdiProgressCheck } from '@mdi/js';
+import { mdiClock, mdiPause, mdiProgressCheck } from '@mdi/js';
 import { computed, ref } from 'vue';
 import { parseExpression } from 'cron-parser';
 import { useRouter } from 'vue-router';

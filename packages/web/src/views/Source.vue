@@ -8,6 +8,7 @@
             variant="outlined"
             density="compact"
             color="primary"
+            :prepend-inner-icon="mdiMagnify"
             hide-details
             :label="t('app.input.keyword')"
             :placeholder="t('app.input.placeholder', { item: t('app.entities.source') })"
@@ -51,7 +52,7 @@ import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import SourceOverview from '@/components/source/SourceOverview.vue';
 import { SourceEntity, SourceQueryDto } from '@/api/interfaces/subscribe.interface';
 import { ref } from 'vue';
-import { mdiPlus } from '@mdi/js';
+import { mdiMagnify, mdiPlus } from '@mdi/js';
 import { debounce } from '@/utils/utils';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { useRouter } from 'vue-router';

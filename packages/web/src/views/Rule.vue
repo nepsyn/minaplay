@@ -8,6 +8,7 @@
             variant="outlined"
             density="compact"
             color="primary"
+            :prepend-inner-icon="mdiMagnify"
             hide-details
             :label="t('app.input.keyword')"
             :placeholder="t('app.input.placeholder', { item: t('app.entities.rule') })"
@@ -57,7 +58,7 @@
 <script setup lang="ts">
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import { useI18n } from 'vue-i18n';
-import { mdiPlus } from '@mdi/js';
+import { mdiMagnify, mdiPlus } from '@mdi/js';
 import { ref } from 'vue';
 import { debounce } from '@/utils/utils';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';

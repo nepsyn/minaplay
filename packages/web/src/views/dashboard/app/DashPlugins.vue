@@ -6,6 +6,11 @@
           {{ t('app.actions.refresh') }}
         </v-btn>
       </v-col>
+      <v-col cols="auto">
+        <v-btn variant="flat" color="secondary-darken-2" :prepend-icon="mdiConsole">
+          {{ t('plugin.openConsole') }}
+        </v-btn>
+      </v-col>
     </v-row>
     <v-row dense class="mt-2">
       <v-col cols="12">
@@ -34,7 +39,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
-import { mdiMagnify, mdiRefresh } from '@mdi/js';
+import { mdiConsole, mdiMagnify, mdiRefresh } from '@mdi/js';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { computed, ref } from 'vue';

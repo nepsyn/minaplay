@@ -13,9 +13,11 @@ export interface MinaPlayPluginMetadata extends Pick<ModuleMetadata, 'imports' |
 }
 
 export interface MinaPlayPluginHooks {
-  onEnabled?(): any;
+  onPluginInit?(): any;
 
-  onDisabled?(): any;
+  onPluginEnabled?(): any;
+
+  onPluginDisabled?(): any;
 }
 
 export interface MinaPlayPluginMessage {

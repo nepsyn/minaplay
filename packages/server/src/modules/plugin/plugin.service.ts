@@ -19,9 +19,9 @@ export class PluginService implements OnModuleInit {
   private controls: PluginControl[] = [];
   constructor(private lazyModuleLoader: LazyModuleLoader) {}
 
-  private async findPlugins() {
+  private async findPlugins(dir?: string) {
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    const base = path.join(__dirname, '../../plugins');
+    const base = dir ?? path.join(__dirname, '../../plugins');
     await fs.ensureDir(base);
 
     const files = fs
@@ -54,12 +54,30 @@ export class PluginService implements OnModuleInit {
 
   async registerPlugin(plugin: Type) {
     const metadata = getMinaPlayPluginMetadata(plugin);
+    if (this.getControlById(metadata.id)) {
+      this.logger.error(`Error occurred while creating plugin instance: Duplicated plugin id '${metadata.id}'`);
+      return;
+    }
+
     try {
+      const control = new PluginControl({
+        id: metadata.id,
+        version: metadata.version,
+        description: metadata.description,
+        author: metadata.author,
+        repo: metadata.repo,
+        license: metadata.license,
+        enabled: true,
+        type: plugin,
+        contexts: new Map(),
+      });
+      this.controls.push(control);
+
       // initialize services
-      const module = await this.lazyModuleLoader.load(() => plugin, { logger: false });
-      const commands: Map<string, MinaPlayCommandMetadata> = new Map();
-      const listeners: MinaPlayMessageListenerMetadata[] = [];
-      const services: MinaPlayPluginHooks[] = [];
+      control.module = await this.lazyModuleLoader.load(() => plugin, { logger: false });
+      control.commands = new Map();
+      control.listeners = [];
+      control.services = [];
       for (const provider of metadata.providers ?? []) {
         if (typeof provider === 'function') {
           // commands
@@ -69,7 +87,7 @@ export class PluginService implements OnModuleInit {
           );
           if (commandsMetadata) {
             for (const [bin, commandMetadata] of commandsMetadata.entries()) {
-              commands.set(bin, commandMetadata);
+              control.commands.set(bin, commandMetadata);
               this.logger.log(`Plugin '${metadata.id}' registered command '${bin}'`);
             }
           }
@@ -80,35 +98,16 @@ export class PluginService implements OnModuleInit {
             provider,
           );
           if (listenersMetadata) {
-            listeners.push(...listenersMetadata);
+            control.listeners.push(...listenersMetadata);
           }
 
-          const service = module.get(provider);
-          services.push(service);
+          const service = control.module.get(provider);
+          control.services.push(service);
         }
       }
 
-      if (this.getControl(metadata.id)) {
-        this.logger.error(`Error occurred while creating plugin instance: Duplicated plugin id '${metadata.id}'`);
-        return;
-      }
-
-      const control = Object.assign(new PluginControl(), {
-        id: metadata.id,
-        version: metadata.version,
-        description: metadata.description,
-        author: metadata.author,
-        repo: metadata.repo,
-        license: metadata.license,
-        enabled: true,
-        services,
-        type: plugin,
-        module,
-        commands,
-        listeners,
-        contexts: new Map(),
-      });
-      this.controls.push(control);
+      // emit onInit
+      await this.emit(control, 'onPluginInit');
 
       this.logger.log(`Plugin '${metadata.id}(${metadata.version ?? 'unknown version'})' registered`);
     } catch (error) {
@@ -126,7 +125,7 @@ export class PluginService implements OnModuleInit {
       await this.registerPlugin(plugin);
     }
 
-    await this.emitAllEnabled('onEnabled');
+    await this.emitAllEnabled('onPluginEnabled');
   }
 
   async emit<T extends keyof MinaPlayPluginHooks>(
@@ -160,16 +159,13 @@ export class PluginService implements OnModuleInit {
   async toggleEnabled(id: string, enabled: boolean) {
     const control = this.controls.find((control) => control.id === id);
     if (!control) {
-      return undefined;
+      return;
     }
 
-    if (enabled && !control.enabled) {
-      await this.emit(control, 'onEnabled');
-    } else if (!enabled && control.enabled) {
-      await this.emit(control, 'onDisabled');
+    if (control.enabled !== enabled) {
+      control.enabled = enabled;
+      await this.emit(control, control.enabled ? 'onPluginEnabled' : 'onPluginDisabled');
     }
-
-    control.enabled = enabled;
 
     return control;
   }
@@ -202,7 +198,7 @@ export class PluginService implements OnModuleInit {
     return this.controls.concat();
   }
 
-  getControl(id: string) {
+  getControlById(id: string) {
     return this.controls.find((control) => control.id === id);
   }
 }

@@ -18,7 +18,7 @@ export class CreateDefaultRootUserService implements MinaPlayPluginHooks {
     @InjectRepository(Permission) private permissionRepository: Repository<Permission>,
   ) {}
 
-  async onEnabled() {
+  async onPluginInit() {
     const rootUserCount = await this.permissionRepository.countBy({
       name: PermissionEnum.ROOT_OP,
     });

@@ -9,7 +9,7 @@ import {
   MinaPlayParamMetadata,
   MinaPlayPluginMetadata,
 } from './plugin.interface.js';
-import { InjectionToken, Module, Type } from '@nestjs/common';
+import { InjectionToken, Module, Provider, Type } from '@nestjs/common';
 import { isDefined } from 'class-validator';
 import {
   COMMAND_ARGUMENTS_TOKEN,
@@ -18,6 +18,7 @@ import {
   MINAPLAY_COMMAND_ARG_METADATA,
   MINAPLAY_COMMAND_METADATA,
   MINAPLAY_LISTENER_METADATA,
+  MINAPLAY_PLUGIN_ID_TOKEN,
   MINAPLAY_PLUGIN_METADATA,
   PARAM_ARGS_METADATA,
 } from './constants.js';
@@ -25,6 +26,7 @@ import { extendArrayMetadata } from '@nestjs/common/utils/extend-metadata.util.j
 import { PluginCommandPreprocessor } from './plugin-preprocessors.js';
 import { PluginCommandValidator } from './plugin-validators.js';
 import { Argument, Command, Option } from 'commander';
+import { PluginRef } from './plugin-ref.js';
 
 export function MinaPlayPlugin(metadata: MinaPlayPluginMetadata): ClassDecorator {
   return function (target: Function) {
@@ -32,7 +34,9 @@ export function MinaPlayPlugin(metadata: MinaPlayPluginMetadata): ClassDecorator
       [
         Module({
           imports: metadata.imports,
-          providers: metadata.providers,
+          providers: [PluginRef as Provider, { provide: MINAPLAY_PLUGIN_ID_TOKEN, useValue: metadata.id }].concat(
+            metadata.providers ?? [],
+          ),
         }),
       ],
       target,

@@ -5,6 +5,10 @@ import { ModuleRef } from '@nestjs/core';
 import { PluginChatContext } from './plugin-chat-context.js';
 
 export class PluginControl {
+  constructor(options?: Partial<PluginControl>) {
+    Object.assign(this, options);
+  }
+
   @Expose()
   id: string;
 

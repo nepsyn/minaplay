@@ -29,13 +29,13 @@ export class ApplicationExceptionFilter extends BaseExceptionFilter {
         code: ErrorCodeEnum.QUERY_FAILED,
         message: 'QUERY FAILED',
       });
-      this.logger.error(exception.stack);
+      this.logger.error(exception.message, exception.stack, ApplicationExceptionFilter.name);
     } else {
       response.status(500).json({
         code: ErrorCodeEnum.INTERNAL_SERVER_ERROR,
         message: 'INTERNAL SERVER ERROR',
       });
-      this.logger.error(exception.stack);
+      this.logger.error(exception.message, exception.stack, ApplicationExceptionFilter.name);
     }
   }
 }

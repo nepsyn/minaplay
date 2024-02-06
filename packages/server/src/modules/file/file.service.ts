@@ -54,7 +54,7 @@ export class FileService implements OnModuleInit {
       try {
         await fs.unlink(file.path);
       } catch (error) {
-        this.logger.error(`Delete file '${file.id}' error`, error.stack);
+        this.logger.error(`Delete file '${file.id}' error`, error.stack, FileService.name);
       }
 
       try {
@@ -63,7 +63,7 @@ export class FileService implements OnModuleInit {
           await fs.rmdir(path.dirname(file.path));
         }
       } catch (error) {
-        this.logger.error(`Delete empty dir '${path.dirname(file.path)}' error`, error.stack);
+        this.logger.error(`Delete empty dir '${path.dirname(file.path)}' error`, error.stack, FileService.name);
       }
     }
 

@@ -45,7 +45,7 @@ export class ApplicationGatewayExceptionFilter extends BaseWsExceptionFilter {
         code: ErrorCodeEnum.INTERNAL_SERVER_ERROR,
         message: 'INTERNAL SERVER ERROR',
       });
-      this.logger.error(exception.stack);
+      this.logger.error(exception.message, exception.stack, ApplicationGatewayExceptionFilter.name);
     }
   }
 }

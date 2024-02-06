@@ -139,25 +139,20 @@ export class FileController {
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP, PermissionEnum.FILE_UPLOAD_VIDEO)
   async uploadMediaFile(@RequestUser() user: User, @UploadedFile() file: Express.Multer.File) {
     if (file) {
-      try {
-        // 计算视频文件 md5
-        const md5 = await generateMD5(fs.createReadStream(file.path));
-        const { id } = await this.fileService.save({
-          user: { id: user.id },
-          filename: file.filename,
-          name: file.originalname,
-          size: file.size,
-          md5,
-          mimetype: file.mimetype,
-          source: FileSourceEnum.USER_UPLOAD,
-          path: file.path,
-        });
+      // 计算视频文件 md5
+      const md5 = await generateMD5(fs.createReadStream(file.path));
+      const { id } = await this.fileService.save({
+        user: { id: user.id },
+        filename: file.filename,
+        name: file.originalname,
+        size: file.size,
+        md5,
+        mimetype: file.mimetype,
+        source: FileSourceEnum.USER_UPLOAD,
+        path: file.path,
+      });
 
-        return await this.fileService.findOneBy({ id });
-      } catch (error) {
-        this.logger.error(error.stack);
-        throw buildException(BadRequestException, ErrorCodeEnum.INVALID_FILE);
-      }
+      return await this.fileService.findOneBy({ id });
     } else {
       throw buildException(BadRequestException, ErrorCodeEnum.INVALID_FILE);
     }

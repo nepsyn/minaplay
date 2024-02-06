@@ -1,4 +1,10 @@
-import { BadRequestException, ClassSerializerInterceptor, Module, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  ClassSerializerInterceptor,
+  Module,
+  OnApplicationBootstrap,
+  ValidationPipe,
+} from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
@@ -21,6 +27,8 @@ import { NotificationModule } from './modules/notification/notification.module.j
 import { PluginModule } from './modules/plugin/plugin.module.js';
 import { ApplicationExceptionFilter } from './common/application.exception.filter.js';
 import { ApplicationTimeoutInterceptor } from './common/application.timeout.interceptor.js';
+import { ApplicationLogger } from './common/application.logger.service.js';
+import { MINAPLAY_VERSION } from './constants.js';
 
 @Module({
   imports: [
@@ -155,4 +163,20 @@ import { ApplicationTimeoutInterceptor } from './common/application.timeout.inte
     },
   ],
 })
-export class AppModule {}
+export class AppModule implements OnApplicationBootstrap {
+  private logger = new ApplicationLogger('MinaPlay');
+
+  onApplicationBootstrap() {
+    this.logger.log(`Welcome to MinaPlay v${MINAPLAY_VERSION} ${banner}`);
+  }
+}
+
+const banner = `
+
+    __  ____             ____  __           
+   /  |/  (_)___  ____ _/ __ \\/ /___ ___  __
+  / /|_/ / / __ \\/ __ \`/ /_/ / / __ \`/ / / /
+ / /  / / / / / / /_/ / ____/ / /_/ / /_/ / 
+/_/  /_/_/_/ /_/\\__,_/_/   /_/\\__,_/\\__, /  
+                                   /____/   
+`;

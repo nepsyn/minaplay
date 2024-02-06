@@ -4,7 +4,7 @@ export class ApplicationLogger extends ConsoleLogger {
   private static messages: string[] = [];
 
   public static addHistoryMessage(message: string) {
-    if (this.messages.length > 255) {
+    if (this.messages.length > 512) {
       this.messages.shift();
     }
     this.messages.push(message);

@@ -161,6 +161,9 @@ export class LiveGateway implements OnGatewayDisconnect {
     if (!message) {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
+    if (!['Text', 'NetworkImage'].includes(message.type)) {
+      throw buildException(WsException, ErrorCodeEnum.NOT_IMPLEMENTED);
+    }
 
     const chat = await this.liveChatService.save({
       live: { id: socket.data.live.id },

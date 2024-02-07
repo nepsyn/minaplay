@@ -532,8 +532,6 @@ import {
 import { TimeoutError, useSocketIOConnection } from '@/composables/use-socket-io-connection';
 import {
   LiveChatEntity,
-  LiveChatNetworkImage,
-  LiveChatText,
   LiveDto,
   LiveEvent,
   LiveEventMap,
@@ -563,6 +561,7 @@ import SeriesSelector from '@/components/resource/SeriesSelector.vue';
 import { SeriesEntity } from '@/api/interfaces/series.interface';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useSettingsStore } from '@/store/settings';
+import { MinaPlayNetworkImage, MinaPlayText } from '@/api/interfaces/message.interface';
 
 const { t } = useI18n();
 const { settings } = useSettingsStore();
@@ -605,7 +604,7 @@ socket.on('connect', async () => {
     }
   } catch (error: any) {
     if (error?.code === ErrorCodeEnum.NOT_FOUND) {
-      await router.replace({ path: '/error/not-found' });
+      await router.replace({ path: '/404' });
     }
 
     toast.toastError(t(`error.${error?.code ?? 'other'}`));
@@ -733,7 +732,7 @@ const {
   onRejected: onJoinFailed,
 } = useAsyncTask(async () => {
   return await emit('join', {
-    id: live.value?.id,
+    id: live.value!.id,
     password: password.value,
   });
 });
@@ -772,7 +771,7 @@ const {
   request: sendChat,
   onResolved: onChatSent,
   onRejected: onChatSendFailed,
-} = useAsyncTask(async (message: LiveChatText | LiveChatNetworkImage) => {
+} = useAsyncTask(async (message: MinaPlayText | MinaPlayNetworkImage) => {
   return await emit('chat', { message });
 });
 onChatSent(() => {
@@ -886,7 +885,7 @@ const connectVoice = async () => {
     });
     producerTransport.value.on('produce', async (data, callback) => {
       const resp = await emit('voice-create-producer', {
-        transportId: producerTransport.value?.id,
+        transportId: producerTransport.value!.id,
         rtpParameters: data.rtpParameters,
       });
       callback({
@@ -952,7 +951,7 @@ const consume = async (userId: number, producerId: string) => {
   if (user && !member && userId !== api.user?.id) {
     const params = await emit('voice-create-consumer', {
       rtpCapabilities: device.rtpCapabilities,
-      transportId: consumerTransport.value?.id,
+      transportId: consumerTransport.value!.id,
       producerId: producerId,
     });
     const consumer = await consumerTransport.value?.consume({
@@ -1123,7 +1122,7 @@ const {
   onRejected: onStreamSwitchFailed,
 } = useAsyncTask(async () => {
   if (edit.value.stream.type === 'server-push') {
-    return await emit('stream-server-push', { id: selectedMedia.value?.id });
+    return await emit('stream-server-push', { id: selectedMedia.value!.id });
   } else if (edit.value.stream.type === 'live-stream') {
     return await emit('stream-third-party', { url: edit.value.stream.url });
   }

@@ -8,7 +8,7 @@ export class TimeoutError extends Error {
   }
 }
 
-export function useSocketIOConnection<EventMap extends Record<string, [object | undefined, object | undefined]> = {}>(
+export function useSocketIOConnection<EventMap extends Record<string, (...args: any[]) => any> = {}>(
   url: string,
   options: Partial<ManagerOptions & SocketOptions> = {},
 ) {
@@ -20,10 +20,10 @@ export function useSocketIOConnection<EventMap extends Record<string, [object | 
     return _sync;
   };
 
-  const request = <Ev extends keyof EventMap, Args = EventMap[Ev][0], Result = EventMap[Ev][1]>(
+  const request = <Ev extends keyof EventMap>(
     ev: Ev,
-    args?: Args,
-  ): Promise<Result> => {
+    ...args: Parameters<EventMap[Ev]>
+  ): Promise<ReturnType<EventMap[Ev]>> => {
     return new Promise((resolve, reject) => {
       const sync = getSyncId();
 
@@ -38,7 +38,7 @@ export function useSocketIOConnection<EventMap extends Record<string, [object | 
         reject(new TimeoutError());
       }, 5000);
 
-      const responseHandler = (resp: { sync: number; data: Result }) => {
+      const responseHandler = (resp: { sync: number; data: ReturnType<EventMap[Ev]> }) => {
         if (resp.sync === sync) {
           unregister();
           resolve(resp.data);

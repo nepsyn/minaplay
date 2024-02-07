@@ -15,18 +15,6 @@ const LoginGuard: NavigationGuard = (to) => {
   );
 };
 
-const PermissionGuard: NavigationGuard = (to) => {
-  const api = useApiStore();
-
-  const permissions = (to.meta?.permissions ?? []) as PermissionEnum[];
-  const valid = api.user === undefined || permissions.length === 0 || api.hasPermission(...permissions);
-  return (
-    valid || {
-      path: '/error/no-permission',
-    }
-  );
-};
-
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -310,21 +298,9 @@ const routes: RouteRecordRaw[] = [
         ],
       },
       {
-        name: 'error',
-        path: '/error',
-        redirect: '/error/not-found',
-        children: [
-          {
-            name: 'error-not-found',
-            path: '/error/not-found',
-            component: () => import('@/views/error/NotFound.vue'),
-          },
-          {
-            name: 'error-no-permission',
-            path: '/error/no-permission',
-            component: () => import('@/views/error/NoPermission.vue'),
-          },
-        ],
+        name: 'not-found',
+        path: '/:pathMatch(.*)*',
+        component: () => import('@/views/error/NotFound.vue'),
       },
     ],
     beforeEnter: LoginGuard,
@@ -340,7 +316,5 @@ const router = createRouter({
   history: createWebHashHistory(process.env.BASE_URL),
   routes,
 });
-
-router.beforeEach(PermissionGuard);
 
 export default router;

@@ -11,7 +11,7 @@ export interface SeriesEntity {
   /** 剧集季度 */
   season?: string;
   /** 发布时间 */
-  pubAt?: Date;
+  pubAt?: string;
   /** 剧集是否已完结 */
   finished?: boolean;
   /** 完整剧集单集数量 */
@@ -34,6 +34,7 @@ export interface SeriesDto {
   name?: string;
   season?: string;
   count?: number;
+  pubAt?: string;
   finished?: boolean;
   description?: string;
   posterFileId?: string;
@@ -90,7 +91,7 @@ export interface EpisodeEntity {
   /** 媒体 */
   media: MediaEntity;
   /** 发布时间 */
-  pubAt: Date;
+  pubAt: string;
   /** 创建时间 */
   createAt: Date;
   /** 更新时间 */

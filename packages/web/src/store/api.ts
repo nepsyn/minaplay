@@ -258,6 +258,7 @@ export const useApiStore = defineStore('api', () => {
   };
 
   const Plugin = {
+    socketPath: baseUrl + '/plugin',
     getAll: apiGet<ApiQueryResult<PluginControl>>('/api/v1/plugins'),
     enable: (id: string) => apiPost<PluginControl>(`/api/v1/plugins/${id}/enable`),
     disable: (id: string) => apiPost<PluginControl>(`/api/v1/plugins/${id}/disable`),

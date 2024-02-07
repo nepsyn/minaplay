@@ -3,6 +3,7 @@ import { FileEntity } from '@/api/interfaces/file.interface';
 import { ApiQueryDto } from '@/api/interfaces/common.interface';
 import { MediaKind, RtpCapabilities, RtpParameters } from 'mediasoup-client/lib/RtpParameters';
 import { DtlsParameters, TransportOptions } from 'mediasoup-client/lib/Transport';
+import { MinaPlayNetworkImage, MinaPlayText } from '@/api/interfaces/message.interface';
 
 export interface LiveEntity {
   id: string;
@@ -61,20 +62,10 @@ export interface LiveState {
   updateAt: Date;
 }
 
-export interface LiveChatText {
-  type: 'Text';
-  content: string;
-}
-
-export interface LiveChatNetworkImage {
-  type: 'NetworkImage';
-  url: string;
-}
-
 export interface LiveChatEntity {
   id: string;
   user: UserEntity;
-  message: LiveChatText | LiveChatNetworkImage;
+  message: MinaPlayText | MinaPlayNetworkImage;
   createAt: Date;
 }
 
@@ -103,31 +94,28 @@ export interface LiveChat {
 export type LiveEvent = LiveNotify | LiveChat;
 
 export type LiveEventMap = {
-  info: [{ id: string }, LiveEntity];
-  join: [{ id: string; password?: string }, LiveState];
-  chat: [{ message: LiveChatText | LiveChatNetworkImage }, undefined];
-  messages: [{ start: string; end?: string }, LiveChatEntity[]];
+  info: (arg: { id: string }) => LiveEntity;
+  join: (arg: { id: string; password?: string }) => LiveState;
+  chat: (arg: { message: MinaPlayText | MinaPlayNetworkImage }) => undefined;
+  messages: (arg: { start: string; end?: string }) => LiveChatEntity[];
 
-  'stream-server-push': [{ id: string }, ServerPushMediaStream];
-  'stream-third-party': [{ url: string }, ThirdPartyLiveStream];
-  'stop-stream': [undefined, undefined];
+  'stream-server-push': (arg: { id: string }) => ServerPushMediaStream;
+  'stream-third-party': (arg: { url: string }) => ThirdPartyLiveStream;
+  'stop-stream': () => undefined;
 
-  'voice-rtp-capabilities': [undefined, RtpCapabilities];
-  'voice-get-producers': [undefined, { userId: number; producerId: string }[]];
-  'voice-create-webrtc-transport': [undefined, TransportOptions];
-  'voice-connect-webrtc-transport': [{ transportId: string; dtlsParameters: DtlsParameters }, undefined];
-  'voice-create-producer': [{ transportId: string; dtlsParameters: DtlsParameters }, { producerId: string }];
-  'voice-create-consumer': [
-    { transportId: string; producerId: string; rtpCapabilities: RtpCapabilities },
-    {
-      consumerId: string;
-      producerId: string;
-      kind: MediaKind;
-      rtpParameters: RtpParameters;
-      type: 'simple' | 'simulcast' | 'svc' | 'pipe';
-      producerPaused: boolean;
-    },
-  ];
+  'voice-rtp-capabilities': () => RtpCapabilities;
+  'voice-get-producers': () => { userId: number; producerId: string }[];
+  'voice-create-webrtc-transport': () => TransportOptions;
+  'voice-connect-webrtc-transport': (arg: { transportId: string; dtlsParameters: DtlsParameters }) => undefined;
+  'voice-create-producer': (arg: { transportId: string; rtpParameters: RtpParameters }) => { producerId: string };
+  'voice-create-consumer': (arg: { transportId: string; producerId: string; rtpCapabilities: RtpCapabilities }) => {
+    consumerId: string;
+    producerId: string;
+    kind: MediaKind;
+    rtpParameters: RtpParameters;
+    type: 'simple' | 'simulcast' | 'svc' | 'pipe';
+    producerPaused: boolean;
+  };
 };
 
 export interface RoomVoice {

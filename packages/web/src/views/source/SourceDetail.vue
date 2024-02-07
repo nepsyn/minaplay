@@ -9,7 +9,7 @@
           style="width: 240px"
         ></nav-sections>
         <div :style="{ marginLeft: display.mdAndUp.value ? '300px' : '0' }" class="h-100 d-flex flex-column">
-          <router-view v-slot="{ Component }">
+          <authed-router-view v-slot="{ Component }">
             <component
               :is="display.mdAndUp.value ? VScrollYReverseTransition : VScrollXReverseTransition"
               leave-absolute
@@ -18,7 +18,7 @@
                 <component :is="Component" />
               </keep-alive>
             </component>
-          </router-view>
+          </authed-router-view>
         </div>
       </v-container>
     </to-top-container>
@@ -35,6 +35,7 @@ import { useDisplay } from 'vuetify';
 import NavSections from '@/components/app/NavSections.vue';
 import NavTabs from '@/components/app/NavTabs.vue';
 import { VScrollXReverseTransition, VScrollYReverseTransition } from 'vuetify/components/transitions';
+import AuthedRouterView from '@/components/app/AuthedRouterView.vue';
 
 const { t } = useI18n();
 const route = useRoute();

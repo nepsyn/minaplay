@@ -59,7 +59,7 @@ const props = withDefaults(
 onMounted(async () => {
   props.loader.onRejected(async (error: any) => {
     if (error.response?.data?.code === ErrorCodeEnum.NOT_FOUND) {
-      await router.replace({ path: '/error/not-found' });
+      await router.replace({ path: '/404' });
     }
   });
 

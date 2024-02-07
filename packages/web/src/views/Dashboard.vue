@@ -50,11 +50,11 @@
           </template>
         </nav-tabs>
         <to-top-container class="scrollable-container">
-          <router-view v-slot="{ Component }">
+          <authed-router-view match="^/dashboard/[^/]+$" v-slot="{ Component }">
             <keep-alive>
               <component :is="Component" />
             </keep-alive>
-          </router-view>
+          </authed-router-view>
         </to-top-container>
       </v-container>
     </v-main>
@@ -81,6 +81,7 @@ import {
 } from '@mdi/js';
 import NavTabs from '@/components/app/NavTabs.vue';
 import { useRoute } from 'vue-router';
+import AuthedRouterView from '@/components/app/AuthedRouterView.vue';
 
 const { t } = useI18n();
 const route = useRoute();

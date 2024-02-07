@@ -7,7 +7,12 @@
         </v-btn>
       </v-col>
       <v-col cols="auto">
-        <v-btn variant="flat" color="secondary-darken-2" :prepend-icon="mdiConsole">
+        <v-btn
+          variant="flat"
+          color="secondary-darken-2"
+          :prepend-icon="mdiConsole"
+          @click="layout.pluginConsoleSheet = true"
+        >
           {{ t('plugin.openConsole') }}
         </v-btn>
       </v-col>
@@ -45,8 +50,10 @@ import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { computed, ref } from 'vue';
 import PluginOverview from '@/components/plugin/PluginOverview.vue';
 import { PluginControl } from '@/api/interfaces/plugin.interface';
+import { useLayoutStore } from '@/store/layout';
 
 const { t } = useI18n();
+const layout = useLayoutStore();
 const api = useApiStore();
 
 const filters = ref({

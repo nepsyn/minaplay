@@ -125,8 +125,10 @@
     </v-list>
   </v-navigation-drawer>
 
+  <plugin-console></plugin-console>
+
   <v-main>
-    <router-view />
+    <authed-router-view match="^/[^/]+$" />
   </v-main>
 </template>
 
@@ -154,6 +156,8 @@ import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useRoute, useRouter } from 'vue-router';
 import { useToastStore } from '@/store/toast';
 import { PermissionEnum } from '@/api/enums/permission.enum';
+import PluginConsole from '@/components/plugin/PluginConsole.vue';
+import AuthedRouterView from '@/components/app/AuthedRouterView.vue';
 
 const { t } = useI18n<{ message: MessageSchema }>();
 const layout = useLayoutStore();

@@ -8,6 +8,8 @@ export const useLayoutStore = defineStore('layout', () => {
 
   const navDrawer = ref(display.mdAndUp.value);
   const uploadDrawer = ref(false);
+  const pluginConsoleSheet = ref(false);
+  const pluginConsoleFullscreen = ref(false);
 
   const darkMode = computed(() => theme.global.current.value.dark);
   const toggleDarkMode = (darkMode: boolean) => {
@@ -17,6 +19,8 @@ export const useLayoutStore = defineStore('layout', () => {
   return {
     navDrawer,
     uploadDrawer,
+    pluginConsoleSheet,
+    pluginConsoleFullscreen,
     darkMode,
     toggleDarkMode,
   };

@@ -30,8 +30,8 @@ export class PluginGateway {
 
   @SubscribeMessage('console')
   @RequirePermissions(PermissionEnum.ROOT_OP)
-  async handleConsole(@ConnectedSocket() socket: Socket, @MessageBody() body: MinaPlayMessage) {
-    const message = parseMessage(body);
+  async handleConsole(@ConnectedSocket() socket: Socket, @MessageBody('message') message: MinaPlayMessage) {
+    message = parseMessage(message);
     if (!message) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }

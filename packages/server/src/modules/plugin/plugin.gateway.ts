@@ -44,15 +44,14 @@ export class PluginGateway {
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(60 * 1000)
   async handleCommands() {
-    const programs = new Map<string, { control: PluginControl; description: string }[]>();
+    const programs: { program: string; control: PluginControl; description: string }[] = [];
     for (const control of this.pluginService.enabledPluginControls) {
       for (const [bin, command] of control.commands) {
-        const desc = programs.get(bin) ?? [];
-        desc.push({
+        programs.push({
+          program: bin,
           control,
           description: command.program.description(),
         });
-        programs.set(bin, desc);
       }
     }
     return programs;

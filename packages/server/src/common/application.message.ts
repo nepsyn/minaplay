@@ -1,23 +1,33 @@
-import { ClassConstructor, Expose, plainToInstance } from 'class-transformer';
-import { Equals, IsHexColor, IsOptional, IsString, IsUrl, Length, validateSync } from 'class-validator';
+import { ClassConstructor, Expose, plainToInstance, Type } from 'class-transformer';
+import {
+  Equals,
+  IsBase64,
+  IsHexColor,
+  IsOptional,
+  IsString,
+  IsUrl,
+  Length,
+  ValidateNested,
+  validateSync,
+} from 'class-validator';
 
 interface TypedMessage {
   type: MinaPlayMessageType;
 }
 
-/** 普通文本 */
+/** Plain Text */
 export class Text implements TypedMessage {
   @Expose()
   @Equals('Text')
   type: 'Text' = 'Text';
 
-  /** 颜色 */
+  /** Color */
   @Expose()
   @IsHexColor()
   @IsOptional()
   color?: string;
 
-  /** 文本内容 */
+  /** Content */
   @Expose()
   @IsString()
   @Length(1, 40)
@@ -29,13 +39,13 @@ export class Text implements TypedMessage {
   }
 }
 
-/** 网络图片 */
+/** Network Image */
 export class NetworkImage implements TypedMessage {
   @Expose()
   @Equals('NetworkImage')
   type: 'NetworkImage' = 'NetworkImage';
 
-  /** 图片 url */
+  /** URL */
   @Expose()
   @IsUrl()
   url: string;
@@ -45,7 +55,90 @@ export class NetworkImage implements TypedMessage {
   }
 }
 
-const MessageMap = { Text, NetworkImage };
+/** base64 Image */
+export class Base64Image implements TypedMessage {
+  @Expose()
+  @Equals('Base64Image')
+  type: 'Base64Image' = 'Base64Image';
+
+  /** base64 content */
+  @Expose()
+  @IsBase64()
+  base64: string;
+
+  constructor(base64: string) {
+    this.base64 = base64;
+  }
+}
+
+/** Group Option */
+export class Option implements TypedMessage {
+  @Expose()
+  @Equals('Option')
+  type: 'Option' = 'Option';
+
+  /** ID */
+  @Expose()
+  @IsString()
+  id: string;
+
+  /** Option Text */
+  @Expose()
+  @ValidateNested()
+  text: Text;
+
+  constructor(id: string, text: Text) {
+    this.id = id;
+    this.text = text;
+  }
+}
+
+/** Action Group */
+export class ActionGroup implements TypedMessage {
+  @Expose()
+  @Equals('ActionGroup')
+  type: 'ActionGroup' = 'ActionGroup';
+
+  /** ID */
+  @Expose()
+  @IsString()
+  id: string;
+
+  /** Options */
+  @Expose()
+  @Type(() => Option)
+  @ValidateNested()
+  options: Option[];
+
+  constructor(id: string, options: Option[]) {
+    this.id = id;
+    this.options = options;
+  }
+}
+
+/** Feedback */
+export class Feedback implements TypedMessage {
+  @Expose()
+  @Equals('Feedback')
+  type: 'Feedback' = 'Feedback';
+
+  /** Group ID */
+  @Expose()
+  @IsString()
+  groupId: string;
+
+  /** Option ID */
+  @Expose()
+  @IsString()
+  optionId: string;
+
+  constructor(groupId: string, optionId: string) {
+    this.groupId = groupId;
+    this.optionId = optionId;
+  }
+}
+
+const MessageMap = { Text, NetworkImage, Base64Image, Option, ActionGroup, Feedback };
 export type MinaPlayMessageType = keyof typeof MessageMap;
 export type MinaPlayMessage = InstanceType<(typeof MessageMap)[MinaPlayMessageType]>;
 

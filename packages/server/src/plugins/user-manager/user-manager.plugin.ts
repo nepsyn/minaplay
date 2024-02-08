@@ -3,8 +3,8 @@ import { MINAPLAY_VERSION } from '../../constants.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../../modules/user/user.entity.js';
 import { Permission } from '../../modules/authorization/permission.entity.js';
-import { CreateDefaultRootUserService } from './service/create-default-root-user.service.js';
-import { UserManagerCommand } from './command/user-manager.command.js';
+import { CreateDefaultRootUserService } from './create-default-root-user.service.js';
+import { UserManagerCommand } from './user-manager.command.js';
 
 @MinaPlayPlugin({
   id: 'user-manager',

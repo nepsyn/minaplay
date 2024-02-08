@@ -1,19 +1,20 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../../modules/user/user.entity.js';
-import { Permission } from '../../../modules/authorization/permission.entity.js';
+import { User } from '../../modules/user/user.entity.js';
+import { Permission } from '../../modules/authorization/permission.entity.js';
 import { Repository } from 'typeorm';
 import { isString } from 'class-validator';
-import { encryptPassword } from '../../../utils/encrypt-password.util.js';
-import { PermissionEnum } from '../../../enums/permission.enum.js';
+import { encryptPassword } from '../../utils/encrypt-password.util.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
 import { Injectable } from '@nestjs/common';
-import { ApplicationLogger } from '../../../common/application.logger.service.js';
+import { ApplicationLogger } from '../../common/application.logger.service.js';
 import { Command } from 'commander';
 import {
   MinaPlayCommand,
   MinaPlayCommandArgument,
   MinaPlayPluginInject,
-} from '../../../modules/plugin/plugin.decorator.js';
-import { PluginChatContext } from '../../../modules/plugin/plugin-chat-context.js';
+} from '../../modules/plugin/plugin.decorator.js';
+import { PluginChatContext } from '../../modules/plugin/plugin-chat-context.js';
+import { ActionGroup, Option, Text } from '../../common/application.message.js';
 
 @Injectable()
 export class UserManagerCommand {
@@ -84,10 +85,18 @@ export class UserManagerCommand {
       return `User '${username}' not found in database`;
     }
 
-    await chat.send(`Are you sure to delete user '${username}' ? (Y/n)`);
+    const groupId = Date.now().toString();
+    await chat.send([
+      new Text(`Are you sure to delete user '${username}' ? (Y/n)`),
+      new ActionGroup(groupId, [
+        new Option('yes', new Text('Yes', '#B00020')),
+        new Option('no', new Text('No')),
+        new Option('cancel', new Text('Cancel')),
+      ]),
+    ]);
     try {
       const resp = await chat.receive();
-      if (resp.type === 'Text' && resp.content.trim().toLowerCase() === 'y') {
+      if (resp.type === 'Feedback' && resp.groupId === groupId && resp.optionId === 'yes') {
         try {
           await this.userRepository.delete({ username });
           return `User '${username}' deleted`;

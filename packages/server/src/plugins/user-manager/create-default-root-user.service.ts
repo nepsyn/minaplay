@@ -1,13 +1,13 @@
 import { ConsoleLogger, Injectable } from '@nestjs/common';
-import { MinaPlayPluginHooks } from '../../../modules/plugin/plugin.interface.js';
+import { MinaPlayPluginHooks } from '../../modules/plugin/plugin.interface.js';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../../modules/user/user.entity.js';
+import { User } from '../../modules/user/user.entity.js';
 import { Repository } from 'typeorm';
-import { Permission } from '../../../modules/authorization/permission.entity.js';
-import { PermissionEnum } from '../../../enums/permission.enum.js';
+import { Permission } from '../../modules/authorization/permission.entity.js';
+import { PermissionEnum } from '../../enums/permission.enum.js';
 import { randomBytes } from 'node:crypto';
-import { encryptPassword } from '../../../utils/encrypt-password.util.js';
-import UserManagerPlugin from '../user-manager.plugin.js';
+import { encryptPassword } from '../../utils/encrypt-password.util.js';
+import UserManagerPlugin from './user-manager.plugin.js';
 
 @Injectable()
 export class CreateDefaultRootUserService implements MinaPlayPluginHooks {

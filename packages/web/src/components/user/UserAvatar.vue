@@ -5,6 +5,7 @@ withDefaults(
   defineProps<{
     src?: string;
     size?: string | number;
+    tile?: boolean;
   }>(),
   {
     size: 64,
@@ -13,7 +14,7 @@ withDefaults(
 </script>
 
 <template>
-  <v-avatar :size="size">
+  <v-avatar :rounded="tile ? 0 : undefined" :size="size">
     <v-img :src="src" cover>
       <template #placeholder>
         <v-icon :size="size" :icon="mdiAccountCircle"></v-icon>

@@ -25,6 +25,7 @@
           </v-btn>
         </v-container>
         <user-avatar
+          tile
           :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
           size="52"
         ></user-avatar>

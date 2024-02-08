@@ -419,6 +419,9 @@ onMounted(async () => {
     player.on('play', () => {
       danmakuPlayer?.play();
     });
+    player.on('progress', () => {
+      emits('progress', player?.currentTime);
+    });
 
     loadResource();
 
@@ -508,6 +511,10 @@ defineExpose({
   emitDanmaku,
   player,
 });
+
+const emits = defineEmits<{
+  (ev: 'progress', progress?: number): any;
+}>();
 </script>
 
 <style lang="sass">

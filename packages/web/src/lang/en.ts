@@ -86,6 +86,7 @@ export default {
     dark: 'Dark Mode',
     light: 'Light Mode',
     actions: {
+      pluginConsole: 'Plugin Console',
       upload: 'Upload Media Files',
       github: 'Github',
     },
@@ -418,7 +419,7 @@ export default {
     sendChat: 'Send a chat to plugin console...',
     initializing: 'Plugin console initializing...',
     connectFailed: 'Plugin console connect failed',
-    welcome: 'Welcome to MinaPlay plugin console.',
+    welcome: `Welcome to MinaPlay plugin console.\nType 'help' to show all available commands in MinaPlay plugin console.`,
     official: 'Official Plugin',
     program: 'Provide Program: {program}',
     enabled: 'Enabled',

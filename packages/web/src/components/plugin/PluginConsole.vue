@@ -6,6 +6,13 @@
         <span>{{ t('plugin.console') }}</span>
         <v-spacer></v-spacer>
         <v-btn
+          :icon="mdiDeleteOutline"
+          size="small"
+          density="compact"
+          variant="text"
+          @click="pluginConsole.messages = pluginConsole.messages.slice(0, 1)"
+        ></v-btn>
+        <v-btn
           :icon="layout.pluginConsoleFullscreen ? mdiArrowCollapseDown : mdiArrowExpandUp"
           size="small"
           density="compact"
@@ -46,14 +53,29 @@
               </v-container>
             </template>
             <template v-else>
-              <v-container fluid class="scrollable-container">
-                <plugin-chat-message
-                  v-for="(message, index) in pluginConsole.messages"
-                  :message="message"
-                  :key="index"
-                ></plugin-chat-message>
+              <v-container fluid class="scrollable-container" ref="messageContainerRef" v-mutate.child="scrollToBottom">
+                <v-container class="d-block py-0">
+                  <v-slide-x-reverse-transition group>
+                    <plugin-chat-message
+                      v-for="(message, index) in pluginConsole.messages"
+                      :message="message"
+                      :key="index"
+                    ></plugin-chat-message>
+                  </v-slide-x-reverse-transition>
+                  <div v-intersect="(isIntersecting: boolean) => (atBottom = isIntersecting)"></div>
+                </v-container>
+                <v-container class="position-sticky d-flex justify-center" style="bottom: 0">
+                  <v-btn
+                    :icon="mdiArrowDown"
+                    variant="elevated"
+                    size="small"
+                    v-if="!atBottom"
+                    elevation="4"
+                    @click="scrollToBottom"
+                  ></v-btn>
+                </v-container>
               </v-container>
-              <v-container fluid class="flex-grow-0 bg-transparent">
+              <v-container class="flex-grow-0 bg-transparent">
                 <v-combobox
                   class="bg-transparent"
                   :items="programs"
@@ -66,13 +88,13 @@
                     })
                   "
                   auto-select-first
+                  :menu-props="!text ? { modelValue: false } : {}"
                   autofocus
                   :return-object="false"
                   variant="outlined"
                   hide-details
                   density="compact"
                   :placeholder="t('plugin.sendChat')"
-                  :prepend-inner-icon="mdiImage"
                   :append-inner-icon="mdiSendVariant"
                   :loading="chatSending"
                   @keydown.tab.prevent
@@ -91,14 +113,15 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, onUpdated, ref } from 'vue';
 import {
   mdiArrowCollapseDown,
+  mdiArrowDown,
   mdiArrowExpandUp,
   mdiClose,
   mdiCloseCircle,
   mdiConsole,
-  mdiImage,
+  mdiDeleteOutline,
   mdiSendVariant,
 } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
@@ -131,6 +154,9 @@ onProgramsLoaded((data) => {
 onProgramsLoadFailed((error: any) => {
   toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
 });
+onUpdated(async () => {
+  await loadPrograms();
+});
 
 const {
   pending: chatSending,
@@ -140,9 +166,25 @@ const {
 } = pluginConsole.sendTask;
 onChatSent(() => {
   text.value = undefined;
+  scrollToBottom();
 });
 onChatSendFailed((error: any) => {
+  text.value = undefined;
   toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
+});
+
+const atBottom = ref(false);
+const messageContainerRef = ref<{ $el: HTMLElement } | undefined>(undefined);
+const scrollToBottom = () => {
+  setTimeout(() => {
+    if (messageContainerRef.value) {
+      const el = messageContainerRef.value.$el;
+      el.scrollTo({ top: el.scrollHeight });
+    }
+  }, 50);
+};
+onUpdated(() => {
+  scrollToBottom();
 });
 
 onMounted(async () => {

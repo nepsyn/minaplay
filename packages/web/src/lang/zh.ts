@@ -87,6 +87,7 @@ const zh: MessageSchema = {
     dark: '夜间模式',
     light: '昼间模式',
     actions: {
+      pluginConsole: '插件控制台',
       upload: '上传媒体文件',
       github: '访问 Github',
     },
@@ -418,7 +419,7 @@ const zh: MessageSchema = {
     sendChat: '发送消息到插件控制台...',
     initializing: '正在初始化插件控制台...',
     connectFailed: '插件控制台连接失败',
-    welcome: '欢迎使用 MinaPlay 插件控制台。',
+    welcome: `欢迎使用 MinaPlay 插件控制台。\n使用命令 'help' 查看 MinaPlay 插件控制台支持的命令列表。`,
     official: '官方插件',
     program: '提供命令: {program}',
     enabled: '已启用',

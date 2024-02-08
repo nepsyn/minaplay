@@ -5,7 +5,7 @@
         <v-col cols="12" md="8">
           <single-item-loader class="pa-0" :loader="isMedia ? mediaLoader : currentEpisodeLoader">
             <v-responsive class="rounded-lg" :aspect-ratio="16 / 9" max-height="520">
-              <video-player :media="media!"></video-player>
+              <video-player @progress="(val: number) => (progress = val)" :media="media!"></video-player>
             </v-responsive>
             <v-container fluid class="pa-0 mt-4 d-flex flex-column">
               <span v-if="isMedia" class="text-h6 text-wrap">{{ media!.name }}</span>
@@ -182,7 +182,7 @@ import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import { useApiStore } from '@/store/api';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
-import { computed } from 'vue';
+import { computed, onUnmounted, ref } from 'vue';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 import VideoPlayer from '@/components/app/VideoPlayer.vue';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
@@ -282,6 +282,14 @@ const seriesLoader = useAxiosPageLoader(
 );
 const series = computed(() => {
   return (seriesLoader.items.value ?? []).filter((series) => series.id !== currentEpisode.value?.series?.id);
+});
+
+const progress = ref<number | undefined>(undefined);
+onUnmounted(async () => {
+  await api.Media.addHistory(media.value!.id)({
+    progress: progress.value && Math.round(progress.value * 1000),
+    episodeId: currentEpisode.value?.id,
+  });
 });
 
 const actions = [

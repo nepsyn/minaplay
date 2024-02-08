@@ -241,9 +241,9 @@ export const useApiStore = defineStore('api', () => {
     query: apiGet<ApiQueryResult<MediaEntity>, MediaQueryDto>(`/api/v1/media`),
     update: (id: string) => apiPut<MediaEntity, MediaDto>(`/api/v1/media/${id}`),
     delete: (id: string) => apiDelete(`/api/v1/media/${id}`),
-    findHistory: (id: number) => apiGet<ViewHistoryEntity>(`/api/v1/media/${id}/history`),
-    addHistory: (id: number) => apiPost<ViewHistoryEntity, ViewHistoryDto>(`/api/v1/media/${id}/history`),
-    deleteHistory: (id: number) => apiDelete(`/api/v1/media/${id}/history`),
+    findHistory: (id: string) => apiGet<ViewHistoryEntity>(`/api/v1/media/${id}/history`),
+    addHistory: (id: string) => apiPost<ViewHistoryEntity, ViewHistoryDto>(`/api/v1/media/${id}/history`),
+    deleteHistory: (id: string) => apiDelete(`/api/v1/media/${id}/history`),
   };
 
   const ViewHistory = {

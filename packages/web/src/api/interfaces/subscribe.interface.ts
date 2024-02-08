@@ -104,6 +104,12 @@ export interface DownloadItemEntity {
   error?: string;
   /** 创建时间 */
   createAt: Date;
+  /** 下载中状态 */
+  state: {
+    totalLength: string;
+    completedLength: string;
+    downloadSpeed: string;
+  };
 }
 
 export interface DownloadItemDto {

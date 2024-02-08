@@ -140,6 +140,7 @@ import {
   mdiCloudUploadOutline,
   mdiCodeBracesBox,
   mdiCog,
+  mdiConsole,
   mdiDotsVertical,
   mdiMovieOpenPlay,
   mdiPencil,
@@ -191,6 +192,14 @@ onLogoutRejected((error: any) => {
 });
 
 const actions = ref([
+  {
+    text: t('layout.actions.pluginConsole'),
+    icon: mdiConsole,
+    click: () => {
+      layout.pluginConsoleSheet = !layout.pluginConsoleSheet;
+    },
+    show: computed(() => api.hasPermission(PermissionEnum.ROOT_OP)),
+  },
   {
     text: t('layout.actions.upload'),
     icon: mdiCloudUploadOutline,

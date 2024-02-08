@@ -22,7 +22,7 @@ export function useSocketIOConnection<EventMap extends Record<string, (...args: 
 
   const request = <Ev extends keyof EventMap>(
     ev: Ev,
-    ...args: Parameters<EventMap[Ev]>
+    args?: Parameters<EventMap[Ev]>[0],
   ): Promise<ReturnType<EventMap[Ev]>> => {
     return new Promise((resolve, reject) => {
       const sync = getSyncId();

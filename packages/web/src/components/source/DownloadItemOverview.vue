@@ -15,7 +15,15 @@
       {{ new Date(item.createAt).toLocaleString(locale) }}
       -
       {{ downloadItemProps.text }}
+      {{ item.state ? `${(Number(item.state.downloadSpeed) / 1024 / 1024).toFixed(2)} MB/s` : '' }}
     </p>
+    <v-progress-linear
+      v-if="item.status === StatusEnum.PENDING && item.state"
+      :model-value="(Number(item.state.completedLength) / Number(item.state.totalLength)) * 100"
+      color="secondary"
+      height="6"
+      striped
+    ></v-progress-linear>
     <pre v-if="item.error" class="text-body-2 mt-2 overflow-x-auto" v-text="item.error"></pre>
     <div class="mt-2 d-flex flex-row align-center">
       <template v-for="(action, index) in actions" :key="index">
@@ -71,7 +79,7 @@ import {
 } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
-import { computed, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { useToastStore } from '@/store/toast';
 import { copyContent } from '@/utils/utils';
 import { useAxiosRequest } from '@/composables/use-axios-request';
@@ -132,6 +140,25 @@ const copyLink = () => {
       toast.toastError(t('common.download.linkCopyFailed'));
     });
 };
+
+let interval: ReturnType<typeof setInterval> | undefined = undefined;
+const { request: updateState, onResolved: onUpdated } = useAxiosRequest(async () => {
+  return await api.Download.getById(props.item.id)();
+});
+onUpdated((data) => {
+  emits('update', data);
+  if (data.status !== StatusEnum.PENDING) {
+    clearInterval(interval);
+  }
+});
+onMounted(() => {
+  if (props.item.status === StatusEnum.PENDING) {
+    interval = setInterval(() => updateState(), 3000);
+  }
+});
+onUnmounted(() => {
+  clearInterval(interval);
+});
 
 const {
   pending: retrying,

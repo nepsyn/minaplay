@@ -2,7 +2,7 @@
   <to-top-container class="page-height overflow-auto">
     <v-container class="d-flex flex-column py-md-12">
       <div class="d-flex flex-row align-center">
-        <v-icon :icon="mdiUpdate" size="x-large"></v-icon>
+        <v-icon :icon="mdiAnimationPlayOutline" size="x-large"></v-icon>
         <span class="text-h5 ml-3">{{ t('resource.seriesUpdates') }}</span>
       </div>
       <multi-items-loader
@@ -58,7 +58,7 @@ import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { computed } from 'vue';
-import { mdiMultimedia, mdiUpdate } from '@mdi/js';
+import { mdiAnimationPlayOutline, mdiMultimedia } from '@mdi/js';
 import { EpisodeQueryDto } from '@/api/interfaces/series.interface';
 import MediaOverview from '@/components/resource/MediaOverview.vue';
 import SeriesOverview from '@/components/resource/SeriesOverview.vue';

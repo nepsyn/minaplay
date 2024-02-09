@@ -14,24 +14,38 @@
         </template>
         <v-sheet v-if="series" border class="pa-6 rounded">
           <v-row>
-            <v-col cols="9" class="d-flex flex-column">
+            <v-col cols="12" sm="9" class="d-flex flex-column">
               <span class="text-h5 text-break">{{ series.name }}</span>
               <span v-if="series.season" class="text-body-2 text-medium-emphasis text-break">
                 {{ t('series.seasonLabel', { season: series.season }) }}
               </span>
               <v-row class="mt-1 flex-grow-0" dense>
                 <v-col cols="auto" v-for="(tag, index) in series.tags" :key="index">
-                  <v-chip color="primary" density="comfortable" label :text="tag.name"></v-chip>
+                  <v-chip color="primary" density="compact" label :text="tag.name"></v-chip>
                 </v-col>
               </v-row>
               <v-divider class="my-2"></v-divider>
-              <expandable-text
-                class="text-subtitle-1"
-                :content="series.description ?? t('resource.noDescription')"
-                style="min-height: 100px"
-              ></expandable-text>
+              <v-row>
+                <v-col cols="4" class="d-flex d-sm-none">
+                  <zoom-img
+                    class="rounded-lg"
+                    :aspect-ratio="1 / 1.4"
+                    :src="
+                      series.poster ? api.File.buildRawPath(series.poster.id, series.poster.name) : SeriesPosterFallback
+                    "
+                    :placeholder="SeriesPosterFallback"
+                  ></zoom-img>
+                </v-col>
+                <v-col cols="8" sm="12">
+                  <expandable-text
+                    class="text-subtitle-1"
+                    :content="series.description ?? t('resource.noDescription')"
+                    style="min-height: 100px"
+                  ></expandable-text>
+                </v-col>
+              </v-row>
             </v-col>
-            <v-col cols="3">
+            <v-col class="d-none d-sm-flex" cols="3">
               <zoom-img
                 class="rounded-lg"
                 :aspect-ratio="1 / 1.4"

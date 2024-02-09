@@ -1,5 +1,10 @@
 <template>
-  <v-bottom-sheet :fullscreen="layout.pluginConsoleFullscreen" v-model="layout.pluginConsoleSheet" min-height="75vh">
+  <v-bottom-sheet
+    :close-on-back="false"
+    :fullscreen="layout.pluginConsoleFullscreen"
+    v-model="layout.pluginConsoleSheet"
+    min-height="75vh"
+  >
     <v-layout>
       <v-system-bar>
         <v-icon :icon="mdiConsole" class="mr-2"></v-icon>
@@ -56,11 +61,9 @@
               <v-container fluid class="scrollable-container" ref="messageContainerRef" v-mutate.child="scrollToBottom">
                 <v-container class="d-block py-0">
                   <v-slide-x-reverse-transition group>
-                    <plugin-chat-message
-                      v-for="(message, index) in pluginConsole.messages"
-                      :message="message"
-                      :key="index"
-                    ></plugin-chat-message>
+                    <template v-for="(message, index) in pluginConsole.messages" :key="index">
+                      <plugin-chat-message v-if="canRender(message.messages)" :message="message"></plugin-chat-message>
+                    </template>
                   </v-slide-x-reverse-transition>
                   <div v-intersect="(isIntersecting: boolean) => (atBottom = isIntersecting)"></div>
                 </v-container>
@@ -88,7 +91,7 @@
                     })
                   "
                   auto-select-first
-                  :menu-props="!text ? { modelValue: false } : {}"
+                  :menu-props="!command ? { modelValue: false } : {}"
                   autofocus
                   :return-object="false"
                   variant="outlined"
@@ -98,9 +101,9 @@
                   :append-inner-icon="mdiSendVariant"
                   :loading="chatSending"
                   @keydown.tab.prevent
-                  @keydown.enter.prevent="text && sendChat({ type: 'Text', content: text })"
-                  @click:append-inner="text && sendChat({ type: 'Text', content: text })"
-                  v-model="text"
+                  @keydown.enter.prevent="command && sendChat({ type: 'Text', content: command })"
+                  @click:append-inner="command && sendChat({ type: 'Text', content: command })"
+                  v-model="command"
                 >
                 </v-combobox>
               </v-container>
@@ -132,14 +135,18 @@ import { TimeoutError } from '@/composables/use-socket-io-connection';
 import { useToastStore } from '@/store/toast';
 import PluginChatMessage from '@/components/plugin/PluginChatMessage.vue';
 import { useLayoutStore } from '@/store/layout';
+import { MinaPlayMessage } from '@/api/interfaces/message.interface';
 
 const { t } = useI18n();
 const layout = useLayoutStore();
 const pluginConsole = usePluginConsoleStore();
 const toast = useToastStore();
 
-const text = ref<string | undefined>(undefined);
+const command = ref<string | undefined>(undefined);
 const programs = ref<PluginCommandDescriptor[]>([]);
+
+const canRender = (messages: MinaPlayMessage[]) =>
+  messages.some(({ type }) => ['Text', 'NetworkImage', 'Base64Image', 'ActionGroup'].includes(type));
 
 const {
   request: loadPrograms,
@@ -165,11 +172,11 @@ const {
   onRejected: onChatSendFailed,
 } = pluginConsole.sendTask;
 onChatSent(() => {
-  text.value = undefined;
+  command.value = undefined;
   scrollToBottom();
 });
 onChatSendFailed((error: any) => {
-  text.value = undefined;
+  command.value = undefined;
   toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
 });
 
@@ -179,7 +186,7 @@ const scrollToBottom = () => {
   setTimeout(() => {
     if (messageContainerRef.value) {
       const el = messageContainerRef.value.$el;
-      el.scrollTo({ top: el.scrollHeight });
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
     }
   }, 50);
 };

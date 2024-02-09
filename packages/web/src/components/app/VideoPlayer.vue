@@ -309,18 +309,18 @@ const initLive = (url: string) => {
       });
       livePlayer.attachMediaElement(videoRef.value);
       livePlayer.load();
-      player?.play();
+      player.value?.play();
     } else if (pathname.endsWith('.m3u8')) {
       livePlayer = new Hls();
       livePlayer.loadSource(url);
       livePlayer.attachMedia(videoRef.value);
-      player?.play();
+      player.value?.play();
     }
   }
 };
 const loadResource = () => {
-  if (player) {
-    player.stop();
+  if (player.value) {
+    player.value.stop();
     if (livePlayer) {
       livePlayer.destroy();
       livePlayer = undefined;
@@ -373,7 +373,7 @@ const fontFiles = computed(
 
 const videoRef = ref<HTMLVideoElement | undefined>(undefined);
 const controlsRef = ref<HTMLElement | undefined>(undefined);
-let player: Plyr | undefined = undefined;
+const player = shallowRef<Plyr | undefined>(undefined);
 let livePlayer: MpegTs.Player | Hls | undefined = undefined;
 let danmakuPlayer: DanmuJs | undefined = undefined;
 let renderer = shallowRef<JASSUB | undefined>(undefined);
@@ -399,7 +399,7 @@ const renderSubtitle = (index: number) => {
 };
 onMounted(async () => {
   if (videoRef.value) {
-    player = new Plyr(videoRef.value, {
+    player.value = new Plyr(videoRef.value, {
       controls: controlsRef.value,
       autoplay: true,
       ratio: props.ratio,
@@ -408,19 +408,14 @@ onMounted(async () => {
         global: true,
       },
     });
-    player.on('exitfullscreen', () => {
-      if (player) {
-        pageFullscreen.value = false;
-      }
+    player.value.on('exitfullscreen', () => {
+      pageFullscreen.value = false;
     });
-    player.on('pause', () => {
+    player.value.on('pause', () => {
       danmakuPlayer?.pause();
     });
-    player.on('play', () => {
+    player.value.on('play', () => {
       danmakuPlayer?.play();
-    });
-    player.on('progress', () => {
-      emits('progress', player?.currentTime);
     });
 
     loadResource();
@@ -431,7 +426,7 @@ onMounted(async () => {
 
     const danmakuEl = document.createElement('div');
     danmakuEl.className = 'danmaku-container';
-    player.elements.container?.appendChild(danmakuEl);
+    player.value?.elements.container?.appendChild(danmakuEl);
     danmakuPlayer = new DanmuJs({
       container: danmakuEl,
       channelSize: 40,
@@ -448,8 +443,8 @@ onUnmounted(() => {
   if (danmakuPlayer) {
     danmakuPlayer.destroy();
   }
-  if (player) {
-    player.destroy();
+  if (player.value) {
+    player.value.destroy();
   }
 });
 
@@ -457,11 +452,11 @@ const pageFullscreen = ref(false);
 watch(
   () => pageFullscreen.value,
   (value) => {
-    if (player) {
+    if (player.value) {
       if (value) {
-        player.elements.container?.classList.add('page-fullscreen');
+        player.value.elements.container?.classList.add('page-fullscreen');
       } else {
-        player.elements.container?.classList.remove('page-fullscreen');
+        player.value.elements.container?.classList.remove('page-fullscreen');
       }
     }
   },
@@ -511,10 +506,6 @@ defineExpose({
   emitDanmaku,
   player,
 });
-
-const emits = defineEmits<{
-  (ev: 'progress', progress?: number): any;
-}>();
 </script>
 
 <style lang="sass">

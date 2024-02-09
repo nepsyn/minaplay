@@ -1,9 +1,3 @@
-<script setup lang="ts">
-import { useToastStore } from '@/store/toast';
-
-const toast = useToastStore();
-</script>
-
 <template>
   <v-layout-item
     class="d-flex flex-column justify-end pointer-events-none"
@@ -29,6 +23,12 @@ const toast = useToastStore();
     </v-container>
   </v-layout-item>
 </template>
+
+<script setup lang="ts">
+import { useToastStore } from '@/store/toast';
+
+const toast = useToastStore();
+</script>
 
 <style scoped lang="sass">
 ::v-deep(.v-alert__prepend)

@@ -9,13 +9,7 @@ export interface AppMessage {
 }
 
 export const useToastStore = defineStore('toast', () => {
-  const counter = (function* () {
-    let counter = 0;
-    while (true) {
-      yield counter;
-      counter = (counter + 1) % 1024;
-    }
-  })();
+  let counter = 0;
   const messages = ref<AppMessage[]>([]);
   const closeToast = (id: number) => {
     messages.value = messages.value.filter((v) => v.id !== id);
@@ -26,7 +20,7 @@ export const useToastStore = defineStore('toast', () => {
     timeout: number = 3000,
   ) => {
     const message = {
-      id: counter.next().value,
+      id: counter++,
       content,
       type,
       timeout,
@@ -35,7 +29,7 @@ export const useToastStore = defineStore('toast', () => {
     if (timeout > 0) {
       setTimeout(() => {
         closeToast(message.id);
-      }, message.timeout);
+      }, timeout);
     }
   };
   const toastSuccess = (content: string, timeout?: number) => toast(content, 'success', timeout);

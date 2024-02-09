@@ -52,5 +52,5 @@ export interface ViewHistoryEntity {
 
 export interface ViewHistoryDto {
   progress?: number;
-  episodeId?: number;
+  episodeId?: number | null;
 }

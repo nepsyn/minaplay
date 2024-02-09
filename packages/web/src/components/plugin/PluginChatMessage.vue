@@ -1,5 +1,5 @@
 <template>
-  <div v-if="canRender" class="d-flex flex-column mb-6">
+  <div class="d-flex flex-column mb-6">
     <div class="d-flex flex-row">
       <template v-if="message.from === 'plugin' && message.control">
         <v-avatar size="small" color="info">{{ message.control.id.slice(0, 2) }}</v-avatar>
@@ -47,7 +47,7 @@ import { MinaPlayPluginMessage } from '@/api/interfaces/plugin.interface';
 import ZoomImg from '@/components/app/ZoomImg.vue';
 import UserAvatar from '@/components/user/UserAvatar.vue';
 import { useApiStore } from '@/store/api';
-import { computed, onMounted } from 'vue';
+import { onMounted } from 'vue';
 import { TimeoutError } from '@/composables/use-socket-io-connection';
 import { usePluginConsoleStore } from '@/store/plugin-console';
 import { useI18n } from 'vue-i18n';
@@ -58,10 +58,6 @@ const { t } = useI18n();
 const api = useApiStore();
 const pluginConsole = usePluginConsoleStore();
 const toast = useToastStore();
-
-const canRender = computed(() =>
-  props.message.messages.some(({ type }) => ['Text', 'NetworkImage', 'Base64Image', 'ActionGroup'].includes(type)),
-);
 
 const sendFeedback = async (group: MinaPlayActionGroup, feedback: MinaPlayFeedback) => {
   pluginConsole.messages.push({

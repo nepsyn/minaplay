@@ -13,37 +13,23 @@ export class ApplicationGatewayExceptionFilter extends BaseWsExceptionFilter {
     const syncId: number = host.switchToWs().getData().sync;
     if (exception instanceof WsException) {
       const error = exception.getError();
-      if (typeof error === 'object' && 'code' in error) {
-        socket.emit('exception', {
-          sync: syncId,
-          ...error,
-        });
-      } else {
-        socket.emit('exception', {
-          sync: syncId,
-          code: ErrorCodeEnum.UNKNOWN_ERROR,
-          message: exception.message,
-        });
-      }
+      socket.emit('exception', {
+        sync: syncId,
+        code: error?.['code'] ?? ErrorCodeEnum.UNKNOWN_ERROR,
+        message: error?.['message'] ?? exception.message,
+      });
     } else if (exception instanceof HttpException) {
       const error = exception.getResponse();
-      if (typeof error === 'object' && 'code' in error) {
-        socket.emit('exception', {
-          sync: syncId,
-          ...error,
-        });
-      } else {
-        socket.emit('exception', {
-          sync: syncId,
-          code: ErrorCodeEnum.UNKNOWN_ERROR,
-          message: exception.message,
-        });
-      }
+      socket.emit('exception', {
+        sync: syncId,
+        code: error?.['code'] ?? ErrorCodeEnum.UNKNOWN_ERROR,
+        message: error?.['message'] ?? exception.message,
+      });
     } else {
       socket.emit('exception', {
         sync: syncId,
-        code: ErrorCodeEnum.INTERNAL_SERVER_ERROR,
-        message: 'INTERNAL SERVER ERROR',
+        code: exception?.['status'] ?? ErrorCodeEnum.INTERNAL_SERVER_ERROR,
+        message: exception?.['message'] ?? 'INTERNAL SERVER ERROR',
       });
       this.logger.error(exception.message, exception.stack, ApplicationGatewayExceptionFilter.name);
     }

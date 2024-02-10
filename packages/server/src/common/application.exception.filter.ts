@@ -13,25 +13,19 @@ export class ApplicationExceptionFilter extends BaseExceptionFilter {
     const response = host.switchToHttp().getResponse<Response>();
 
     if (exception instanceof HttpException) {
-      response.status(exception.getStatus());
-
       const data = exception.getResponse();
-      if (typeof data === 'object' && 'code' in data) {
-        response.json(exception.getResponse());
-      } else {
-        response.json({
-          code: ErrorCodeEnum.UNKNOWN_ERROR,
-          message: exception.message,
-        });
-      }
+      response.status(exception.getStatus()).json({
+        code: data?.['code'] ?? ErrorCodeEnum.UNKNOWN_ERROR,
+        message: data?.['message'] ?? exception.message,
+      });
     } else if (exception instanceof QueryFailedError) {
-      response.status(400).json({
+      response.status(500).json({
         code: ErrorCodeEnum.QUERY_FAILED,
         message: 'QUERY FAILED',
       });
       this.logger.error(exception.message, exception.stack, ApplicationExceptionFilter.name);
     } else {
-      response.status(500).json({
+      response.status(exception?.['statusCode'] ?? exception?.['status'] ?? 500).json({
         code: ErrorCodeEnum.INTERNAL_SERVER_ERROR,
         message: 'INTERNAL SERVER ERROR',
       });

@@ -125,7 +125,7 @@
     </v-list>
   </v-navigation-drawer>
 
-  <plugin-console></plugin-console>
+  <plugin-console v-if="api.hasPermission(PermissionEnum.ROOT_OP)"></plugin-console>
 
   <v-main>
     <authed-router-view match="^/[^/]+$" />

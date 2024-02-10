@@ -9,7 +9,8 @@
         :loader="updatesLoader"
         class="px-0 py-4"
         :hide-empty="updates.length > 0"
-        :auto="updates.length < 12"
+        hide-load-more
+        :auto="updates.length < 18"
       >
         <v-row :dense="display.mdAndDown.value">
           <v-col v-for="episode in updates" :key="episode.id" cols="4" sm="3" md="2">
@@ -78,7 +79,7 @@ const updatesLoader = useAxiosPageLoader(
       order: 'DESC',
     });
   },
-  { page: 0, size: 12 },
+  { page: 0, size: 18 },
 );
 const updates = computed(() =>
   updatesLoader.items.value.filter(

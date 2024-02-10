@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { useSocketIOConnection } from '@/composables/use-socket-io-connection';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { useApiStore } from '@/store/api';
 import { MinaPlayPluginMessage, PluginControl, PluginEventMap } from '@/api/interfaces/plugin.interface';
 import { MinaPlayMessage } from '@/api/interfaces/message.interface';
@@ -14,45 +14,60 @@ export const usePluginConsoleStore = defineStore('plugin-console', () => {
   const connected = ref(false);
   const error = ref<Error | undefined>(undefined);
 
-  const client = useSocketIOConnection<PluginEventMap>(api.Plugin.socketPath, {
-    extraHeaders: {
-      Authorization: api.getToken() as string,
-    },
-    reconnectionAttempts: 5,
-    reconnectionDelay: 5000,
-    autoConnect: false,
-  });
-  client.socket.on('connect', () => {
-    connected.value = true;
-    connecting.value = false;
-  });
-  client.socket.on('disconnect', () => {
-    connected.value = false;
-    connecting.value = false;
-  });
-  client.socket.on('connect_error', (e: Error) => {
-    error.value = e;
-    connecting.value = false;
-  });
-  client.socket.on('console', (message: { plugin: PluginControl; messages: MinaPlayMessage[] }) => {
-    messages.value.push({
-      from: 'plugin',
-      control: message.plugin,
-      messages: message.messages,
+  const initClient = () => {
+    const client = useSocketIOConnection<PluginEventMap>(api.Plugin.socketPath, {
+      extraHeaders: {
+        Authorization: api.getToken() as string,
+      },
+      reconnectionAttempts: 5,
+      reconnectionDelay: 5000,
+      autoConnect: false,
     });
-  });
-
+    client.socket.on('connect', () => {
+      connected.value = true;
+      connecting.value = false;
+    });
+    client.socket.on('disconnect', () => {
+      connected.value = false;
+      connecting.value = false;
+    });
+    client.socket.on('connect_error', (e: Error) => {
+      error.value = e;
+      connecting.value = false;
+    });
+    client.socket.on('console', (message: { plugin: PluginControl; messages: MinaPlayMessage[] }) => {
+      messages.value.push({
+        from: 'plugin',
+        control: message.plugin,
+        messages: message.messages,
+      });
+    });
+    return client;
+  };
+  let _client: ReturnType<typeof useSocketIOConnection<PluginEventMap>> = initClient();
   const connect = () => {
     error.value = undefined;
+    connected.value = false;
     connecting.value = true;
-    client.socket.connect();
+    _client.socket.connect();
   };
+  watch(
+    () => api.getToken(),
+    () => {
+      if (_client) {
+        _client.socket.disconnect();
+      }
+      _client = initClient();
+      connect();
+    },
+  );
+
   const sendTask = useAsyncTask(async (message: MinaPlayMessage) => {
     messages.value.push({
       from: 'user',
       messages: [message],
     });
-    return await client.request('console', { message });
+    return await _client.request('console', { message });
   });
 
   return {
@@ -60,7 +75,9 @@ export const usePluginConsoleStore = defineStore('plugin-console', () => {
     connecting,
     connected,
     error,
-    client,
+    get client() {
+      return _client;
+    },
     connect,
     sendTask,
   };

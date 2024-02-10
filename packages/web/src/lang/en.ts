@@ -202,7 +202,6 @@ export default {
       password: 'Password',
       permissions: 'User Permissions',
       avatar: 'Avatar',
-      email: 'Email',
       notify: 'Notify Enabled',
       createAt: 'Create At',
     },

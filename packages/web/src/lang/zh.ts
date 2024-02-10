@@ -203,7 +203,6 @@ const zh: MessageSchema = {
       password: '密码',
       permissions: '用户权限',
       avatar: '头像',
-      email: '邮箱地址',
       notify: '是否启用通知',
       createAt: '创建时间',
     },

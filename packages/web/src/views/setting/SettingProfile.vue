@@ -18,7 +18,7 @@
             color="primary"
             variant="outlined"
             :prepend-icon="mdiUpload"
-            :loading="avatarUploading || profileUpdating"
+            :loading="avatarUploading || avatarUpdating"
             @click="selectAndUploadAvatar()"
           >
             {{ t('settings.profile.uploadAvatar') }}
@@ -40,8 +40,8 @@
           density="comfortable"
           color="primary"
           v-model="api.user!.notify"
-          :loading="profileUpdating"
-          @update:model-value="updateProfile({ notify: api.user?.notify })"
+          :loading="notifyUpdating"
+          @update:model-value="updateNotify({ notify: api.user?.notify })"
         ></v-switch>
       </v-container>
     </v-sheet>
@@ -64,13 +64,13 @@ import { selectFile } from '@/utils/utils';
 import { TimeoutError } from '@/composables/use-socket-io-connection';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import axios from 'axios';
+import { useAsyncTask } from '@/composables/use-async-task';
 
 const { t } = useI18n();
 const api = useApiStore();
 const toast = useToastStore();
 
 const {
-  pending: profileUpdating,
   request: updateProfile,
   onResolved: onProfileUpdated,
   onRejected: onProfileUpdateFailed,
@@ -83,6 +83,8 @@ onProfileUpdated((profile) => {
 onProfileUpdateFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
+
+const { pending: avatarUpdating, request: updateAvatar } = useAsyncTask(updateProfile);
 const avatarUploading = ref(false);
 const selectAndUploadAvatar = async () => {
   selectFile('image/*', false, async (files) => {
@@ -95,7 +97,7 @@ const selectAndUploadAvatar = async () => {
       }, 5000);
       try {
         const uploadFile = await api.File.uploadImage(file, undefined, controller.signal);
-        await updateProfile({ avatarFileId: uploadFile.data.id });
+        await updateAvatar({ avatarFileId: uploadFile.data.id });
       } catch (error: any) {
         if (error instanceof TimeoutError) {
           toast.toastError(t(`error.${ErrorCodeEnum.TIMEOUT}`));
@@ -111,6 +113,8 @@ const selectAndUploadAvatar = async () => {
     }
   });
 };
+
+const { pending: notifyUpdating, request: updateNotify } = useAsyncTask(updateProfile);
 </script>
 
 <style scoped lang="sass"></style>

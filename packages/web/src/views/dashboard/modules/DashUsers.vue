@@ -306,11 +306,6 @@ const headers = ref([
     sortable: false,
   },
   {
-    title: t('user.entity.email'),
-    key: 'email',
-    sortable: false,
-  },
-  {
     title: t('user.entity.notify'),
     key: 'notify',
   },

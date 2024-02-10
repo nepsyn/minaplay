@@ -26,7 +26,7 @@
               </v-row>
               <v-divider class="my-2"></v-divider>
               <v-row>
-                <v-col cols="4" class="d-flex d-sm-none">
+                <v-col cols="4" class="d-block d-sm-none">
                   <zoom-img
                     class="rounded-lg"
                     :aspect-ratio="1 / 1.4"

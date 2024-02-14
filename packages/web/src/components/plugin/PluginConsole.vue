@@ -62,7 +62,10 @@
                 <v-container class="d-block py-0">
                   <v-slide-x-reverse-transition group>
                     <template v-for="(message, index) in pluginConsole.messages" :key="index">
-                      <plugin-chat-message v-if="canRender(message.messages)" :message="message"></plugin-chat-message>
+                      <plugin-chat-message
+                        v-if="message.messages.filter(canRender).length > 0"
+                        :message="message"
+                      ></plugin-chat-message>
                     </template>
                   </v-slide-x-reverse-transition>
                   <div v-intersect="(isIntersecting: boolean) => (atBottom = isIntersecting)"></div>
@@ -135,7 +138,7 @@ import { TimeoutError } from '@/composables/use-socket-io-connection';
 import { useToastStore } from '@/store/toast';
 import PluginChatMessage from '@/components/plugin/PluginChatMessage.vue';
 import { useLayoutStore } from '@/store/layout';
-import { MinaPlayMessage } from '@/api/interfaces/message.interface';
+import { canRender } from '@/utils/utils';
 
 const { t } = useI18n();
 const layout = useLayoutStore();
@@ -144,9 +147,6 @@ const toast = useToastStore();
 
 const command = ref<string | undefined>(undefined);
 const programs = ref<PluginCommandDescriptor[]>([]);
-
-const canRender = (messages: MinaPlayMessage[]) =>
-  messages.some(({ type }) => ['Text', 'NetworkImage', 'Base64Image', 'ActionGroup'].includes(type));
 
 const {
   request: loadPrograms,
@@ -203,7 +203,7 @@ onMounted(async () => {
         messages: [
           {
             type: 'Text',
-            color: '#4671D5',
+            color: '#0288d1',
             content: t('plugin.welcome'),
           },
         ],

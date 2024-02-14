@@ -144,11 +144,13 @@ export default {
   resource: {
     seriesUpdates: 'Series Updates',
     mediaUpdates: 'Media Updates',
+    histories: 'Histories',
     medias: 'Medias',
     series: 'Series',
     episodes: 'Episodes',
     information: 'Info',
     noDescription: 'No Description',
+    continuePlay: 'Positioned to the last playback location',
     episode: {
       next: 'Next',
       previous: 'Prev',

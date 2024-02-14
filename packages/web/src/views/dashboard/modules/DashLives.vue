@@ -2,7 +2,7 @@
   <v-container class="d-flex flex-column pa-md-12">
     <v-row dense>
       <v-col cols="auto">
-        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus">
+        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus" :loading="creating" @click="createLive">
           {{ t('app.actions.add') }}
         </v-btn>
       </v-col>
@@ -216,6 +216,23 @@ onLiveClosed(async () => {
   deleteDialog.value = false;
 });
 onLiveCloseFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const {
+  pending: creating,
+  request: createLive,
+  onResolved: onCreated,
+  onRejected: onCreateFailed,
+} = useAxiosRequest(async () => {
+  return await api.Live.create({
+    title: t('live.unnamed'),
+  });
+});
+onCreated(async (data) => {
+  await router.push({ path: `/live/${data.id}` });
+});
+onCreateFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 

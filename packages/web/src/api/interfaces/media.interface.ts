@@ -18,6 +18,8 @@ export interface MediaEntity {
   file?: FileEntity;
   /** 字幕文件 */
   subtitles: FileEntity[];
+  /** duration */
+  duration?: number;
   /** 附件 */
   attachments: FileEntity[];
   /** 创建时间 */

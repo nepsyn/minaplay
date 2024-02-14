@@ -247,8 +247,8 @@ export const useApiStore = defineStore('api', () => {
   };
 
   const ViewHistory = {
-    getAll: apiGet<ApiQueryResult<ViewHistoryEntity>>('/api/v1/media/history'),
-    deleteAll: apiDelete('/api/v1/media/history'),
+    query: apiGet<ApiQueryResult<ViewHistoryEntity>>('/api/v1/media/history'),
+    clear: apiDelete('/api/v1/media/history'),
   };
 
   const System = {

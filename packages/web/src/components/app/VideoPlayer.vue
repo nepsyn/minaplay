@@ -281,6 +281,7 @@ const api = useApiStore();
 const props = withDefaults(
   defineProps<{
     media?: MediaEntity;
+    duration?: number;
     live?: boolean;
     stream?: LiveStream;
     ratio?: string;
@@ -407,6 +408,11 @@ onMounted(async () => {
       keyboard: {
         global: true,
       },
+    });
+    player.value.once('canplay', () => {
+      if (props.duration != null && player.value) {
+        player.value.currentTime = props.duration / 1000;
+      }
     });
     player.value.on('exitfullscreen', () => {
       pageFullscreen.value = false;

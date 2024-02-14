@@ -5,7 +5,7 @@
         <v-col cols="12" md="8">
           <single-item-loader class="pa-0" :loader="isMedia ? mediaLoader : currentEpisodeLoader">
             <v-responsive class="rounded-lg" :aspect-ratio="16 / 9" max-height="520">
-              <video-player ref="playerRef" :media="media!"></video-player>
+              <video-player ref="playerRef" :duration="duration" :media="media!"></video-player>
             </v-responsive>
             <v-container fluid class="pa-0 mt-4 d-flex flex-column">
               <span v-if="isMedia" class="text-h6 text-wrap">{{ media!.name }}</span>
@@ -160,7 +160,7 @@
                   <span class="text-medium-emphasis"> {{ t('app.loader.empty') }} </span>
                 </v-container>
               </template>
-              <v-row>
+              <v-row dense>
                 <v-col v-for="item in series" :key="item.id" cols="4">
                   <series-overview
                     @click="router.push({ path: `/series/${item.id}` })"
@@ -285,6 +285,20 @@ const series = computed(() => {
 });
 
 const playerRef = ref<typeof VideoPlayer | undefined>(undefined);
+const duration = ref<number | undefined>(undefined);
+const onResourceReady = async () => {
+  try {
+    if (media.value) {
+      const { data } = await api.Media.findHistory(media.value.id)();
+      if (data.progress) {
+        duration.value = data.progress;
+        toast.toastSuccess(t('resource.continuePlay'));
+      }
+    }
+  } catch {}
+};
+mediaLoader.onResolved(onResourceReady);
+currentEpisodeLoader.onResolved(onResourceReady);
 onBeforeRouteLeave(async () => {
   try {
     const progress = playerRef.value?.player?.currentTime;

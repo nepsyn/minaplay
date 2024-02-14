@@ -61,13 +61,15 @@
           </tr>
         </template>
         <template #item.poster="{ item }">
-          <zoom-img
-            class="rounded ma-1"
-            :aspect-ratio="16 / 9"
-            min-width="120"
-            max-width="160"
-            :src="item.poster ? api.File.buildRawPath(item.poster.id, item.poster.name) : MediaPosterFallback"
-          ></zoom-img>
+          <div class="d-block">
+            <zoom-img
+              class="rounded ma-1"
+              :aspect-ratio="16 / 9"
+              min-width="120"
+              max-width="160"
+              :src="item.poster ? api.File.buildRawPath(item.poster.id, item.poster.name) : MediaPosterFallback"
+            ></zoom-img>
+          </div>
         </template>
         <template #item.isPublic="{ item }">
           <v-icon size="small" :icon="item.isPublic ? mdiCheck : mdiClose"></v-icon>

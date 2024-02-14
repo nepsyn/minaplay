@@ -3,7 +3,7 @@ import { useSocketIOConnection } from '@/composables/use-socket-io-connection';
 import { ref, watch } from 'vue';
 import { useApiStore } from '@/store/api';
 import { MinaPlayPluginMessage, PluginControl, PluginEventMap } from '@/api/interfaces/plugin.interface';
-import { MinaPlayMessage } from '@/api/interfaces/message.interface';
+import { MinaPlayConsumed, MinaPlayMessage } from '@/api/interfaces/message.interface';
 import { useAsyncTask } from '@/composables/use-async-task';
 
 export const usePluginConsoleStore = defineStore('plugin-console', () => {
@@ -36,6 +36,14 @@ export const usePluginConsoleStore = defineStore('plugin-console', () => {
       connecting.value = false;
     });
     client.socket.on('console', (message: { plugin: PluginControl; messages: MinaPlayMessage[] }) => {
+      for (const { id } of message.messages.filter(({ type }) => type === 'Consumed') as MinaPlayConsumed[]) {
+        for (const history of messages.value.filter(({ from }) => from === 'plugin')) {
+          history.messages = history.messages.filter(
+            (message) => message.type !== 'ConsumableGroup' || message.id !== id,
+          );
+        }
+      }
+
       messages.value.push({
         from: 'plugin',
         control: message.plugin,

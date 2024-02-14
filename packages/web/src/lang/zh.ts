@@ -145,11 +145,13 @@ const zh: MessageSchema = {
   resource: {
     seriesUpdates: '最新剧集',
     mediaUpdates: '最新媒体',
+    histories: '历史记录',
     medias: '媒体',
     series: '剧集',
     episodes: '单集',
     information: '信息',
     noDescription: '无描述内容',
+    continuePlay: '已定位到上次播放位置',
     episode: {
       next: '下集',
       previous: '上集',

@@ -14,28 +14,40 @@ export interface MinaPlayBase64Image {
   content: string;
 }
 
-export interface MinaPlayOption {
-  type: 'Option';
-  id: string;
+export interface MinaPlayAction {
+  type: 'Action';
+  value: string;
   text: MinaPlayText;
 }
 
-export interface MinaPlayActionGroup {
-  type: 'ActionGroup';
+export interface MinaPlayConsumableGroup {
+  type: 'ConsumableGroup';
   id: string;
-  options: MinaPlayOption[];
+  items: MinaPlayMessage[];
 }
 
-export interface MinaPlayFeedback {
-  type: 'Feedback';
-  groupId: string;
-  optionId: string;
+export interface MinaPlayConsumableFeedback {
+  type: 'ConsumableFeedback';
+  id: string;
+  value: string;
+}
+
+export interface MinaPlayConsumed {
+  type: 'Consumed';
+  id: string;
+}
+
+export interface MinaPlayTimeout {
+  type: 'Timeout';
+  ms: number;
 }
 
 export type MinaPlayMessage =
   | MinaPlayText
   | MinaPlayNetworkImage
   | MinaPlayBase64Image
-  | MinaPlayOption
-  | MinaPlayActionGroup
-  | MinaPlayFeedback;
+  | MinaPlayAction
+  | MinaPlayConsumableGroup
+  | MinaPlayConsumableFeedback
+  | MinaPlayConsumed
+  | MinaPlayTimeout;

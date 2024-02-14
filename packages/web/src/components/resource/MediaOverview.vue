@@ -1,15 +1,39 @@
 <template>
   <v-container fluid class="d-flex flex-column rounded-lg pa-0 cursor-pointer media-container">
-    <v-img
-      :aspect-ratio="16 / 9"
-      cover
-      :src="media.poster ? api.File.buildRawPath(media.poster.id, media.poster.name) : MediaPosterFallback"
-      class="media-img rounded-lg"
-    >
-      <template #placeholder>
-        <v-img :src="MediaPosterFallback" cover></v-img>
-      </template>
-    </v-img>
+    <div class="position-relative">
+      <v-img
+        :aspect-ratio="16 / 9"
+        cover
+        :src="media.poster ? api.File.buildRawPath(media.poster.id, media.poster.name) : MediaPosterFallback"
+        class="media-img rounded-lg"
+      >
+        <template #placeholder>
+          <v-img :src="MediaPosterFallback" cover></v-img>
+        </template>
+      </v-img>
+
+      <div
+        v-if="historyDuration && media.duration"
+        class="position-absolute d-flex align-end w-100 h-100 rounded-b-lg overflow-hidden progress-container"
+      >
+        <v-progress-linear
+          height="4"
+          color="primary-lighten-1"
+          :model-value="(historyDuration / 1000 / media.duration) * 100"
+        ></v-progress-linear>
+      </div>
+
+      <div
+        v-if="media.duration != null"
+        class="position-absolute text-caption font-weight-bold duration-container mb-3 mr-3 px-2 rounded"
+      >
+        <template v-if="historyDuration != null">
+          <span>{{ getDurationLabel(historyDuration / 1000) }}</span>
+          <span> / </span>
+        </template>
+        <span>{{ getDurationLabel(media.duration) }}</span>
+      </div>
+    </div>
 
     <span class="mt-2 px-1 media-title font-weight-bold" :title="media.name">
       {{ media.name || media.file?.name }}
@@ -35,7 +59,17 @@ const api = useApiStore();
 
 defineProps<{
   media: MediaEntity;
+  historyDuration?: number;
 }>();
+
+const getDurationLabel = (duration?: number) => {
+  if (duration == null) {
+    return '--:--';
+  }
+  const minutes = `${Math.floor(duration / 60)}`.padStart(2, '0');
+  const seconds = `${Math.floor(duration % 60)}`.padStart(2, '0');
+  return `${minutes}:${seconds}`;
+};
 </script>
 
 <style scoped lang="sass">
@@ -59,4 +93,13 @@ defineProps<{
 
 .media-container:hover .media-img
   box-shadow: 0 4px 10px #888888
+
+.progress-container
+  top: 0
+
+.duration-container
+  bottom: 0
+  right: 0
+  color: rgb(var(--v-theme-background))
+  background-color: rgb(var(--v-theme-on-background), 0.6)
 </style>

@@ -1,3 +1,5 @@
+import { MinaPlayMessage } from '@/api/interfaces/message.interface';
+
 export function openUrl(url: string) {
   const a = document.createElement('a');
   a.href = url;
@@ -56,4 +58,8 @@ export function selectFile(accept: string, multiple: boolean, onSelected: (files
 
 export function getFullUrl(uri: string) {
   return uri.startsWith('/') ? `${window.origin}${uri}` : uri;
+}
+
+export function canRender(message: MinaPlayMessage) {
+  return ['Text', 'NetworkImage', 'Base64Image', 'ConsumableGroup', 'Action', 'Timeout'].includes(message.type);
 }

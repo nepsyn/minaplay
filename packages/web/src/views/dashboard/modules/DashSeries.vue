@@ -64,13 +64,15 @@
           <v-icon size="small" :icon="item.finished ? mdiCheck : mdiClose"></v-icon>
         </template>
         <template #item.poster="{ item }">
-          <zoom-img
-            class="rounded ma-1"
-            :aspect-ratio="3 / 4"
-            min-width="60"
-            max-width="100"
-            :src="item.poster ? api.File.buildRawPath(item.poster.id, item.poster.name) : SeriesPosterFallback"
-          ></zoom-img>
+          <div class="d-block">
+            <zoom-img
+              class="rounded ma-1"
+              :aspect-ratio="3 / 4"
+              min-width="60"
+              max-width="100"
+              :src="item.poster ? api.File.buildRawPath(item.poster.id, item.poster.name) : SeriesPosterFallback"
+            ></zoom-img>
+          </div>
         </template>
         <template #item.actions="{ item }">
           <div class="d-flex justify-end">

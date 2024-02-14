@@ -74,30 +74,34 @@
         density="compact"
       >
         <template #item.series="{ item }">
-          <zoom-img
-            class="rounded ma-1"
-            :aspect-ratio="3 / 4"
-            min-width="60"
-            max-width="100"
-            :src="
-              item.series?.poster
-                ? api.File.buildRawPath(item.series.poster.id, item.series.poster.name)
-                : SeriesPosterFallback
-            "
-          ></zoom-img>
+          <div class="d-block">
+            <zoom-img
+              class="rounded ma-1"
+              :aspect-ratio="3 / 4"
+              min-width="60"
+              max-width="100"
+              :src="
+                item.series?.poster
+                  ? api.File.buildRawPath(item.series.poster.id, item.series.poster.name)
+                  : SeriesPosterFallback
+              "
+            ></zoom-img>
+          </div>
         </template>
         <template #item.media="{ item }">
-          <zoom-img
-            class="rounded ma-1"
-            :aspect-ratio="16 / 9"
-            min-width="120"
-            max-width="160"
-            :src="
-              item.media?.poster
-                ? api.File.buildRawPath(item.media.poster.id, item.media.poster.name)
-                : MediaPosterFallback
-            "
-          ></zoom-img>
+          <div class="d-block">
+            <zoom-img
+              class="rounded ma-1"
+              :aspect-ratio="16 / 9"
+              min-width="120"
+              max-width="160"
+              :src="
+                item.media?.poster
+                  ? api.File.buildRawPath(item.media.poster.id, item.media.poster.name)
+                  : MediaPosterFallback
+              "
+            ></zoom-img>
+          </div>
         </template>
         <template #item.actions="{ item }">
           <div class="d-flex justify-end">

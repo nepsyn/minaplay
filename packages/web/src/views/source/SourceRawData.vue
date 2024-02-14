@@ -144,8 +144,6 @@
                 density="comfortable"
                 :model-value="page"
                 @update:model-value="setPage"
-                @prev="prevPage"
-                @next="nextPage"
                 :length="pageCount"
               ></v-pagination>
             </template>

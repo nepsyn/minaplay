@@ -9,9 +9,10 @@ import {
   Relation,
   UpdateDateColumn,
 } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { File } from '../file/file.entity.js';
 import { DownloadItem } from '../subscribe/download/download-item.entity.js';
+import { MediaMetadata } from '../../interfaces/media.metadata.js';
 
 @Entity()
 export class Media {
@@ -60,6 +61,27 @@ export class Media {
     eager: true,
   })
   file?: Relation<File>;
+
+  /** Duration(s) */
+  @Expose()
+  get duration() {
+    try {
+      const metadata: MediaMetadata = JSON.parse(this.metadata);
+      const duration: string = metadata.streams?.[0]?.duration ?? metadata.streams?.[0]?.tags?.DURATION;
+      if (duration) {
+        const groups = duration.match(/^(\d+):(\d+):([\d.]+)$/);
+        if (groups) {
+          return Number(groups[1]) * 3600 + Number(groups[2]) * 60 + Number(groups[3]);
+        } else {
+          return Number(duration);
+        }
+      } else {
+        return undefined;
+      }
+    } catch {
+      return undefined;
+    }
+  }
 
   /** 元数据 */
   @Exclude()

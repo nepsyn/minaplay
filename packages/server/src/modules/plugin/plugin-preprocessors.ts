@@ -7,9 +7,10 @@ import {
   PROGRAM_TOKEN,
 } from './constants.js';
 import { Command, CommanderError } from 'commander';
-import { MinaPlayMessage, Text } from '../../common/application.message.js';
+import { MinaPlayMessage } from '../../common/application.message.js';
 import { ValueProvider } from '@nestjs/common';
 import { PluginChatContext } from './plugin-chat-context.js';
+import { Text } from '../../common/messages/text.js';
 
 export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePreprocessor {
   return {
@@ -83,7 +84,7 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
           if (['commander.help', 'commander.helpDisplayed'].includes(error.code)) {
             await context.send(new Text(metadata.program.helpInformation()));
           } else {
-            await context.send(new Text(error.message, '#B00020'));
+            await context.send(new Text(error.message, Text.Colors.ERROR));
           }
         }
 

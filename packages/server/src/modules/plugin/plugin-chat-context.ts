@@ -1,5 +1,5 @@
 import { PluginControl } from './plugin-control.js';
-import { MinaPlayMessage, Text } from '../../common/application.message.js';
+import { MinaPlayMessage } from '../../common/application.message.js';
 import { InjectionToken, RequestTimeoutException } from '@nestjs/common';
 import { isString } from 'class-validator';
 import { TypedEventEmitter } from '../../utils/typed-event-emitter.js';
@@ -12,6 +12,7 @@ import {
 } from './plugin.interface.js';
 import { User } from '../user/user.entity.js';
 import { MESSAGE_TOKEN, PROGRAM_ROOT_TOKEN } from './constants.js';
+import { Text } from '../../common/messages/text.js';
 
 export type PluginChatContextEventMap = {
   send: (messages: MinaPlayMessage[]) => any;

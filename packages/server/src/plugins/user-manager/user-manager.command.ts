@@ -14,7 +14,11 @@ import {
   MinaPlayPluginInject,
 } from '../../modules/plugin/plugin.decorator.js';
 import { PluginChatContext } from '../../modules/plugin/plugin-chat-context.js';
-import { ActionGroup, Option, Text } from '../../common/application.message.js';
+import { ConsumableGroup } from '../../common/messages/consumable-group.js';
+import { Action } from '../../common/messages/action.js';
+import { Text } from '../../common/messages/text.js';
+import { Consumed } from '../../common/messages/consumed.js';
+import { Timeout } from '../../common/messages/timeout.js';
 
 @Injectable()
 export class UserManagerCommand {
@@ -47,11 +51,11 @@ export class UserManagerCommand {
   ) {
     const sameNameUser = await this.userRepository.findOneBy({ username });
     if (sameNameUser) {
-      return `Duplicated username '${username}' in database.`;
+      return new Text(`Duplicated username '${username}' in database.`, Text.Colors.ERROR);
     }
 
     if (!isString(password) || password.length < 6 || password.length > 40) {
-      return `Password too short`;
+      return new Text(`Password too short`, Text.Colors.ERROR);
     }
 
     try {
@@ -63,10 +67,10 @@ export class UserManagerCommand {
         userId: id,
         name: PermissionEnum.ROOT_OP,
       });
-      return `Root user '${username}' added`;
+      return new Text(`Root user '${username}' added`, Text.Colors.SUCCESS);
     } catch (error) {
       this.logger.error(`Root user '${username}' add failed`, error.stack, UserManagerCommand.name);
-      return `Root user '${username}' add failed`;
+      return new Text(`Root user '${username}' add failed`, Text.Colors.WARNING);
     }
   }
 
@@ -82,33 +86,35 @@ export class UserManagerCommand {
   ) {
     const user = await this.userRepository.findOneBy({ username });
     if (!user) {
-      return `User '${username}' not found in database`;
+      return new Text(`User '${username}' not found in database`, Text.Colors.ERROR);
     }
 
     const groupId = Date.now().toString();
     await chat.send([
       new Text(`Are you sure to delete user '${username}' ? (Y/n)`),
-      new ActionGroup(groupId, [
-        new Option('yes', new Text('Yes', '#B00020')),
-        new Option('no', new Text('No')),
-        new Option('cancel', new Text('Cancel')),
+      new ConsumableGroup(groupId, [
+        new Consumed(groupId),
+        new Action('yes', new Text('Yes', Text.Colors.ERROR)),
+        new Action('no', new Text('No')),
+        new Action('cancel', new Text('Cancel')),
+        new Timeout(30000),
       ]),
     ]);
     try {
-      const resp = await chat.receive();
-      if (resp.type === 'Feedback' && resp.groupId === groupId && resp.optionId === 'yes') {
+      const resp = await chat.receive(30000);
+      if (resp.type === 'ConsumableFeedback' && resp.id === groupId && resp.value === 'yes') {
         try {
           await this.userRepository.delete({ username });
-          return `User '${username}' deleted`;
+          return [new Consumed(groupId), new Text(`User '${username}' deleted`)];
         } catch (error) {
           this.logger.error(`User '${username}' delete failed`, error.stack, UserManagerCommand.name);
-          return `User '${username}' delete failed`;
+          return [new Consumed(groupId), new Text(`User '${username}' delete failed`, Text.Colors.WARNING)];
         }
       } else {
-        return `User '${username}' delete canceled`;
+        return [new Consumed(groupId), new Text(`User '${username}' delete canceled`)];
       }
     } catch {
-      return `User '${username}' delete canceled`;
+      return [new Consumed(groupId), new Text(`User '${username}' delete canceled`)];
     }
   }
 }

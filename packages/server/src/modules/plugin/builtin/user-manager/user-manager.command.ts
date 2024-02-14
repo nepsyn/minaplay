@@ -79,7 +79,12 @@ export class UserManagerCommand {
     })
     username: string,
     @MinaPlayPluginInject() chat: PluginChatContext,
+    @MinaPlayPluginInject() operator: User,
   ) {
+    if (operator.username === username) {
+      return new Text(`Cannot delete the currently logged in user`, Text.Colors.ERROR);
+    }
+
     const user = await this.userRepository.findOneBy({ username });
     if (!user) {
       return new Text(`User '${username}' not found in database`, Text.Colors.ERROR);

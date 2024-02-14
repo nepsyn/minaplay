@@ -21,7 +21,7 @@ export class PluginService implements OnModuleInit {
   private controls: PluginControl[] = [];
   constructor(private lazyModuleLoader: LazyModuleLoader) {}
 
-  private async findPlugins(dir?: string) {
+  async findPlugins(dir?: string) {
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
     const base = dir ?? path.join(__dirname, './builtin');
     await fs.ensureDir(base);

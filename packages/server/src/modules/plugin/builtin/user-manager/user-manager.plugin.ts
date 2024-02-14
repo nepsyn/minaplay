@@ -1,8 +1,8 @@
-import { MinaPlayPlugin } from '../../modules/plugin/plugin.decorator.js';
-import { MINAPLAY_VERSION } from '../../constants.js';
+import { MinaPlayPlugin } from '../../plugin.decorator.js';
+import { MINAPLAY_VERSION } from '../../../../constants.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from '../../modules/user/user.entity.js';
-import { Permission } from '../../modules/authorization/permission.entity.js';
+import { User } from '../../../user/user.entity.js';
+import { Permission } from '../../../authorization/permission.entity.js';
 import { CreateDefaultRootUserService } from './create-default-root-user.service.js';
 import { UserManagerCommand } from './user-manager.command.js';
 

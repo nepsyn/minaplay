@@ -1,24 +1,20 @@
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../modules/user/user.entity.js';
-import { Permission } from '../../modules/authorization/permission.entity.js';
+import { User } from '../../../user/user.entity.js';
+import { Permission } from '../../../authorization/permission.entity.js';
 import { Repository } from 'typeorm';
 import { isString } from 'class-validator';
-import { encryptPassword } from '../../utils/encrypt-password.util.js';
-import { PermissionEnum } from '../../enums/permission.enum.js';
+import { encryptPassword } from '../../../../utils/encrypt-password.util.js';
+import { PermissionEnum } from '../../../../enums/permission.enum.js';
 import { Injectable } from '@nestjs/common';
-import { ApplicationLogger } from '../../common/application.logger.service.js';
+import { ApplicationLogger } from '../../../../common/application.logger.service.js';
 import { Command } from 'commander';
-import {
-  MinaPlayCommand,
-  MinaPlayCommandArgument,
-  MinaPlayPluginInject,
-} from '../../modules/plugin/plugin.decorator.js';
-import { PluginChatContext } from '../../modules/plugin/plugin-chat-context.js';
-import { ConsumableGroup } from '../../common/messages/consumable-group.js';
-import { Action } from '../../common/messages/action.js';
-import { Text } from '../../common/messages/text.js';
-import { Consumed } from '../../common/messages/consumed.js';
-import { Timeout } from '../../common/messages/timeout.js';
+import { MinaPlayCommand, MinaPlayCommandArgument, MinaPlayPluginInject } from '../../plugin.decorator.js';
+import { PluginChatContext } from '../../plugin-chat-context.js';
+import { ConsumableGroup } from '../../../../common/messages/consumable-group.js';
+import { Action } from '../../../../common/messages/action.js';
+import { Text } from '../../../../common/messages/text.js';
+import { Consumed } from '../../../../common/messages/consumed.js';
+import { Timeout } from '../../../../common/messages/timeout.js';
 
 @Injectable()
 export class UserManagerCommand {

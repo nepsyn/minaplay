@@ -12,6 +12,8 @@ import { MINAPLAY_COMMAND_METADATA, MINAPLAY_LISTENER_METADATA } from './constan
 import { Socket } from 'socket.io';
 import { PluginChatContext } from './plugin-chat-context.js';
 import { instanceToPlain } from 'class-transformer';
+import { register } from 'node:module';
+import { PLUGIN_DIR } from '../../constants.js';
 
 @Injectable()
 export class PluginService implements OnModuleInit {
@@ -21,14 +23,15 @@ export class PluginService implements OnModuleInit {
 
   private async findPlugins(dir?: string) {
     const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    const base = dir ?? path.join(__dirname, '../../plugins');
+    const base = dir ?? path.join(__dirname, './builtin');
     await fs.ensureDir(base);
 
     const files = fs
       .readdirSync(base, { withFileTypes: true })
-      .filter((file) => file.isDirectory())
-      .flatMap((dir) => fs.readdirSync(path.join(dir.path, dir.name), { withFileTypes: true }))
-      .filter((file) => file.isFile() && file.name.endsWith('.plugin.js'))
+      .flatMap((file) =>
+        file.isDirectory() ? fs.readdirSync(path.join(file.path, file.name), { withFileTypes: true }) : file,
+      )
+      .filter((file) => file.isFile() && (file.name.endsWith('.plugin.js') || file.name.endsWith('.plugin.mjs')))
       .map((file) => pathToFileURL(path.join(file.path, file.name)).href);
 
     const plugins: Type[] = [];
@@ -119,9 +122,21 @@ export class PluginService implements OnModuleInit {
     }
   }
 
+  registerImportMap() {
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    register(pathToFileURL(path.join(__dirname, './import-map-hooks.js')));
+  }
+
   async onModuleInit() {
-    const plugins = await this.findPlugins();
-    for (const plugin of plugins) {
+    this.registerImportMap();
+
+    // register built in plugins
+    for (const plugin of await this.findPlugins()) {
+      await this.registerPlugin(plugin);
+    }
+
+    // register plugins in data dir
+    for (const plugin of await this.findPlugins(PLUGIN_DIR)) {
       await this.registerPlugin(plugin);
     }
 

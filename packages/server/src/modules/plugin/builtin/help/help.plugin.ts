@@ -1,5 +1,5 @@
-import { MinaPlayPlugin } from '../../modules/plugin/plugin.decorator.js';
-import { MINAPLAY_VERSION } from '../../constants.js';
+import { MinaPlayPlugin } from '../../plugin.decorator.js';
+import { MINAPLAY_VERSION } from '../../../../constants.js';
 import { HelpCommand } from './help.command.js';
 
 @MinaPlayPlugin({

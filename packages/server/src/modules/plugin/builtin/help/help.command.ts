@@ -1,18 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { PluginService } from '../../modules/plugin/plugin.service.js';
+import { PluginService } from '../../plugin.service.js';
 import {
   MinaPlayChatMessage,
   MinaPlayCommand,
   MinaPlayCommandArgument,
   MinaPlayMessageListener,
-} from '../../modules/plugin/plugin.decorator.js';
-import { MessageIsType } from '../../modules/plugin/plugin-validators.js';
-import { PluginControl } from '../../modules/plugin/plugin-control.js';
-import { MinaPlayMessage } from '../../common/application.message.js';
-import { Text } from '../../common/messages/text.js';
-import { ConsumableGroup } from '../../common/messages/consumable-group.js';
-import { Action } from '../../common/messages/action.js';
-import { ConsumableFeedback } from '../../common/messages/consumable-feedback.js';
+} from '../../plugin.decorator.js';
+import { MessageIsType } from '../../plugin-validators.js';
+import { PluginControl } from '../../plugin-control.js';
+import { MinaPlayMessage } from '../../../../common/application.message.js';
+import { Text } from '../../../../common/messages/text.js';
+import { ConsumableGroup } from '../../../../common/messages/consumable-group.js';
+import { Action } from '../../../../common/messages/action.js';
+import { ConsumableFeedback } from '../../../../common/messages/consumable-feedback.js';
 import { Command } from 'commander';
 
 @Injectable()

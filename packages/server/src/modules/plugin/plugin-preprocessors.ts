@@ -34,7 +34,7 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
 
       // find handler Command node
       let metadata: MinaPlayCommandMetadata | undefined = undefined;
-      const argv = message.content.split(/\s+/);
+      const argv = message.content.trim().split(/\s+/);
       for (const arg of argv.concat()) {
         if (root.has(arg)) {
           metadata = root.get(arg);

@@ -14,7 +14,7 @@
     </v-btn>
   </template>
   <template v-else-if="message.type === 'Timeout'">
-    <v-progress-circular color="primary" :model-value="(ttl / props.message.ms) * 100">
+    <v-progress-circular color="primary" :model-value="(ttl / (props.message as MinaPlayTimeout).ms) * 100">
       {{ Math.round(ttl / 1000) }}
     </v-progress-circular>
   </template>
@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { MinaPlayMessage } from '@/api/interfaces/message.interface';
+import { MinaPlayMessage, MinaPlayTimeout } from '@/api/interfaces/message.interface';
 import ZoomImg from '@/components/app/ZoomImg.vue';
 import { TimeoutError } from '@/composables/use-socket-io-connection';
 import { usePluginConsoleStore } from '@/store/plugin-console';

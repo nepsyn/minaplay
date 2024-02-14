@@ -286,7 +286,9 @@ const series = computed(() => {
 
 const playerRef = ref<typeof VideoPlayer | undefined>(undefined);
 const duration = ref<number | undefined>(undefined);
+const watchTimeStart = ref(0);
 const onResourceReady = async () => {
+  watchTimeStart.value = Date.now();
   try {
     if (media.value) {
       const { data } = await api.Media.findHistory(media.value.id)();
@@ -300,13 +302,15 @@ const onResourceReady = async () => {
 mediaLoader.onResolved(onResourceReady);
 currentEpisodeLoader.onResolved(onResourceReady);
 onBeforeRouteLeave(async () => {
-  try {
-    const progress = playerRef.value?.player?.currentTime;
-    await api.Media.addHistory(media.value!.id)({
-      progress: progress && Math.round(progress * 1000),
-      episodeId: currentEpisode.value?.id ?? null,
-    });
-  } catch {}
+  if ((Date.now() - watchTimeStart.value) / 1000 >= 5) {
+    try {
+      const progress = playerRef.value?.player?.currentTime;
+      await api.Media.addHistory(media.value!.id)({
+        progress: progress && Math.round(progress * 1000),
+        episodeId: currentEpisode.value?.id ?? null,
+      });
+    } catch {}
+  }
 });
 
 const actions = [

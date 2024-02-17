@@ -8,6 +8,7 @@ import { Action } from './messages/action.js';
 import { Timeout } from './messages/timeout.js';
 import { ConsumableGroup } from './messages/consumable-group.js';
 import { ConsumableFeedback } from './messages/consumable-feedback.js';
+import { Pending } from './messages/pending.js';
 
 export const MinaPlayMessageMap = {
   Text,
@@ -18,6 +19,7 @@ export const MinaPlayMessageMap = {
   ConsumableGroup,
   ConsumableFeedback,
   Consumed,
+  Pending,
 };
 export type MinaPlayMessage =
   | Text
@@ -27,7 +29,8 @@ export type MinaPlayMessage =
   | Timeout
   | ConsumableGroup
   | ConsumableFeedback
-  | Consumed;
+  | Consumed
+  | Pending;
 export type MinaPlayMessageType = MinaPlayMessage['type'];
 
 /** 通过对象构造消息类型 */

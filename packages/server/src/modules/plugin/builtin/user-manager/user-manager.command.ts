@@ -8,7 +8,7 @@ import { PermissionEnum } from '../../../../enums/permission.enum.js';
 import { Injectable } from '@nestjs/common';
 import { ApplicationLogger } from '../../../../common/application.logger.service.js';
 import { Command } from 'commander';
-import { MinaPlayCommand, MinaPlayCommandArgument, MinaPlayPluginInject } from '../../plugin.decorator.js';
+import { MinaPlayCommand, MinaPlayCommandArgument, MinaPlayListenerInject } from '../../plugin.decorator.js';
 import { PluginChatContext } from '../../plugin-chat-context.js';
 import { ConsumableGroup } from '../../../../common/messages/consumable-group.js';
 import { Action } from '../../../../common/messages/action.js';
@@ -28,11 +28,12 @@ export class UserManagerCommand {
   @MinaPlayCommand('um', {
     description: 'manage users in MinaPlay',
   })
-  async handleUm(@MinaPlayPluginInject() program: Command) {
+  async handleUm(@MinaPlayListenerInject() program: Command) {
     return program.helpInformation();
   }
 
   @MinaPlayCommand('add-root', {
+    aliases: ['ar'],
     parents: ['um'],
   })
   async handleAddRootUser(
@@ -71,6 +72,7 @@ export class UserManagerCommand {
   }
 
   @MinaPlayCommand('delete', {
+    aliases: ['d'],
     parents: ['um'],
   })
   async handleDeleteUser(
@@ -78,8 +80,8 @@ export class UserManagerCommand {
       description: 'Username of this root user',
     })
     username: string,
-    @MinaPlayPluginInject() chat: PluginChatContext,
-    @MinaPlayPluginInject() operator: User,
+    @MinaPlayListenerInject() chat: PluginChatContext,
+    @MinaPlayListenerInject() operator: User,
   ) {
     if (operator.username === username) {
       return new Text(`Cannot delete the currently logged in user`, Text.Colors.ERROR);
@@ -94,7 +96,6 @@ export class UserManagerCommand {
     await chat.send([
       new Text(`Are you sure to delete user '${username}' ? (Y/n)`),
       new ConsumableGroup(groupId, [
-        new Consumed(groupId),
         new Action('yes', new Text('Yes', Text.Colors.ERROR)),
         new Action('no', new Text('No')),
         new Action('cancel', new Text('Cancel')),

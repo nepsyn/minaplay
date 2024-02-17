@@ -39,12 +39,12 @@ export class PluginChatContext extends TypedEventEmitter<PluginChatContextEventM
     container: Map<InjectionToken, any>,
   ) {
     const params = [];
-    for (const { index, token } of metadata.params) {
-      if (container.has(token)) {
-        params[index] = container.get(token);
+    for (const { index, param } of metadata.params) {
+      if (container.has(param)) {
+        params[index] = container.get(param);
       } else {
         try {
-          params[index] = this.control.module.get(token);
+          params[index] = this.control.module.get(param);
         } catch {
           this.logger.error(
             `Unable to resolve dependency type on ${metadata.type.name}#${String(metadata.key)} at index ${index}`,
@@ -63,13 +63,13 @@ export class PluginChatContext extends TypedEventEmitter<PluginChatContextEventM
     type: 'preprocessors' | 'validators',
   ) {
     const params = [];
-    const tokens: MinaPlayParamMetadata[] = (middleware.injects ?? []).map((value, index) => ({ index, token: value }));
-    for (const { index, token } of tokens) {
-      if (container.has(token)) {
-        params[index] = container.get(token);
+    const tokens: MinaPlayParamMetadata[] = (middleware.injects ?? []).map((value, index) => ({ index, param: value }));
+    for (const { index, param } of tokens) {
+      if (container.has(param)) {
+        params[index] = container.get(param);
       } else {
         try {
-          params[index] = this.control.module.get(token);
+          params[index] = this.control.module.get(param);
         } catch {
           this.logger.error(
             `Unable to resolve dependency type of ` +

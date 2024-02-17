@@ -20,13 +20,13 @@ import {
   MINAPLAY_LISTENER_METADATA,
   MINAPLAY_PLUGIN_ID_TOKEN,
   MINAPLAY_PLUGIN_METADATA,
-  PARAM_ARGS_METADATA,
 } from './constants.js';
 import { extendArrayMetadata } from '@nestjs/common/utils/extend-metadata.util.js';
 import { PluginCommandPreprocessor } from './plugin-preprocessors.js';
 import { PluginCommandValidator } from './plugin-validators.js';
 import { Argument, Command, Option } from 'commander';
 import { PluginRef } from './plugin-ref.js';
+import { SELF_DECLARED_DEPS_METADATA } from '@nestjs/common/constants.js';
 
 export function MinaPlayPlugin(metadata: MinaPlayPluginMetadata): ClassDecorator {
   return function (target: Function) {
@@ -63,7 +63,7 @@ export function MinaPlayMessageListener(options: MinaPlayMessageListenerOptions 
     }
 
     const paramsMetadata: MinaPlayParamMetadata[] =
-      Reflect.getMetadata(PARAM_ARGS_METADATA, target.constructor, propertyKey) ?? [];
+      Reflect.getMetadata(SELF_DECLARED_DEPS_METADATA, target.constructor, propertyKey) ?? [];
     extendArrayMetadata<MinaPlayMessageListenerMetadata[]>(
       MINAPLAY_LISTENER_METADATA,
       [
@@ -86,37 +86,51 @@ export function MinaPlayCommand(bin: string, options: MinaPlayCommandOptions = {
       throw new Error(`@${MinaPlayCommand.name} cannot apply on static method '${target.name}#${String(propertyKey)}'`);
     }
 
-    // create command instance
-    let program = new Command(bin);
-    program.aliases(options.aliases ?? []);
-    program.description(options.description);
-    program.configureOutput({
-      writeOut: () => undefined,
-      writeErr: () => undefined,
-    });
-    program.addHelpCommand(false);
-    program.exitOverride();
-    program = options.factory?.(program) ?? program;
-
-    // add options & arguments, merge parameters metadata
+    // get options & arguments metadata
     const argsMetadata: MinaPlayCommanderArgMetadata[] =
       Reflect.getMetadata(MINAPLAY_COMMAND_ARG_METADATA, target.constructor, propertyKey) ?? [];
     argsMetadata.sort((a, b) => a.index - b.index);
     const paramsMetadata: MinaPlayParamMetadata[] =
-      Reflect.getMetadata(PARAM_ARGS_METADATA, target.constructor, propertyKey) ?? [];
+      Reflect.getMetadata(SELF_DECLARED_DEPS_METADATA, target.constructor, propertyKey) ?? [];
+
+    // merge parameters metadata
     let argIndex = 0;
     for (const arg of argsMetadata) {
       if (arg.instance instanceof Argument) {
-        program.addArgument(arg.instance);
-        paramsMetadata.push({ index: arg.index, token: `${COMMAND_ARGUMENTS_TOKEN}:${argIndex++}` });
+        paramsMetadata.push({ index: arg.index, param: `${COMMAND_ARGUMENTS_TOKEN}:${argIndex++}` });
       } else if (arg.instance instanceof Option) {
-        program.addOption(arg.instance);
-        paramsMetadata.push({ index: arg.index, token: `${COMMAND_OPTIONS_TOKEN}:${arg.instance.attributeName()}` });
+        paramsMetadata.push({ index: arg.index, param: `${COMMAND_OPTIONS_TOKEN}:${arg.instance.attributeName()}` });
       }
     }
-    Reflect.defineMetadata(PARAM_ARGS_METADATA, paramsMetadata, target.constructor, propertyKey);
+    Reflect.defineMetadata(SELF_DECLARED_DEPS_METADATA, paramsMetadata, target.constructor, propertyKey);
+
+    const programFactory = () => {
+      // create command instance
+      let program = new Command(bin);
+      program.aliases(options.aliases ?? []);
+      program.description(options.description);
+      program.configureOutput({
+        writeOut: () => undefined,
+        writeErr: () => undefined,
+      });
+      program.helpCommand(false);
+      program.exitOverride();
+      program = options.factory?.(program) ?? program;
+
+      // add options & arguments
+      for (const arg of argsMetadata) {
+        if (arg.instance instanceof Argument) {
+          program.addArgument(arg.instance);
+        } else if (arg.instance instanceof Option) {
+          program.addOption(arg.instance);
+        }
+      }
+
+      return program;
+    };
 
     // decorate this handler by @MinaPlayMessageListener
+    const program = programFactory();
     Reflect.decorate(
       [
         MinaPlayMessageListener({
@@ -137,7 +151,7 @@ export function MinaPlayCommand(bin: string, options: MinaPlayCommandOptions = {
       Reflect.defineMetadata(MINAPLAY_COMMAND_METADATA, root, target.constructor);
     }
 
-    // find root command
+    // find parent command
     for (const route of options.parents ?? []) {
       if (!root.has(route)) {
         throw new Error(`No parent command found for '${bin}' in '${target.constructor.name}#${String(propertyKey)}'`);
@@ -145,13 +159,12 @@ export function MinaPlayCommand(bin: string, options: MinaPlayCommandOptions = {
       commandMetadata = root.get(route);
       root = root.get(route).subcommands;
     }
-    if (commandMetadata) {
-      commandMetadata.program.addCommand(program);
-    }
+    commandMetadata?.program?.addCommand(program);
 
     // insert this command to root command map
     const metadata: MinaPlayCommandMetadata = {
       program,
+      programFactory,
       subcommands: new Map(),
     };
     for (const name of [bin, ...(options.aliases ?? [])]) {
@@ -160,11 +173,11 @@ export function MinaPlayCommand(bin: string, options: MinaPlayCommandOptions = {
   };
 }
 
-export function MinaPlayPluginInject(token?: InjectionToken): ParameterDecorator {
+export function MinaPlayListenerInject(token?: InjectionToken): ParameterDecorator {
   return function (target, propertyKey, parameterIndex) {
     if (typeof target === 'function') {
       throw new Error(
-        `@${MinaPlayPluginInject.name} cannot apply on static method '${target.name}#${String(propertyKey)}'`,
+        `@${MinaPlayCommandOption.name} cannot apply on static method '${target.name}#${String(propertyKey)}'`,
       );
     }
 
@@ -177,10 +190,10 @@ export function MinaPlayPluginInject(token?: InjectionToken): ParameterDecorator
     }
 
     const paramsMetadata: MinaPlayParamMetadata[] =
-      Reflect.getMetadata(PARAM_ARGS_METADATA, target.constructor, propertyKey) ?? [];
+      Reflect.getMetadata(SELF_DECLARED_DEPS_METADATA, target.constructor, propertyKey) ?? [];
     Reflect.defineMetadata(
-      PARAM_ARGS_METADATA,
-      [...paramsMetadata, { index: parameterIndex, token: type }],
+      SELF_DECLARED_DEPS_METADATA,
+      [...paramsMetadata, { index: parameterIndex, param: type }],
       target.constructor,
       propertyKey,
     );
@@ -243,5 +256,5 @@ export function MinaPlayCommandArgument(arg: string, options: MinaPlayCommandArg
 }
 
 export function MinaPlayChatMessage(): ParameterDecorator {
-  return MinaPlayPluginInject(MESSAGE_TOKEN);
+  return MinaPlayListenerInject(MESSAGE_TOKEN);
 }

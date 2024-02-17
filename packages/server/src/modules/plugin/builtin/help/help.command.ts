@@ -43,8 +43,7 @@ export class HelpCommand {
     if (pagedPrograms.length > 0) {
       messages.push(
         ...pagedPrograms.map(
-          ({ bin, control, description }) =>
-            new Text(`${bin.padEnd(20, ' ')}[plugin:${control.id}] - ${description}\n`),
+          ({ bin, control, description }) => new Text(`${bin.padEnd(20, ' ')}[${control.id}] - ${description}\n`),
         ),
       );
     } else {
@@ -72,7 +71,7 @@ export class HelpCommand {
       if (programs.length > 0) {
         return programs.map(
           ({ bin, control, program, description }) =>
-            new Text(`${bin.padEnd(20, ' ')}[from:${control.id}] - ${description}\n${program.helpInformation()}`),
+            new Text(`${bin.padEnd(20, ' ')}[${control.id}] - ${description}\n${program.helpInformation()}`),
         );
       } else {
         return new Text(`error: unknown command '${bin}'`, Text.Colors.ERROR);

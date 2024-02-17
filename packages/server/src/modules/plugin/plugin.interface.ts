@@ -36,7 +36,7 @@ export interface MinaPlayMessageValidator {
 
 export interface MinaPlayParamMetadata {
   index: number;
-  token: InjectionToken;
+  param: InjectionToken;
 }
 
 export interface MinaPlayMessageListenerMetadata {
@@ -59,6 +59,7 @@ export interface MinaPlayCommanderArgMetadata {
 
 export interface MinaPlayCommandMetadata {
   program: Command;
+  programFactory: () => Command;
   subcommands?: Map<string, MinaPlayCommandMetadata>;
 }
 

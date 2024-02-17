@@ -1,5 +1,5 @@
 import { MinaPlayMessageValidator } from './plugin.interface.js';
-import { MESSAGE_TOKEN, PROGRAM_TOKEN } from './constants.js';
+import { MESSAGE_TOKEN } from './constants.js';
 import { Command, CommanderError } from 'commander';
 import { isDefined, isString } from 'class-validator';
 import { MinaPlayMessage, MinaPlayMessageType } from '../../common/application.message.js';
@@ -7,7 +7,7 @@ import { Type } from '@nestjs/common';
 
 export function PluginCommandValidator(): MinaPlayMessageValidator {
   return {
-    injects: [PROGRAM_TOKEN, CommanderError],
+    injects: [Command, CommanderError],
     factory(command: Command, error: CommanderError) {
       return isDefined(command) && !isDefined(error);
     },

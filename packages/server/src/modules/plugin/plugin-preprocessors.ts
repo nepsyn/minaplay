@@ -1,11 +1,5 @@
 import { MinaPlayCommandMetadata, MinaPlayMessagePreprocessor } from './plugin.interface.js';
-import {
-  COMMAND_ARGUMENTS_TOKEN,
-  COMMAND_OPTIONS_TOKEN,
-  MESSAGE_TOKEN,
-  PROGRAM_ROOT_TOKEN,
-  PROGRAM_TOKEN,
-} from './constants.js';
+import { COMMAND_ARGUMENTS_TOKEN, COMMAND_OPTIONS_TOKEN, MESSAGE_TOKEN, PROGRAM_ROOT_TOKEN } from './constants.js';
 import { Command, CommanderError } from 'commander';
 import { MinaPlayMessage } from '../../common/application.message.js';
 import { ValueProvider } from '@nestjs/common';
@@ -18,7 +12,7 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
     async factory(message: MinaPlayMessage, root: Map<string, MinaPlayCommandMetadata>, context: PluginChatContext) {
       const providers: ValueProvider[] = [
         {
-          provide: PROGRAM_TOKEN,
+          provide: Command,
           useValue: undefined,
         },
         {
@@ -34,10 +28,14 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
 
       // find handler Command node
       let metadata: MinaPlayCommandMetadata | undefined = undefined;
+      let program: Command | undefined = undefined;
       const argv = message.content.trim().split(/\s+/);
       for (const arg of argv.concat()) {
         if (root.has(arg)) {
           metadata = root.get(arg);
+          const command = metadata.programFactory();
+          program?.addCommand(command);
+          program = command;
           root = root.get(arg).subcommands;
           argv.shift();
         } else {
@@ -50,13 +48,17 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
 
       // parse args
       try {
-        const program = metadata.program.parse(argv, { from: 'user' });
+        program.parse(argv, { from: 'user' });
         const opts = Object.assign({}, program.opts());
         const args = program.processedArgs.concat();
         return [
           {
-            provide: PROGRAM_TOKEN,
-            useValue: metadata.program,
+            provide: Command,
+            useValue: program,
+          },
+          {
+            provide: CommanderError,
+            useValue: undefined,
           },
           {
             provide: COMMAND_OPTIONS_TOKEN,
@@ -65,10 +67,6 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
           {
             provide: COMMAND_ARGUMENTS_TOKEN,
             useValue: args,
-          },
-          {
-            provide: CommanderError,
-            useValue: undefined,
           },
           ...Object.keys(opts).map((key) => ({
             provide: `${COMMAND_OPTIONS_TOKEN}:${key}`,
@@ -90,8 +88,8 @@ export function PluginCommandPreprocessor(command: Command): MinaPlayMessagePrep
 
         return [
           {
-            provide: PROGRAM_TOKEN,
-            useValue: metadata.program,
+            provide: Command,
+            useValue: program,
           },
           {
             provide: CommanderError,

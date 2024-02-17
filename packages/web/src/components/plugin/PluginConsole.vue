@@ -58,8 +58,8 @@
               </v-container>
             </template>
             <template v-else>
-              <v-container fluid class="scrollable-container" ref="messageContainerRef" v-mutate.child="scrollToBottom">
-                <v-container class="d-block py-0">
+              <v-container fluid class="scrollable-container" ref="messageContainerRef">
+                <v-container class="d-block py-0" v-mutate.child="scrollToBottom">
                   <v-slide-x-reverse-transition group>
                     <template v-for="(message, index) in pluginConsole.messages" :key="index">
                       <plugin-chat-message
@@ -70,9 +70,10 @@
                   </v-slide-x-reverse-transition>
                   <div v-intersect="(isIntersecting: boolean) => (atBottom = isIntersecting)"></div>
                 </v-container>
-                <v-container class="position-sticky d-flex justify-center" style="bottom: 0">
+                <v-container class="position-sticky d-flex justify-center pointer-events-none" style="bottom: 0">
                   <v-btn
                     :icon="mdiArrowDown"
+                    class="pointer-events-initial"
                     variant="elevated"
                     size="small"
                     v-if="!atBottom"

@@ -33,10 +33,4 @@ const toast = useToastStore();
 <style scoped lang="sass">
 ::v-deep(.v-alert__prepend)
   align-self: center
-
-.pointer-events-none
-  pointer-events: none
-
-.pointer-events-initial
-  pointer-events: initial
 </style>

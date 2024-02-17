@@ -58,10 +58,4 @@ defineExpose({
   </div>
 </template>
 
-<style lang="sass" scoped>
-.pointer-events-none
-  pointer-events: none
-
-.pointer-events-initial
-  pointer-events: initial
-</style>
+<style lang="sass" scoped></style>

@@ -94,7 +94,7 @@
                     })
                   "
                   auto-select-first
-                  :menu-props="!command ? { modelValue: false } : {}"
+                  :menu-props="!command || command.includes(' ') ? { modelValue: false } : {}"
                   autofocus
                   :return-object="false"
                   variant="outlined"

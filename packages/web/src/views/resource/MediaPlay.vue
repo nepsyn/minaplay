@@ -68,7 +68,7 @@
           <div class="pb-2" v-if="isMedia">
             <div class="d-flex align-center">
               <v-icon :icon="mdiMultimedia" size="large"></v-icon>
-              <span class="text-h6 ml-3">{{ t('resource.medias') }}</span>
+              <span class="text-h6 ml-3">{{ t('resource.recommendMedias') }}</span>
             </div>
             <multi-items-loader class="px-0 py-3" :loader="recommendsLoader" :hide-empty="recommends.length > 0" auto>
               <template #empty>
@@ -152,7 +152,7 @@
           <div class="pb-2" v-if="!isMedia">
             <div class="d-flex align-center">
               <v-icon :icon="mdiMultimedia" size="large"></v-icon>
-              <span class="text-h6 ml-3">{{ t('resource.series') }}</span>
+              <span class="text-h6 ml-3">{{ t('resource.recommendSeries') }}</span>
             </div>
             <multi-items-loader class="px-0 py-3" :loader="seriesLoader" :hide-empty="series.length > 0">
               <template #empty>
@@ -302,7 +302,7 @@ const onResourceReady = async () => {
 mediaLoader.onResolved(onResourceReady);
 currentEpisodeLoader.onResolved(onResourceReady);
 onBeforeRouteLeave(async () => {
-  if ((Date.now() - watchTimeStart.value) / 1000 >= 5) {
+  if ((Date.now() - watchTimeStart.value) / 1000 >= 20) {
     try {
       const progress = playerRef.value?.player?.currentTime;
       await api.Media.addHistory(media.value!.id)({

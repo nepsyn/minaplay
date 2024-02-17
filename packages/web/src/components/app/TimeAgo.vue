@@ -29,7 +29,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <span>{{ ago }}{{ label }}</span>
+  <span>{{ ago }} {{ label }}</span>
 </template>
 
 <style scoped lang="sass"></style>

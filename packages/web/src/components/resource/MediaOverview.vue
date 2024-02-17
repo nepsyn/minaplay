@@ -16,34 +16,42 @@
         v-if="historyDuration && media.duration"
         class="position-absolute d-flex align-end w-100 h-100 rounded-b-lg overflow-hidden progress-container"
       >
-        <v-progress-linear
-          height="4"
-          color="primary-lighten-1"
-          :model-value="(historyDuration / 1000 / media.duration) * 100"
-        ></v-progress-linear>
+        <slot name="progress">
+          <v-progress-linear
+            height="4"
+            color="primary-lighten-1"
+            :model-value="(historyDuration / 1000 / media.duration) * 100"
+          ></v-progress-linear>
+        </slot>
       </div>
 
       <div
         v-if="media.duration != null"
         class="position-absolute text-caption font-weight-bold duration-container mb-3 mr-3 px-2 rounded"
       >
-        <template v-if="historyDuration != null">
-          <span>{{ getDurationLabel(historyDuration / 1000) }}</span>
-          <span> / </span>
-        </template>
-        <span>{{ getDurationLabel(media.duration) }}</span>
+        <slot name="duration">
+          <template v-if="historyDuration != null">
+            <span>{{ getDurationLabel(historyDuration / 1000) }}</span>
+            <span> / </span>
+          </template>
+          <span>{{ getDurationLabel(media.duration) }}</span>
+        </slot>
       </div>
     </div>
 
-    <span class="mt-2 px-1 media-title font-weight-bold" :title="media.name">
-      {{ media.name || media.file?.name }}
-    </span>
+    <slot name="title">
+      <span class="mt-2 px-1 media-title font-weight-bold" :title="media.name">
+        {{ media.name || media.file?.name }}
+      </span>
+    </slot>
 
-    <div class="my-1 px-1 text-caption">
-      <span>{{ t(`file.source.${media.file?.source ?? 'other'}`) }}</span>
-      ·
-      <time-ago :time="media.createAt"></time-ago>
-    </div>
+    <slot name="append">
+      <div class="my-1 px-1 text-caption">
+        <span>{{ t(`file.source.${media.file?.source ?? 'other'}`) }}</span>
+        ·
+        <time-ago :time="media.createAt"></time-ago>
+      </div>
+    </slot>
   </v-container>
 </template>
 

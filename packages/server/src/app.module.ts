@@ -16,7 +16,7 @@ import { FileModule } from './modules/file/file.module.js';
 import { RedisClientOptions } from 'redis';
 import { redisStore } from 'cache-manager-redis-yet';
 import { buildException } from './utils/build-exception.util.js';
-import { ErrorCodeEnum } from './enums/error-code.enum.js';
+import { ErrorCodeEnum } from './enums/index.js';
 import { LiveModule } from './modules/live/live.module.js';
 import { cpus } from 'node:os';
 import { UserModule } from './modules/user/user.module.js';

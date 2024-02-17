@@ -4,6 +4,8 @@
   "author": "Nepsyn",
   "license": "AGPL-3.0",
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "nest build",
     "start": "nest start",

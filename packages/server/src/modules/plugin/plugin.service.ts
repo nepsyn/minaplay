@@ -19,6 +19,7 @@ import { PLUGIN_DIR } from '../../constants.js';
 export class PluginService implements OnModuleInit {
   private logger = new ApplicationLogger(PluginService.name);
   private controls: PluginControl[] = [];
+
   constructor(private lazyModuleLoader: LazyModuleLoader) {}
 
   async findPlugins(dir?: string) {

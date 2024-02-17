@@ -1,14 +1,16 @@
 import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
 import { Text } from './messages/text.js';
-import { NetworkImage } from './messages/network-image.js';
-import { Consumed } from './messages/consumed.js';
-import { Base64Image } from './messages/base64-image.js';
-import { Action } from './messages/action.js';
-import { Timeout } from './messages/timeout.js';
-import { ConsumableGroup } from './messages/consumable-group.js';
-import { ConsumableFeedback } from './messages/consumable-feedback.js';
-import { Pending } from './messages/pending.js';
+import {
+  Action,
+  Base64Image,
+  ConsumableFeedback,
+  ConsumableGroup,
+  Consumed,
+  NetworkImage,
+  Pending,
+  Timeout,
+} from './messages/index.js';
 
 export const MinaPlayMessageMap = {
   Text,

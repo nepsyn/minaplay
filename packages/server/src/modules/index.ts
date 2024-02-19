@@ -37,9 +37,7 @@ export * from './plugin/plugin.service.js';
 export * from './plugin/plugin.interface.js';
 export * from './plugin/plugin-control.js';
 export * from './plugin/plugin-ref.js';
-export * from './plugin/plugin-chat-context.js';
-export * from './plugin/plugin-preprocessors.js';
-export * from './plugin/plugin-validators.js';
+export * from './plugin/plugin-listener-context.js';
 export * from './plugin/plugin.decorator.js';
 export * from './plugin/constants.js';
 

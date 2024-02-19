@@ -15,17 +15,18 @@ import fs from 'fs-extra';
 import path from 'node:path';
 import { PLUGIN_DIR } from '../../../../constants.js';
 import * as compressing from 'compressing';
-import { PluginChatContext } from '../../plugin-chat-context.js';
+import { PluginChat } from '../../plugin-listener-context.js';
 import { Action } from '../../../../common/messages/action.js';
 import { Timeout } from '../../../../common/messages/timeout.js';
 import { Consumed } from '../../../../common/messages/consumed.js';
-import { ConsumableGroup } from '../../../../common/messages/consumable-group.js';
+import { ConsumableGroup } from '../../../../common/messages/index.js';
 
 @Injectable()
 export class PluginManagerCommand {
   constructor(private pluginService: PluginService, private configService: ConfigService) {}
 
   @MinaPlayCommand('pm', {
+    aliases: ['plugin-manager'],
     description: 'manage plugins in MinaPlay',
   })
   async handlePm(@MinaPlayListenerInject() program: Command) {
@@ -34,7 +35,7 @@ export class PluginManagerCommand {
 
   @MinaPlayCommand('enable', {
     aliases: ['e'],
-    parents: ['pm'],
+    parent: () => PluginManagerCommand.prototype.handlePm,
   })
   async handleEnable(
     @MinaPlayCommandArgument('<id>', {
@@ -53,7 +54,7 @@ export class PluginManagerCommand {
 
   @MinaPlayCommand('disable', {
     aliases: ['d'],
-    parents: ['pm'],
+    parent: () => PluginManagerCommand.prototype.handlePm,
   })
   async handleDisable(
     @MinaPlayCommandArgument('<id>', {
@@ -72,7 +73,7 @@ export class PluginManagerCommand {
 
   @MinaPlayCommand('install', {
     aliases: ['add', 'i'],
-    parents: ['pm'],
+    parent: () => PluginManagerCommand.prototype.handlePm,
   })
   async handleInstall(
     @MinaPlayCommandArgument('<id>', {
@@ -94,7 +95,7 @@ export class PluginManagerCommand {
       default: false,
     })
     yes: boolean,
-    @MinaPlayListenerInject() chat: PluginChatContext,
+    @MinaPlayListenerInject() chat: PluginChat,
   ) {
     const plugin = this.pluginService.getControlById(id);
     if (plugin) {
@@ -154,7 +155,7 @@ export class PluginManagerCommand {
         ];
       }
     } catch (error) {
-      return new Text(`Install plugin '${id}' error: ${error.message}`, Text.Colors.ERROR);
+      return new Text(`Plugin '${id}' installation failed: ${error.message}`, Text.Colors.ERROR);
     }
   }
 }

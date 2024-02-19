@@ -1,5 +1,8 @@
 import { InjectionToken, ModuleMetadata, ValueProvider } from '@nestjs/common';
 import { Argument, Command, Option } from 'commander';
+import { Observable } from 'rxjs';
+import { MinaPlayMessage } from '../../common/application.message.js';
+import { PluginListenerContext } from './plugin-listener-context.js';
 
 export interface MinaPlayPluginMetadata extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   id: string;
@@ -18,14 +21,21 @@ export interface MinaPlayPluginHooks {
   onPluginDisabled?(): any;
 }
 
-export interface MinaPlayMessagePreprocessor {
-  injects?: InjectionToken[];
-  factory: (...args: any) => ValueProvider[] | undefined | Promise<ValueProvider[] | undefined>;
+export type MinaPlayListenerResult = string | MinaPlayMessage | MinaPlayMessage[] | undefined;
+
+export interface MinaPlayCallHandlerOptions {
+  provides: ValueProvider[];
 }
 
-export interface MinaPlayMessageValidator {
-  injects?: InjectionToken[];
-  factory: (...args: any) => boolean | Promise<boolean>;
+export interface MinaPlayCallHandler {
+  handle(options?: MinaPlayCallHandlerOptions): Observable<MinaPlayListenerResult>;
+  end(message?: MinaPlayListenerResult): Observable<MinaPlayListenerResult>;
+}
+
+export interface MinaPlayMessageListenerInterceptor {
+  (ctx: PluginListenerContext, message: MinaPlayMessage, next: MinaPlayCallHandler):
+    | Observable<MinaPlayListenerResult>
+    | Promise<Observable<MinaPlayListenerResult>>;
 }
 
 export interface MinaPlayParamMetadata {
@@ -34,16 +44,14 @@ export interface MinaPlayParamMetadata {
 }
 
 export interface MinaPlayMessageListenerMetadata {
-  preprocessors: MinaPlayMessagePreprocessor[];
-  validators: MinaPlayMessageValidator[];
+  interceptors: MinaPlayMessageListenerInterceptor[];
   type: Function;
   key: string | symbol;
   params: MinaPlayParamMetadata[];
 }
 
 export interface MinaPlayMessageListenerOptions {
-  preprocessors?: MinaPlayMessagePreprocessor[];
-  validators?: MinaPlayMessageValidator[];
+  interceptors?: MinaPlayMessageListenerInterceptor[];
 }
 
 export interface MinaPlayCommanderArgMetadata {
@@ -51,17 +59,20 @@ export interface MinaPlayCommanderArgMetadata {
   instance: Option | Argument;
 }
 
-export interface MinaPlayCommandMetadata {
-  program: Command;
-  programFactory: () => Command;
-  subcommands?: Map<string, MinaPlayCommandMetadata>;
-}
-
 export interface MinaPlayCommandOptions extends MinaPlayMessageListenerOptions {
   aliases?: string[];
   description?: string;
-  parents?: string[];
+  parent?: () => Function;
   factory?: (program: Command) => Command;
+}
+
+export interface MinaPlayCommandMetadata {
+  bin: string;
+  aliases?: string[];
+  parent?: () => Function;
+  handler: Function;
+  commandFactory: () => Command;
+  subcommands: MinaPlayCommandMetadata[];
 }
 
 export interface MinaPlayCommandOptionOptions {

@@ -4,13 +4,13 @@ import { Permission } from '../../../authorization/permission.entity.js';
 import { Repository } from 'typeorm';
 import { isString } from 'class-validator';
 import { encryptPassword } from '../../../../utils/encrypt-password.util.js';
-import { PermissionEnum } from '../../../../enums/permission.enum.js';
+import { PermissionEnum } from '../../../../enums/index.js';
 import { Injectable } from '@nestjs/common';
 import { ApplicationLogger } from '../../../../common/application.logger.service.js';
 import { Command } from 'commander';
 import { MinaPlayCommand, MinaPlayCommandArgument, MinaPlayListenerInject } from '../../plugin.decorator.js';
-import { PluginChatContext } from '../../plugin-chat-context.js';
-import { ConsumableGroup } from '../../../../common/messages/consumable-group.js';
+import { PluginChat } from '../../plugin-listener-context.js';
+import { ConsumableGroup } from '../../../../common/messages/index.js';
 import { Action } from '../../../../common/messages/action.js';
 import { Text } from '../../../../common/messages/text.js';
 import { Consumed } from '../../../../common/messages/consumed.js';
@@ -26,6 +26,7 @@ export class UserManagerCommand {
   ) {}
 
   @MinaPlayCommand('um', {
+    aliases: ['user-manager'],
     description: 'manage users in MinaPlay',
   })
   async handleUm(@MinaPlayListenerInject() program: Command) {
@@ -34,7 +35,7 @@ export class UserManagerCommand {
 
   @MinaPlayCommand('add-root', {
     aliases: ['ar'],
-    parents: ['um'],
+    parent: () => UserManagerCommand.prototype.handleUm,
   })
   async handleAddRootUser(
     @MinaPlayCommandArgument('<username>', {
@@ -73,14 +74,14 @@ export class UserManagerCommand {
 
   @MinaPlayCommand('delete', {
     aliases: ['d'],
-    parents: ['um'],
+    parent: () => UserManagerCommand.prototype.handleUm,
   })
   async handleDeleteUser(
     @MinaPlayCommandArgument('<username>', {
       description: 'Username of this root user',
     })
     username: string,
-    @MinaPlayListenerInject() chat: PluginChatContext,
+    @MinaPlayListenerInject() chat: PluginChat,
     @MinaPlayListenerInject() operator: User,
   ) {
     if (operator.username === username) {
@@ -107,7 +108,7 @@ export class UserManagerCommand {
       if (resp.type === 'ConsumableFeedback' && resp.id === groupId && resp.value === 'yes') {
         try {
           await this.userRepository.delete({ username });
-          return [new Consumed(groupId), new Text(`User '${username}' deleted`)];
+          return [new Consumed(groupId), new Text(`User '${username}' deleted`, Text.Colors.SUCCESS)];
         } catch (error) {
           this.logger.error(`User '${username}' delete failed`, error.stack, UserManagerCommand.name);
           return [new Consumed(groupId), new Text(`User '${username}' delete failed`, Text.Colors.WARNING)];

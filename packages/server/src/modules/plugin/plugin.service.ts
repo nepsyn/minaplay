@@ -10,10 +10,11 @@ import fs from 'fs-extra';
 import { MinaPlayMessage } from '../../common/application.message.js';
 import { MINAPLAY_COMMAND_METADATA, MINAPLAY_LISTENER_METADATA } from './constants.js';
 import { Socket } from 'socket.io';
-import { PluginChatContext } from './plugin-chat-context.js';
+import { PluginListenerContext } from './plugin-listener-context.js';
 import { instanceToPlain } from 'class-transformer';
 import { register } from 'node:module';
 import { PLUGIN_DIR } from '../../constants.js';
+import { isDefined } from 'class-validator';
 
 @Injectable()
 export class PluginService implements OnModuleInit {
@@ -79,22 +80,22 @@ export class PluginService implements OnModuleInit {
 
       // initialize services
       control.module = await this.lazyModuleLoader.load(() => plugin, { logger: false });
-      control.commands = new Map();
+      control.commands = [];
       control.listeners = [];
       control.services = [];
       for (const provider of metadata.providers ?? []) {
         if (typeof provider === 'function') {
           // commands
-          const commandsMetadata: Map<string, MinaPlayCommandMetadata> = Reflect.getMetadata(
-            MINAPLAY_COMMAND_METADATA,
-            provider,
-          );
-          if (commandsMetadata) {
-            for (const [bin, commandMetadata] of commandsMetadata.entries()) {
-              control.commands.set(bin, commandMetadata);
-              this.logger.log(`Plugin '${metadata.id}' registered command '${bin}'`);
+          const commandsMetadata: MinaPlayCommandMetadata[] =
+            Reflect.getMetadata(MINAPLAY_COMMAND_METADATA, provider) ?? [];
+          for (const commandMetadata of commandsMetadata) {
+            const parentHandler = commandMetadata.parent?.();
+            const parent = parentHandler && commandsMetadata.find(({ handler }) => handler === parentHandler);
+            if (parent) {
+              parent.subcommands.push(commandMetadata);
             }
           }
+          control.commands.push(...commandsMetadata.filter(({ parent }) => !isDefined(parent)));
 
           // listeners
           const listenersMetadata: MinaPlayMessageListenerMetadata[] = Reflect.getMetadata(
@@ -113,7 +114,10 @@ export class PluginService implements OnModuleInit {
       // emit onInit
       await this.emit(control, 'onPluginInit');
 
+      // logs
       this.logger.log(`Plugin '${metadata.id}(${metadata.version ?? 'unknown version'})' registered`);
+      const bins = control.commands.map(({ bin }) => bin);
+      this.logger.log(`Plugin '${metadata.id}' registered command { ${bins.length > 1 ? bins.join(', ') : bins[0]} }`);
     } catch (error) {
       this.logger.error(
         `Error occurred while creating plugin instance: '${metadata.id}'`,
@@ -188,7 +192,7 @@ export class PluginService implements OnModuleInit {
 
   async handleGatewayMessage(message: MinaPlayMessage, socket: Socket) {
     const contexts = this.enabledPluginControls.map((control) => {
-      const context = control.contexts.get(socket.data.user.id) ?? new PluginChatContext(socket.data.user, control);
+      const context = control.contexts.get(socket.data.user.id) ?? new PluginListenerContext(socket.data.user, control);
       control.contexts.set(socket.data.user.id, context);
       return context;
     });

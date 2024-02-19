@@ -6,14 +6,13 @@ import {
   MinaPlayCommandArgument,
   MinaPlayMessageListener,
 } from '../../plugin.decorator.js';
-import { MessageIsType } from '../../plugin-validators.js';
 import { PluginControl } from '../../plugin-control.js';
 import { MinaPlayMessage } from '../../../../common/application.message.js';
 import { Text } from '../../../../common/messages/text.js';
-import { ConsumableGroup } from '../../../../common/messages/consumable-group.js';
+import { ConsumableFeedback, ConsumableGroup } from '../../../../common/messages/index.js';
 import { Action } from '../../../../common/messages/action.js';
-import { ConsumableFeedback } from '../../../../common/messages/consumable-feedback.js';
 import { Command } from 'commander';
+import { buildPluginCommand } from '../../../../utils/build-plugin-command.js';
 
 @Injectable()
 export class HelpCommand {
@@ -22,12 +21,13 @@ export class HelpCommand {
   private getPrograms() {
     const programs: { bin: string; control: PluginControl; program: Command; description: string }[] = [];
     for (const control of this.pluginService.enabledPluginControls) {
-      for (const [bin, command] of control.commands) {
+      for (const metadata of control.commands) {
+        const program = buildPluginCommand(metadata);
         programs.push({
-          bin,
+          bin: metadata.bin,
           control,
-          program: command.program,
-          description: command.program.description(),
+          program,
+          description: program.description(),
         });
       }
     }
@@ -63,6 +63,7 @@ export class HelpCommand {
   }
 
   @MinaPlayCommand('help', {
+    aliases: ['man'],
     description: 'show commands in MinaPlay plugin console',
   })
   async handleHelp(@MinaPlayCommandArgument('[bin]') bin?: string) {
@@ -82,12 +83,17 @@ export class HelpCommand {
   }
 
   @MinaPlayMessageListener({
-    validators: [MessageIsType(ConsumableFeedback)],
+    interceptors: [
+      (_ctx, message, next) => {
+        if (message.type === 'ConsumableFeedback' && message.id.startsWith('help-page')) {
+          return next.handle();
+        } else {
+          return next.end();
+        }
+      },
+    ],
   })
   async handleHelpOnPage(@MinaPlayChatMessage() message: ConsumableFeedback) {
-    if (message.id.startsWith('help-page')) {
-      const page = Number(message.value);
-      return this.buildHelpPage(page);
-    }
+    return this.buildHelpPage(Number(message.value));
   }
 }

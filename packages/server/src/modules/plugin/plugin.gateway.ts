@@ -10,14 +10,14 @@ import { AuthorizationWsGuard } from '../authorization/authorization.ws.guard.js
 import { ApplicationGatewayExceptionFilter } from '../../common/application.gateway.exception.filter.js';
 import { MinaPlayMessage, parseMessage } from '../../common/application.message.js';
 import { buildException } from '../../utils/build-exception.util.js';
-import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { ErrorCodeEnum, PermissionEnum } from '../../enums/index.js';
 import { PluginService } from './plugin.service.js';
 import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
-import { PermissionEnum } from '../../enums/permission.enum.js';
 import { Socket } from 'socket.io';
 import { ApplicationGatewayInterceptor } from '../../common/application.gateway.interceptor.js';
 import { PluginControl } from './plugin-control.js';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
+import { buildPluginCommand } from '../../utils/build-plugin-command.js';
 
 @WebSocketGateway({
   namespace: 'plugin',
@@ -46,11 +46,11 @@ export class PluginGateway {
   async handleCommands() {
     const programs: { program: string; control: PluginControl; description: string }[] = [];
     for (const control of this.pluginService.enabledPluginControls) {
-      for (const [bin, command] of control.commands) {
+      for (const metadata of control.commands) {
         programs.push({
-          program: bin,
+          program: metadata.bin,
           control,
-          description: command.program.description(),
+          description: buildPluginCommand(metadata).description(),
         });
       }
     }

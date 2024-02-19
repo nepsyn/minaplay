@@ -22,11 +22,10 @@ import {
   MINAPLAY_PLUGIN_METADATA,
 } from './constants.js';
 import { extendArrayMetadata } from '@nestjs/common/utils/extend-metadata.util.js';
-import { PluginCommandPreprocessor } from './plugin-preprocessors.js';
-import { PluginCommandValidator } from './plugin-validators.js';
 import { Argument, Command, Option } from 'commander';
 import { PluginRef } from './plugin-ref.js';
 import { SELF_DECLARED_DEPS_METADATA } from '@nestjs/common/constants.js';
+import { PluginCommandInterceptor } from './plugin-command.interceptor.js';
 
 export function MinaPlayPlugin(metadata: MinaPlayPluginMetadata): ClassDecorator {
   return function (target: Function) {
@@ -68,8 +67,7 @@ export function MinaPlayMessageListener(options: MinaPlayMessageListenerOptions 
       MINAPLAY_LISTENER_METADATA,
       [
         {
-          preprocessors: options.preprocessors ?? [],
-          validators: options.validators ?? [],
+          interceptors: options.interceptors ?? [],
           type: target.constructor,
           key: propertyKey,
           params: paramsMetadata,
@@ -81,7 +79,7 @@ export function MinaPlayMessageListener(options: MinaPlayMessageListenerOptions 
 }
 
 export function MinaPlayCommand(bin: string, options: MinaPlayCommandOptions = {}): MethodDecorator {
-  return function (target, propertyKey, descriptor) {
+  return function (target, propertyKey, descriptor: PropertyDescriptor) {
     if (typeof target === 'function') {
       throw new Error(`@${MinaPlayCommand.name} cannot apply on static method '${target.name}#${String(propertyKey)}'`);
     }
@@ -104,7 +102,7 @@ export function MinaPlayCommand(bin: string, options: MinaPlayCommandOptions = {
     }
     Reflect.defineMetadata(SELF_DECLARED_DEPS_METADATA, paramsMetadata, target.constructor, propertyKey);
 
-    const programFactory = () => {
+    const commandFactory = () => {
       // create command instance
       let program = new Command(bin);
       program.aliases(options.aliases ?? []);
@@ -129,47 +127,30 @@ export function MinaPlayCommand(bin: string, options: MinaPlayCommandOptions = {
       return program;
     };
 
+    // create root command list
+    const metadata: MinaPlayCommandMetadata = {
+      bin,
+      aliases: options.aliases,
+      parent: options.parent,
+      handler: descriptor.value,
+      commandFactory,
+      subcommands: [],
+    };
+    const root: MinaPlayCommandMetadata[] = Reflect.getMetadata(MINAPLAY_COMMAND_METADATA, target.constructor) ?? [];
+    root.push(metadata);
+    Reflect.defineMetadata(MINAPLAY_COMMAND_METADATA, root, target.constructor);
+
     // decorate this handler by @MinaPlayMessageListener
-    const program = programFactory();
     Reflect.decorate(
       [
         MinaPlayMessageListener({
-          preprocessors: [PluginCommandPreprocessor(program)].concat(options.preprocessors ?? []),
-          validators: [PluginCommandValidator()].concat(options.validators ?? []),
+          interceptors: [PluginCommandInterceptor(metadata)].concat(options.interceptors ?? []),
         }),
       ],
       target,
       propertyKey,
       descriptor,
     );
-
-    // create root command map
-    let root: Map<string, MinaPlayCommandMetadata> = Reflect.getMetadata(MINAPLAY_COMMAND_METADATA, target.constructor);
-    let commandMetadata: MinaPlayCommandMetadata | undefined = undefined;
-    if (!root) {
-      root = new Map();
-      Reflect.defineMetadata(MINAPLAY_COMMAND_METADATA, root, target.constructor);
-    }
-
-    // find parent command
-    for (const route of options.parents ?? []) {
-      if (!root.has(route)) {
-        throw new Error(`No parent command found for '${bin}' in '${target.constructor.name}#${String(propertyKey)}'`);
-      }
-      commandMetadata = root.get(route);
-      root = root.get(route).subcommands;
-    }
-    commandMetadata?.program?.addCommand(program);
-
-    // insert this command to root command map
-    const metadata: MinaPlayCommandMetadata = {
-      program,
-      programFactory,
-      subcommands: new Map(),
-    };
-    for (const name of [bin, ...(options.aliases ?? [])]) {
-      root.set(name, metadata);
-    }
   };
 }
 

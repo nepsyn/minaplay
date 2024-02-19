@@ -1,7 +1,7 @@
 import { CallHandler, ExecutionContext, Injectable, NestInterceptor } from '@nestjs/common';
 import { Socket } from 'socket.io';
 import { LiveService } from './live.service.js';
-import { tap } from 'rxjs';
+import { finalize } from 'rxjs';
 
 @Injectable()
 export class LiveStateWsInterceptor implements NestInterceptor {
@@ -14,7 +14,7 @@ export class LiveStateWsInterceptor implements NestInterceptor {
     }
 
     return next.handle().pipe(
-      tap(async () => {
+      finalize(async () => {
         if (socket.data.live && socket.data.state) {
           await this.liveService.updateLiveState(socket.data.state);
         }

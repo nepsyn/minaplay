@@ -2,7 +2,7 @@ import { MinaPlayCommandMetadata, MinaPlayMessageListenerMetadata, MinaPlayPlugi
 import { Type } from '@nestjs/common';
 import { Exclude, Expose } from 'class-transformer';
 import { ModuleRef } from '@nestjs/core';
-import { PluginChatContext } from './plugin-chat-context.js';
+import { PluginListenerContext } from './plugin-listener-context.js';
 
 export class PluginControl {
   constructor(options?: Partial<PluginControl>) {
@@ -40,16 +40,16 @@ export class PluginControl {
   module: ModuleRef;
 
   @Exclude()
-  commands: Map<string, MinaPlayCommandMetadata>;
+  commands: MinaPlayCommandMetadata[];
 
   @Expose()
   get programs() {
-    return [...this.commands.keys()];
+    return this.commands.map(({ bin }) => bin);
   }
 
   @Exclude()
   listeners: MinaPlayMessageListenerMetadata[];
 
   @Exclude()
-  contexts: Map<number, PluginChatContext>;
+  contexts: Map<number, PluginListenerContext>;
 }

@@ -139,10 +139,12 @@ export class PluginManagerCommand {
       const tarballResponse = await fetch(tarballDownloadPath, {
         agent: proxyUrl && new HttpsProxyAgent(proxyUrl),
       });
-      const dir = path.join(PLUGIN_DIR, id);
-      await fs.ensureDir(dir);
-      await compressing.tgz.decompress(Buffer.from(await tarballResponse.arrayBuffer()), dir);
-      const plugins = await this.pluginService.findPlugins(dir);
+      const downloadDir = path.join(PLUGIN_DIR, `.${id}`);
+      const destDir = path.join(PLUGIN_DIR, id);
+      await compressing.tgz.decompress(Buffer.from(await tarballResponse.arrayBuffer()), downloadDir);
+      await fs.move(path.join(downloadDir, 'package'), destDir, { overwrite: true });
+      await fs.rmdir(downloadDir);
+      const plugins = await this.pluginService.findPlugins(destDir);
       if (plugins.length > 0) {
         for (const plugin of plugins) {
           await this.pluginService.registerPlugin(plugin);

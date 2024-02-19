@@ -293,8 +293,14 @@ const onResourceReady = async () => {
     if (media.value) {
       const { data } = await api.Media.findHistory(media.value.id)();
       if (data.progress) {
-        duration.value = data.progress;
-        toast.toastSuccess(t('resource.continuePlay'));
+        if (
+          media.value.duration &&
+          data.progress / 1000 > media.value.duration * 0.1 &&
+          data.progress / 1000 < media.value.duration * 0.9
+        ) {
+          duration.value = data.progress;
+          toast.toastSuccess(t('resource.continuePlay'));
+        }
       }
     }
   } catch {}
@@ -302,7 +308,7 @@ const onResourceReady = async () => {
 mediaLoader.onResolved(onResourceReady);
 currentEpisodeLoader.onResolved(onResourceReady);
 onBeforeRouteLeave(async () => {
-  if ((Date.now() - watchTimeStart.value) / 1000 >= 20) {
+  if ((Date.now() - watchTimeStart.value) / 1000 >= 10) {
     try {
       const progress = playerRef.value?.player?.currentTime;
       await api.Media.addHistory(media.value!.id)({

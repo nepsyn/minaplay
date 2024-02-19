@@ -474,6 +474,10 @@ const zh: MessageSchema = {
       danmakuDescription: '是否在放映室连接时自动播放弹幕。',
       joinVoice: '自动加入放映室语音',
       joinVoiceDescription: '是否在放映室连接时自动加入语音房间。',
+      homepage: '主页内容',
+      visiblePlates: '可见板块',
+      hiddenPlates: '隐藏板块',
+      noPlate: '这里似乎没有可见板块',
     },
     profile: {
       basic: '基本信息',

@@ -140,6 +140,7 @@ import { useToastStore } from '@/store/toast';
 import PluginChatMessage from '@/components/plugin/PluginChatMessage.vue';
 import { useLayoutStore } from '@/store/layout';
 import { canRender } from '@/utils/utils';
+import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 
 const { t } = useI18n();
 const layout = useLayoutStore();
@@ -160,7 +161,7 @@ onProgramsLoaded((data) => {
   programs.value = data;
 });
 onProgramsLoadFailed((error: any) => {
-  toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
+  toast.toastError(t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`));
 });
 onUpdated(async () => {
   await loadPrograms();
@@ -178,7 +179,7 @@ onChatSent(() => {
 });
 onChatSendFailed((error: any) => {
   command.value = undefined;
-  toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
+  toast.toastError(t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`));
 });
 
 const atBottom = ref(false);

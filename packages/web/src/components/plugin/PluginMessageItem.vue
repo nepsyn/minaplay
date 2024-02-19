@@ -41,6 +41,7 @@ import { useToastStore } from '@/store/toast';
 import { useI18n } from 'vue-i18n';
 import { onBeforeMount, onUnmounted, ref } from 'vue';
 import { canRender } from '@/utils/utils';
+import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 
 const { t } = useI18n();
 const pluginConsole = usePluginConsoleStore();
@@ -85,7 +86,7 @@ const handleAction = async (value: string) => {
 
 const { request: sendChat, onRejected: onChatSendFailed } = pluginConsole.sendTask;
 onChatSendFailed((error: any) => {
-  toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
+  toast.toastError(t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`));
 });
 </script>
 

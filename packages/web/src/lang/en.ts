@@ -474,6 +474,10 @@ export default {
       danmakuDescription: 'Play live danmaku by default.',
       joinVoice: 'Auto Join Live Voice',
       joinVoiceDescription: 'Join live voice room by default.',
+      homepage: 'Homepage Content',
+      visiblePlates: 'Visible Plates',
+      hiddenPlates: 'Hidden Plates',
+      noPlate: 'There seems to be no visible plate',
     },
     profile: {
       basic: 'Basic Info',

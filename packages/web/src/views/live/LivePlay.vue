@@ -766,7 +766,7 @@ onJoinCompleted(async (data) => {
   }
 });
 onJoinFailed((error: any) => {
-  validateError.value = t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`);
+  validateError.value = t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`);
 });
 
 const chatText = ref('');
@@ -782,7 +782,7 @@ onChatSent(() => {
   chatText.value = '';
 });
 onChatSendFailed((error: any) => {
-  toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
+  toast.toastError(t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`));
 });
 const selectAndSendImage = () => {
   selectFile('image/*', false, async (files) => {
@@ -1138,7 +1138,7 @@ onStreamSwitched((data) => {
   updateStreamMenu.value = false;
 });
 onStreamSwitchFailed((error: any) => {
-  toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
+  toast.toastError(t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`));
 });
 const {
   pending: streamStopping,
@@ -1155,7 +1155,7 @@ onStreamStopped(() => {
   updateStreamMenu.value = false;
 });
 onStreamStopFailed((error: any) => {
-  toast.toastError(t(`error.${error instanceof TimeoutError ? 'timeout' : error.code}`));
+  toast.toastError(t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`));
 });
 
 const {

@@ -2,7 +2,7 @@
   <div class="d-flex flex-column mb-6">
     <div class="d-flex flex-row">
       <template v-if="message.from === 'plugin' && message.control">
-        <v-avatar size="small" color="info">{{ message.control.id.slice(0, 2) }}</v-avatar>
+        <v-avatar size="small" :color="getHashColor(message.control.id)">{{ message.control.id.slice(0, 2) }}</v-avatar>
         <span class="ml-4 text-subtitle-1 font-weight-bold">{{ message.control.id }}</span>
       </template>
       <template v-else-if="message.from === 'user' && api.user">
@@ -26,12 +26,17 @@ import { useApiStore } from '@/store/api';
 import { onMounted } from 'vue';
 import PluginMessageItem from '@/components/plugin/PluginMessageItem.vue';
 import { canRender } from '@/utils/utils';
+import { md5 } from 'js-md5';
 
 const api = useApiStore();
 
 defineProps<{
   message: MinaPlayPluginMessage;
 }>();
+
+const getHashColor = (text: string) => {
+  return `#${md5(text).slice(0, 6)}`;
+};
 
 const emits = defineEmits(['load']);
 

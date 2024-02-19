@@ -9,6 +9,7 @@ export interface AppSettings {
   showSubtitle: boolean;
   showDanmaku: boolean;
   autoJoinVoice: boolean;
+  plates: Array<'series-update' | 'history' | 'media-update' | string>;
 }
 
 export const useSettingsStore = defineStore('settings', () => {
@@ -25,6 +26,7 @@ export const useSettingsStore = defineStore('settings', () => {
         showSubtitle: true,
         showDanmaku: true,
         autoJoinVoice: false,
+        plates: ['series-update', 'history', 'media-update'],
       },
       localSettings,
     ),

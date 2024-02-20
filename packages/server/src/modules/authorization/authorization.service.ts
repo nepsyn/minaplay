@@ -6,7 +6,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '../user/user.entity.js';
 import { instanceToPlain } from 'class-transformer';
 import { UserService } from '../user/user.service.js';
-import { PermissionEnum } from '../../enums/permission.enum.js';
+import { PermissionEnum } from '../../enums/index.js';
 
 @Injectable()
 export class AuthorizationService {
@@ -17,15 +17,16 @@ export class AuthorizationService {
   ) {}
 
   async login(user: User) {
-    const ticket = Date.now().toString();
+    const ticket = user.ticket ?? Date.now().toString();
+    if (!user.ticket) {
+      await this.updateTicket(user.id, ticket);
+    }
 
     const payload = {
       id: user.id,
       ticket,
     };
     const token = await this.signToken(payload);
-
-    await this.updateTicket(user.id, ticket);
 
     return {
       ...instanceToPlain(user, { groups: ['profile'] }),

@@ -118,6 +118,8 @@ export class PluginService implements OnModuleInit {
       this.logger.log(`Plugin '${metadata.id}(${metadata.version ?? 'unknown version'})' registered`);
       const bins = control.commands.map(({ bin }) => bin);
       this.logger.log(`Plugin '${metadata.id}' registered command { ${bins.length > 1 ? bins.join(', ') : bins[0]} }`);
+
+      return control;
     } catch (error) {
       this.logger.error(
         `Error occurred while creating plugin instance: '${metadata.id}'`,

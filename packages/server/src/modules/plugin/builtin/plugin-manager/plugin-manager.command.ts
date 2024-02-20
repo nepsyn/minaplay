@@ -19,7 +19,8 @@ import { PluginChat } from '../../plugin-listener-context.js';
 import { Action } from '../../../../common/messages/action.js';
 import { Timeout } from '../../../../common/messages/timeout.js';
 import { Consumed } from '../../../../common/messages/consumed.js';
-import { ConsumableGroup } from '../../../../common/messages/index.js';
+import { ConsumableGroup, Pending } from '../../../../common/messages/index.js';
+import { execaCommand } from 'execa';
 
 @Injectable()
 export class PluginManagerCommand {
@@ -85,7 +86,7 @@ export class PluginManagerCommand {
       default: 'https://registry.npmjs.com',
     })
     registry: string,
-    @MinaPlayCommandOption('-i,--ignore-prefix', {
+    @MinaPlayCommandOption('-I,--ignore-prefix', {
       description: 'Ignore MinaPlay plugin package prefix',
       default: false,
     })
@@ -97,26 +98,30 @@ export class PluginManagerCommand {
     yes: boolean,
     @MinaPlayListenerInject() chat: PluginChat,
   ) {
-    const plugin = this.pluginService.getControlById(id);
+    const atIndex = id.lastIndexOf('@');
+    const name = atIndex >= 0 ? id.slice(0, atIndex) : id;
+    const version = atIndex >= 0 ? id.slice(atIndex + 1, id.length) : 'latest';
+    const packageId = ignorePrefix ? name : `minaplay-plugin-${name}`;
+
+    const plugin = this.pluginService.getControlById(name);
     if (plugin) {
-      return new Text(`Plugin '${id}' was already registered in MinaPlay`, Text.Colors.ERROR);
+      return new Text(`Plugin '${name}' was already registered in MinaPlay`, Text.Colors.ERROR);
     }
 
+    const groupId = Date.now().toString();
     try {
       const proxyUrl = this.configService.get('APP_HTTP_PROXY');
-      const packageId = ignorePrefix ? id : `minaplay-plugin-${id}`;
-      const metadataResponse = await fetch(`${registry}/${packageId}/latest`, {
+      const metadataResponse = await fetch(`${registry}/${packageId}/${version}`, {
         agent: proxyUrl && new HttpsProxyAgent(proxyUrl),
       });
       if (metadataResponse.status === 404) {
-        return new Text(`Plugin package '${packageId}' not found in registry`, Text.Colors.ERROR);
+        return new Text(`Plugin package '${packageId}@${version}' not found in registry`, Text.Colors.ERROR);
       }
       const data = await metadataResponse.json();
 
       if (!yes) {
-        const groupId = Date.now().toString();
         await chat.send([
-          new Text(`Find package '${packageId}' , install it now? (Y/n)`),
+          new Text(`Find package '${packageId}@${version}' , install it now? (Y/n)`),
           new ConsumableGroup(groupId, [
             new Action('yes', new Text('Yes')),
             new Action('no', new Text('No')),
@@ -127,37 +132,49 @@ export class PluginManagerCommand {
         try {
           const resp = await chat.receive(30000);
           if (resp.type !== 'ConsumableFeedback' || resp.id !== groupId || resp.value !== 'yes') {
-            return [new Consumed(groupId), new Text(`Install '${packageId}' canceled`)];
+            return [new Consumed(groupId), new Text(`Install '${packageId}@${version}' canceled`)];
           }
         } catch {
-          return [new Consumed(groupId), new Text(`Install '${packageId}' canceled`)];
+          return [new Consumed(groupId), new Text(`Install '${packageId}@${version}' canceled`)];
         }
         await chat.send(new Consumed(groupId));
       }
 
+      await chat.send(
+        new ConsumableGroup(groupId, [new Text(`Installing plugin '${packageId}@${version}' ...`), new Pending()]),
+      );
       const tarballDownloadPath = data['dist']['tarball'];
       const tarballResponse = await fetch(tarballDownloadPath, {
         agent: proxyUrl && new HttpsProxyAgent(proxyUrl),
       });
-      const downloadDir = path.join(PLUGIN_DIR, `.${id}`);
-      const destDir = path.join(PLUGIN_DIR, id);
+      const downloadDir = path.join(PLUGIN_DIR, `.${packageId}`);
+      const destDir = path.join(PLUGIN_DIR, packageId);
       await compressing.tgz.decompress(Buffer.from(await tarballResponse.arrayBuffer()), downloadDir);
       await fs.move(path.join(downloadDir, 'package'), destDir, { overwrite: true });
       await fs.rmdir(downloadDir);
+      await execaCommand('npm install', {
+        cwd: destDir,
+      });
       const plugins = await this.pluginService.findPlugins(destDir);
       if (plugins.length > 0) {
+        const installedTexts: Text[] = [];
         for (const plugin of plugins) {
-          await this.pluginService.registerPlugin(plugin);
+          const control = await this.pluginService.registerPlugin(plugin);
+          if (control) {
+            installedTexts.push(new Text(`Plugin '${control.id}' registered`, Text.Colors.SUCCESS));
+          }
         }
-        return new Text(`Plugin package '${packageId}' installed`, Text.Colors.SUCCESS);
+        return [new Text(`Plugin package '${packageId}@${version}' installed`, Text.Colors.SUCCESS), ...installedTexts];
       } else {
         return [
-          new Text(`Plugin package '${packageId}' installed`, Text.Colors.SUCCESS),
-          new Text(`Cannot find valid MinaPlay plugin in package '${packageId}'`, Text.Colors.WARNING),
+          new Text(`Plugin package '${packageId}@${version}' installed`, Text.Colors.SUCCESS),
+          new Text(`No valid MinaPlay plugin in package '${packageId}'`, Text.Colors.WARNING),
         ];
       }
     } catch (error) {
-      return new Text(`Plugin '${id}' installation failed: ${error.message}`, Text.Colors.ERROR);
+      return new Text(`Plugin '${name}' installation failed: ${error.message}`, Text.Colors.ERROR);
+    } finally {
+      await chat.send(new Consumed(groupId));
     }
   }
 }

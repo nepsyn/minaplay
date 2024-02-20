@@ -40,6 +40,11 @@ export function useAxiosPageLoader<
     }
   };
 
+  const reload = async () => {
+    reset();
+    return await request();
+  };
+
   const setTotal = (total: number) => {
     if (data.value) {
       data.value.total = total;
@@ -58,6 +63,7 @@ export function useAxiosPageLoader<
     loaded,
     total,
     reset,
+    reload,
     setTotal,
   };
 }

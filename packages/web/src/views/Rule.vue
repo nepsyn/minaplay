@@ -26,7 +26,7 @@
             :items="orders"
             hide-details
             clearable
-            @update:model-value="query"
+            @update:model-value="rulesLoader.reload()"
           ></v-select>
         </v-col>
         <v-col cols="12" sm="auto" class="flex-grow-0">
@@ -103,11 +103,7 @@ const filters = ref<Partial<RuleQueryDto>>({
   keyword: '',
   order: 'DESC',
 });
-const query = () => {
-  rulesLoader.reset();
-  rulesLoader.request();
-};
-const useQuery = debounce(query, 1000);
+const useQuery = debounce(rulesLoader.reload, 1000);
 
 const {
   pending: creating,

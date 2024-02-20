@@ -26,8 +26,8 @@
             clearable
             autofocus
             :append-inner-icon="mdiMagnify"
-            @click:append-inner="search()"
-            @keydown.enter="search()"
+            @click:append-inner="mediasLoader.reload()"
+            @keydown.enter="mediasLoader.reload()"
           >
           </v-text-field>
         </v-container>
@@ -108,10 +108,6 @@ const { items: medias } = mediasLoader;
 mediasLoader.onRejected((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
-const search = async () => {
-  mediasLoader.reset();
-  await mediasLoader.request();
-};
 </script>
 
 <style scoped lang="sass"></style>

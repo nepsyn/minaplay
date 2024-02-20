@@ -145,6 +145,7 @@ export default {
     seriesUpdates: 'Series Updates',
     mediaUpdates: 'Media Updates',
     histories: 'Histories',
+    allSeries: 'All Series',
     medias: 'Medias',
     recommendMedias: 'Recommend Medias',
     series: 'Series',
@@ -454,6 +455,20 @@ export default {
     episode: 'Episodes',
     live: 'Lives',
     file: 'Files',
+  },
+  system: {
+    usage: 'Usage',
+    diskUsage: 'Disk Usage',
+    memoryUsage: 'Memory Usage',
+    usageLabels: {
+      minaplay: 'MinaPlay Used',
+      others: 'Others Used',
+      free: 'Free',
+    },
+    workingTime: 'Working Time',
+    startTime: 'Start Time',
+    workedTime: 'Worked for',
+    version: 'Version',
   },
   settings: {
     title: 'Settings',

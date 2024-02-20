@@ -26,8 +26,8 @@
             clearable
             autofocus
             :append-inner-icon="mdiMagnify"
-            @click:append-inner="search()"
-            @keydown.enter="search()"
+            @click:append-inner="seriesLoader.reload()"
+            @keydown.enter="seriesLoader.reload()"
           >
           </v-text-field>
         </v-container>
@@ -108,10 +108,6 @@ const { items: series } = seriesLoader;
 seriesLoader.onRejected((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
-const search = async () => {
-  seriesLoader.reset();
-  await seriesLoader.request();
-};
 </script>
 
 <style scoped lang="sass"></style>

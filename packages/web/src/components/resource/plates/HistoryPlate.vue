@@ -1,8 +1,31 @@
 <template>
-  <div>
-    <div class="d-flex flex-row align-center mt-6">
+  <div class="mb-6">
+    <div class="d-flex flex-row align-center">
       <v-icon :icon="mdiHistory" size="x-large"></v-icon>
       <span class="text-h5 ml-3">{{ t('resource.histories') }}</span>
+      <v-spacer></v-spacer>
+      <v-tooltip location="bottom">
+        {{ t(`app.input.${filters.order!.toLowerCase()}`) }}
+        <template #activator="{ props }">
+          <v-btn
+            v-bind="props"
+            variant="text"
+            :disabled="historiesLoader.pending.value"
+            :icon="filters.order === 'ASC' ? mdiSortClockDescendingOutline : mdiSortClockAscendingOutline"
+            @click="
+              filters.order = filters.order === 'ASC' ? 'DESC' : 'ASC';
+              historiesLoader.reload();
+            "
+          ></v-btn>
+        </template>
+      </v-tooltip>
+      <v-btn
+        class="ml-1"
+        variant="text"
+        :icon="mdiRefresh"
+        :loading="historiesLoader.pending.value"
+        @click="historiesLoader.reload()"
+      ></v-btn>
     </div>
     <multi-items-loader :loader="historiesLoader" class="px-0 py-4" :hide-empty="histories.length > 0">
       <v-row :dense="display.mdAndDown.value">
@@ -26,7 +49,14 @@
       <template #loading>
         <v-row :dense="display.mdAndDown.value">
           <v-col v-for="index in 8" :key="index" cols="12" sm="6">
-            <v-skeleton-loader type="image,list-item-two-line"></v-skeleton-loader>
+            <v-row>
+              <v-col cols="4">
+                <v-skeleton-loader type="image"></v-skeleton-loader>
+              </v-col>
+              <v-col cols="8">
+                <v-skeleton-loader type="paragraph"></v-skeleton-loader>
+              </v-col>
+            </v-row>
           </v-col>
         </v-row>
       </template>
@@ -35,7 +65,7 @@
 </template>
 
 <script setup lang="ts">
-import { mdiHistory } from '@mdi/js';
+import { mdiHistory, mdiRefresh, mdiSortClockAscendingOutline, mdiSortClockDescendingOutline } from '@mdi/js';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
@@ -44,18 +74,23 @@ import { useDisplay } from 'vuetify';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
 import TimeAgo from '@/components/app/TimeAgo.vue';
+import { ref } from 'vue';
+import { ApiQueryDto } from '@/api/interfaces/common.interface';
 
 const { t } = useI18n();
 const api = useApiStore();
 const router = useRouter();
 const display = useDisplay();
 
+const filters = ref<ApiQueryDto>({
+  sort: 'updateAt',
+  order: 'DESC',
+});
 const historiesLoader = useAxiosPageLoader(
   async (query = {}) => {
     return await api.ViewHistory.query({
       ...query,
-      sort: 'updateAt',
-      order: 'DESC',
+      ...filters.value,
     });
   },
   { page: 0, size: 8 },

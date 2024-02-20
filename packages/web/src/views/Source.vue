@@ -76,10 +76,7 @@ const sourcesLoader = useAxiosPageLoader(
 const { items: sources } = sourcesLoader;
 
 const keyword = ref('');
-const useQuery = debounce(() => {
-  sourcesLoader.reset();
-  sourcesLoader.request();
-}, 1000);
+const useQuery = debounce(sourcesLoader.reload, 1000);
 
 const {
   pending: creating,

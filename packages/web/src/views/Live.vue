@@ -26,7 +26,7 @@
             :items="orders"
             hide-details
             clearable
-            @update:model-value="query"
+            @update:model-value="livesLoader.reload()"
           ></v-select>
         </v-col>
         <v-col cols="12" sm="auto" class="flex-grow-0">
@@ -104,11 +104,7 @@ const filters = ref<Partial<LiveQueryDto>>({
   keyword: '',
   order: 'DESC',
 });
-const query = () => {
-  livesLoader.reset();
-  livesLoader.request();
-};
-const useQuery = debounce(query, 1000);
+const useQuery = debounce(livesLoader.reload, 1000);
 
 const {
   pending: creating,

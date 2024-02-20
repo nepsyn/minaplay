@@ -146,6 +146,7 @@ const zh: MessageSchema = {
     seriesUpdates: '最新剧集',
     mediaUpdates: '最新媒体',
     histories: '历史记录',
+    allSeries: '全部剧集',
     medias: '媒体',
     recommendMedias: '推荐媒体',
     series: '剧集',
@@ -454,6 +455,20 @@ const zh: MessageSchema = {
     episode: '单集',
     live: '放映室',
     file: '文件',
+  },
+  system: {
+    usage: '用量',
+    diskUsage: '存储空间用量',
+    memoryUsage: '内存用量',
+    usageLabels: {
+      minaplay: 'MinaPlay 使用',
+      others: '其他应用使用',
+      free: '空闲',
+    },
+    workingTime: '工作时间',
+    startTime: '启动时间',
+    workedTime: '已持续运行',
+    version: '版本',
   },
   settings: {
     title: '设置',

@@ -16,6 +16,7 @@ import MediaUpdatesPlate from '@/components/resource/plates/MediaUpdatesPlate.vu
 import HistoryPlate from '@/components/resource/plates/HistoryPlate.vue';
 import { useSettingsStore } from '@/store/settings';
 import NoPlates from '@/views/error/NoPlates.vue';
+import SeriesPlate from '@/components/resource/plates/SeriesPlate.vue';
 
 const { settings } = useSettingsStore();
 
@@ -24,6 +25,7 @@ const plateMap = new Map(
     'series-update': SeriesUpdatesPlate,
     history: HistoryPlate,
     'media-update': MediaUpdatesPlate,
+    series: SeriesPlate,
   }),
 );
 </script>

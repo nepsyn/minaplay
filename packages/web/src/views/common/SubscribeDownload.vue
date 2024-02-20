@@ -25,7 +25,7 @@
           item-value="value"
           hide-details
           clearable
-          @update:model-value="query"
+          @update:model-value="downloadsLoader.reload()"
         ></v-select>
       </v-col>
       <v-col cols="6" sm="4">
@@ -37,7 +37,7 @@
           :items="orders"
           hide-details
           clearable
-          @update:model-value="query"
+          @update:model-value="downloadsLoader.reload()"
         ></v-select>
       </v-col>
       <v-col cols="12" sm="auto" class="text-end">
@@ -48,7 +48,7 @@
           height="40"
           :prepend-icon="mdiRefresh"
           :loading="downloadsLoader.pending.value"
-          @click="query()"
+          @click="downloadsLoader.reload()"
         >
           {{ t('app.actions.refresh') }}
         </v-btn>
@@ -116,11 +116,7 @@ const filters = ref<Partial<DownloadItemQueryDto>>({
   sort: undefined,
   order: 'DESC',
 });
-const query = () => {
-  downloadsLoader.reset();
-  downloadsLoader.request();
-};
-const useQuery = debounce(query, 1000);
+const useQuery = debounce(downloadsLoader.reload, 1000);
 
 const statusOptions = [
   {

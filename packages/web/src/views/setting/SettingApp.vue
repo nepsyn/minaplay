@@ -86,6 +86,7 @@
             <v-card-subtitle class="my-2">{{ t('settings.app.visiblePlates') }}</v-card-subtitle>
             <v-divider></v-divider>
             <vue-sortable
+              :key="sortableKey"
               class="h-100"
               :list="visiblePlates"
               @end="
@@ -94,8 +95,8 @@
               item-key="value"
               :options="{ group: 'shared', animation: 150 }"
             >
-              <template #item="{ element, index }">
-                <v-list-item :prepend-icon="element.icon" class="cursor-move" :key="index">
+              <template #item="{ element }">
+                <v-list-item :prepend-icon="element.icon" class="cursor-move" :key="element.value">
                   <v-list-item-title>{{ element.name }}</v-list-item-title>
                 </v-list-item>
               </template>
@@ -107,6 +108,7 @@
             <v-card-subtitle class="my-2">{{ t('settings.app.hiddenPlates') }}</v-card-subtitle>
             <v-divider></v-divider>
             <vue-sortable
+              :key="sortableKey"
               class="h-100"
               :list="hiddenPlates"
               @end="
@@ -115,8 +117,8 @@
               item-key="value"
               :options="{ group: 'shared', animation: 150 }"
             >
-              <template #item="{ element, index }">
-                <v-list-item :prepend-icon="element.icon" class="cursor-move" :key="index">
+              <template #item="{ element }">
+                <v-list-item :prepend-icon="element.icon" class="cursor-move" :key="element.value">
                   <v-list-item-title>{{ element.name }}</v-list-item-title>
                 </v-list-item>
               </template>
@@ -135,13 +137,14 @@ import {
   mdiAnimationPlayOutline,
   mdiHistory,
   mdiMicrophonePlus,
+  mdiMotionPlayOutline,
   mdiMultimedia,
   mdiSubtitles,
   mdiThemeLightDark,
   mdiTranslate,
 } from '@mdi/js';
 import { Sortable as VueSortable } from 'sortablejs-vue3';
-import { onMounted } from 'vue';
+import { onMounted, onUpdated, ref } from 'vue';
 import { useRoute } from 'vue-router';
 
 const { t } = useI18n();
@@ -175,7 +178,7 @@ const themes = [
 const allPlates = [
   {
     name: t('resource.seriesUpdates'),
-    icon: mdiAnimationPlayOutline,
+    icon: mdiMotionPlayOutline,
     value: 'series-update',
   },
   {
@@ -188,9 +191,18 @@ const allPlates = [
     icon: mdiMultimedia,
     value: 'media-update',
   },
+  {
+    name: t('resource.allSeries'),
+    icon: mdiAnimationPlayOutline,
+    value: 'series',
+  },
 ];
-const visiblePlates = settings.plates.map((name) => allPlates.find(({ value }) => value === name)!);
+const visiblePlates = allPlates.filter(({ value }) => settings.plates.includes(value as any));
 const hiddenPlates = allPlates.filter(({ value }) => !settings.plates.includes(value as any));
+const sortableKey = ref(Date.now());
+onUpdated(() => {
+  sortableKey.value = Date.now();
+});
 const onMoveEnd = (from: number, to: number, origin: any[], target: any[]) => {
   const item = origin.splice(from, 1)[0];
   target.splice(to, 0, item);

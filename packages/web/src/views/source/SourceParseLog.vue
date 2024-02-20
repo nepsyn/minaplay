@@ -13,7 +13,7 @@
           item-value="value"
           hide-details
           clearable
-          @update:model-value="query"
+          @update:model-value="logsLoader.reload()"
         ></v-select>
       </v-col>
       <v-col cols="6" sm="3">
@@ -25,7 +25,7 @@
           :items="orders"
           hide-details
           clearable
-          @update:model-value="query"
+          @update:model-value="logsLoader.reload()"
         ></v-select>
       </v-col>
       <v-col class="flex-grow-1 text-end">
@@ -152,10 +152,6 @@ const filters = ref<Partial<ParseLogQueryDto>>({
   status: undefined,
   order: 'DESC',
 });
-const query = () => {
-  logsLoader.reset();
-  logsLoader.request();
-};
 
 const statusOptions = [
   {

@@ -11,7 +11,7 @@
           :items="orders"
           hide-details
           clearable
-          @update:model-value="query"
+          @update:model-value="logsLoader.reload()"
         ></v-select>
       </v-col>
       <v-col class="flex-grow-1 text-end">
@@ -67,7 +67,7 @@ import { useApiStore } from '@/store/api';
 import { useRoute } from 'vue-router';
 import { useToastStore } from '@/store/toast';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
-import { ParseLogQueryDto, RuleErrorLogEntity } from '@/api/interfaces/subscribe.interface';
+import { RuleErrorLogEntity } from '@/api/interfaces/subscribe.interface';
 import { ApiQueryDto } from '@/api/interfaces/common.interface';
 import { ref } from 'vue';
 import { useAxiosRequest } from '@/composables/use-axios-request';
@@ -92,20 +92,16 @@ const logsLoader = useAxiosPageLoader(
   async (query: ApiQueryDto<RuleErrorLogEntity> = {}) => {
     return await api.Rule.getErrorLogsById(Number(route.params.id))({
       ...query,
-      order: filters.value.order,
+      ...filters.value,
     });
   },
   { page: 0, size: 20 },
 );
 const { items: logs } = logsLoader;
 
-const filters = ref<Partial<ParseLogQueryDto>>({
+const filters = ref<ApiQueryDto<RuleErrorLogEntity>>({
   order: 'DESC',
 });
-const query = () => {
-  logsLoader.reset();
-  logsLoader.request();
-};
 
 const {
   pending: logsClearing,

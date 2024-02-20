@@ -47,7 +47,7 @@ watch(
 onBeforeMount(async () => {
   if (api.isLogin) {
     try {
-      const response = await api.User.getProfileById(Number(localStorage.getItem('minaplay-user')))();
+      const response = await api.Auth.refreshToken();
       api.user = response.data;
     } catch {
       toast.toastWarning(t(`error.${ErrorCodeEnum.INVALID_TOKEN}`));

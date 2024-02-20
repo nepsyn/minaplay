@@ -71,12 +71,7 @@ export const useApiStore = defineStore('api', () => {
     token.value = value;
     if (value == null) {
       localStorage.removeItem('minaplay-token');
-      localStorage.removeItem('minaplay-user');
     } else {
-      try {
-        const payload: { id: number } = JSON.parse(atob(value.split('.')[1]));
-        localStorage.setItem('minaplay-user', String(payload.id));
-      } catch {}
       localStorage.setItem('minaplay-token', value);
     }
   };

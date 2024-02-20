@@ -17,6 +17,7 @@
     "@mdi/js": "^7.4.47",
     "ansi_up": "^6.0.2",
     "axios": "^1.6.7",
+    "chart.js": "^4.4.1",
     "cron-parser": "^4.9.0",
     "danmu.js": "^1.1.13",
     "filesize": "^10.1.0",
@@ -36,6 +37,7 @@
     "timeago.js": "^4.0.2",
     "ts-ebml": "^2.0.2",
     "vue": "^3.4.19",
+    "vue-chartjs": "^5.3.0",
     "vue-i18n": "^9.9.1",
     "vue-router": "^4.2.5",
     "vuetify": "^3.5.3"

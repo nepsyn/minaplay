@@ -4,7 +4,7 @@
       <v-icon :icon="mdiHistory" size="x-large"></v-icon>
       <span class="text-h5 ml-3">{{ t('resource.histories') }}</span>
       <v-spacer></v-spacer>
-      <v-tooltip location="bottom">
+      <v-tooltip location="left">
         {{ t(`app.input.${filters.order!.toLowerCase()}`) }}
         <template #activator="{ props }">
           <v-btn

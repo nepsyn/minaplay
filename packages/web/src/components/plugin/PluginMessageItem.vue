@@ -18,6 +18,9 @@
       {{ Math.round(ttl / 1000) }}
     </v-progress-circular>
   </template>
+  <template v-else-if="message.type === 'Pending'">
+    <v-progress-circular :color="message.color" indeterminate></v-progress-circular>
+  </template>
   <template v-else-if="message.type === 'ConsumableGroup'">
     <v-row dense class="align-center">
       <template v-for="(item, index) in message.items" :key="index">

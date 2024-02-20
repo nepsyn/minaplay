@@ -42,6 +42,11 @@ export interface MinaPlayTimeout {
   ms: number;
 }
 
+export interface MinaPlayPending {
+  type: 'Pending';
+  color?: string;
+}
+
 export type MinaPlayMessage =
   | MinaPlayText
   | MinaPlayNetworkImage
@@ -50,4 +55,5 @@ export type MinaPlayMessage =
   | MinaPlayConsumableGroup
   | MinaPlayConsumableFeedback
   | MinaPlayConsumed
-  | MinaPlayTimeout;
+  | MinaPlayTimeout
+  | MinaPlayPending;

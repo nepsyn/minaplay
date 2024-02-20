@@ -15,10 +15,14 @@
         <v-sheet v-if="series" border class="pa-6 rounded">
           <v-row>
             <v-col cols="12" sm="9" class="d-flex flex-column">
-              <span class="text-h5 text-break">{{ series.name }}</span>
-              <span v-if="series.season" class="text-body-2 text-medium-emphasis text-break">
-                {{ t('series.seasonLabel', { season: series.season }) }}
-              </span>
+              <div class="d-flex flex-row align-center justify-space-between">
+                <div>
+                  <span class="text-h5 text-break">{{ series.name }}</span>
+                  <span v-if="series.season" class="text-body-2 text-medium-emphasis text-break">
+                    {{ t('series.seasonLabel', { season: series.season }) }}
+                  </span>
+                </div>
+              </div>
               <v-row class="mt-1 flex-grow-0" dense>
                 <v-col cols="auto" v-for="(tag, index) in series.tags" :key="index">
                   <v-chip color="primary" density="compact" label :text="tag.name"></v-chip>
@@ -108,7 +112,6 @@ import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useRoute, useRouter } from 'vue-router';
-import { computed } from 'vue';
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 import ZoomImg from '@/components/app/ZoomImg.vue';
@@ -126,7 +129,11 @@ const router = useRouter();
 const seriesLoader = useAxiosRequest(async () => {
   return await api.Series.getById(Number(route.params.seriesId))();
 });
-const series = computed(() => seriesLoader.data.value);
+const { data: series } = seriesLoader;
+
+const subscribeLoader = useAxiosRequest(async () => {
+  return await api.Series.findSubscribe(Number(route.params.seriesId))();
+});
 
 const episodesLoader = useAxiosPageLoader(
   async (query = {}) => {

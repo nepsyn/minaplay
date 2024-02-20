@@ -2,11 +2,12 @@ import { Controller, Get, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
-import { PermissionEnum } from '../../enums/permission.enum.js';
+import { PermissionEnum } from '../../enums/index.js';
 import { SystemService } from './system.service.js';
 import { MINAPLAY_VERSION } from '../../constants.js';
 import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
+import { RequestTimeout } from '../../common/request.timeout.decorator.js';
 
 @Controller('system')
 @UseGuards(AuthorizationGuard)
@@ -22,6 +23,7 @@ export class SystemController {
   })
   @UseInterceptors(CacheInterceptor)
   @CacheTTL(60 * 1000)
+  @RequestTimeout(30000)
   async getStatus() {
     return {
       startAt: this.systemService.startAt,

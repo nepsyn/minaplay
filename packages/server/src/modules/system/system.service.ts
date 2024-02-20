@@ -1,13 +1,17 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import os from 'node:os';
 import { DATA_DIR } from '../../constants.js';
-import checkDiskSpace from 'check-disk-space';
-import getFolderSize from 'get-folder-size';
 import process from 'node:process';
+import { check } from 'diskusage';
+import path from 'node:path';
+import fastFolderSize from 'fast-folder-size';
+import { promisify } from 'node:util';
 
 @Injectable()
 export class SystemService implements OnModuleInit {
   public startAt: Date;
+
+  static getFolderSize = promisify(fastFolderSize);
 
   async onModuleInit() {
     this.startAt = new Date();
@@ -22,14 +26,12 @@ export class SystemService implements OnModuleInit {
   }
 
   async getDiskUsage() {
-    // @ts-ignore
-    const diskSpace = await checkDiskSpace(DATA_DIR);
+    const diskSpace = await check(DATA_DIR);
     return {
-      disk: diskSpace.diskPath,
-      total: diskSpace.size,
-      free: diskSpace.free,
-      // @ts-ignore
-      used: await getFolderSize.loose(DATA_DIR),
+      disk: path.parse(DATA_DIR).root,
+      total: diskSpace.total,
+      free: diskSpace.available,
+      used: await SystemService.getFolderSize(path.join(DATA_DIR, '..')),
     };
   }
 }

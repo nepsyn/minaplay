@@ -27,10 +27,8 @@ export * from './media/episode/episode.service.js';
 export * from './media/view-history/view-history.service.js';
 
 export * from './notification/notification-meta.entity.js';
-export * from './notification/notification-subscribe.entity.js';
 export * from './notification/notification.service.js';
 export * from './notification/notification-meta.service.js';
-export * from './notification/notification-subscribe.service.js';
 export * from './notification/notification-service-adapter.interface.js';
 
 export * from './plugin/plugin.service.js';

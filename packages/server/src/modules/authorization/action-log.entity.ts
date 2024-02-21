@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Relation } from 'typeorm';
 import { User } from '../user/user.entity.js';
-import { AuthActionEnum } from '../../enums/auth-action.enum.js';
+import { AuthActionEnum } from '../../enums/index.js';
 
 /** 操作日志 */
 @Entity()
@@ -14,10 +14,7 @@ export class ActionLog {
   ip?: string;
 
   /** 操作类型 */
-  @Column({
-    type: 'enum',
-    enum: AuthActionEnum,
-  })
+  @Column()
   action: AuthActionEnum;
 
   /** 操作人 */

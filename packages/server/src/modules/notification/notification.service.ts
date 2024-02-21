@@ -1,23 +1,19 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
-import { NotificationEventEnum } from '../../enums/notification-event.enum.js';
+import { NotificationEventEnum, NotificationServiceEnum } from '../../enums/index.js';
 import { NotificationEventMap } from './notification-event.interface.js';
 import { User } from '../user/user.entity.js';
 import { NotificationServiceAdapter } from './notification-service-adapter.interface.js';
 import { DiscoveryService } from '@nestjs/core';
-import { NotificationServiceEnum } from '../../enums/notification-service.enum.js';
-import { In } from 'typeorm';
-import { NotificationSubscribeService } from './notification-subscribe.service.js';
+import { In, Like } from 'typeorm';
+import { NotificationMetaService } from './notification-meta.service.js';
 
 @Injectable()
 export class NotificationService implements OnModuleInit {
   private logger = new ApplicationLogger(NotificationService.name);
   private adapters: Map<NotificationServiceEnum, NotificationServiceAdapter> = new Map();
 
-  constructor(
-    private discoveryService: DiscoveryService,
-    private notificationSubscribeService: NotificationSubscribeService,
-  ) {}
+  constructor(private discoveryService: DiscoveryService, private notificationMetaService: NotificationMetaService) {}
 
   getAdapter(type: NotificationServiceEnum) {
     return this.adapters.get(type);
@@ -43,22 +39,18 @@ export class NotificationService implements OnModuleInit {
   }
 
   async notify<T extends NotificationEventEnum>(event: T, data: NotificationEventMap[T], to?: User | User[]) {
-    const [subscribes] = await this.notificationSubscribeService.findAndCount({
+    const [metas] = await this.notificationMetaService.findAndCount({
       where: {
-        name: event,
-        meta: {
-          enabled: true,
-          user: {
-            id: to && In([].concat(to).map(({ id }) => id)),
-            notify: true,
-          },
+        events: Like(`%${event}%`),
+        enabled: true,
+        user: {
+          id: to && In([].concat(to).map(({ id }) => id)),
+          notify: true,
         },
       },
     });
 
-    for (const subscribe of subscribes) {
-      const meta = await subscribe.meta;
-
+    for (const meta of metas) {
       const adapter = this.getAdapter(meta.service);
       if (!adapter) {
         continue;

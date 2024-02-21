@@ -9,26 +9,12 @@ import { EmailAdapter } from './adapters/email/email.adapter.js';
 import { NotificationGateway } from './adapters/ws/notification.gateway.js';
 import { WsAdapter } from './adapters/ws/ws.adapter.js';
 import { NotificationMetaService } from './notification-meta.service.js';
-import { NotificationSubscribeService } from './notification-subscribe.service.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationMeta } from './notification-meta.entity.js';
-import { NotificationSubscribe } from './notification-subscribe.entity.js';
 
 @Module({
-  imports: [
-    AuthorizationModule,
-    UserModule,
-    DiscoveryModule,
-    TypeOrmModule.forFeature([NotificationMeta, NotificationSubscribe]),
-  ],
-  providers: [
-    NotificationService,
-    NotificationMetaService,
-    NotificationSubscribeService,
-    EmailAdapter,
-    NotificationGateway,
-    WsAdapter,
-  ],
+  imports: [AuthorizationModule, UserModule, DiscoveryModule, TypeOrmModule.forFeature([NotificationMeta])],
+  providers: [NotificationService, NotificationMetaService, EmailAdapter, NotificationGateway, WsAdapter],
   controllers: [NotificationController],
   exports: [NotificationService],
 })

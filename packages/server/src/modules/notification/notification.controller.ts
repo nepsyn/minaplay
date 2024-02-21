@@ -20,16 +20,14 @@ import { User } from '../user/user.entity.js';
 import { NotificationMetaService } from './notification-meta.service.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { buildException } from '../../utils/build-exception.util.js';
-import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
+import { ErrorCodeEnum, NotificationServiceEnum } from '../../enums/index.js';
 import { NotificationService } from './notification.service.js';
-import { NotificationSubscribeDto } from './notification-subscribe.dto.js';
+import { NotificationMetaDto } from './notification-meta.dto.js';
 import { EmailBindDto } from './adapters/email/email-bind.dto.js';
 import { EmailVerifyDto } from './adapters/email/email-verify.dto.js';
 import { EmailAdapter } from './adapters/email/email.adapter.js';
-import { NotificationServiceEnum } from '../../enums/notification-service.enum.js';
 import { AdapterEnabledGuard } from './adapter-enabled.guard.js';
 import { RequireAdapter } from './require-adapter.decorator.js';
-import { NotificationSubscribeService } from './notification-subscribe.service.js';
 
 @Controller('notification')
 @ApiTags('notification')
@@ -39,7 +37,6 @@ export class NotificationController {
   constructor(
     private notificationService: NotificationService,
     private notificationMetaService: NotificationMetaService,
-    private notificationSubscribeService: NotificationSubscribeService,
     private emailAdapter: EmailAdapter,
   ) {}
 
@@ -64,14 +61,14 @@ export class NotificationController {
     return new ApiPaginationResultDto(metas, count, 0, -1);
   }
 
-  @Put(':id/subscribe')
+  @Put(':id')
   @ApiOperation({
-    description: '修改通知服务事件订阅',
+    description: '修改通知服务',
   })
   async updateMetaSubscribes(
     @RequestUser() user: User,
     @Param('id', ParseIntPipe) id: number,
-    @Body() data: NotificationSubscribeDto,
+    @Body() data: NotificationMetaDto,
   ) {
     const meta = await this.notificationMetaService.findOneBy({
       id,
@@ -86,15 +83,12 @@ export class NotificationController {
       throw buildException(NotImplementedException, ErrorCodeEnum.NOT_IMPLEMENTED);
     }
 
-    await this.notificationSubscribeService.delete({
-      metaId: id,
+    await this.notificationMetaService.save({
+      id,
+      enabled: data.enabled,
+      events: data.subscribes?.join(','),
     });
-    for (const name of data.subscribes) {
-      await this.notificationSubscribeService.save({
-        metaId: id,
-        name,
-      });
-    }
+
     return await this.notificationMetaService.findOneBy({ id });
   }
 

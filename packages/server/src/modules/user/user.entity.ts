@@ -14,7 +14,8 @@ import { Exclude, Expose } from 'class-transformer';
 import { File } from '../file/file.entity.js';
 import { Series } from '../media/series/series.entity.js';
 import { Source } from '../subscribe/source/source.entity.js';
-import { PermissionEnum } from '../../enums/permission.enum.js';
+import { PermissionEnum } from '../../enums/index.js';
+import { NotificationMeta } from '../notification/notification-meta.entity.js';
 
 /** 用户 */
 @Entity()
@@ -67,6 +68,13 @@ export class User {
   @Exclude()
   @OneToMany(() => Source, (source) => source.user)
   sources: Relation<Source[]>;
+
+  /** 创建的通知服务 */
+  @Expose({ groups: ['profile'] })
+  @OneToMany(() => NotificationMeta, (meta) => meta.user, {
+    eager: true,
+  })
+  metas: Relation<NotificationMeta[]>;
 
   /** 头像文件 */
   @ManyToOne(() => File, {

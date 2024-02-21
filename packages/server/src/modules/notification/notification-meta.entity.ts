@@ -22,10 +22,8 @@ export class NotificationMeta {
 
   /** 用户 */
   @ManyToOne(() => User, {
-    eager: true,
     onDelete: 'CASCADE',
   })
-  @Exclude()
   user: Relation<User>;
 
   /** 通知类型 */

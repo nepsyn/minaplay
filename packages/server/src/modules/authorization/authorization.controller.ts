@@ -138,6 +138,8 @@ export class AuthorizationController {
       password: await encryptPassword(data.current),
     });
 
+    await this.authService.revokeTicket(user.id);
+
     return data;
   }
 
@@ -242,6 +244,8 @@ export class AuthorizationController {
       id: user.id,
       password: await encryptPassword(data.current),
     });
+
+    await this.authService.revokeTicket(userId);
 
     return { current: data.current };
   }

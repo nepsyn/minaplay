@@ -138,7 +138,7 @@
                 <v-divider></v-divider>
               </template>
             </template>
-            <template #footer="{ page, pageCount, setPage, prevPage, nextPage }">
+            <template #footer="{ page, pageCount, setPage }">
               <v-pagination
                 class="my-2"
                 density="comfortable"

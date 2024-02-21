@@ -1,6 +1,7 @@
 import { PermissionEnum } from '@/api/enums/permission.enum';
 import { FileEntity } from '@/api/interfaces/file.interface';
 import { ApiQueryDto } from '@/api/interfaces/common.interface';
+import { NotificationMetaEntity } from '@/api/interfaces/notification.interface';
 
 export interface UserEntity {
   /** id */
@@ -11,6 +12,8 @@ export interface UserEntity {
   createAt: Date;
   /** 是否启用通知 */
   notify?: boolean;
+  /** 通知服务 */
+  metas: NotificationMetaEntity[];
   /** 邮箱地址 */
   email?: string;
   /** 修改时间 */

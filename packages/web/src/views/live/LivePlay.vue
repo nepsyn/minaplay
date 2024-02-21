@@ -138,8 +138,13 @@
               </v-row>
             </v-container>
             <v-container v-else class="scrollable-container d-flex flex-column align-center justify-center">
-              <v-icon :icon="mdiEmoticonCoolOutline" size="100"></v-icon>
-              <span class="font-italic font-weight-bold mt-4 px-6">{{ t('live.play.voice.single') }}</span>
+              <v-icon
+                :icon="consumerTransport ? mdiEmoticonCoolOutline : mdiEmoticonConfusedOutline"
+                size="100"
+              ></v-icon>
+              <span class="font-italic font-weight-bold mt-4 px-6">
+                {{ consumerTransport ? t('live.play.voice.single') : t('live.play.voice.voiceNotConnected') }}
+              </span>
             </v-container>
             <div class="d-flex flex-column flex-grow-0">
               <v-divider></v-divider>
@@ -515,6 +520,7 @@ import {
   mdiCheck,
   mdiClose,
   mdiCloudUpload,
+  mdiEmoticonConfusedOutline,
   mdiEmoticonCoolOutline,
   mdiImagePlus,
   mdiLock,

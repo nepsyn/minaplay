@@ -12,7 +12,9 @@
     :eager="eager"
   >
     <template #placeholder>
-      <v-img :src="placeholder"></v-img>
+      <slot name="placeholder">
+        <v-img cover :src="placeholder"></v-img>
+      </slot>
     </template>
     <v-overlay activator="parent" close-on-content-click close-on-back class="align-center justify-center">
       <v-container class="d-flex align-center justify-center" style="width: 100dvw; height: 100dvh">

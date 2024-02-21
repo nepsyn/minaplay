@@ -3,6 +3,7 @@ import { StatusEnum } from '@/api/enums/status.enum';
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
 import { MessageSchema } from '@/lang/index';
 import { AuthActionEnum } from '@/api/enums/auth-action.enum';
+import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
 
 const zh: MessageSchema = {
   app: {
@@ -55,6 +56,7 @@ const zh: MessageSchema = {
       series: '剧集',
       episode: '单集',
       file: '文件',
+      notificationMeta: '通知服务',
     },
     actions: {
       add: '新建',
@@ -379,6 +381,7 @@ const zh: MessageSchema = {
       },
       voice: {
         single: '您包场了此语音房间！',
+        voiceNotConnected: '放映室语音服务未连接',
         voiceConnectFailed: '连接放映室语音服务失败',
         voiceNotEnabled: '浏览器录音被禁止',
         join: '加入语音',
@@ -500,7 +503,25 @@ const zh: MessageSchema = {
       avatar: '用户头像',
       uploadAvatar: '上传新头像',
       globalNotification: '全局通知',
+      password: '密码',
+      oldPassword: '原密码',
+      newPassword: '新密码',
+      passwordConfirm: '确认新密码',
+      passwordChanged: '密码已更改，请重新登录',
+      passwordLength: '密码长度应在 6~40 之间',
+      passwordMismatch: '两次输入的新密码不一致',
+      changePassword: '更改密码',
       notification: '通知',
+      availableAdapters: '可选通知服务',
+      adapters: {
+        [NotificationServiceEnum.WS]: '用户界面通知',
+        [NotificationServiceEnum.EMAIL]: '邮箱通知',
+      },
+      subscriptions: '编辑消息订阅',
+      email: {
+        address: '邮箱地址',
+        verifyCode: '邮箱验证码',
+      },
     },
   },
   login: {

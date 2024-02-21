@@ -3,10 +3,18 @@
     <pre class="text-subtitle-2 text-pre-wrap" :style="{ color: message.color }">{{ message.content }}</pre>
   </template>
   <template v-else-if="message.type === 'NetworkImage'">
-    <zoom-img class="rounded" :src="message.url" eager max-width="60%"></zoom-img>
+    <zoom-img class="rounded" :src="message.url" eager max-width="240">
+      <template #placeholder>
+        <v-skeleton-loader height="100%" type="image"></v-skeleton-loader>
+      </template>
+    </zoom-img>
   </template>
   <template v-else-if="message.type === 'Base64Image'">
-    <zoom-img class="rounded" :src="message.content" eager max-width="60%"></zoom-img>
+    <zoom-img class="rounded" :src="message.content" eager max-width="240">
+      <template #placeholder>
+        <v-skeleton-loader height="100%" type="image"></v-skeleton-loader>
+      </template>
+    </zoom-img>
   </template>
   <template v-else-if="message.type === 'Action'">
     <v-btn :color="message.text.color" variant="outlined" density="comfortable" @click="emits('action', message.value)">

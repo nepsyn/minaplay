@@ -8,10 +8,6 @@ import {
   ChangePasswordData,
   ChangePasswordDto,
   CreateUserDto,
-  EmailBindData,
-  EmailBindDto,
-  EmailVerifyData,
-  EmailVerifyDto,
   LoginDto,
   PermissionDto,
 } from '@/api/interfaces/auth.interface';
@@ -57,6 +53,14 @@ import { FileEntity, FileQueryDto } from '@/api/interfaces/file.interface';
 import { SystemStatus } from '@/api/interfaces/system.interface';
 import { LiveDto, LiveEntity, LiveQueryDto } from '@/api/interfaces/live.interface';
 import { PluginControl } from '@/api/interfaces/plugin.interface';
+import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
+import {
+  EmailBindData,
+  EmailConfigDto,
+  EmailVerifyDto,
+  NotificationMetaDto,
+  NotificationMetaEntity,
+} from '@/api/interfaces/notification.interface';
 
 export const useApiStore = defineStore('api', () => {
   const user = ref<UserEntity | undefined>(undefined);
@@ -123,8 +127,6 @@ export const useApiStore = defineStore('api', () => {
     login: apiPost<AuthData, LoginDto>('/api/v1/auth/login/'),
     logout: apiPost('/api/v1/auth/logout/'),
     refreshToken: apiPost<AuthData>('/api/v1/auth/refresh'),
-    bindEmail: apiPost<EmailBindData, EmailBindDto>('/api/v1/auth/email/bind'),
-    verifyEmail: apiPost<EmailVerifyData, EmailVerifyDto>('/api/v1/auth/email/verify'),
     changePassword: apiPut<ChangePasswordData, ChangePasswordDto>('/api/v1/auth/password'),
     createUser: apiPost<UserEntity, CreateUserDto>('/api/v1/auth/user/create'),
     logoutUser: (id: number) => apiPost(`/api/v1/auth/user/${id}/logout`),
@@ -259,6 +261,17 @@ export const useApiStore = defineStore('api', () => {
     disable: (id: string) => apiPost<PluginControl>(`/api/v1/plugins/${id}/disable`),
   };
 
+  const Notification = {
+    socketPath: baseUrl + '/notification',
+    getEnabledAdapters: apiGet<{ adapters: NotificationServiceEnum[] }>('/api/v1/notification/adapters'),
+    getAll: apiGet<ApiQueryResult<NotificationMetaEntity>>('/api/v1/notification'),
+    update: (id: number) => apiPut<NotificationMetaEntity, NotificationMetaDto>(`/api/v1/notification/${id}`),
+    delete: (id: number) => apiDelete(`/api/v1/notification/${id}`),
+    bindWs: apiPost<NotificationMetaEntity>('/api/v1/notification/ws/bind'),
+    bindEmail: apiPost<EmailBindData, EmailConfigDto>('/api/v1/notification/email/bind'),
+    verifyEmail: apiPost<NotificationMetaEntity, EmailVerifyDto>('/api/v1/notification/email/verify'),
+  };
+
   return {
     isLogin,
     getToken,
@@ -280,5 +293,6 @@ export const useApiStore = defineStore('api', () => {
     ViewHistory,
     System,
     Plugin,
+    Notification,
   };
 });

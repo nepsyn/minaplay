@@ -2,6 +2,7 @@ import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { StatusEnum } from '@/api/enums/status.enum';
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
 import { AuthActionEnum } from '@/api/enums/auth-action.enum';
+import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
 
 export default {
   app: {
@@ -54,6 +55,7 @@ export default {
       series: 'Series',
       episode: 'Episode',
       file: 'File',
+      notificationMeta: 'Notification Service',
     },
     actions: {
       add: 'New',
@@ -378,7 +380,8 @@ export default {
         url: 'URL',
       },
       voice: {
-        single: 'You are the only one!',
+        single: `You've booked the whole live room!`,
+        voiceNotConnected: 'Live voice service not connected',
         voiceConnectFailed: 'Live voice service connect failed',
         voiceNotEnabled: 'Audio recording is forbidden',
         join: 'Join Live Voice',
@@ -500,7 +503,25 @@ export default {
       avatar: 'User Avatar',
       uploadAvatar: 'Upload New Avatar',
       globalNotification: 'Global Notification',
+      password: 'Password',
+      oldPassword: 'Old Password',
+      newPassword: 'New Password',
+      passwordConfirm: 'Confirm New Password',
+      passwordChanged: 'Password changed, Please login again',
+      passwordLength: 'Password must be in 6~40 characters',
+      passwordMismatch: 'The two passwords do not match',
+      changePassword: 'Change Password',
       notification: 'Notification',
+      availableAdapters: 'Available Adapters',
+      adapters: {
+        [NotificationServiceEnum.WS]: 'Web UI Interface Notification',
+        [NotificationServiceEnum.EMAIL]: 'Email Notification',
+      },
+      subscriptions: ' Edit Notification Subscriptions',
+      email: {
+        address: 'Email Address',
+        verifyCode: 'Email Verification Code',
+      },
     },
   },
   login: {

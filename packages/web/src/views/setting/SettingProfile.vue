@@ -14,9 +14,9 @@
         <v-container class="pa-0">
           <p class="text-subtitle-1">{{ t('settings.profile.avatar') }}</p>
           <v-btn
-            density="compact"
+            density="comfortable"
             color="primary"
-            variant="outlined"
+            variant="tonal"
             :prepend-icon="mdiUpload"
             :loading="avatarUploading || avatarUpdating"
             @click="selectAndUploadAvatar()"
@@ -44,10 +44,206 @@
           @update:model-value="updateNotify({ notify: api.user?.notify })"
         ></v-switch>
       </v-container>
+      <v-divider class="ml-4"></v-divider>
+      <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
+        <v-container class="pa-0">
+          <p class="text-subtitle-1">{{ t('settings.profile.password') }}</p>
+        </v-container>
+        <v-btn variant="tonal" :prepend-icon="mdiKeyVariant" color="warning" @click="openPasswordDialog()">
+          {{ t('settings.profile.changePassword') }}
+        </v-btn>
+      </v-container>
     </v-sheet>
     <v-sheet class="mt-6 rounded-lg border">
-      <v-card-title class="py-6">{{ t('settings.profile.notification') }}</v-card-title>
+      <v-card-title class="py-6 d-flex align-center">
+        <span>{{ t('settings.profile.notification') }}</span>
+        <v-spacer></v-spacer>
+        <v-menu location="left">
+          <v-list class="rounded py-0" density="compact">
+            <v-list-subheader>
+              {{ t('settings.profile.availableAdapters') }}
+            </v-list-subheader>
+            <v-list-item
+              v-for="adapter in availableAdapters"
+              :key="adapter.id"
+              :prepend-icon="adapter.icon"
+              :title="adapter.name"
+              link
+            >
+            </v-list-item>
+          </v-list>
+          <template #activator="{ props }">
+            <v-btn
+              v-bind="props"
+              v-if="adaptersLoader.data.value"
+              variant="tonal"
+              color="success"
+              :prepend-icon="mdiPlus"
+              :disabled="availableAdapters.length === 0"
+            >
+              {{ t('app.actions.add') }}
+            </v-btn>
+          </template>
+        </v-menu>
+      </v-card-title>
+      <single-item-loader class="pa-0" :loader="adaptersLoader">
+        <v-card-subtitle class="py-3" v-if="api.user?.metas.length === 0">
+          {{ t('app.loader.empty') }}
+        </v-card-subtitle>
+        <template v-for="(meta, index) in api.user!.metas ?? []" :key="meta.id">
+          <v-list-item>
+            <template #prepend>
+              <v-switch
+                hide-details
+                density="comfortable"
+                :model-value="meta.enabled"
+                color="success"
+                :loading="metaUpdating && editItem?.id === meta.id"
+                :false-icon="mdiClose"
+                :true-icon="mdiCheck"
+                @click.prevent="
+                  editItem = meta;
+                  updateMeta({ enabled: !meta.enabled });
+                "
+              ></v-switch>
+            </template>
+            <v-list-item-title class="px-4">
+              {{ t(`settings.profile.adapters.${meta.service}`) }}
+            </v-list-item-title>
+            <template #append>
+              <v-tooltip location="left">
+                {{ t('settings.profile.subscriptions') }}
+                <template #activator="{ props }">
+                  <v-btn v-bind="props" density="comfortable" variant="text" :icon="mdiBellCog" color="primary"></v-btn>
+                </template>
+              </v-tooltip>
+              <v-tooltip location="left">
+                {{ t('app.actions.delete') }}
+                <template #activator="{ props }">
+                  <v-btn
+                    v-bind="props"
+                    density="comfortable"
+                    variant="plain"
+                    :icon="mdiDelete"
+                    color="error"
+                    @click="
+                      editItem = meta;
+                      deleteDialog = true;
+                    "
+                  ></v-btn>
+                </template>
+              </v-tooltip>
+            </template>
+          </v-list-item>
+          <v-divider v-if="index < api.user!.metas.length - 1" class="ml-4"></v-divider>
+        </template>
+      </single-item-loader>
     </v-sheet>
+
+    <v-dialog
+      :class="display.smAndUp.value ? 'w-75' : 'w-100'"
+      close-on-back
+      :fullscreen="!display.smAndUp.value"
+      v-model="editPasswordDialog"
+      scrollable
+    >
+      <v-card v-if="api.user">
+        <v-toolbar color="primary">
+          <v-btn :icon="mdiClose" @click="editPasswordDialog = false"></v-btn>
+          <v-toolbar-title>
+            {{ t('app.actions.edit') }}
+            {{ t('app.entities.user') }}
+          </v-toolbar-title>
+          <v-btn variant="text" :prepend-icon="mdiCheck" :loading="passwordChanging" @click="changePassword()">
+            {{ t('app.actions.save') }}
+          </v-btn>
+        </v-toolbar>
+        <v-card-text class="py-6">
+          <v-container class="pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('user.entity.username') }}</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              disabled
+              hide-details
+              color="primary"
+              density="compact"
+              v-model.trim="api.user.username"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('settings.profile.oldPassword') }}</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              :rules="passwordRule"
+              validate-on="input"
+              color="primary"
+              density="compact"
+              autocomplete="one-time-code"
+              v-model.trim="passwordEdit.old"
+              :type="passwordEdit.oldView ? 'text' : 'password'"
+              :append-inner-icon="passwordEdit.oldView ? mdiEyeOff : mdiEye"
+              @click:append-inner="passwordEdit.oldView = !passwordEdit.oldView"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('settings.profile.newPassword') }}</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              :rules="passwordRule"
+              validate-on="input"
+              color="primary"
+              density="compact"
+              autocomplete="one-time-code"
+              v-model.trim="passwordEdit.current"
+              :type="passwordEdit.currentView ? 'text' : 'password'"
+              :append-inner-icon="passwordEdit.currentView ? mdiEyeOff : mdiEye"
+              @click:append-inner="passwordEdit.currentView = !passwordEdit.currentView"
+            ></v-text-field>
+          </v-container>
+          <v-container class="mt-4 pa-0">
+            <span class="text-body-1 font-weight-bold">{{ t('settings.profile.passwordConfirm') }}</span>
+            <v-text-field
+              class="mt-2"
+              variant="outlined"
+              :rules="passwordRule"
+              validate-on="input"
+              color="primary"
+              density="compact"
+              autocomplete="one-time-code"
+              v-model.trim="passwordEdit.confirm"
+              :type="passwordEdit.confirmView ? 'text' : 'password'"
+              :append-inner-icon="passwordEdit.confirmView ? mdiEyeOff : mdiEye"
+              @click:append-inner="passwordEdit.confirmView = !passwordEdit.confirmView"
+              @keydown.enter="changePassword()"
+            ></v-text-field>
+          </v-container>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
+
+    <v-dialog v-model="deleteDialog" width="auto">
+      <v-card v-if="editItem">
+        <v-card-title>
+          {{ t('app.actions.deleteTitle') }}
+        </v-card-title>
+        <v-card-text class="d-flex flex-column">
+          <span>{{ t('app.actions.deleteConfirm', { item: t('app.entities.notificationMeta') }) }}</span>
+          <span class="font-italic font-weight-bold">{{ t(`settings.profile.adapters.${editItem.service}`) }}</span>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="primary" @click="deleteDialog = false">
+            {{ t('app.cancel') }}
+          </v-btn>
+          <v-btn variant="plain" color="error" :loading="metaDeleting" @click="deleteMeta(editItem.id)">
+            {{ t('app.ok') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -55,9 +251,21 @@
 import { useI18n } from 'vue-i18n';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useApiStore } from '@/store/api';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import UserAvatar from '@/components/user/UserAvatar.vue';
-import { mdiUpload } from '@mdi/js';
+import {
+  mdiBellCog,
+  mdiCheck,
+  mdiClose,
+  mdiDelete,
+  mdiEmailFastOutline,
+  mdiEye,
+  mdiEyeOff,
+  mdiKeyVariant,
+  mdiPlus,
+  mdiSquareRoundedBadgeOutline,
+  mdiUpload,
+} from '@mdi/js';
 import { UserDto } from '@/api/interfaces/user.interface';
 import { useToastStore } from '@/store/toast';
 import { selectFile } from '@/utils/utils';
@@ -65,10 +273,17 @@ import { TimeoutError } from '@/composables/use-socket-io-connection';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import axios from 'axios';
 import { useAsyncTask } from '@/composables/use-async-task';
+import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
+import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
+import { NotificationMetaDto, NotificationMetaEntity } from '@/api/interfaces/notification.interface';
+import { useDisplay } from 'vuetify';
+import { useRouter } from 'vue-router';
 
 const { t } = useI18n();
+const display = useDisplay();
 const api = useApiStore();
 const toast = useToastStore();
+const router = useRouter();
 
 const {
   request: updateProfile,
@@ -115,6 +330,122 @@ const selectAndUploadAvatar = async () => {
 };
 
 const { pending: notifyUpdating, request: updateNotify } = useAsyncTask(updateProfile);
+
+const adaptersLoader = useAxiosRequest(async () => {
+  return await api.Notification.getEnabledAdapters();
+});
+const availableAdapters = computed(() => {
+  return [
+    {
+      id: NotificationServiceEnum.WS,
+      name: t(`settings.profile.adapters.${NotificationServiceEnum.WS}`),
+      icon: mdiSquareRoundedBadgeOutline,
+    },
+    {
+      id: NotificationServiceEnum.EMAIL,
+      name: t(`settings.profile.adapters.${NotificationServiceEnum.EMAIL}`),
+      icon: mdiEmailFastOutline,
+    },
+  ].filter(
+    ({ id }) =>
+      adaptersLoader.data.value?.adapters?.includes(id) &&
+      api.user &&
+      !api.user.metas.find(({ service }) => service === id),
+  );
+});
+
+const editItem = ref<NotificationMetaEntity | undefined>(undefined);
+
+const {
+  pending: metaUpdating,
+  request: updateMeta,
+  onResolved: onMetaUpdated,
+  onRejected: onMetaUpdateFailed,
+} = useAxiosRequest(async (data: NotificationMetaDto) => {
+  return await api.Notification.update(editItem.value!.id)(data);
+});
+onMetaUpdated(async (meta) => {
+  if (api.user) {
+    const index = api.user.metas.findIndex(({ id }) => id === meta.id);
+    if (index >= 0) {
+      api.user.metas[index] = meta;
+    }
+  }
+  deleteDialog.value = false;
+});
+onMetaUpdateFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const deleteDialog = ref(false);
+const {
+  pending: metaDeleting,
+  request: deleteMeta,
+  onResolved: onMetaDeleted,
+  onRejected: onMetaDeleteFailed,
+} = useAxiosRequest(async (id: number) => {
+  return await api.Notification.delete(id)();
+});
+onMetaDeleted(async () => {
+  toast.toastSuccess(t('app.actions.deleteToast'));
+  if (api.user) {
+    api.user.metas = api.user.metas.filter(({ id }) => id !== editItem.value?.id);
+  }
+  deleteDialog.value = false;
+});
+onMetaDeleteFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const editPasswordDialog = ref(false);
+const passwordRule = [
+  (value: string) => (value && value.length >= 6 && value.length <= 40) || t('settings.profile.passwordLength'),
+];
+const passwordEdit = ref({
+  old: '',
+  oldView: false,
+  current: '',
+  currentView: false,
+  confirm: '',
+  confirmView: false,
+});
+const openPasswordDialog = () => {
+  passwordEdit.value = {
+    old: '',
+    oldView: false,
+    current: '',
+    currentView: false,
+    confirm: '',
+    confirmView: false,
+  };
+  editPasswordDialog.value = true;
+};
+const {
+  pending: passwordChanging,
+  request: _changePassword,
+  onResolved: onPasswordChanged,
+  onRejected: onPasswordChangeFailed,
+} = useAxiosRequest(async () => {
+  return await api.Auth.changePassword({
+    old: passwordEdit.value.old,
+    current: passwordEdit.value.current,
+  });
+});
+const changePassword = () => {
+  if (passwordEdit.value.current !== passwordEdit.value.confirm) {
+    toast.toastError(t('settings.profile.passwordMismatch'));
+  } else {
+    return _changePassword();
+  }
+};
+onPasswordChanged(async () => {
+  toast.toastSuccess(t('settings.profile.passwordChanged'));
+  api.setToken(undefined);
+  await router.push({ path: '/login' });
+});
+onPasswordChangeFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
 </script>
 
 <style scoped lang="sass"></style>

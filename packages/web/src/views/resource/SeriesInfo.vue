@@ -18,8 +18,8 @@
               <div class="d-flex flex-row align-center justify-space-between">
                 <div>
                   <span class="text-h5 text-break">{{ series.name }}</span>
-                  <span v-if="series.season" class="text-body-2 text-medium-emphasis text-break">
-                    {{ t('series.seasonLabel', { season: series.season }) }}
+                  <span v-if="series.season" class="text-body-2 text-medium-emphasis text-break ml-2">
+                    {{ +series.season ? t('series.seasonLabel', { season: series.season }) : series.season }}
                   </span>
                 </div>
               </div>
@@ -130,10 +130,6 @@ const seriesLoader = useAxiosRequest(async () => {
   return await api.Series.getById(Number(route.params.seriesId))();
 });
 const { data: series } = seriesLoader;
-
-const subscribeLoader = useAxiosRequest(async () => {
-  return await api.Series.findSubscribe(Number(route.params.seriesId))();
-});
 
 const episodesLoader = useAxiosPageLoader(
   async (query = {}) => {

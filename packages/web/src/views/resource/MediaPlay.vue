@@ -137,7 +137,11 @@
                       v-if="currentEpisode?.series.season"
                       class="text-body-2 text-medium-emphasis text-break cursor-pointer"
                     >
-                      {{ t('series.seasonLabel', { season: currentEpisode?.series.season }) }}
+                      {{
+                        +currentEpisode?.series.season
+                          ? t('series.seasonLabel', { season: currentEpisode?.series.season })
+                          : currentEpisode?.series.season
+                      }}
                     </span>
                     <v-divider class="my-1"></v-divider>
                     <expandable-text

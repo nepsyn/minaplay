@@ -4,6 +4,7 @@ import { FileSourceEnum } from '@/api/enums/file-source.enum';
 import { MessageSchema } from '@/lang/index';
 import { AuthActionEnum } from '@/api/enums/auth-action.enum';
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
+import { NotificationEventEnum } from '@/api/enums/notification-event.enum';
 
 const zh: MessageSchema = {
   app: {
@@ -72,6 +73,7 @@ const zh: MessageSchema = {
       upload: '上传',
       download: '下载',
       select: '选择',
+      selectAll: '全选',
       send: '发送',
       more: '[展开]',
       collapse: '[收起]',
@@ -179,7 +181,7 @@ const zh: MessageSchema = {
     },
   },
   series: {
-    seasonLabel: '第{season}季',
+    seasonLabel: '第 {season} 季',
     entity: {
       name: '名称',
       description: '描述',
@@ -514,10 +516,14 @@ const zh: MessageSchema = {
       notification: '通知',
       availableAdapters: '可选通知服务',
       adapters: {
-        [NotificationServiceEnum.WS]: '用户界面通知',
+        [NotificationServiceEnum.WS]: '客户端通知',
         [NotificationServiceEnum.EMAIL]: '邮箱通知',
       },
-      subscriptions: '编辑消息订阅',
+      editSubscriptions: '编辑消息订阅',
+      subscriptions: {
+        [NotificationEventEnum.NEW_MEDIA]: '媒体文件更新',
+        [NotificationEventEnum.NEW_EPISODE]: '剧集更新',
+      },
       email: {
         address: '邮箱地址',
         verifyCode: '邮箱验证码',

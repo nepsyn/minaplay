@@ -35,7 +35,7 @@
         {{ series.name }}
       </span>
       <span v-if="series.season" class="text-caption text-medium-emphasis">
-        {{ t('series.seasonLabel', { season: series.season }) }}
+        {{ +series.season ? t('series.seasonLabel', { season: series.season }) : series.season }}
       </span>
     </div>
   </v-container>

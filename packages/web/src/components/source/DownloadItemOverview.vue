@@ -170,6 +170,8 @@ const {
 });
 onRetried((data) => {
   emits('update', data);
+  clearInterval(interval);
+  interval = setInterval(() => updateState(), 3000);
 });
 onRetryFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
@@ -185,6 +187,7 @@ const {
 });
 onPaused((data) => {
   emits('update', data);
+  clearInterval(interval);
 });
 onPauseFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
@@ -200,6 +203,8 @@ const {
 });
 onUnpaused((data) => {
   emits('update', data);
+  clearInterval(interval);
+  interval = setInterval(() => updateState(), 3000);
 });
 onUnpauseFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
@@ -215,6 +220,7 @@ const {
 });
 onCanceled((data) => {
   emits('update', data);
+  clearInterval(interval);
 });
 onCancelFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
@@ -230,6 +236,7 @@ const {
 });
 onDeleted(() => {
   emits('delete', props.item);
+  clearInterval(interval);
 });
 onDeleteFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));

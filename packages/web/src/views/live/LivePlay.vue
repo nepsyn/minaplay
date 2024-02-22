@@ -334,6 +334,7 @@
                 :close-on-content-click="false"
                 v-model="updateStreamMenu"
                 @update:model-value="updateStreamMenu && (edit.stream = { ...state?.stream } as any)"
+                max-width="40%"
               >
                 <v-card>
                   <v-card-text>
@@ -369,10 +370,53 @@
                             class="ml-2"
                             variant="tonal"
                             color="primary"
+                            :disabled="episodesLoading"
                             :prepend-icon="mdiAnimationPlayOutline"
                             @click="seriesSelectDialog = true"
                           >
                             {{ t('app.actions.select') }} {{ t('app.entities.series') }}
+                          </v-btn>
+                        </v-col>
+                      </v-row>
+                      <v-row v-if="selectedSeries">
+                        <v-col cols="4">
+                          <series-overview
+                            :series="selectedSeries"
+                            @click="router.push({ path: `/series/${selectedSeries.id}` })"
+                          ></series-overview>
+                        </v-col>
+                        <v-col cols="8" class="d-flex flex-column justify-space-between">
+                          <multi-items-loader
+                            class="pa-0"
+                            :hide-empty="episodes.length > 0"
+                            :loader="episodesLoader"
+                            lazy
+                          >
+                            <v-row dense>
+                              <v-col cols="auto" v-for="(episode, index) in episodes" :key="episode.id">
+                                <v-btn
+                                  variant="outlined"
+                                  density="comfortable"
+                                  :color="selectedMedia?.id === episode.media.id ? 'primary' : undefined"
+                                  :active="selectedMedia?.id === episode.media.id"
+                                  @click="
+                                    selectedMedia = episode.media;
+                                    switchStream();
+                                  "
+                                >
+                                  {{ episode.no || episode.title || index + 1 }}
+                                </v-btn>
+                              </v-col>
+                            </v-row>
+                          </multi-items-loader>
+                          <v-btn
+                            density="comfortable"
+                            color="warning"
+                            variant="tonal"
+                            :prepend-icon="mdiClose"
+                            @click="selectedSeries = undefined"
+                          >
+                            {{ t('app.cancel') }}
                           </v-btn>
                         </v-col>
                       </v-row>
@@ -564,10 +608,13 @@ import ZoomImg from '@/components/app/ZoomImg.vue';
 import { VBottomSheet, VMenu } from 'vuetify/components';
 import MediaSelector from '@/components/resource/MediaSelector.vue';
 import SeriesSelector from '@/components/resource/SeriesSelector.vue';
-import { SeriesEntity } from '@/api/interfaces/series.interface';
+import { EpisodeQueryDto, SeriesEntity } from '@/api/interfaces/series.interface';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useSettingsStore } from '@/store/settings';
 import { MinaPlayNetworkImage, MinaPlayText } from '@/api/interfaces/message.interface';
+import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
+import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
+import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 
 const { t } = useI18n();
 const { settings } = useSettingsStore();
@@ -1114,13 +1161,30 @@ const mediaSelectDialog = ref(false);
 const selectedMedia = ref<MediaEntity | undefined>(undefined);
 const onStreamMediaSelected = async (media: MediaEntity) => {
   selectedMedia.value = media;
+  selectedSeries.value = undefined;
   await switchStream();
 };
 const seriesSelectDialog = ref(false);
 const selectedSeries = ref<SeriesEntity | undefined>(undefined);
 const onSeresSelected = async (series: SeriesEntity) => {
   selectedSeries.value = series;
+  await reloadEpisodes();
 };
+const episodesLoader = useAxiosPageLoader(
+  async (query: EpisodeQueryDto = {}) => {
+    return await api.Episode.query({ ...query, seriesId: selectedSeries.value?.id });
+  },
+  { page: 0, size: 48 },
+);
+const {
+  items: episodes,
+  pending: episodesLoading,
+  reload: reloadEpisodes,
+  onRejected: onEpisodesLoadFailed,
+} = episodesLoader;
+onEpisodesLoadFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
 const streamTypes = [
   { title: t('live.play.stream.serverPush'), value: 'server-push' },
   { title: t('live.play.stream.liveStream'), value: 'live-stream' },
@@ -1159,6 +1223,7 @@ onStreamStopped(() => {
     state.value.stream = undefined;
   }
   updateStreamMenu.value = false;
+  selectedMedia.value = undefined;
 });
 onStreamStopFailed((error: any) => {
   toast.toastError(t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`));

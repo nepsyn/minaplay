@@ -44,7 +44,7 @@
           :item-props="
             (item) => ({
               density: 'comfortable',
-              subtitle: item.season && t('series.seasonLabel', { season: item.season }),
+              subtitle: item.season && (+item.season ? t('series.seasonLabel', { season: item.season }) : item.season),
             })
           "
           @focus.once="loadSeries()"
@@ -204,7 +204,8 @@
               :item-props="
                 (item) => ({
                   density: 'comfortable',
-                  subtitle: item.season && t('series.seasonLabel', { season: item.season }),
+                  subtitle:
+                    item.season && (+item.season ? t('series.seasonLabel', { season: item.season }) : item.season),
                 })
               "
               @focus.once="loadSeries()"

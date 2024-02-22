@@ -3,6 +3,7 @@ import { StatusEnum } from '@/api/enums/status.enum';
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
 import { AuthActionEnum } from '@/api/enums/auth-action.enum';
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
+import { NotificationEventEnum } from '@/api/enums/notification-event.enum';
 
 export default {
   app: {
@@ -71,6 +72,7 @@ export default {
       upload: 'Upload',
       download: 'Download',
       select: 'Select',
+      selectAll: 'Select All',
       send: 'Send',
       more: '[more]',
       collapse: '[collapse]',
@@ -514,10 +516,14 @@ export default {
       notification: 'Notification',
       availableAdapters: 'Available Adapters',
       adapters: {
-        [NotificationServiceEnum.WS]: 'Web UI Interface Notification',
+        [NotificationServiceEnum.WS]: 'Client Notification',
         [NotificationServiceEnum.EMAIL]: 'Email Notification',
       },
-      subscriptions: ' Edit Notification Subscriptions',
+      editSubscriptions: ' Edit Notification Subscriptions',
+      subscriptions: {
+        [NotificationEventEnum.NEW_MEDIA]: 'New Media Updated',
+        [NotificationEventEnum.NEW_EPISODE]: 'New Series Episode Updated',
+      },
       email: {
         address: 'Email Address',
         verifyCode: 'Email Verification Code',

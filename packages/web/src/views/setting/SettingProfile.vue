@@ -11,10 +11,16 @@
       </v-container>
       <v-divider class="ml-4"></v-divider>
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
-        <v-container class="pa-0">
-          <p class="text-subtitle-1">{{ t('settings.profile.avatar') }}</p>
+        <p class="text-subtitle-1">{{ t('settings.profile.avatar') }}</p>
+        <div class="d-flex flex-column align-end">
+          <user-avatar
+            tile
+            :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
+            size="52"
+          ></user-avatar>
           <v-btn
             density="comfortable"
+            class="mt-2"
             color="primary"
             variant="tonal"
             :prepend-icon="mdiUpload"
@@ -23,12 +29,7 @@
           >
             {{ t('settings.profile.uploadAvatar') }}
           </v-btn>
-        </v-container>
-        <user-avatar
-          tile
-          :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
-          size="52"
-        ></user-avatar>
+        </div>
       </v-container>
       <v-divider class="ml-4"></v-divider>
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
@@ -49,7 +50,13 @@
         <v-container class="pa-0">
           <p class="text-subtitle-1">{{ t('settings.profile.password') }}</p>
         </v-container>
-        <v-btn variant="tonal" :prepend-icon="mdiKeyVariant" color="warning" @click="openPasswordDialog()">
+        <v-btn
+          variant="tonal"
+          density="comfortable"
+          :prepend-icon="mdiKeyVariant"
+          color="warning"
+          @click="openPasswordDialog()"
+        >
           {{ t('settings.profile.changePassword') }}
         </v-btn>
       </v-container>
@@ -58,7 +65,7 @@
       <v-card-title class="py-6 d-flex align-center">
         <span>{{ t('settings.profile.notification') }}</span>
         <v-spacer></v-spacer>
-        <v-menu location="left">
+        <v-menu location="left bottom">
           <v-list class="rounded py-0" density="compact">
             <v-list-subheader>
               {{ t('settings.profile.availableAdapters') }}
@@ -69,6 +76,7 @@
               :prepend-icon="adapter.icon"
               :title="adapter.name"
               link
+              @click="adapter.click()"
             >
             </v-list-item>
           </v-list>
@@ -111,28 +119,27 @@
               {{ t(`settings.profile.adapters.${meta.service}`) }}
             </v-list-item-title>
             <template #append>
-              <v-tooltip location="left">
-                {{ t('settings.profile.subscriptions') }}
-                <template #activator="{ props }">
-                  <v-btn v-bind="props" density="comfortable" variant="text" :icon="mdiBellCog" color="primary"></v-btn>
-                </template>
-              </v-tooltip>
-              <v-tooltip location="left">
-                {{ t('app.actions.delete') }}
-                <template #activator="{ props }">
-                  <v-btn
-                    v-bind="props"
-                    density="comfortable"
-                    variant="plain"
-                    :icon="mdiDelete"
-                    color="error"
-                    @click="
-                      editItem = meta;
-                      deleteDialog = true;
-                    "
-                  ></v-btn>
-                </template>
-              </v-tooltip>
+              <v-btn
+                density="comfortable"
+                variant="text"
+                :icon="mdiBellCog"
+                color="primary"
+                @click="
+                  editItem = meta;
+                  editSubscriptions = meta.subscribes.concat();
+                  editSubscriptionsSheet = true;
+                "
+              ></v-btn>
+              <v-btn
+                density="comfortable"
+                variant="plain"
+                :icon="mdiDelete"
+                color="error"
+                @click="
+                  editItem = meta;
+                  deleteDialog = true;
+                "
+              ></v-btn>
             </template>
           </v-list-item>
           <v-divider v-if="index < api.user!.metas.length - 1" class="ml-4"></v-divider>
@@ -224,6 +231,45 @@
       </v-card>
     </v-dialog>
 
+    <v-bottom-sheet inset v-model="editSubscriptionsSheet">
+      <v-card>
+        <v-card-title>
+          <span class="text-subtitle-2 text-medium-emphasis font-weight-bold">
+            {{ t('settings.profile.editSubscriptions') }}
+          </span>
+        </v-card-title>
+        <v-card-text class="px-4 py-0">
+          <v-chip-group column multiple v-model="editSubscriptions">
+            <v-chip filter variant="outlined" v-for="event of subscriptions" :key="event" :value="event">
+              {{ t(`settings.profile.subscriptions.${event}`) }}
+            </v-chip>
+          </v-chip-group>
+        </v-card-text>
+        <v-card-actions class="px-4">
+          <v-btn
+            variant="text"
+            color="warning"
+            :prepend-icon="mdiCheckAll"
+            @click="editSubscriptions = subscriptions.concat()"
+          >
+            {{ t('app.actions.selectAll') }}
+          </v-btn>
+          <v-spacer></v-spacer>
+          <v-btn variant="text" @click="editSubscriptionsSheet = false">
+            {{ t('app.cancel') }}
+          </v-btn>
+          <v-btn
+            variant="text"
+            color="primary"
+            :loading="metaUpdating"
+            @click="updateMeta({ subscribes: editSubscriptions })"
+          >
+            {{ t('app.ok') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-bottom-sheet>
+
     <v-dialog v-model="deleteDialog" width="auto">
       <v-card v-if="editItem">
         <v-card-title>
@@ -256,6 +302,7 @@ import UserAvatar from '@/components/user/UserAvatar.vue';
 import {
   mdiBellCog,
   mdiCheck,
+  mdiCheckAll,
   mdiClose,
   mdiDelete,
   mdiEmailFastOutline,
@@ -278,6 +325,7 @@ import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 import { NotificationMetaDto, NotificationMetaEntity } from '@/api/interfaces/notification.interface';
 import { useDisplay } from 'vuetify';
 import { useRouter } from 'vue-router';
+import { NotificationEventEnum } from '@/api/enums/notification-event.enum';
 
 const { t } = useI18n();
 const display = useDisplay();
@@ -340,11 +388,13 @@ const availableAdapters = computed(() => {
       id: NotificationServiceEnum.WS,
       name: t(`settings.profile.adapters.${NotificationServiceEnum.WS}`),
       icon: mdiSquareRoundedBadgeOutline,
+      click: () => bindWs(),
     },
     {
       id: NotificationServiceEnum.EMAIL,
       name: t(`settings.profile.adapters.${NotificationServiceEnum.EMAIL}`),
       icon: mdiEmailFastOutline,
+      click: () => 0,
     },
   ].filter(
     ({ id }) =>
@@ -353,6 +403,7 @@ const availableAdapters = computed(() => {
       !api.user.metas.find(({ service }) => service === id),
   );
 });
+const subscriptions = [...Object.values(NotificationEventEnum)];
 
 const editItem = ref<NotificationMetaEntity | undefined>(undefined);
 
@@ -371,6 +422,7 @@ onMetaUpdated(async (meta) => {
       api.user.metas[index] = meta;
     }
   }
+  editSubscriptionsSheet.value = false;
   deleteDialog.value = false;
 });
 onMetaUpdateFailed((error: any) => {
@@ -444,6 +496,25 @@ onPasswordChanged(async () => {
   await router.push({ path: '/login' });
 });
 onPasswordChangeFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const editSubscriptionsSheet = ref(false);
+const editSubscriptions = ref<NotificationEventEnum[]>([]);
+
+const {
+  request: bindWs,
+  onResolved: onWsBound,
+  onRejected: onWsBindFailed,
+} = useAxiosRequest(async () => {
+  return await api.Notification.bindWs();
+});
+onWsBound((meta) => {
+  if (api.user?.metas) {
+    api.user.metas.push(meta);
+  }
+});
+onWsBindFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 </script>

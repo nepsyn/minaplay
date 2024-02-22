@@ -12,17 +12,16 @@ import { DownloadItem } from './download-item.entity.js';
 import path from 'node:path';
 import { DOWNLOAD_DIR, VALID_VIDEO_MIME } from '../../../constants.js';
 import { randomUUID } from 'node:crypto';
-import { StatusEnum } from '../../../enums/status.enum.js';
+import { FileSourceEnum, StatusEnum } from '../../../enums/index.js';
 import { generateMD5 } from '../../../utils/generate-md5.util.js';
 import { aria2, Aria2ClientNotification, Conn as Aria2Connection, open } from 'maria2';
 import { DownloadTask } from './download-task.js';
 import { File } from '../../file/file.entity.js';
 import fs from 'fs-extra';
 import { fileTypeFromFile } from 'file-type';
-import { FileSourceEnum } from '../../../enums/file-source.enum.js';
 import { DownloadItemState } from './download-item-state.interface.js';
 import { FeedEntry } from '@extractus/feed-extractor';
-import { RuleFileDescriber, RuleFileDescriptor } from '../rule/rule.interface.js';
+import { RuleFileDescriptor } from '../rule/rule.interface.js';
 import { Rule } from '../rule/rule.entity.js';
 import { Source } from '../source/source.entity.js';
 import { ParseLog } from '../parse-log/parse-log.entity.js';
@@ -34,6 +33,7 @@ import { MediaFileService } from '../../media/media-file.service.js';
 import { SUBSCRIBE_MODULE_OPTIONS_TOKEN } from '../subscribe.module-definition.js';
 import { SubscribeModuleOptions } from '../subscribe.module.interface.js';
 import WebSocket from 'ws';
+import { RuleService } from '../rule/rule.service.js';
 
 @Injectable()
 export class DownloadService implements OnModuleInit {
@@ -49,6 +49,7 @@ export class DownloadService implements OnModuleInit {
     @Inject(CACHE_MANAGER) private cacheStore: CacheStore,
     private scheduleRegistry: SchedulerRegistry,
     private fileService: FileService,
+    private ruleService: RuleService,
     private ruleErrorLogService: RuleErrorLogService,
     private mediaService: MediaService,
     private seriesService: SeriesService,
@@ -81,6 +82,7 @@ export class DownloadService implements OnModuleInit {
       if (status.following || !status.followedBy) {
         await this.save({ id: task.itemId, status: StatusEnum.SUCCESS });
         task.emit('complete', files, status);
+        task.removeAllListeners();
         this.tasks.delete(task.taskId);
       }
     }
@@ -91,7 +93,8 @@ export class DownloadService implements OnModuleInit {
     const task = this.tasks.get(status.following ?? gid);
     if (task) {
       await this.save({ id: task.itemId, status: StatusEnum.FAILED, error: status.errorMessage });
-      task.emit('error', status);
+      task.emit('failed', status);
+      task.removeAllListeners();
       this.tasks.delete(task.taskId);
     }
   }
@@ -120,6 +123,7 @@ export class DownloadService implements OnModuleInit {
     if (task) {
       await this.save({ id: task.itemId, status: StatusEnum.FAILED, error: 'Canceled' });
       task.emit('stop', status);
+      task.removeAllListeners();
       this.tasks.delete(task.taskId);
     }
   }
@@ -155,9 +159,15 @@ export class DownloadService implements OnModuleInit {
   async onModuleInit() {
     await this.initClient();
 
-    await this.delete({
-      status: In([StatusEnum.PENDING, StatusEnum.PAUSED]),
-    });
+    await this.downloadItemRepository.update(
+      {
+        status: In([StatusEnum.PENDING, StatusEnum.PAUSED]),
+      },
+      {
+        status: StatusEnum.FAILED,
+        error: 'Application restarted',
+      },
+    );
 
     if (this.options.trackerAutoUpdate) {
       const job = CronJob.from({
@@ -237,7 +247,6 @@ export class DownloadService implements OnModuleInit {
     entry: FeedEntry,
     props: {
       item?: DownloadItem;
-      describeFn?: RuleFileDescriber;
       rule?: Partial<Rule>;
       source?: Partial<Source>;
       log?: Partial<ParseLog>;
@@ -260,21 +269,24 @@ export class DownloadService implements OnModuleInit {
       const mediaFiles = files.filter((file) => VALID_VIDEO_MIME.includes(file.mimetype));
       for (const mediaFile of mediaFiles) {
         // generate file descriptor
-        let descriptor: RuleFileDescriptor;
-        try {
-          descriptor = await props.describeFn?.(entry, mediaFile, mediaFiles);
-        } catch (error) {
-          if (props.rule && props.describeFn) {
+        let descriptor: RuleFileDescriptor = {};
+        if (props.rule?.id) {
+          try {
+            const rule = await this.ruleService.findOneBy({ id: props.rule.id });
+            if (rule?.file?.isExist) {
+              const { isolate, hooks } = await this.ruleService.createRuleVm(rule.code);
+              descriptor = await hooks?.describe?.(entry, mediaFile, mediaFiles);
+              isolate?.dispose();
+            }
+          } catch (error) {
             await this.ruleErrorLogService.save({
               rule: { id: props.rule.id },
               entry: JSON.stringify(entry),
               error: error.toString(),
             });
+          } finally {
+            descriptor ??= {};
           }
-
-          continue;
-        } finally {
-          descriptor ??= {};
         }
 
         // attachment files

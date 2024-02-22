@@ -5,7 +5,6 @@ import {
   Delete,
   Get,
   HttpCode,
-  InternalServerErrorException,
   NotFoundException,
   Param,
   Post,
@@ -27,9 +26,6 @@ import { ApiPaginationResultDto } from '../../../common/api.pagination.result.dt
 import { isDefined } from 'class-validator';
 import { DownloadService } from './download.service.js';
 import { DownloadItemDto } from './download-item.dto.js';
-import { RuleFileDescriber } from '../rule/rule.interface.js';
-import { RuleService } from '../rule/rule.service.js';
-import { RuleErrorLogService } from '../rule/rule-error-log.service.js';
 import { generateMD5 } from '../../../utils/generate-md5.util.js';
 
 @Controller('subscribe/download')
@@ -37,11 +33,7 @@ import { generateMD5 } from '../../../utils/generate-md5.util.js';
 @ApiTags('subscribe')
 @ApiBearerAuth()
 export class DownloadItemController {
-  constructor(
-    private downloadService: DownloadService,
-    private ruleService: RuleService,
-    private ruleErrorLogService: RuleErrorLogService,
-  ) {}
+  constructor(private downloadService: DownloadService) {}
 
   @Post()
   @ApiOperation({
@@ -109,23 +101,8 @@ export class DownloadItemController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    let describe: RuleFileDescriber | undefined = undefined;
-    if (item.rule) {
-      try {
-        const vm = await this.ruleService.createRuleVm(item.rule.code);
-        describe = vm.hooks?.describe;
-      } catch (error) {
-        await this.ruleErrorLogService.save({
-          rule: { id: item.rule.id },
-          error: error.toString(),
-        });
-        throw buildException(InternalServerErrorException, ErrorCodeEnum.UNKNOWN_ERROR);
-      }
-    }
-
     const { itemId } = await this.downloadService.createAutoDownloadTask(JSON.parse(item.entry), {
       item,
-      describeFn: describe,
       rule: item.rule,
       source: item.source,
       log: item.log,

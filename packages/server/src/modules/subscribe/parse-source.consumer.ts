@@ -5,13 +5,13 @@ import { Job } from 'bull';
 import { Source } from './source/source.entity.js';
 import { ParseLogService } from './parse-log/parse-log.service.js';
 import { RuleService } from './rule/rule.service.js';
-import { StatusEnum } from '../../enums/status.enum.js';
+import { StatusEnum } from '../../enums/index.js';
 import { FeedData } from '@extractus/feed-extractor';
 import { RuleErrorLogService } from './rule/rule-error-log.service.js';
-import { RuleHooks } from './rule/rule.interface.js';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
 import { DownloadService } from './download/download.service.js';
 import { generateMD5 } from '../../utils/generate-md5.util.js';
+import { RuleVm } from './rule/rule.interface.js';
 
 @Injectable()
 @Processor('parse-source')
@@ -50,6 +50,9 @@ export class ParseSourceConsumer {
 
     // no valid rules
     if (validRules.length === 0) {
+      this.logger.warn(
+        `No subscribe rules for subscribe source '${source.title ?? source.remark ?? source.url}' while parsing`,
+      );
       return;
     }
 
@@ -79,19 +82,18 @@ export class ParseSourceConsumer {
     const validEntries = data.entries.filter((entry) => entry.enclosure?.url);
     let count = 0;
     for (const rule of validRules) {
-      let hooks: RuleHooks;
+      let vm: RuleVm | undefined = undefined;
       try {
-        const vm = await this.ruleService.createRuleVm(rule.code);
-        hooks = vm.hooks;
+        vm = await this.ruleService.createRuleVm(rule.code);
       } catch (error) {
         await this.ruleErrorLogService.save({
           rule: { id: rule.id },
           error: error.toString(),
         });
-        continue;
       }
 
-      if (typeof hooks.validate !== 'function') {
+      if (!vm || typeof vm.hooks.validate !== 'function') {
+        vm?.isolate?.dispose();
         continue;
       }
 
@@ -102,7 +104,7 @@ export class ParseSourceConsumer {
         }
 
         try {
-          const valid = await hooks.validate?.(entry);
+          const valid = await vm.hooks.validate?.(entry);
           if (!valid) {
             continue;
           }
@@ -115,18 +117,22 @@ export class ParseSourceConsumer {
           break;
         }
 
-        await this.downloadService.createAutoDownloadTask(entry, {
-          describeFn: hooks.describe,
+        const task = await this.downloadService.createAutoDownloadTask(entry, {
           rule,
           source,
           log,
         });
-        this.logger.log(`Starting download entry: ${entry.title}`);
+        task.on('complete', () => {
+          this.logger.log(`Download entry '${entry.title}' complete`);
+        });
+        this.logger.log(`Starting download entry '${entry.title}'`);
         count++;
       }
+
+      vm.isolate.dispose();
     }
     this.logger.log(
-      `Parse subscribe source ${source.title ?? source.remark ?? source.url} done, ${count} entry(s) downloading`,
+      `Parse subscribe source '${source.title ?? source.remark ?? source.url}' done, ${count} entry(s) downloading`,
     );
   }
 }

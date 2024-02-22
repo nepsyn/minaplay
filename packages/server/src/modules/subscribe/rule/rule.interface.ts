@@ -1,5 +1,6 @@
 import { FeedEntry } from '@extractus/feed-extractor';
 import { File } from '../../file/file.entity.js';
+import { Context, Isolate, Module } from 'isolated-vm';
 
 export interface RuleEntryValidator {
   /**
@@ -59,4 +60,11 @@ export interface RuleFileDescriber {
 export interface RuleHooks {
   validate: RuleEntryValidator;
   describe?: RuleFileDescriber;
+}
+
+export interface RuleVm {
+  isolate: Isolate;
+  context: Context;
+  module: Module;
+  hooks: Partial<RuleHooks>;
 }

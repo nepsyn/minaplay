@@ -4,7 +4,7 @@ import { aria2, Aria2DownloadStatus, Conn as Aria2Connection } from 'maria2';
 
 export type DownloadTaskEventMap = {
   complete: (files: File[], status: Aria2DownloadStatus) => any;
-  error: (status: Aria2DownloadStatus) => any;
+  failed: (status: Aria2DownloadStatus) => any;
   pause: (status: Aria2DownloadStatus) => any;
   start: (status: Aria2DownloadStatus) => any;
   stop: (status: Aria2DownloadStatus) => any;

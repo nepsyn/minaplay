@@ -4,7 +4,7 @@ import { Rule } from './rule.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { FileService } from '../../file/file.service.js';
 import IsolatedVM from 'isolated-vm';
-import { RuleHooks } from './rule.interface.js';
+import { RuleHooks, RuleVm } from './rule.interface.js';
 import TypeScript from 'typescript';
 
 @Injectable()
@@ -29,10 +29,10 @@ export class RuleService {
     }
   }
 
-  async createRuleVm(code: string) {
-    const vm = new IsolatedVM.Isolate();
-    const context = await vm.createContext();
-    const module = await vm.compileModule(
+  async createRuleVm(code: string): Promise<RuleVm> {
+    const isolate = new IsolatedVM.Isolate();
+    const context = await isolate.createContext();
+    const module = await isolate.compileModule(
       TypeScript.transpileModule(code, {
         compilerOptions: {
           target: TypeScript.ScriptTarget.ES2017,
@@ -45,7 +45,7 @@ export class RuleService {
     const exports = await module.namespace.get('default', { reference: true });
 
     return {
-      vm,
+      isolate,
       context,
       module,
       hooks: {

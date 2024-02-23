@@ -62,7 +62,7 @@ export class NotificationService implements OnModuleInit {
       }
 
       try {
-        await adapter.notify(event, data, meta.user, config);
+        await adapter.notify(event, data, meta.userId, config);
       } catch (error) {
         this.logger.error('Emit notification error', error.stack, NotificationService.name);
       }

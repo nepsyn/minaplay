@@ -21,6 +21,10 @@ export class NotificationMeta {
   id: number;
 
   /** 用户 */
+  @Column()
+  userId: number;
+
+  /** 用户 */
   @ManyToOne(() => User, {
     onDelete: 'CASCADE',
   })

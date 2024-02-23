@@ -11,13 +11,12 @@ import { isUndefined } from '@nestjs/common/utils/shared.utils.js';
 import { ApplicationLogger } from '../../../../common/application.logger.service.js';
 import { fileURLToPath } from 'node:url';
 import { NotificationServiceAdapter } from '../../notification-service-adapter.interface.js';
-import { NotificationEventEnum } from '../../../../enums/notification-event.enum.js';
+import { NotificationEventEnum, NotificationServiceEnum } from '../../../../enums/index.js';
 import { User } from '../../../user/user.entity.js';
 import { EmailConfig } from './email.config.js';
 import { generateMD5 } from '../../../../utils/generate-md5.util.js';
 import { EmailVerifyCache } from './email-verify-cache.interface.js';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
-import { NotificationServiceEnum } from '../../../../enums/notification-service.enum.js';
 
 @Injectable()
 export class EmailAdapter implements NotificationServiceAdapter<EmailConfig> {
@@ -113,7 +112,7 @@ export class EmailAdapter implements NotificationServiceAdapter<EmailConfig> {
     }
 
     const code = Math.round(Math.random() * (999999 - 100000) + 100000).toString();
-    await this.notify('verify-code', { code }, user, { address });
+    await this.notify('verify-code', { code }, user.id, { address });
     await this.cacheStore.set<EmailVerifyCache>(
       token,
       {
@@ -152,14 +151,14 @@ export class EmailAdapter implements NotificationServiceAdapter<EmailConfig> {
     return cache;
   }
 
-  async notify(event: 'verify-code', data: { code: string }, to: User, config: EmailConfig): Promise<any>;
+  async notify(event: 'verify-code', data: { code: string }, userId: number, config: EmailConfig): Promise<any>;
   async notify<T extends NotificationEventEnum>(
     event: T,
     data: NotificationEventMap[T],
-    _to: User,
+    userId: number,
     config: EmailConfig,
   ): Promise<any>;
-  async notify(event: string, data: object, _to: User, config: EmailConfig) {
+  async notify(event: string, data: object, _userId: number, config: EmailConfig) {
     if (isUndefined(this.templates[event])) {
       this.templates[event] = await this.compileTemplate(event);
     }

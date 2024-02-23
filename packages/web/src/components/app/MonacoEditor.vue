@@ -4,7 +4,6 @@
 
 <script setup lang="ts">
 import * as monaco from 'monaco-editor';
-import { KeyCode } from 'monaco-editor';
 
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useLayoutStore } from '@/store/layout';
@@ -54,7 +53,7 @@ onMounted(() => {
     emits('update:value', editor?.getValue() ?? '');
   });
   editor.onKeyDown((e) => {
-    if (e.ctrlKey && e.keyCode === KeyCode.KeyS) {
+    if (e.ctrlKey && e.keyCode === monaco.KeyCode.KeyS) {
       e.preventDefault();
       emits('save');
     }

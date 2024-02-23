@@ -39,7 +39,7 @@
                   {{ new Date(media!.createAt).toLocaleString(locale) }}
                 </span>
                 <v-spacer></v-spacer>
-                <div v-for="(action, index) in actions" :key="index">
+                <div :id="action.id" v-for="action in actions" :key="action.id">
                   <v-tooltip location="bottom">
                     {{ action.text }}
                     <template #activator="{ props }">
@@ -49,12 +49,43 @@
                         size="small"
                         :color="action.color"
                         :icon="action.icon"
-                        @click="action.click()"
+                        @click="action.click?.()"
                         variant="text"
                       ></v-btn>
                     </template>
                   </v-tooltip>
                 </div>
+                <v-menu activator="#live" location="top center">
+                  <v-card>
+                    <v-card-text>
+                      <v-list-subheader class="font-weight-bold">
+                        {{ t('resource.actions.play') }}
+                      </v-list-subheader>
+                      <v-btn
+                        variant="tonal"
+                        color="primary"
+                        :prepend-icon="mdiVideoVintage"
+                        @click="liveSelectDialog = true"
+                      >
+                        {{ t('app.actions.select') }} {{ t('app.entities.live') }}
+                      </v-btn>
+                      <v-list-subheader class="font-weight-bold">
+                        {{ t('app.or') }}
+                      </v-list-subheader>
+                      <v-btn variant="tonal" color="success" :prepend-icon="mdiPlus" @click="createLive()">
+                        {{ t('app.actions.add') }} {{ t('app.entities.live') }}
+                      </v-btn>
+                    </v-card-text>
+                  </v-card>
+                </v-menu>
+                <live-selector
+                  owner
+                  v-model="liveSelectDialog"
+                  @selected="
+                    (live: LiveEntity) =>
+                      router.push({ path: `/live/${live.id}`, query: { ep: currentEpisode?.id, media: media?.id } })
+                  "
+                ></live-selector>
               </v-container>
               <v-divider class="my-2"></v-divider>
               <pre
@@ -198,6 +229,8 @@ import {
   mdiInformationVariantCircleOutline,
   mdiMotionPlayOutline,
   mdiMultimedia,
+  mdiPlus,
+  mdiVideoVintage,
   mdiViewComfy,
 } from '@mdi/js';
 import MediaOverviewLandscape from '@/components/resource/MediaOverviewLandscape.vue';
@@ -209,6 +242,8 @@ import { MediaEntity } from '@/api/interfaces/media.interface';
 import ZoomImg from '@/components/app/ZoomImg.vue';
 import ExpandableText from '@/components/app/ExpandableText.vue';
 import SeriesOverview from '@/components/resource/SeriesOverview.vue';
+import LiveSelector from '@/components/live/LiveSelector.vue';
+import { LiveEntity } from '@/api/interfaces/live.interface';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
@@ -325,6 +360,7 @@ onBeforeRouteLeave(async () => {
 
 const actions = [
   {
+    id: 'copy',
     text: t('resource.actions.copy'),
     icon: mdiContentCopy,
     color: 'info',
@@ -342,6 +378,7 @@ const actions = [
     },
   },
   {
+    id: 'openInVLC',
     text: t('resource.actions.openInVLC'),
     icon: 'M12,1C11.58,1 11.19,1.23 11,1.75L9.88,4.88C10.36,5.4 11.28,5.5 12,5.5C12.72,5.5 13.64,5.4 14.13,4.88L13,1.75C12.82,1.25 12.42,1 12,1M8.44,8.91L7,12.91C8.07,14.27 10.26,14.5 12,14.5C13.74,14.5 15.93,14.27 17,12.91L15.56,8.91C14.76,9.83 13.24,10 12,10C10.76,10 9.24,9.83 8.44,8.91M5.44,15C4.62,15 3.76,15.65 3.53,16.44L2.06,21.56C1.84,22.35 2.3,23 3.13,23H20.88C21.7,23 22.16,22.35 21.94,21.56L20.47,16.44C20.24,15.65 19.38,15 18.56,15H17.75L18.09,15.97C18.21,16.29 18.29,16.69 18.09,16.97C16.84,18.7 14.14,19 12,19C9.86,19 7.16,18.7 5.91,16.97C5.71,16.69 5.79,16.29 5.91,15.97L6.25,15H5.44Z',
     color: 'warning',
@@ -355,14 +392,29 @@ const actions = [
     },
   },
   {
+    id: 'live',
     text: t('resource.actions.play'),
     icon: mdiMotionPlayOutline,
     color: 'secondary',
-    click: () => {
-      //
-    },
   },
 ];
+
+const liveSelectDialog = ref(false);
+const {
+  request: createLive,
+  onResolved: onCreated,
+  onRejected: onCreateFailed,
+} = useAxiosRequest(async () => {
+  return await api.Live.create({
+    title: t('live.unnamed'),
+  });
+});
+onCreated(async (data) => {
+  await router.push({ path: `/live/${data.id}`, query: { ep: currentEpisode.value?.id, media: media.value?.id } });
+});
+onCreateFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
 </script>
 
 <style scoped lang="sass">

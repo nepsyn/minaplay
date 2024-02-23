@@ -56,7 +56,6 @@ import { PluginControl } from '@/api/interfaces/plugin.interface';
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
 import {
   EmailBindData,
-  EmailConfigDto,
   EmailVerifyDto,
   NotificationMetaDto,
   NotificationMetaEntity,
@@ -268,7 +267,7 @@ export const useApiStore = defineStore('api', () => {
     update: (id: number) => apiPut<NotificationMetaEntity, NotificationMetaDto>(`/api/v1/notification/${id}`),
     delete: (id: number) => apiDelete(`/api/v1/notification/${id}`),
     bindWs: apiPost<NotificationMetaEntity>('/api/v1/notification/ws/bind'),
-    bindEmail: apiPost<EmailBindData, EmailConfigDto>('/api/v1/notification/email/bind'),
+    bindEmail: apiPost<EmailBindData, Pick<EmailBindData, 'email'>>('/api/v1/notification/email/bind'),
     verifyEmail: apiPost<NotificationMetaEntity, EmailVerifyDto>('/api/v1/notification/email/verify'),
   };
 

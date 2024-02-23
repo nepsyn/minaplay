@@ -62,6 +62,7 @@
       </v-container>
     </v-sheet>
     <v-sheet class="mt-6 rounded-lg border">
+      <email-bind-prompt v-model="emailBindDialog"></email-bind-prompt>
       <v-card-title class="py-6 d-flex align-center">
         <span>{{ t('settings.profile.notification') }}</span>
         <v-spacer></v-spacer>
@@ -118,6 +119,9 @@
             <v-list-item-title class="px-4">
               {{ t(`settings.profile.adapters.${meta.service}`) }}
             </v-list-item-title>
+            <v-list-item-subtitle v-if="getNotificationMetaConfigLabel(meta)" class="px-4">
+              {{ getNotificationMetaConfigLabel(meta) }}
+            </v-list-item-subtitle>
             <template #append>
               <v-btn
                 density="comfortable"
@@ -322,10 +326,11 @@ import axios from 'axios';
 import { useAsyncTask } from '@/composables/use-async-task';
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
-import { NotificationMetaDto, NotificationMetaEntity } from '@/api/interfaces/notification.interface';
+import { EmailConfigDto, NotificationMetaDto, NotificationMetaEntity } from '@/api/interfaces/notification.interface';
 import { useDisplay } from 'vuetify';
 import { useRouter } from 'vue-router';
 import { NotificationEventEnum } from '@/api/enums/notification-event.enum';
+import EmailBindPrompt from '@/components/notification/EmailBindPrompt.vue';
 
 const { t } = useI18n();
 const display = useDisplay();
@@ -394,7 +399,7 @@ const availableAdapters = computed(() => {
       id: NotificationServiceEnum.EMAIL,
       name: t(`settings.profile.adapters.${NotificationServiceEnum.EMAIL}`),
       icon: mdiEmailFastOutline,
-      click: () => 0,
+      click: () => (emailBindDialog.value = true),
     },
   ].filter(
     ({ id }) =>
@@ -404,6 +409,7 @@ const availableAdapters = computed(() => {
   );
 });
 const subscriptions = [...Object.values(NotificationEventEnum)];
+const emailBindDialog = ref(false);
 
 const editItem = ref<NotificationMetaEntity | undefined>(undefined);
 
@@ -517,6 +523,20 @@ onWsBound((meta) => {
 onWsBindFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
+
+const getNotificationMetaConfigLabel = (meta: NotificationMetaEntity) => {
+  try {
+    const config = JSON.parse(meta.config as string);
+    switch (meta.service) {
+      case NotificationServiceEnum.EMAIL:
+        return (config as EmailConfigDto).address;
+      default:
+        return undefined;
+    }
+  } catch {
+    return undefined;
+  }
+};
 </script>
 
 <style scoped lang="sass"></style>

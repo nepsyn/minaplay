@@ -75,15 +75,46 @@
               </v-btn>
             </v-col>
             <v-col cols="auto">
-              <v-btn
-                class="rounded-pill"
-                variant="flat"
-                :prepend-icon="mdiMotionPlayOutline"
-                color="secondary"
-                :disabled="episodes.length === 0"
-              >
-                {{ t('resource.actions.play') }}
-              </v-btn>
+              <v-menu location="top center" offset="10">
+                <v-card>
+                  <v-card-text>
+                    <v-list-subheader class="font-weight-bold">
+                      {{ t('resource.actions.play') }}
+                    </v-list-subheader>
+                    <v-btn
+                      variant="tonal"
+                      color="primary"
+                      :prepend-icon="mdiVideoVintage"
+                      @click="liveSelectDialog = true"
+                    >
+                      {{ t('app.actions.select') }} {{ t('app.entities.live') }}
+                    </v-btn>
+                    <v-list-subheader class="font-weight-bold">
+                      {{ t('app.or') }}
+                    </v-list-subheader>
+                    <v-btn variant="tonal" color="success" :prepend-icon="mdiPlus" @click="createLive()">
+                      {{ t('app.actions.add') }} {{ t('app.entities.live') }}
+                    </v-btn>
+                  </v-card-text>
+                </v-card>
+                <template #activator="{ props }">
+                  <v-btn
+                    v-bind="props"
+                    class="rounded-pill"
+                    variant="flat"
+                    :prepend-icon="mdiMotionPlayOutline"
+                    color="secondary"
+                    :disabled="episodes.length === 0"
+                  >
+                    {{ t('resource.actions.play') }}
+                  </v-btn>
+                </template>
+              </v-menu>
+              <live-selector
+                owner
+                v-model="liveSelectDialog"
+                @selected="(live: LiveEntity) => router.push({ path: `/live/${live.id}`, query: { ep: episodes[0].id } })"
+              ></live-selector>
             </v-col>
           </v-row>
         </v-sheet>
@@ -117,12 +148,17 @@ import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 import ZoomImg from '@/components/app/ZoomImg.vue';
 import SeriesPosterFallback from '@/assets/banner-portrait.jpeg';
 import ExpandableText from '@/components/app/ExpandableText.vue';
-import { mdiMotionPlayOutline, mdiPlay, mdiViewComfy } from '@mdi/js';
+import { mdiMotionPlayOutline, mdiPlay, mdiPlus, mdiVideoVintage, mdiViewComfy } from '@mdi/js';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
+import { ref } from 'vue';
+import { useToastStore } from '@/store/toast';
+import { LiveEntity } from '@/api/interfaces/live.interface';
+import LiveSelector from '@/components/live/LiveSelector.vue';
 
 const { t } = useI18n();
 const api = useApiStore();
+const toast = useToastStore();
 const route = useRoute();
 const router = useRouter();
 
@@ -143,6 +179,23 @@ const episodesLoader = useAxiosPageLoader(
   { page: 0, size: 24 },
 );
 const { items: episodes } = episodesLoader;
+
+const liveSelectDialog = ref(false);
+const {
+  request: createLive,
+  onResolved: onCreated,
+  onRejected: onCreateFailed,
+} = useAxiosRequest(async () => {
+  return await api.Live.create({
+    title: t('live.unnamed'),
+  });
+});
+onCreated(async (data) => {
+  await router.push({ path: `/live/${data.id}`, query: { ep: episodes.value[0].id } });
+});
+onCreateFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
 </script>
 
 <style scoped lang="sass"></style>

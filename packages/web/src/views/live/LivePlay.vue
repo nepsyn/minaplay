@@ -533,6 +533,27 @@
       </v-card>
     </v-dialog>
 
+    <v-dialog v-model="selectedMediaDialog" max-width="480px" persistent>
+      <v-card>
+        <v-card-title>{{ t('live.play.streamTitle') }}</v-card-title>
+        <v-card-text class="d-flex flex-column">
+          <span>{{ t('live.play.streamHint') }}</span>
+          <span class="font-italic font-weight-bold" v-if="selectedMedia">
+            {{ selectedMedia.name }}
+          </span>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn @click="cancelStream()">
+            {{ t('app.cancel') }}
+          </v-btn>
+          <v-btn color="primary" @click="confirmStream()">
+            {{ t('app.ok') }}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-dialog v-model="disposeDialog" max-width="480px" persistent>
       <v-card>
         <v-card-title>{{ t('live.play.disposeTitle') }}</v-card-title>
@@ -820,6 +841,45 @@ onJoinCompleted(async (data) => {
 });
 onJoinFailed((error: any) => {
   validateError.value = t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`);
+});
+
+const selectedMediaDialog = ref(false);
+const confirmStream = async () => {
+  await switchStream();
+  selectedMediaDialog.value = false;
+  if (selectedSeries.value) {
+    await episodesLoader.request();
+  }
+};
+const cancelStream = () => {
+  edit.value = {} as any;
+  selectedSeries.value = undefined;
+  selectedMediaDialog.value = false;
+};
+onJoinCompleted((data) => {
+  // auto stream selected resource
+  if (data.live.user && data.live.user.id === api.user?.id) {
+    const episodeId = Number(route.query.ep);
+    const mediaId = route.query.media as string;
+    if (episodeId) {
+      api.Episode.getById(episodeId)()
+        .then(({ data }) => {
+          edit.value.stream.type = 'server-push';
+          selectedSeries.value = data.series;
+          selectedMedia.value = data.media;
+          selectedMediaDialog.value = true;
+        })
+        .catch();
+    } else if (mediaId) {
+      api.Media.getById(mediaId)()
+        .then(({ data }) => {
+          edit.value.stream.type = 'server-push';
+          selectedMedia.value = data;
+          selectedMediaDialog.value = true;
+        })
+        .catch();
+    }
+  }
 });
 
 const chatText = ref('');

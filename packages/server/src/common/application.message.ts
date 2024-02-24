@@ -9,6 +9,8 @@ import {
   Consumed,
   NetworkImage,
   Pending,
+  ResourceMedia,
+  ResourceSeries,
   Timeout,
 } from './messages/index.js';
 
@@ -22,6 +24,8 @@ export const MinaPlayMessageMap = {
   ConsumableFeedback,
   Consumed,
   Pending,
+  ResourceSeries,
+  ResourceMedia,
 };
 export type MinaPlayMessage =
   | Text
@@ -32,7 +36,9 @@ export type MinaPlayMessage =
   | ConsumableGroup
   | ConsumableFeedback
   | Consumed
-  | Pending;
+  | Pending
+  | ResourceSeries
+  | ResourceMedia;
 export type MinaPlayMessageType = MinaPlayMessage['type'];
 
 /** 通过对象构造消息类型 */

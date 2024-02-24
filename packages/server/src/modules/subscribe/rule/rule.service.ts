@@ -11,8 +11,9 @@ import TypeScript from 'typescript';
 export class RuleService {
   constructor(@InjectRepository(Rule) private ruleRepository: Repository<Rule>, private fileService: FileService) {}
 
-  async buildRuleHook<T extends keyof RuleHooks>(hookName: T, exports: IsolatedVM.Reference) {
-    const hook = await exports.get(hookName, { reference: true });
+  private isolate = new IsolatedVM.Isolate();
+
+  async buildRuleHook<T extends keyof RuleHooks>(hook: IsolatedVM.Reference) {
     if (hook.typeof === 'function') {
       return (...args: Parameters<RuleHooks[T]>) =>
         hook.applySync(null, args, {
@@ -30,9 +31,7 @@ export class RuleService {
   }
 
   async createRuleVm(code: string): Promise<RuleVm> {
-    const isolate = new IsolatedVM.Isolate();
-    const context = await isolate.createContext();
-    const module = await isolate.compileModule(
+    const module = await this.isolate.compileModule(
       TypeScript.transpileModule(code, {
         compilerOptions: {
           target: TypeScript.ScriptTarget.ES2017,
@@ -40,18 +39,35 @@ export class RuleService {
         },
       }).outputText,
     );
+    const context = await this.isolate.createContext();
     await module.instantiate(context, () => undefined);
     await module.evaluate({ timeout: 1000, reference: true });
     const exports = await module.namespace.get('default', { reference: true });
 
+    const validateHook = await exports.get('validate', { reference: true });
+    const describeHook = await exports.get('describe', { reference: true });
+    const hooks = {
+      validate: await this.buildRuleHook<'validate'>(validateHook),
+      describe: await this.buildRuleHook<'describe'>(describeHook),
+    };
+
+    const release = () => {
+      validateHook.release();
+      describeHook.release();
+
+      hooks.validate = undefined;
+      hooks.describe = undefined;
+
+      exports.release();
+      module.release();
+      context.release();
+    };
+
     return {
-      isolate,
       context,
       module,
-      hooks: {
-        validate: await this.buildRuleHook('validate', exports),
-        describe: await this.buildRuleHook('describe', exports),
-      },
+      hooks,
+      release,
     };
   }
 

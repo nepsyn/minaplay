@@ -93,7 +93,7 @@ export class ParseSourceConsumer {
       }
 
       if (!vm || typeof vm.hooks.validate !== 'function') {
-        vm?.isolate?.dispose();
+        vm?.release();
         continue;
       }
 
@@ -129,7 +129,7 @@ export class ParseSourceConsumer {
         count++;
       }
 
-      vm.isolate.dispose();
+      vm.release();
     }
     this.logger.log(
       `Parse subscribe source '${source.title ?? source.remark ?? source.url}' done, ${count} entry(s) downloading`,

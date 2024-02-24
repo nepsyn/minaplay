@@ -2,7 +2,7 @@ import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Source } from './source.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
-import { SchedulerRegistry } from '@nestjs/schedule';
+import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { CronJob } from 'cron';
 import { InjectQueue } from '@nestjs/bull';
 import { Queue } from 'bull';
@@ -37,6 +37,12 @@ export class SourceService implements OnModuleInit {
         this.logger.error(`Source(id:${source.id}) fetch job startup failed`, error.stack, SourceService.name);
       }
     }
+  }
+
+  @Cron(CronExpression.EVERY_HOUR)
+  async cleanFetchSubscribeDataJobs() {
+    await this.fetchSubscribeSourceQueue.clean(0, 'completed');
+    await this.fetchSubscribeSourceQueue.clean(0, 'failed');
   }
 
   async save(source: DeepPartial<Source>) {

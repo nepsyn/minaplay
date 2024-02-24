@@ -2,14 +2,18 @@
 <br />
 <p>
   Welcome to MinaPlay. Series
-  <strong>{{episode.series.name}}</strong>
+  <strong>
+    {{episode.series.name}}
+    {{#if episode.series.season}}
+      {{episode.series.season}}
+    {{/if}}
+  </strong>
   updated with a new episode
   <strong>
     {{#if episode.no}}
-      {{episode.no}}
-    {{else}}
-      {{episode.title}}
+      {{episode.no}} -
     {{/if}}
+    {{episode.title}}
   </strong>
   .
 </p>

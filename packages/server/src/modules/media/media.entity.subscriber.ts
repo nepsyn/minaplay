@@ -1,7 +1,7 @@
 import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent } from 'typeorm';
 import { Media } from './media.entity.js';
 import { NotificationService } from '../notification/notification.service.js';
-import { NotificationEventEnum } from '../../enums/notification-event.enum.js';
+import { NotificationEventEnum } from '../../enums/index.js';
 
 @EventSubscriber()
 export class MediaEntitySubscriber implements EntitySubscriberInterface<Media> {
@@ -15,7 +15,7 @@ export class MediaEntitySubscriber implements EntitySubscriberInterface<Media> {
 
   async afterInsert(event: InsertEvent<Media>) {
     await this.notificationService.notify(NotificationEventEnum.NEW_MEDIA, {
-      media: event.entity,
+      media: await event.manager.getRepository(Media).findOneBy({ id: event.entity.id }),
       time: new Date(),
     });
   }

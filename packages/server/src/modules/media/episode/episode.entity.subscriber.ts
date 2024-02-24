@@ -1,7 +1,7 @@
 import { DataSource, EntitySubscriberInterface, EventSubscriber, InsertEvent } from 'typeorm';
 import { Episode } from './episode.entity.js';
 import { NotificationService } from '../../notification/notification.service.js';
-import { NotificationEventEnum } from '../../../enums/notification-event.enum.js';
+import { NotificationEventEnum } from '../../../enums/index.js';
 
 @EventSubscriber()
 export class EpisodeEntitySubscriber implements EntitySubscriberInterface<Episode> {
@@ -15,7 +15,7 @@ export class EpisodeEntitySubscriber implements EntitySubscriberInterface<Episod
 
   async afterInsert(event: InsertEvent<Episode>) {
     await this.notificationService.notify(NotificationEventEnum.NEW_EPISODE, {
-      episode: event.entity,
+      episode: await event.manager.getRepository(Episode).findOneBy({ id: event.entity.id }),
       time: new Date(),
     });
   }

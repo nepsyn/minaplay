@@ -27,9 +27,7 @@ import { RequirePermissions } from '../authorization/require-permissions.decorat
 import { RequestUser } from '../../common/request.user.decorator.js';
 import { buildException } from '../../utils/build-exception.util.js';
 import { generateMD5 } from '../../utils/generate-md5.util.js';
-import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
-import { PermissionEnum } from '../../enums/permission.enum.js';
-import { FileSourceEnum } from '../../enums/file-source.enum.js';
+import { ErrorCodeEnum, FileSourceEnum, PermissionEnum } from '../../enums/index.js';
 import { USER_UPLOAD_IMAGE_DIR, USER_UPLOAD_VIDEO_DIR, VALID_IMAGE_MIME, VALID_VIDEO_MIME } from '../../constants.js';
 import { FileQueryDto } from './file-query.dto.js';
 import { buildQueryOptions } from '../../utils/build-query-options.util.js';
@@ -40,7 +38,6 @@ import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 import { ApiFile } from '../../common/api.file.decorator.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
-import { ApplicationLogger } from '../../common/application.logger.service.js';
 import { RequestTimeout } from '../../common/request.timeout.decorator.js';
 
 @Controller('file')
@@ -48,8 +45,6 @@ import { RequestTimeout } from '../../common/request.timeout.decorator.js';
 @RequestTimeout(0)
 @ApiBearerAuth()
 export class FileController {
-  private readonly logger = new ApplicationLogger(FileController.name);
-
   constructor(private fileService: FileService, @Inject(CACHE_MANAGER) private cacheStore: CacheStore) {}
 
   @Post('image')
@@ -58,18 +53,18 @@ export class FileController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination(req, file, callback) {
+        destination(_req, _file, callback) {
           fs.ensureDirSync(USER_UPLOAD_IMAGE_DIR);
           callback(null, USER_UPLOAD_IMAGE_DIR);
         },
-        filename(req, file, callback) {
+        filename(_req, file, callback) {
           callback(null, randomUUID().replace(/-/g, '') + path.extname(file.originalname));
         },
       }),
       limits: {
         fileSize: 10485760, // 10MB
       },
-      fileFilter(req, file, callback) {
+      fileFilter(_req, file, callback) {
         file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8');
         if (VALID_IMAGE_MIME.includes(file.mimetype)) {
           callback(null, true);
@@ -110,18 +105,18 @@ export class FileController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination(req, file, callback) {
+        destination(_req, _file, callback) {
           fs.ensureDirSync(USER_UPLOAD_VIDEO_DIR);
           callback(null, USER_UPLOAD_VIDEO_DIR);
         },
-        filename(req, file, callback) {
+        filename(_req, file, callback) {
           callback(null, randomUUID().replace(/-/g, '') + path.extname(file.originalname));
         },
       }),
       limits: {
         fileSize: 4294967296, // 10GB
       },
-      fileFilter(req, file, callback) {
+      fileFilter(_req, file, callback) {
         file.originalname = Buffer.from(file.originalname, 'latin1').toString('utf8');
         if (VALID_VIDEO_MIME.includes(file.mimetype)) {
           callback(null, true);
@@ -158,19 +153,18 @@ export class FileController {
     }
   }
 
-  async getFilePathById(id: string) {
-    const key = `file-path:${id}`;
-    let path = await this.cacheStore.get<string>(key);
-    if (!path) {
-      const file = await this.fileService.findOneBy({ id });
+  async getFileCacheById(id: string) {
+    const key = `file:${id}`;
+    let file = await this.cacheStore.get<File>(key);
+    if (!file) {
+      file = await this.fileService.findOneBy({ id });
       if (!file || !file.isExist) {
         throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
       }
-      path = file.path;
-      await this.cacheStore.set(key, path, 60 * 60 * 1000);
+      await this.cacheStore.set(key, file, 24 * 60 * 60 * 1000);
     }
 
-    return path;
+    return file;
   }
 
   @Get(':id')
@@ -201,7 +195,10 @@ export class FileController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    res.sendFile(await this.getFilePathById(id));
+    const file = await this.getFileCacheById(id);
+    res.sendFile(file.path, {
+      maxAge: '1d',
+    });
   }
 
   @Get([':id/download', ':id/download/:name'])
@@ -213,7 +210,8 @@ export class FileController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    res.download(await this.getFilePathById(id), name);
+    const file = await this.getFileCacheById(id);
+    res.download(file.path, name);
   }
 
   @Get()

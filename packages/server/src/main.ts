@@ -10,6 +10,8 @@ import process from 'node:process';
 
 async function bootstrap() {
   const logger = new ApplicationLogger();
+
+  process.title = `MinaPlay v${MINAPLAY_VERSION}`;
   process.on('unhandledRejection', (reason) => {
     logger.error(`Uncaught rejection: ${reason}`);
     process.exit(-1);

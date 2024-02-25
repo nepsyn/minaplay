@@ -31,14 +31,17 @@
               <template v-if="resource.value === 'series'">
                 <v-col v-for="item in resource.loader.items.value" :key="item.id" cols="4" sm="3" md="2">
                   <series-overview
-                    :series="item"
+                    :series="item as SeriesEntity"
                     @click="router.push({ path: `/series/${item.id}` })"
                   ></series-overview>
                 </v-col>
               </template>
               <template v-if="resource.value === 'media'">
                 <v-col v-for="item in resource.loader.items.value" :key="item.id" cols="6" sm="4" md="3">
-                  <media-overview :media="item" @click="router.push({ path: `/media/${item.id}` })"></media-overview>
+                  <media-overview
+                    :media="item as MediaEntity"
+                    @click="router.push({ path: `/media/${item.id}` })"
+                  ></media-overview>
                 </v-col>
               </template>
             </v-row>
@@ -56,8 +59,8 @@ import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { useApiStore } from '@/store/api';
-import { SeriesQueryDto } from '@/api/interfaces/series.interface';
-import { MediaQueryDto } from '@/api/interfaces/media.interface';
+import { SeriesEntity, SeriesQueryDto } from '@/api/interfaces/series.interface';
+import { MediaEntity, MediaQueryDto } from '@/api/interfaces/media.interface';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 import MediaOverview from '@/components/resource/MediaOverview.vue';

@@ -90,6 +90,7 @@ export default {
     dark: 'Dark Mode',
     light: 'Light Mode',
     actions: {
+      search: 'Search Resources',
       pluginConsole: 'Plugin Console',
       upload: 'Upload Media Files',
       github: 'Github',

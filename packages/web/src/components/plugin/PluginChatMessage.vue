@@ -14,7 +14,11 @@
       </template>
     </div>
     <div class="ml-12 mb-1" v-for="item in message.messages">
-      <plugin-message-item v-if="canRender(item)" :message="item"></plugin-message-item>
+      <plugin-message-item
+        v-if="canRender(item)"
+        :message="item"
+        @action="(id, value) => emits('action', id, value)"
+      ></plugin-message-item>
     </div>
   </div>
 </template>
@@ -38,7 +42,10 @@ const getHashColor = (text: string) => {
   return `#${md5(text).slice(0, 6)}`;
 };
 
-const emits = defineEmits(['load']);
+const emits = defineEmits<{
+  (ev: 'load'): any;
+  (ev: 'action', id: string | undefined, value: string): any;
+}>();
 
 onMounted(() => {
   emits('load');

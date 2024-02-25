@@ -34,6 +34,14 @@ const routes: RouteRecordRaw[] = [
             },
           },
           {
+            path: '/resource/search',
+            name: 'search',
+            component: () => import('@/views/resource/ResourceSearch.vue'),
+            meta: {
+              permissions: [PermissionEnum.MEDIA_VIEW, PermissionEnum.MEDIA_OP, PermissionEnum.ROOT_OP],
+            },
+          },
+          {
             path: '/media/:mediaId',
             name: 'media',
             component: () => import('@/views/resource/MediaPlay.vue'),

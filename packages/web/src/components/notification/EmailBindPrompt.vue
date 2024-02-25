@@ -27,6 +27,7 @@
             class="mt-2"
             variant="tonal"
             color="primary"
+            block
             :prepend-icon="mdiEmailArrowRightOutline"
             :loading="codeSending"
             @click="sendCode()"
@@ -40,7 +41,7 @@
             </template>
           </v-btn>
         </v-container>
-        <v-container class="mt-4 pa-0">
+        <v-container class="mt-4 mb-2 pa-0">
           <span class="text-body-1 font-weight-bold">{{ t('settings.profile.email.verifyCode') }}</span>
           <v-otp-input
             base-color="primary"
@@ -51,6 +52,7 @@
           <v-btn
             variant="tonal"
             color="warning"
+            block
             :prepend-icon="mdiKeyVariant"
             :loading="codeVerifying"
             @click="verifyCode()"

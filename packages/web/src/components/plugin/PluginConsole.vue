@@ -15,7 +15,7 @@
           size="small"
           density="compact"
           variant="text"
-          @click="pluginConsole.messages = pluginConsole.messages.slice(0, 1)"
+          @click="messages = messages.slice(0, 1)"
         ></v-btn>
         <v-btn
           :icon="layout.pluginConsoleFullscreen ? mdiArrowCollapseDown : mdiArrowExpandUp"
@@ -37,23 +37,23 @@
       <v-main>
         <v-sheet height="100%">
           <v-container fluid class="h-100 d-flex flex-column pa-0">
-            <template v-if="!pluginConsole.connected">
+            <template v-if="!connected">
               <v-container fluid class="h-100 d-flex align-center justify-center">
-                <template v-if="pluginConsole.connecting">
-                  <v-progress-circular indeterminate color="primary"></v-progress-circular>
-                  <span class="text-subtitle-1 font-weight-bold ml-2">{{ t('plugin.initializing') }}</span>
-                </template>
-                <template v-else-if="pluginConsole.error">
+                <template v-if="connectError">
                   <v-icon :icon="mdiCloseCircle"></v-icon>
                   <span class="text-subtitle-1 font-weight-bold ml-2">{{ t('plugin.connectFailed') }}</span>
                   <v-btn
                     variant="text"
                     color="primary"
                     class="text-subtitle-1 font-weight-bold ml-2"
-                    @click="pluginConsole.connect()"
+                    @click="socket.connect()"
                   >
                     {{ t('app.actions.retry') }}
                   </v-btn>
+                </template>
+                <template v-else>
+                  <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                  <span class="text-subtitle-1 font-weight-bold ml-2">{{ t('plugin.initializing') }}</span>
                 </template>
               </v-container>
             </template>
@@ -61,10 +61,11 @@
               <v-container fluid class="scrollable-container" ref="messageContainerRef">
                 <v-container class="d-block py-0" v-mutate.child="scrollToBottom">
                   <v-slide-x-reverse-transition group>
-                    <template v-for="(message, index) in pluginConsole.messages" :key="index">
+                    <template v-for="(message, index) in messages" :key="index">
                       <plugin-chat-message
                         v-if="message.messages.filter(canRender).length > 0"
                         :message="message"
+                        @action="onAction"
                       ></plugin-chat-message>
                     </template>
                   </v-slide-x-reverse-transition>
@@ -120,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUpdated, ref } from 'vue';
+import { onMounted, onUnmounted, onUpdated, ref } from 'vue';
 import {
   mdiArrowCollapseDown,
   mdiArrowDown,
@@ -132,30 +133,110 @@ import {
   mdiSendVariant,
 } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
-import { usePluginConsoleStore } from '@/store/plugin-console';
-import { PluginCommandDescriptor } from '@/api/interfaces/plugin.interface';
+import {
+  MinaPlayPluginMessage,
+  PluginCommandDescriptor,
+  PluginControl,
+  PluginEventMap,
+} from '@/api/interfaces/plugin.interface';
 import { useAsyncTask } from '@/composables/use-async-task';
-import { TimeoutError } from '@/composables/use-socket-io-connection';
+import { TimeoutError, useSocketIOConnection } from '@/composables/use-socket-io-connection';
 import { useToastStore } from '@/store/toast';
 import PluginChatMessage from '@/components/plugin/PluginChatMessage.vue';
 import { useLayoutStore } from '@/store/layout';
 import { canRender } from '@/utils/utils';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
+import { useApiStore } from '@/store/api';
+import { MinaPlayConsumed, MinaPlayMessage } from '@/api/interfaces/message.interface';
 
 const { t } = useI18n();
 const layout = useLayoutStore();
-const pluginConsole = usePluginConsoleStore();
 const toast = useToastStore();
+const api = useApiStore();
 
 const command = ref<string | undefined>(undefined);
+const messages = ref<MinaPlayPluginMessage[]>([]);
 const programs = ref<PluginCommandDescriptor[]>([]);
+const connected = ref(false);
+const connectError = ref<Error | undefined>(undefined);
+
+const { socket, request } = useSocketIOConnection<PluginEventMap>(api.Plugin.socketPath, {
+  extraHeaders: {
+    Authorization: api.getToken() as string,
+  },
+  reconnectionAttempts: 5,
+  reconnectionDelay: 5000,
+  autoConnect: false,
+});
+onMounted(() => {
+  socket.once('connect', async () => {
+    await loadPrograms();
+    messages.value.push({
+      from: 'plugin',
+      messages: [
+        {
+          type: 'Text',
+          color: '#0288d1',
+          content: t('plugin.welcome'),
+        },
+      ],
+    });
+  });
+  socket.connect();
+});
+onUnmounted(() => {
+  socket.disconnect();
+});
+socket.on('console', (message: { plugin: PluginControl; messages: MinaPlayMessage[] }) => {
+  for (const { id } of message.messages.filter(({ type }) => type === 'Consumed') as MinaPlayConsumed[]) {
+    for (const history of messages.value.filter(({ from }) => from === 'plugin')) {
+      history.messages = history.messages.filter((message) => message.type !== 'ConsumableGroup' || message.id !== id);
+    }
+  }
+
+  messages.value.push({
+    from: 'plugin',
+    control: message.plugin,
+    messages: message.messages,
+  });
+});
+socket.on('connect', () => {
+  connected.value = true;
+});
+socket.on('disconnect', () => {
+  connected.value = false;
+});
+socket.on('connect_error', (e: Error) => {
+  connectError.value = e;
+});
+
+const {
+  pending: chatSending,
+  request: sendChat,
+  onResolved: onChatSent,
+  onRejected: onChatSendFailed,
+} = useAsyncTask(async (message: MinaPlayMessage) => {
+  messages.value.push({
+    from: 'user',
+    messages: [message],
+  });
+  return await request('console', { message });
+});
+onChatSent(() => {
+  command.value = undefined;
+  scrollToBottom();
+});
+onChatSendFailed((error: any) => {
+  command.value = undefined;
+  toast.toastError(t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`));
+});
 
 const {
   request: loadPrograms,
   onResolved: onProgramsLoaded,
   onRejected: onProgramsLoadFailed,
 } = useAsyncTask(async () => {
-  return await pluginConsole.client.request('commands');
+  return await request('commands');
 });
 onProgramsLoaded((data) => {
   programs.value = data;
@@ -167,20 +248,15 @@ onUpdated(async () => {
   await loadPrograms();
 });
 
-const {
-  pending: chatSending,
-  request: sendChat,
-  onResolved: onChatSent,
-  onRejected: onChatSendFailed,
-} = pluginConsole.sendTask;
-onChatSent(() => {
-  command.value = undefined;
-  scrollToBottom();
-});
-onChatSendFailed((error: any) => {
-  command.value = undefined;
-  toast.toastError(t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`));
-});
+const onAction = async (id: string | undefined, value: string) => {
+  if (id != null) {
+    await sendChat({
+      type: 'ConsumableFeedback',
+      id,
+      value,
+    });
+  }
+};
 
 const atBottom = ref(false);
 const messageContainerRef = ref<{ $el: HTMLElement } | undefined>(undefined);
@@ -194,27 +270,6 @@ const scrollToBottom = () => {
 };
 onUpdated(() => {
   scrollToBottom();
-});
-
-onMounted(async () => {
-  if (!pluginConsole.connected) {
-    pluginConsole.client.socket.once('connect', async () => {
-      await loadPrograms();
-      pluginConsole.messages.push({
-        from: 'plugin',
-        messages: [
-          {
-            type: 'Text',
-            color: '#0288d1',
-            content: t('plugin.welcome'),
-          },
-        ],
-      });
-    });
-    pluginConsole.connect();
-  } else {
-    await loadPrograms();
-  }
 });
 </script>
 

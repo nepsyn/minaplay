@@ -2,7 +2,7 @@
   <to-top-container class="page-height overflow-auto">
     <v-container class="d-flex flex-column py-md-12">
       <span class="text-h4">{{ t('rule.title') }}</span>
-      <v-row class="py-2" dense>
+      <v-row class="mt-3" dense>
         <v-col cols="12" sm="auto" class="flex-grow-1">
           <v-text-field
             variant="outlined"
@@ -13,7 +13,7 @@
             :label="t('app.input.keyword')"
             :placeholder="t('app.input.placeholder', { item: t('app.entities.rule') })"
             clearable
-            v-model="filters.keyword"
+            v-model.trim="filters.keyword"
             @update:model-value="useQuery"
           ></v-text-field>
         </v-col>
@@ -95,7 +95,7 @@ const rulesLoader = useAxiosPageLoader(
       keyword: filters.value.keyword,
     });
   },
-  { page: 0, size: 120 },
+  { page: 0, size: 24 },
 );
 const { items: rules } = rulesLoader;
 

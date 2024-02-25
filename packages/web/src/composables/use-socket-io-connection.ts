@@ -1,5 +1,6 @@
 import { io, ManagerOptions, SocketOptions } from 'socket.io-client';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
+import { useApiStore } from '@/store/api';
 
 export class TimeoutError extends Error {
   constructor(message?: string) {
@@ -12,7 +13,9 @@ export function useSocketIOConnection<EventMap extends Record<string, (...args: 
   url: string,
   options: Partial<ManagerOptions & SocketOptions> = {},
 ) {
-  const socket = io(url, options);
+  const api = useApiStore();
+
+  let socket = io(url, options);
 
   let _sync = 0;
   const getSyncId = () => {
@@ -48,6 +51,19 @@ export function useSocketIOConnection<EventMap extends Record<string, (...args: 
 
       const exceptionHandler = (error: { sync: number; code: ErrorCodeEnum; message?: string }) => {
         if (error.sync === sync) {
+          if (error?.code === ErrorCodeEnum.INVALID_TOKEN) {
+            socket.removeAllListeners();
+            socket.disconnect();
+            socket = io(url, {
+              ...options,
+              extraHeaders: {
+                ...options.extraHeaders,
+                Authorization: api.getToken() as string,
+              },
+            });
+          }
+          socket.connect();
+
           unregister();
           reject(error);
         }

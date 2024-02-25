@@ -17,7 +17,12 @@
     </zoom-img>
   </template>
   <template v-else-if="message.type === 'Action'">
-    <v-btn :color="message.text.color" variant="outlined" density="comfortable" @click="emits('action', message.value)">
+    <v-btn
+      :color="message.text.color"
+      variant="outlined"
+      density="comfortable"
+      @click="emits('action', undefined, message.value)"
+    >
       {{ message.text.content }}
     </v-btn>
   </template>
@@ -46,24 +51,15 @@
 <script setup lang="ts">
 import { MinaPlayMessage, MinaPlayTimeout } from '@/api/interfaces/message.interface';
 import ZoomImg from '@/components/app/ZoomImg.vue';
-import { TimeoutError } from '@/composables/use-socket-io-connection';
-import { usePluginConsoleStore } from '@/store/plugin-console';
-import { useToastStore } from '@/store/toast';
-import { useI18n } from 'vue-i18n';
 import { onBeforeMount, onUnmounted, ref } from 'vue';
 import { canRender } from '@/utils/utils';
-import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
-
-const { t } = useI18n();
-const pluginConsole = usePluginConsoleStore();
-const toast = useToastStore();
 
 const props = defineProps<{
   message: MinaPlayMessage;
 }>();
 
 const emits = defineEmits<{
-  (ev: 'action', value: string): any;
+  (ev: 'action', id: string | undefined, value: string): any;
 }>();
 
 let interval: ReturnType<typeof setInterval> | undefined = undefined;
@@ -83,22 +79,13 @@ onUnmounted(() => {
   clearInterval(interval);
 });
 
-const handleAction = async (value: string) => {
-  if (props.message.type === 'ConsumableGroup') {
-    await sendChat({
-      type: 'ConsumableFeedback',
-      id: props.message.id,
-      value,
-    });
+const handleAction = async (id: string | undefined, value: string) => {
+  if (!id && props.message.type === 'ConsumableGroup') {
+    emits('action', props.message.id, value);
   } else {
-    emits('action', value);
+    emits('action', id, value);
   }
 };
-
-const { request: sendChat, onRejected: onChatSendFailed } = pluginConsole.sendTask;
-onChatSendFailed((error: any) => {
-  toast.toastError(t(`error.${error instanceof TimeoutError ? ErrorCodeEnum.TIMEOUT : error.code}`));
-});
 </script>
 
 <style scoped lang="sass"></style>

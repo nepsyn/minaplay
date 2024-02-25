@@ -142,6 +142,7 @@ import {
   mdiCog,
   mdiConsole,
   mdiDotsVertical,
+  mdiMagnify,
   mdiMovieOpenPlay,
   mdiPencil,
   mdiRssBox,
@@ -192,6 +193,14 @@ onLogoutRejected((error: any) => {
 });
 
 const actions = ref([
+  {
+    text: t('layout.actions.search'),
+    icon: mdiMagnify,
+    click: async () => {
+      await router.push({ path: '/resource/search' });
+    },
+    show: true,
+  },
   {
     text: t('layout.actions.pluginConsole'),
     icon: mdiConsole,

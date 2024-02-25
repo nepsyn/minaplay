@@ -91,6 +91,7 @@ const zh: MessageSchema = {
     dark: '夜间模式',
     light: '昼间模式',
     actions: {
+      search: '搜索资源',
       pluginConsole: '插件控制台',
       upload: '上传媒体文件',
       github: '访问 Github',

@@ -183,7 +183,7 @@ export class PluginService implements OnModuleInit {
 
   async uninstall(control: PluginControl) {
     if (control.isBuiltin) {
-      return;
+      return [];
     }
 
     const controls = this.controls.filter(({ path }) => path === control.path);
@@ -204,6 +204,7 @@ export class PluginService implements OnModuleInit {
     }
 
     this.controls = this.controls.filter(({ path }) => path !== control.path);
+    return controls;
   }
 
   async handleGatewayMessage(message: MinaPlayMessage, socket: Socket) {

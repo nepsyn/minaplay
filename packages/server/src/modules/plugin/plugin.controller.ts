@@ -90,7 +90,6 @@ export class PluginController {
       throw buildException(BadRequestException, ErrorCodeEnum.BUILTIN_PLUGIN_NOT_UNINSTALLABLE);
     }
 
-    await this.pluginService.uninstall(control);
-    return {};
+    return await this.pluginService.uninstall(control);
   }
 }

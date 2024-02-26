@@ -224,7 +224,10 @@ export class PluginManagerCommand {
     }
 
     await chat.send(new ConsumableGroup(groupId, [new Text(`Uninstalling plugin '${id}' ...`), new Pending()]));
-    await this.pluginService.uninstall(plugin);
-    await chat.send([new Consumed(groupId), new Text(`Plugin '${id}' uninstalled`)]);
+    const plugins = await this.pluginService.uninstall(plugin);
+    await chat.send([
+      new Consumed(groupId),
+      ...plugins.map(({ id }) => new Text(`Plugin '${id}' uninstalled`, Text.Colors.SUCCESS)),
+    ]);
   }
 }

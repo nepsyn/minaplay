@@ -82,7 +82,7 @@ const zh: MessageSchema = {
       cancel: '取消',
       saveToast: '对象已保存',
       deleteTitle: '删除确认',
-      deleteConfirm: '确定要删除此{item}吗?',
+      deleteConfirm: '确定要删除此{item}吗？',
       deleteToast: '对象已删除',
     },
   },
@@ -108,7 +108,7 @@ const zh: MessageSchema = {
       edit: '编辑用户资料',
       logout: {
         title: '注销登录确认',
-        confirm: '确定要注销登录当前 MinaPlay 账号吗?',
+        confirm: '确定要注销登录当前 MinaPlay 账号吗？',
         btn: '注销登录',
       },
     },
@@ -117,7 +117,7 @@ const zh: MessageSchema = {
       drop: '将文件拖动到此处上传',
       closePageHint: '关闭此页面会终止所有上传任务！',
       cancelTitle: '取消确认',
-      cancelConfirm: '确定要取消上传此文件吗',
+      cancelConfirm: '确定要取消上传此文件吗？',
       status: {
         finished: '已完成',
         generating: '正在生成资源文件',
@@ -439,6 +439,9 @@ const zh: MessageSchema = {
     disabled: '已禁用',
     enablePlugin: '启用插件',
     disablePlugin: '禁用插件',
+    uninstallTitle: '卸载确认',
+    uninstallHint: '确定要卸载此插件吗？',
+    uninstalled: '插件已卸载',
     entity: {
       repo: '源码仓库',
       author: '作者',
@@ -580,6 +583,7 @@ const zh: MessageSchema = {
     [ErrorCodeEnum.TIMEOUT]: '请求超时！请稍后再试',
     [ErrorCodeEnum.DUPLICATED_NOTIFICATION_SERVICE]: '已存在同类型通知服务',
     [ErrorCodeEnum.WRONG_EMAIL_VERIFY_CODE]: '邮箱验证码错误',
+    [ErrorCodeEnum.BUILTIN_PLUGIN_NOT_UNINSTALLABLE]: '不可卸载内置插件',
     other: '请求失败！请稍后再试',
   },
 };

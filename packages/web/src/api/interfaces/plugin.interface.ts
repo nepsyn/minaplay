@@ -8,6 +8,7 @@ export interface PluginControl {
   repo?: string;
   license?: string;
   enabled: boolean;
+  isBuiltin: boolean;
   programs: string[];
 }
 

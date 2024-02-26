@@ -66,6 +66,29 @@
         </template>
       </v-tooltip>
       <v-spacer></v-spacer>
+      <v-menu location="top center">
+        <v-card>
+          <v-card-title>{{ t('plugin.uninstallTitle') }}</v-card-title>
+          <v-card-text>{{ t('plugin.uninstallHint') }}</v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn variant="text" color="primary">{{ t('app.cancel') }}</v-btn>
+            <v-btn variant="plain" color="error" @click="uninstall">{{ t('app.ok') }}</v-btn>
+          </v-card-actions>
+        </v-card>
+        <template #activator="{ props }">
+          <v-btn
+            v-if="!plugin.isBuiltin"
+            v-bind="props"
+            density="comfortable"
+            class="mr-1"
+            variant="plain"
+            :loading="uninstalling"
+            color="error"
+            :icon="mdiDelete"
+          ></v-btn>
+        </template>
+      </v-menu>
       <v-btn
         variant="outlined"
         density="comfortable"
@@ -81,7 +104,7 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
 import { PluginControl } from '@/api/interfaces/plugin.interface';
-import { mdiAccountOutline, mdiCircle, mdiScaleBalance, mdiSourceRepository, mdiTagOutline } from '@mdi/js';
+import { mdiAccountOutline, mdiCircle, mdiDelete, mdiScaleBalance, mdiSourceRepository, mdiTagOutline } from '@mdi/js';
 import { openUrl } from '@/utils/utils';
 import { useApiStore } from '@/store/api';
 import { useToastStore } from '@/store/toast';
@@ -96,7 +119,24 @@ const props = defineProps<{
 }>();
 const emits = defineEmits<{
   (ev: 'update', plugin: PluginControl): any;
+  (ev: 'uninstall', plugins: PluginControl[]): any;
 }>();
+
+const {
+  pending: uninstalling,
+  request: uninstall,
+  onResolved: onUninstalled,
+  onRejected: onUninstallFailed,
+} = useAxiosRequest(async () => {
+  return await api.Plugin.uninstall(props.plugin.id)();
+});
+onUninstalled((data) => {
+  toast.toastSuccess(t('plugin.uninstalled'));
+  emits('uninstall', data);
+});
+onUninstallFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
 
 const {
   pending: enabledChanging,

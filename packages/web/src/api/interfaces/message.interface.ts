@@ -1,3 +1,6 @@
+import { SeriesEntity } from '@/api/interfaces/series.interface';
+import { MediaEntity } from '@/api/interfaces/media.interface';
+
 export interface MinaPlayText {
   type: 'Text';
   color?: string;
@@ -47,6 +50,16 @@ export interface MinaPlayPending {
   color?: string;
 }
 
+export interface MinaPlayResourceSeries {
+  type: 'ResourceSeries';
+  series: SeriesEntity;
+}
+
+export interface MinaPlayResourceMedia {
+  type: 'ResourceMedia';
+  media: MediaEntity;
+}
+
 export type MinaPlayMessage =
   | MinaPlayText
   | MinaPlayNetworkImage
@@ -56,4 +69,6 @@ export type MinaPlayMessage =
   | MinaPlayConsumableFeedback
   | MinaPlayConsumed
   | MinaPlayTimeout
-  | MinaPlayPending;
+  | MinaPlayPending
+  | MinaPlayResourceSeries
+  | MinaPlayResourceMedia;

@@ -61,7 +61,15 @@ export function getFullUrl(uri: string) {
 }
 
 export function canRender(message: MinaPlayMessage) {
-  return ['Text', 'NetworkImage', 'Base64Image', 'ConsumableGroup', 'Action', 'Timeout', 'Pending'].includes(
-    message.type,
-  );
+  return [
+    'Text',
+    'NetworkImage',
+    'Base64Image',
+    'ConsumableGroup',
+    'Action',
+    'Timeout',
+    'Pending',
+    'ResourceSeries',
+    'ResourceMedia',
+  ].includes(message.type);
 }

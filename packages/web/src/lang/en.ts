@@ -439,6 +439,9 @@ export default {
     disabled: 'Disabled',
     enablePlugin: 'Enable Plugin',
     disablePlugin: 'Disable Plugin',
+    uninstallTitle: 'Uninstall Confirm',
+    uninstallHint: 'Are you sure to uninstall this plugin?',
+    uninstalled: 'Plugin uninstalled',
     entity: {
       repo: 'Source Repository',
       author: 'Author',
@@ -580,6 +583,7 @@ export default {
     [ErrorCodeEnum.TIMEOUT]: 'Request timeout! Please try again later',
     [ErrorCodeEnum.DUPLICATED_NOTIFICATION_SERVICE]: 'Duplicated notification service',
     [ErrorCodeEnum.WRONG_EMAIL_VERIFY_CODE]: 'Wrong email verify code',
+    [ErrorCodeEnum.BUILTIN_PLUGIN_NOT_UNINSTALLABLE]: 'Builtin plugins are not uninstallable',
     other: 'Request failed! Please try again later',
   },
 };

@@ -43,6 +43,32 @@
       </template>
     </v-row>
   </template>
+  <template v-else-if="message.type === 'ResourceSeries'">
+    <v-row>
+      <v-col cols="4" sm="3" md="2">
+        <series-overview
+          :series="message.series"
+          @click="
+            router.push({ path: `/series/${message.series.id}` });
+            layout.pluginConsoleSheet = false;
+          "
+        ></series-overview>
+      </v-col>
+    </v-row>
+  </template>
+  <template v-else-if="message.type === 'ResourceMedia'">
+    <v-row>
+      <v-col cols="6" sm="4" md="3">
+        <media-overview
+          :media="message.media"
+          @click="
+            router.push({ path: `/media/${message.media.id}` });
+            layout.pluginConsoleSheet = false;
+          "
+        ></media-overview>
+      </v-col>
+    </v-row>
+  </template>
   <template v-else>
     <slot></slot>
   </template>
@@ -53,6 +79,13 @@ import { MinaPlayMessage, MinaPlayTimeout } from '@/api/interfaces/message.inter
 import ZoomImg from '@/components/app/ZoomImg.vue';
 import { onBeforeMount, onUnmounted, ref } from 'vue';
 import { canRender } from '@/utils/utils';
+import SeriesOverview from '@/components/resource/SeriesOverview.vue';
+import { useRouter } from 'vue-router';
+import MediaOverview from '@/components/resource/MediaOverview.vue';
+import { useLayoutStore } from '@/store/layout';
+
+const layout = useLayoutStore();
+const router = useRouter();
 
 const props = defineProps<{
   message: MinaPlayMessage;
@@ -60,6 +93,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   (ev: 'action', id: string | undefined, value: string): any;
+  (ev: 'close-dialog'): any;
 }>();
 
 let interval: ReturnType<typeof setInterval> | undefined = undefined;

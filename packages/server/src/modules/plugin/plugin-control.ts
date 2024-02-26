@@ -3,6 +3,7 @@ import { Type } from '@nestjs/common';
 import { Exclude, Expose } from 'class-transformer';
 import { ModuleRef } from '@nestjs/core';
 import { PluginListenerContext } from './plugin-listener-context.js';
+import { isDefined } from 'class-validator';
 
 export class PluginControl {
   constructor(options?: Partial<PluginControl>) {
@@ -35,6 +36,14 @@ export class PluginControl {
 
   @Exclude()
   type: Type;
+
+  @Exclude()
+  path?: string;
+
+  @Expose()
+  get isBuiltin() {
+    return !isDefined(this.path);
+  }
 
   @Exclude()
   module: ModuleRef;

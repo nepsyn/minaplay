@@ -49,7 +49,7 @@ export class PluginManagerCommand {
       return new Text(`Plugin '${id}' not found in MinaPlay`, Text.Colors.ERROR);
     }
 
-    await this.pluginService.toggleEnabled(id, true);
+    await this.pluginService.toggleEnabled(plugin, true);
     return new Text(`Plugin '${id}' enabled`, Text.Colors.SUCCESS);
   }
 
@@ -68,7 +68,7 @@ export class PluginManagerCommand {
       return new Text(`Plugin '${id}' not found in MinaPlay`, Text.Colors.ERROR);
     }
 
-    await this.pluginService.toggleEnabled(id, false);
+    await this.pluginService.toggleEnabled(plugin, false);
     return new Text(`Plugin '${id}' disabled`, Text.Colors.SUCCESS);
   }
 
@@ -152,14 +152,14 @@ export class PluginManagerCommand {
       await compressing.tgz.decompress(Buffer.from(await tarballResponse.arrayBuffer()), downloadDir);
       await fs.move(path.join(downloadDir, 'package'), destDir, { overwrite: true });
       await fs.rmdir(downloadDir);
-      await execaCommand('npm install', {
+      await execaCommand('npm install --omit=peer', {
         cwd: destDir,
       });
       const plugins = await this.pluginService.findPlugins(destDir);
       if (plugins.length > 0) {
         const installedTexts: Text[] = [];
-        for (const plugin of plugins) {
-          const control = await this.pluginService.registerPlugin(plugin);
+        for (const [type] of plugins) {
+          const control = await this.pluginService.registerPlugin(type, destDir);
           if (control) {
             installedTexts.push(new Text(`Plugin '${control.id}' registered`, Text.Colors.SUCCESS));
           }
@@ -176,5 +176,55 @@ export class PluginManagerCommand {
     } finally {
       await chat.send(new Consumed(groupId));
     }
+  }
+
+  @MinaPlayCommand('uninstall', {
+    aliases: ['remove', 'u'],
+    parent: () => PluginManagerCommand.prototype.handlePm,
+  })
+  async handleUninstall(
+    @MinaPlayCommandArgument('<id>', {
+      description: 'plugin ID',
+    })
+    id: string,
+    @MinaPlayCommandOption('-y,--yes', {
+      description: 'Skip uninstall confirmation',
+      default: false,
+    })
+    yes: boolean,
+    @MinaPlayListenerInject() chat: PluginChat,
+  ) {
+    const plugin = this.pluginService.getControlById(id);
+    if (!plugin) {
+      return new Text(`Plugin '${id}' not found in MinaPlay`, Text.Colors.ERROR);
+    }
+    if (plugin.isBuiltin) {
+      return new Text(`Cannot uninstall builtin plugin '${id}'`, Text.Colors.ERROR);
+    }
+
+    const groupId = Date.now().toString();
+    if (!yes) {
+      await chat.send([
+        new Text(`Uninstall plugin '${id}'? (Y/n)`),
+        new ConsumableGroup(groupId, [
+          new Action('yes', new Text('Yes', Text.Colors.ERROR)),
+          new Action('no', new Text('No')),
+          new Action('cancel', new Text('Cancel')),
+          new Timeout(30000),
+        ]),
+      ]);
+      try {
+        const resp = await chat.receive(30000);
+        if (resp.type !== 'ConsumableFeedback' || resp.id !== groupId || resp.value !== 'yes') {
+          return [new Consumed(groupId), new Text(`Uninstall '${id}' canceled`)];
+        }
+      } catch {
+        return [new Consumed(groupId), new Text(`Uninstall '${id}' canceled`)];
+      }
+    }
+
+    await chat.send(new ConsumableGroup(groupId, [new Text(`Uninstalling plugin '${id}' ...`), new Pending()]));
+    await this.pluginService.uninstall(plugin);
+    await chat.send([new Consumed(groupId), new Text(`Plugin '${id}' uninstalled`)]);
   }
 }

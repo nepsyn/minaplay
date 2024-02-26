@@ -14,7 +14,7 @@ import { PluginListenerContext } from './plugin-listener-context.js';
 import { instanceToPlain } from 'class-transformer';
 import { register } from 'node:module';
 import { PLUGIN_DIR } from '../../constants.js';
-import { isDefined } from 'class-validator';
+import { isDefined, isEmpty } from 'class-validator';
 
 @Injectable()
 export class PluginService implements OnModuleInit {
@@ -23,41 +23,34 @@ export class PluginService implements OnModuleInit {
 
   constructor(private lazyModuleLoader: LazyModuleLoader) {}
 
-  async findPlugins(dir?: string) {
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    const base = dir ?? path.join(__dirname, './builtin');
-    await fs.ensureDir(base);
+  async findPlugins(dir: string) {
+    await fs.ensureDir(dir);
 
     const files = fs
-      .readdirSync(base, { withFileTypes: true })
+      .readdirSync(dir, { withFileTypes: true })
       .flatMap((file) =>
         file.isDirectory() ? fs.readdirSync(path.join(file.path, file.name), { withFileTypes: true }) : file,
       )
-      .filter((file) => file.isFile() && (file.name.endsWith('.plugin.js') || file.name.endsWith('.plugin.mjs')))
-      .map((file) => pathToFileURL(path.join(file.path, file.name)).href);
+      .filter((file) => file.isFile() && (file.name.endsWith('.plugin.js') || file.name.endsWith('.plugin.mjs')));
 
-    const plugins: Type[] = [];
+    const plugins: [Type, fs.Dirent][] = [];
     for (const file of files) {
       try {
-        const module: object = await import(file);
+        const module: object = await import(pathToFileURL(path.join(file.path, file.name)).href);
         for (const attr of Object.values(module)) {
           if (isMinaPlayPlugin(attr)) {
-            plugins.push(attr);
+            plugins.push([attr, file]);
           }
         }
       } catch (error) {
-        this.logger.error(
-          `Error occurred while loading plugin file: ${path.basename(file)}`,
-          error.stack,
-          PluginService.name,
-        );
+        this.logger.error(`Error occurred while loading plugin file: ${file.name}`, error.stack, PluginService.name);
       }
     }
 
     return plugins;
   }
 
-  async registerPlugin(plugin: Type) {
+  async registerPlugin(plugin: Type, path?: string) {
     const metadata = getMinaPlayPluginMetadata(plugin);
     if (this.getControlById(metadata.id)) {
       this.logger.error(`Error occurred while creating plugin instance: Duplicated plugin id '${metadata.id}'`);
@@ -74,6 +67,7 @@ export class PluginService implements OnModuleInit {
         license: metadata.license,
         enabled: true,
         type: plugin,
+        path,
         contexts: new Map(),
       });
       this.controls.push(control);
@@ -138,13 +132,15 @@ export class PluginService implements OnModuleInit {
     this.registerImportMap();
 
     // register built in plugins
-    for (const plugin of await this.findPlugins()) {
-      await this.registerPlugin(plugin);
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    for (const [type] of await this.findPlugins(path.join(__dirname, './builtin'))) {
+      await this.registerPlugin(type);
     }
 
     // register plugins in data dir
-    for (const plugin of await this.findPlugins(PLUGIN_DIR)) {
-      await this.registerPlugin(plugin);
+    for (const [type, file] of await this.findPlugins(PLUGIN_DIR)) {
+      const pluginPath = isEmpty(path.relative(PLUGIN_DIR, file.path)) ? path.join(file.path, file.name) : file.path;
+      await this.registerPlugin(type, pluginPath);
     }
 
     await this.emitAllEnabled('onPluginEnabled');
@@ -178,18 +174,36 @@ export class PluginService implements OnModuleInit {
     }
   }
 
-  async toggleEnabled(id: string, enabled: boolean) {
-    const control = this.controls.find((control) => control.id === id);
-    if (!control) {
-      return;
-    }
-
+  async toggleEnabled(control: PluginControl, enabled: boolean) {
     if (control.enabled !== enabled) {
       control.enabled = enabled;
       await this.emit(control, control.enabled ? 'onPluginEnabled' : 'onPluginDisabled');
     }
+  }
 
-    return control;
+  async uninstall(control: PluginControl) {
+    if (control.isBuiltin) {
+      return;
+    }
+
+    const controls = this.controls.filter(({ path }) => path === control.path);
+    for (const control of controls) {
+      await this.toggleEnabled(control, false);
+      await this.emit(control, 'onPluginUninstall');
+    }
+
+    try {
+      const stat = await fs.stat(control.path);
+      if (stat.isFile()) {
+        await fs.unlink(control.path);
+      } else if (stat.isDirectory()) {
+        await fs.rm(control.path, { recursive: true, force: true });
+      }
+    } catch (error) {
+      this.logger.error(`Cannot uninstall plugin at '${control.path}'`, error.stack, PluginService.name);
+    }
+
+    this.controls = this.controls.filter(({ path }) => path !== control.path);
   }
 
   async handleGatewayMessage(message: MinaPlayMessage, socket: Socket) {

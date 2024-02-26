@@ -19,6 +19,8 @@ export interface MinaPlayPluginHooks {
   onPluginEnabled?(): any;
 
   onPluginDisabled?(): any;
+
+  onPluginUninstall?(): any;
 }
 
 export type MinaPlayListenerResult = string | MinaPlayMessage | MinaPlayMessage[] | undefined;

@@ -60,4 +60,7 @@ export enum ErrorCodeEnum {
   DUPLICATED_NOTIFICATION_SERVICE = 0x0701,
   /** 邮箱验证码错误 */
   WRONG_EMAIL_VERIFY_CODE = 0x0702,
+
+  /** 内置插件不可卸载 */
+  BUILTIN_PLUGIN_NOT_UNINSTALLABLE = 0x0801,
 }

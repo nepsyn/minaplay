@@ -64,7 +64,7 @@ import { MINAPLAY_VERSION } from './constants.js';
         type: 'mysql',
         host: configService.get('DB_HOST', '127.0.0.1'),
         port: Number(configService.get('DB_PORT', 3306)),
-        username: configService.get('DB_USERNAME'),
+        username: configService.get('DB_USERNAME', 'root'),
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE', 'minaplay'),
         entities: ['dist/**/*.entity{.ts,.js}'],
@@ -89,7 +89,7 @@ import { MINAPLAY_VERSION } from './constants.js';
         streamHttpPort: configService.get('STREAM_HTTP_PORT', 3001),
         streamChunkSize: Number(configService.get('STREAM_CHUNK_SIZE', 60000)),
         streamFfmpegPath: configService.get('FFMPEG_PATH', 'ffmpeg'),
-        streamPublishKey: configService.get('STREAM_PUBLISH_KEY'),
+        streamPublishKey: configService.get('STREAM_PUBLISH_KEY', Date.now().toString()),
       }),
     }),
     MediaModule.registerAsync({
@@ -110,7 +110,7 @@ import { MINAPLAY_VERSION } from './constants.js';
         rpcSecret: configService.get('ARIA2_RPC_SECRET'),
         trackerAutoUpdate: Number(configService.get('ARIA2_AUTO_UPDATE_TRACKER', 0)) === 1,
         trackerUpdateUrl: configService.get('ARIA2_TRACKER_LIST_URL'),
-        httpProxy: configService.get('APP_HTTP_PROXY', undefined),
+        httpProxy: configService.get('APP_HTTP_PROXY'),
       }),
     }),
     NotificationModule.registerAsync({

@@ -90,7 +90,7 @@ export const useApiStore = defineStore('api', () => {
     },
   );
 
-  const baseUrl = import.meta.env.VITE_API_HOST;
+  const baseUrl = import.meta.env.VITE_API_HOST ?? '';
 
   function apiGet<T = any, Params = any>(url: string, config: AxiosRequestConfig = {}) {
     return (params?: Params) => axios.get<T>(baseUrl + url, { params, ...config });

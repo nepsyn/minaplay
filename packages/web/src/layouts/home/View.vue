@@ -2,7 +2,7 @@
   <v-app-bar order="1" border="b" color="background" flat>
     <v-app-bar-nav-icon variant="text" @click.stop="layout.navDrawer = !layout.navDrawer"></v-app-bar-nav-icon>
 
-    <v-badge color="info" content="alpha">
+    <v-badge color="info" content="beta">
       <v-toolbar-title>
         <router-link to="/" class="title-link" active-class="title-link">
           {{ t('app.name') }}

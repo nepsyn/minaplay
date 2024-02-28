@@ -1,0 +1,16 @@
+packages/server/node_modules
+packages/server/dist
+packages/server/data
+packages/server/public
+packages/server/.env
+packages/server/.env.prod
+packages/server/.env.dev
+
+packages/web/node_modules
+packages/web/dist
+packages/web/dev-dist
+packages/web/.env
+packages/web/.env.production
+packages/web/.env.local
+
+

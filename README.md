@@ -42,7 +42,7 @@ docker run -d \
   nepsyn/minaplay:beta
 ```
 
-首次启动时，系统将会打印默认超级管理员 minaplay 用户及其密码，可通过命令 `docker logs minaplay` 查看。
+首次启动时，系统将会打印默认超级管理员 minaplay 用户及其密码，可通过命令 `docker logs MinaPlay` 查看。
 
 ```
 [Nest] 14  - 02/28/2024, 3:25:37 PM     LOG [UserManagerPlugin] Default root user created, username: minaplay, password: xxxxxxx

@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  minaplay-mysql:
+    image: "mysql:8"
+    container_name: minaplay-mysql
+    networks:
+      - minaplay-network
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=minaplay
+    restart: always
+
+  minaplay-redis:
+    image: "redis:latest"
+    container_name: minaplay-redis
+    networks:
+      - minaplay-network
+    restart: always
+
+  minaplay:
+    image: "nepsyn/minaplay:beta"
+    container_name: minaplay
+    networks:
+      - minaplay-network
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DB_HOST=minaplay-mysql
+      - REDIS_HOST=minaplay-redis
+      - MS_ANNOUNCED_IP=127.0.0.1
+    ports:
+      - "3000:3000"
+      - "12000-12999:12000-12999"
+    depends_on:
+      - minaplay-mysql
+      - minaplay-redis
+    restart: unless-stopped
+
+networks:
+  minaplay-network:

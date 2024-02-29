@@ -23,26 +23,107 @@ MinaPlay 是一个用于追番 / 追剧的个人媒体库。MinaPlay 根据用�
 
 ## 快速开始
 
+### Docker Compose 部署
+
+推荐使用 [Docker Compose](https://docs.docker.com/compose/) 快速部署 MinaPlay。
+
+将以下代码保存到文件 `docker-compose.yml` 中，或直接使用预设的 [docker-compose.yml](docker-compose.yml) 文件。
+
+```yaml
+version: '3.8'
+
+services:
+  minaplay-mysql:
+    image: "mysql:8"
+    container_name: minaplay-mysql
+    networks:
+      - minaplay-network
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=minaplay
+    restart: always
+
+  minaplay-redis:
+    image: "redis:latest"
+    container_name: minaplay-redis
+    networks:
+      - minaplay-network
+    restart: always
+
+  minaplay:
+    image: "nepsyn/minaplay:beta"
+    container_name: minaplay
+    networks:
+      - minaplay-network
+    volumes:
+      - ./data:/app/data
+    environment:
+      - DB_HOST=minaplay-mysql
+      - REDIS_HOST=minaplay-redis
+      - MS_ANNOUNCED_IP=127.0.0.1
+    ports:
+      - "3000:3000"
+      - "12000-12999:12000-12999"
+    depends_on:
+      - minaplay-mysql
+      - minaplay-redis
+    restart: unless-stopped
+
+networks:
+  minaplay-network:
+```
+
+使用命令运行 MinaPlay 服务。
+
+```shell
+docker compose up -d
+```
+
 ### Docker 部署
 
-推荐使用 [Docker](https://docs.docker.com/engine/install/) 快速部署 MinaPlay。
+使用 [Docker](https://docs.docker.com/engine/install/) 部署 MinaPlay。
 复制以下命令并修改相关配置。
 
 ```shell
+# 创建网络
+docker network create minaplay-network 
+
+# 启动 MySQL
 docker run -d \
-  --name MinaPlay \
-  -v ./data:/app/data \
-  -e DB_HOST="MySQL 地址" \
-  -e DB_PASSWORD="MySQL 密码" \
-  -e REDIS_HOST="Redis 地址" \
-  -e MS_ANNOUNCED_IP="宿主机外网 IP" \
-  -p 3000:3000 \
-  -p 12000-13000:12000-13000 \
+  --name minaplay-mysql \
+  --network minaplay-network \
+  --restart always \
+  -e TZ=Asia/Shanghai \
+  -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
+  -e MYSQL_DATABASE=minaplay \
+  mysql:8
+
+# 启动 Redis
+docker run -d \
+  --name minaplay-redis \
+  --network minaplay-network \
+  --restart always \
+  redis:latest
+
+# 启动 MinaPlay
+# 在需要放映室语音通话服务的情况下，将命令中 `-e MS_ANNOUNCED_IP=127.0.0.1` 更改为宿主机的外部访问 IP 地址
+docker run -d \
+  --name minaplay \
+  --network minaplay-network \
   --restart unless-stopped \
+  -v ./data:/app/data \
+  -p 3000:3000 \
+  -p 12000-12999:12000-12999 \
+  -e DB_HOST=minaplay-mysql \
+  -e REDIS_HOST=minaplay-redis \
+  -e MS_ANNOUNCED_IP=127.0.0.1 \
   nepsyn/minaplay:beta
 ```
 
-首次启动时，系统将会打印默认超级管理员 minaplay 用户及其密码，可通过命令 `docker logs MinaPlay` 查看。
+### 开始使用
+
+首次启动时，系统将会打印默认超级管理员 minaplay 用户及其密码，可通过命令 `docker logs minaplay` 查看。
 
 ```
 [Nest] 14  - 02/28/2024, 3:25:37 PM     LOG [UserManagerPlugin] Default root user created, username: minaplay, password: xxxxxxx

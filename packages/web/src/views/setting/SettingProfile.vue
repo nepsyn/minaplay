@@ -100,7 +100,7 @@
           {{ t('app.loader.empty') }}
         </v-card-subtitle>
         <template v-for="(meta, index) in api.user!.metas ?? []" :key="meta.id">
-          <v-list-item>
+          <v-list-item v-if="enabledAdapters.includes(meta.service)">
             <template #prepend>
               <v-switch
                 hide-details
@@ -386,6 +386,9 @@ const { pending: notifyUpdating, request: updateNotify } = useAsyncTask(updatePr
 
 const adaptersLoader = useAxiosRequest(async () => {
   return await api.Notification.getEnabledAdapters();
+});
+const enabledAdapters = computed(() => {
+  return adaptersLoader.data.value?.adapters ?? [];
 });
 const availableAdapters = computed(() => {
   return [

@@ -35,7 +35,6 @@ import { Rule } from './rule.entity.js';
 import { RuleErrorLog } from './rule-error-log.entity.js';
 import { RuleErrorLogService } from './rule-error-log.service.js';
 import { SourceService } from '../source/source.service.js';
-import { In } from 'typeorm';
 import { ApiPaginationResultDto } from '../../../common/api.pagination.result.dto.js';
 import { ApiQueryDto } from '../../../common/api.query.dto.js';
 import { isDefined } from 'class-validator';
@@ -107,21 +106,12 @@ export class RuleController {
   async querySubscribeRule(@Query() query: RuleQueryDto) {
     const { keyword, sourceId } = query;
 
-    let idCondition = undefined;
-    if (sourceId) {
-      const source = await this.sourceService.findOneBy({ id: sourceId });
-      if (source) {
-        const rules = (await source.rules) ?? [];
-        idCondition = In(rules.map(({ id }) => id));
-      }
-    }
-
     const [result, total] = await this.ruleService.findAndCount({
       where: buildQueryOptions<Rule>({
         keyword,
         keywordProperties: (entity) => [entity.remark],
         exact: {
-          id: idCondition,
+          sources: { id: sourceId },
         },
       }),
       skip: query.page * query.size,
@@ -158,6 +148,7 @@ export class RuleController {
       id,
       ...data,
       sources: data.sourceIds?.map((id) => ({ id })),
+      updateAt: new Date(),
     });
 
     return await this.ruleService.findOneBy({ id });

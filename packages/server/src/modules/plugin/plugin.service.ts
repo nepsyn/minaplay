@@ -207,7 +207,7 @@ export class PluginService implements OnModuleInit {
     return controls;
   }
 
-  async handleGatewayMessage(message: MinaPlayMessage, socket: Socket) {
+  async handleGatewayMessage(message: MinaPlayMessage, socket: Socket, locale?: string) {
     const contexts = this.enabledPluginControls.map((control) => {
       const context = control.contexts.get(socket.data.user.id) ?? new PluginListenerContext(socket.data.user, control);
       control.contexts.set(socket.data.user.id, context);
@@ -225,7 +225,7 @@ export class PluginService implements OnModuleInit {
             }),
           );
         });
-        await context.handleMessage(message);
+        await context.handleMessage(message, locale);
         context.control.contexts.delete(socket.data.user.id);
       }),
     );

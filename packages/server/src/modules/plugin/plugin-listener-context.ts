@@ -6,7 +6,7 @@ import { TypedEventEmitter } from '../../utils/typed-event-emitter.js';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
 import { MinaPlayCallHandler, MinaPlayListenerResult, MinaPlayMessageListenerMetadata } from './plugin.interface.js';
 import { User } from '../user/user.entity.js';
-import { MESSAGE_TOKEN } from './constants.js';
+import { LOCALE_TOKEN, MESSAGE_TOKEN } from './constants.js';
 import { Text } from '../../common/messages/text.js';
 import { defer, finalize, lastValueFrom, mergeAll, Observable, of, switchMap } from 'rxjs';
 import { fromPromise } from 'rxjs/internal/observable/innerFrom';
@@ -50,7 +50,7 @@ export class PluginListenerContext extends TypedEventEmitter<PluginListenerConte
     return params;
   }
 
-  async handleMessage(message: MinaPlayMessage) {
+  async handleMessage(message: MinaPlayMessage, locale?: string) {
     if (this.blocking) {
       this.emit('receive', message);
       return;
@@ -61,6 +61,7 @@ export class PluginListenerContext extends TypedEventEmitter<PluginListenerConte
       container.set(MESSAGE_TOKEN, message);
       container.set(User, this.user);
       container.set(PluginChat, new PluginChat(this));
+      container.set(LOCALE_TOKEN, locale);
 
       const nextFn = async (i = 0) => {
         if (i >= metadata.interceptors.length) {

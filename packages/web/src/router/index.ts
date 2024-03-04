@@ -135,6 +135,14 @@ const routes: RouteRecordRaw[] = [
                   permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
                 },
               },
+              {
+                path: '/source/:id/rule',
+                name: 'source-rule',
+                component: () => import('@/views/source/SourceRule.vue'),
+                meta: {
+                  permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+                },
+              },
             ],
           },
         ],

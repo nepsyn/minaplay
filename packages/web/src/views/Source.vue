@@ -35,7 +35,7 @@
       <multi-items-loader :loader="sourcesLoader" class="px-0 py-2 mt-2" auto>
         <v-row>
           <v-col v-for="source in sources" :key="source.id" cols="12" sm="6" md="4">
-            <source-overview :source="source" @update="onSourceUpdate"></source-overview>
+            <source-overview :source="source" @updated="onSourceUpdate"></source-overview>
           </v-col>
         </v-row>
       </multi-items-loader>

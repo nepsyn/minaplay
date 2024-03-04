@@ -14,6 +14,7 @@ import { isDefined } from 'class-validator';
 import {
   COMMAND_ARGUMENTS_TOKEN,
   COMMAND_OPTIONS_TOKEN,
+  LOCALE_TOKEN,
   MESSAGE_TOKEN,
   MINAPLAY_COMMAND_ARG_METADATA,
   MINAPLAY_COMMAND_METADATA,
@@ -238,4 +239,8 @@ export function MinaPlayCommandArgument(arg: string, options: MinaPlayCommandArg
 
 export function MinaPlayChatMessage(): ParameterDecorator {
   return MinaPlayListenerInject(MESSAGE_TOKEN);
+}
+
+export function MinaPlayChatLocale(): ParameterDecorator {
+  return MinaPlayListenerInject(LOCALE_TOKEN);
 }

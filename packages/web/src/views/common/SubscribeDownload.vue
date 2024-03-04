@@ -61,8 +61,8 @@
         v-for="item in downloads"
         :key="item.id"
         :item="item"
-        @update="onItemUpdated"
-        @delete="onItemDeleted"
+        @updated="onItemUpdated"
+        @deleted="onItemDeleted"
       ></download-item-overview>
     </multi-items-loader>
   </v-container>

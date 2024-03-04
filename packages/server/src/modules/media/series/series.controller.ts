@@ -25,7 +25,7 @@ import { buildQueryOptions } from '../../../utils/build-query-options.util.js';
 import { AuthorizationGuard } from '../../authorization/authorization.guard.js';
 import { PermissionEnum } from '../../../enums/permission.enum.js';
 import { ErrorCodeEnum } from '../../../enums/error-code.enum.js';
-import { Between, In } from 'typeorm';
+import { Between } from 'typeorm';
 import { SeriesSubscribeDto } from './series-subscribe.dto.js';
 import { SeriesSubscribeService } from './series-subscribe.service.js';
 import { SeriesTagService } from './series-tag.service.js';
@@ -85,25 +85,16 @@ export class SeriesController {
   async querySeries(@RequestUser() user: User, @Query() query: SeriesQueryDto) {
     const { keyword, name, season, finished, userId, tag: tagName, start, end } = query;
 
-    let idCondition = undefined;
-    if (tagName) {
-      const tag = await this.seriesTagService.findOneBy({ name: tagName });
-      if (tag) {
-        const series = (await tag.series) ?? [];
-        idCondition = In(series.map(({ id }) => id));
-      }
-    }
-
     const [result, total] = await this.seriesService.findAndCount({
       where: buildQueryOptions<Series>({
         keyword,
         keywordProperties: (entity) => [entity.name, entity.description],
         exact: {
-          id: idCondition,
           name,
           season,
           finished,
           user: { id: userId },
+          tags: { name: tagName },
           createAt: start && Between(new Date(start), end ? new Date(end) : new Date()),
         },
       }),

@@ -29,7 +29,13 @@
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import { useI18n } from 'vue-i18n';
 import { computed } from 'vue';
-import { mdiDownloadCircleOutline, mdiInformationOutline, mdiRss, mdiTimelineClockOutline } from '@mdi/js';
+import {
+  mdiCodeBraces,
+  mdiDownloadCircleOutline,
+  mdiInformationOutline,
+  mdiRss,
+  mdiTimelineClockOutline,
+} from '@mdi/js';
 import { useRoute } from 'vue-router';
 import { useDisplay } from 'vuetify';
 import NavSections from '@/components/app/NavSections.vue';
@@ -61,6 +67,11 @@ const tabs = computed(() => [
     to: `/source/${route.params.id}/download`,
     icon: mdiDownloadCircleOutline,
     text: t('source.sections.download'),
+  },
+  {
+    to: `/source/${route.params.id}/rule`,
+    icon: mdiCodeBraces,
+    text: t('source.sections.rule'),
   },
 ]);
 </script>

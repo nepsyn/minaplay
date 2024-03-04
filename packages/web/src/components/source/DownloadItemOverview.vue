@@ -93,8 +93,8 @@ const props = defineProps<{
 }>();
 
 const emits = defineEmits<{
-  (ev: 'update', item: DownloadItemEntity): any;
-  (ev: 'delete', item: DownloadItemEntity): any;
+  (ev: 'updated', item: DownloadItemEntity): any;
+  (ev: 'deleted', item: DownloadItemEntity): any;
 }>();
 
 const downloadItemProps = computed(() => {
@@ -146,7 +146,7 @@ const { request: updateState, onResolved: onUpdated } = useAxiosRequest(async ()
   return await api.Download.getById(props.item.id)();
 });
 onUpdated((data) => {
-  emits('update', data);
+  emits('updated', data);
   if (data.status !== StatusEnum.PENDING) {
     clearInterval(interval);
   }
@@ -169,7 +169,7 @@ const {
   return await api.Download.retry(props.item.id)();
 });
 onRetried((data) => {
-  emits('update', data);
+  emits('updated', data);
   clearInterval(interval);
   interval = setInterval(() => updateState(), 3000);
 });
@@ -186,7 +186,7 @@ const {
   return await api.Download.pause(props.item.id)();
 });
 onPaused((data) => {
-  emits('update', data);
+  emits('updated', data);
   clearInterval(interval);
 });
 onPauseFailed((error: any) => {
@@ -202,7 +202,7 @@ const {
   return await api.Download.unpause(props.item.id)();
 });
 onUnpaused((data) => {
-  emits('update', data);
+  emits('updated', data);
   clearInterval(interval);
   interval = setInterval(() => updateState(), 3000);
 });
@@ -219,7 +219,7 @@ const {
   return await api.Download.cancel(props.item.id)();
 });
 onCanceled((data) => {
-  emits('update', data);
+  emits('updated', data);
   clearInterval(interval);
 });
 onCancelFailed((error: any) => {
@@ -235,7 +235,7 @@ const {
   return await api.Download.delete(props.item.id)();
 });
 onDeleted(() => {
-  emits('delete', props.item);
+  emits('deleted', props.item);
   clearInterval(interval);
 });
 onDeleteFailed((error: any) => {

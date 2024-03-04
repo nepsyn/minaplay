@@ -47,7 +47,7 @@
       <multi-items-loader :loader="rulesLoader" class="px-0 py-2 mt-2" auto>
         <v-row>
           <v-col v-for="rule in rules" :key="rule.id" cols="12" sm="6" md="4">
-            <rule-overview class="h-100" :rule="rule"></rule-overview>
+            <rule-overview class="h-100" :rule="rule" @deleted="onRuleDeleted"></rule-overview>
           </v-col>
         </v-row>
       </multi-items-loader>
@@ -62,7 +62,7 @@ import { mdiMagnify, mdiPlus } from '@mdi/js';
 import { ref } from 'vue';
 import { debounce } from '@/utils/utils';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
-import { RuleQueryDto } from '@/api/interfaces/subscribe.interface';
+import { RuleEntity, RuleQueryDto } from '@/api/interfaces/subscribe.interface';
 import { useApiStore } from '@/store/api';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { useAxiosRequest } from '@/composables/use-axios-request';
@@ -122,6 +122,10 @@ onCreated(async (data) => {
 onCreateFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
+
+const onRuleDeleted = (rule: RuleEntity) => {
+  rules.value = rules.value.filter(({ id }) => id !== rule.id);
+};
 </script>
 
 <style scoped lang="sass"></style>

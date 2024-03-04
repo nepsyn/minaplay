@@ -75,7 +75,7 @@ const props = defineProps<{
   source: SourceEntity;
 }>();
 const emits = defineEmits<{
-  (ev: 'update', source: SourceEntity): any;
+  (ev: 'updated', source: SourceEntity): any;
 }>();
 
 const editEnabled = ref(props.source.enabled);
@@ -90,7 +90,7 @@ const {
   });
 });
 onEnabledChanged((data) => {
-  emits('update', data);
+  emits('updated', data);
 });
 onEnabledChangeFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));

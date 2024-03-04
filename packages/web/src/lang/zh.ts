@@ -264,6 +264,7 @@ const zh: MessageSchema = {
       raw: '原始数据',
       log: '解析日志',
       download: '下载项目',
+      rule: '订阅规则',
     },
     info: {
       actions: '操作',

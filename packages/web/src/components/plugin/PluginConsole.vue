@@ -149,7 +149,7 @@ import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useApiStore } from '@/store/api';
 import { MinaPlayConsumed, MinaPlayMessage } from '@/api/interfaces/message.interface';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const layout = useLayoutStore();
 const toast = useToastStore();
 const api = useApiStore();
@@ -220,7 +220,7 @@ const {
     from: 'user',
     messages: [message],
   });
-  return await request('console', { message });
+  return await request('console', { message, locale: locale.value });
 });
 onChatSent(() => {
   command.value = undefined;

@@ -263,6 +263,7 @@ export default {
       raw: 'Raw Data',
       log: 'Parse Log',
       download: 'Download',
+      rule: 'Rules',
     },
     info: {
       actions: 'Actions',

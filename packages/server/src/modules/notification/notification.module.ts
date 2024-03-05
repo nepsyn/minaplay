@@ -11,10 +11,25 @@ import { WsAdapter } from './adapters/ws/ws.adapter.js';
 import { NotificationMetaService } from './notification-meta.service.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationMeta } from './notification-meta.entity.js';
+import { BullModule } from '@nestjs/bull';
+import { NotificationConsumer } from './notification.consumer.js';
 
 @Module({
-  imports: [AuthorizationModule, UserModule, DiscoveryModule, TypeOrmModule.forFeature([NotificationMeta])],
-  providers: [NotificationService, NotificationMetaService, EmailAdapter, NotificationGateway, WsAdapter],
+  imports: [
+    AuthorizationModule,
+    UserModule,
+    DiscoveryModule,
+    TypeOrmModule.forFeature([NotificationMeta]),
+    BullModule.registerQueue({ name: 'notification' }),
+  ],
+  providers: [
+    NotificationService,
+    NotificationMetaService,
+    EmailAdapter,
+    NotificationGateway,
+    WsAdapter,
+    NotificationConsumer,
+  ],
   controllers: [NotificationController],
   exports: [NotificationService],
 })

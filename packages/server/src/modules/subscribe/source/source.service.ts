@@ -92,7 +92,7 @@ export class SourceService implements OnModuleInit {
     const job = CronJob.from({
       cronTime: source.cron,
       onTick: async () => {
-        await this.fetchSubscribeSourceQueue.add(source);
+        await this.fetchSubscribeSourceQueue.add(source, { attempts: 3 });
       },
     });
     this.scheduleRegistry.addCronJob(name, job);

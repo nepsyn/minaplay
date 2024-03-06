@@ -65,38 +65,62 @@
               </v-container>
             </v-container>
             <v-divider></v-divider>
-            <v-dialog width="auto">
-              <template #default="{ isActive }">
-                <v-card>
-                  <v-card-title>{{ t('layout.user.logout.title') }}</v-card-title>
-                  <v-card-text>{{ t('layout.user.logout.confirm') }}</v-card-text>
-                  <v-card-actions>
-                    <v-spacer></v-spacer>
-                    <v-btn color="primary" variant="text" @click="isActive.value = false">
-                      {{ t('app.cancel') }}
-                    </v-btn>
-                    <v-btn color="error" variant="plain" @click="logout()" :loading="logoutPending">
-                      {{ t('app.ok') }}
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </template>
-              <template #activator="{ props }">
-                <v-btn v-bind="props" variant="plain" block color="error">
-                  {{ t('layout.user.logout.btn') }}
-                </v-btn>
-              </template>
-            </v-dialog>
+            <v-list density="compact">
+              <v-list-item color="primary" @click="layout.notificationWindow = true">
+                <template #prepend>
+                  <v-icon :icon="mdiBell"></v-icon>
+                </template>
+                {{ t('layout.user.notification.title') }}
+                <template #append>
+                  <v-badge
+                    inline
+                    v-if="notification.unread.length > 0"
+                    color="error-darken-1"
+                    :content="notification.unread.length"
+                  ></v-badge>
+                </template>
+              </v-list-item>
+              <v-dialog width="auto">
+                <template #default="{ isActive }">
+                  <v-card>
+                    <v-card-title>{{ t('layout.user.logout.title') }}</v-card-title>
+                    <v-card-text>{{ t('layout.user.logout.confirm') }}</v-card-text>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="primary" variant="text" @click="isActive.value = false">
+                        {{ t('app.cancel') }}
+                      </v-btn>
+                      <v-btn color="error" variant="plain" @click="logout()" :loading="logoutPending">
+                        {{ t('app.ok') }}
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </template>
+                <template #activator="{ props }">
+                  <v-list-item :prepend-icon="mdiLogout" v-bind="props" variant="plain" base-color="error">
+                    {{ t('layout.user.logout.btn') }}
+                  </v-list-item>
+                </template>
+              </v-dialog>
+            </v-list>
           </v-card>
           <template #activator="{ props }">
-            <user-avatar
-              v-bind="props"
-              v-if="api.user"
-              class="cursor-pointer"
-              :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar?.id, api.user?.avatar?.name)"
-              size="40"
+            <v-badge
+              color="error-darken-1"
+              :model-value="notification.unread.length > 0"
+              offset-x="4"
+              offset-y="4"
+              :content="notification.unread.length"
             >
-            </user-avatar>
+              <user-avatar
+                v-bind="props"
+                v-if="api.user"
+                class="cursor-pointer"
+                :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar?.id, api.user?.avatar?.name)"
+                size="40"
+              >
+              </user-avatar>
+            </v-badge>
           </template>
         </v-menu>
       </div>
@@ -126,6 +150,7 @@
   </v-navigation-drawer>
 
   <plugin-console v-if="api.hasPermission(PermissionEnum.ROOT_OP)"></plugin-console>
+  <notification-window></notification-window>
 
   <v-main>
     <authed-router-view match="^/[^/]+$" />
@@ -137,11 +162,13 @@ import { useLayoutStore } from '@/store/layout';
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
 import {
+  mdiBell,
   mdiCloudUploadOutline,
   mdiCodeBracesBox,
   mdiCog,
   mdiConsole,
   mdiDotsVertical,
+  mdiLogout,
   mdiMagnify,
   mdiMovieOpenPlay,
   mdiPencil,
@@ -160,12 +187,15 @@ import { useToastStore } from '@/store/toast';
 import { PermissionEnum } from '@/api/enums/permission.enum';
 import PluginConsole from '@/components/plugin/PluginConsole.vue';
 import AuthedRouterView from '@/components/app/AuthedRouterView.vue';
+import NotificationWindow from '@/components/notification/NotificationWindow.vue';
+import { useNotificationStore } from '@/store/notification';
 
 const { t } = useI18n<{ message: MessageSchema }>();
 const layout = useLayoutStore();
 const api = useApiStore();
 const route = useRoute();
 const router = useRouter();
+const notification = useNotificationStore();
 const toast = useToastStore();
 
 const navDrawerWidth = ref(108);

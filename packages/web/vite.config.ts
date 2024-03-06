@@ -28,7 +28,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ttf,ico,png,svg,jpeg}'],
+        globPatterns: ['**/*.{js,css,html,ttf,ico,svg}'],
       },
       devOptions: {
         enabled: true,

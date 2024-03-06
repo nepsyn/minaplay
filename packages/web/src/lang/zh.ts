@@ -106,6 +106,11 @@ const zh: MessageSchema = {
     },
     user: {
       edit: '编辑用户资料',
+      notification: {
+        title: '通知中心',
+        unread: '未读',
+        read: '已读',
+      },
       logout: {
         title: '注销登录确认',
         confirm: '确定要注销登录当前 MinaPlay 账号吗？',
@@ -501,6 +506,8 @@ const zh: MessageSchema = {
       danmakuDescription: '是否在放映室连接时自动播放弹幕。',
       joinVoice: '自动加入放映室语音',
       joinVoiceDescription: '是否在放映室连接时自动加入语音房间。',
+      autoContinue: '自动续播',
+      autoContinueDescription: '自动续播到上次播放位置',
       homepage: '主页内容',
       visiblePlates: '可见板块',
       hiddenPlates: '隐藏板块',
@@ -556,6 +563,18 @@ const zh: MessageSchema = {
     [StatusEnum.PAUSED]: '暂停中',
     [StatusEnum.FAILED]: '已失败',
     unknown: '未知',
+  },
+  notification: {
+    markAsRead: '标记为已读',
+    markAsUnread: '标记为未读',
+    titles: {
+      [NotificationEventEnum.NEW_MEDIA]: '媒体文件更新',
+      [NotificationEventEnum.NEW_EPISODE]: '剧集更新',
+    },
+    descriptions: {
+      [NotificationEventEnum.NEW_MEDIA]: `MinaPlay 中更新了新的媒体文件 《{name}》`,
+      [NotificationEventEnum.NEW_EPISODE]: `MinaPlay 中更新了新的剧集 《{series} #{no}》`,
+    },
   },
   error: {
     [ErrorCodeEnum.BAD_REQUEST]: '请求失败！参数错误',

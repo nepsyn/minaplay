@@ -77,6 +77,17 @@
         </v-container>
         <v-switch v-model="settings.autoJoinVoice" hide-details density="compact" color="primary"> </v-switch>
       </v-container>
+      <v-divider class="ml-4"></v-divider>
+      <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
+        <v-container class="pa-0 d-flex flex-row align-center">
+          <v-icon :icon="mdiPlayCircle"></v-icon>
+          <v-container class="pa-0 ml-3">
+            <p class="text-subtitle-1">{{ t('settings.app.autoContinue') }}</p>
+            <p class="text-caption">{{ t('settings.app.autoContinueDescription') }}</p>
+          </v-container>
+        </v-container>
+        <v-switch v-model="settings.autoContinue" hide-details density="compact" color="primary"> </v-switch>
+      </v-container>
     </v-sheet>
     <v-sheet id="plates" class="mt-6 rounded-lg border">
       <v-card-title class="py-4">{{ t('settings.app.homepage') }}</v-card-title>
@@ -139,6 +150,7 @@ import {
   mdiMicrophonePlus,
   mdiMotionPlayOutline,
   mdiMultimedia,
+  mdiPlayCircle,
   mdiSubtitles,
   mdiThemeLightDark,
   mdiTranslate,

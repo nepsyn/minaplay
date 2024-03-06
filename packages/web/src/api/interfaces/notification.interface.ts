@@ -1,5 +1,7 @@
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
 import { NotificationEventEnum } from '@/api/enums/notification-event.enum';
+import { EpisodeEntity } from '@/api/interfaces/series.interface';
+import { MediaEntity } from '@/api/interfaces/media.interface';
 
 export interface NotificationMetaEntity {
   /** id */
@@ -36,3 +38,22 @@ export interface EmailVerifyDto {
   key: string;
   code: string;
 }
+
+export type NotificationEventMap = {
+  [NotificationEventEnum.NEW_EPISODE]: {
+    episode: EpisodeEntity;
+    time: Date;
+  };
+  [NotificationEventEnum.NEW_MEDIA]: {
+    media: MediaEntity;
+    time: Date;
+  };
+};
+
+export type NotificationItem = {
+  [K in keyof NotificationEventMap]: {
+    event: K;
+    data: NotificationEventMap[K];
+    read: boolean;
+  };
+}[keyof NotificationEventMap];

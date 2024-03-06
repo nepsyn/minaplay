@@ -244,12 +244,14 @@ import ExpandableText from '@/components/app/ExpandableText.vue';
 import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 import LiveSelector from '@/components/live/LiveSelector.vue';
 import { LiveEntity } from '@/api/interfaces/live.interface';
+import { useSettingsStore } from '@/store/settings';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
 const route = useRoute();
 const router = useRouter();
 const toast = useToastStore();
+const { settings } = useSettingsStore();
 
 const isMedia = computed(() => route.name === 'media');
 const mediaLoader = useAxiosRequest(async (id?: string) => {
@@ -327,6 +329,10 @@ const playerRef = ref<typeof VideoPlayer | undefined>(undefined);
 const duration = ref<number | undefined>(undefined);
 const watchTimeStart = ref(0);
 const onResourceReady = async () => {
+  if (!settings.autoContinue) {
+    return;
+  }
+
   watchTimeStart.value = Date.now();
   try {
     if (media.value) {

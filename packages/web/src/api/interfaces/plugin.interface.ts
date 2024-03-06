@@ -25,6 +25,6 @@ export interface MinaPlayPluginMessage {
 }
 
 export type PluginEventMap = {
-  console: (arg: { message: MinaPlayMessage }) => MinaPlayMessage[] | undefined;
+  console: (arg: { message: MinaPlayMessage; locale?: string }) => MinaPlayMessage[] | undefined;
   commands: () => PluginCommandDescriptor[];
 };

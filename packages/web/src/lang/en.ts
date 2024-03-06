@@ -105,6 +105,11 @@ export default {
     },
     user: {
       edit: 'Edit User Profile',
+      notification: {
+        title: 'Notifications',
+        unread: 'Unread',
+        read: 'Read',
+      },
       logout: {
         title: 'Logout Confirm',
         confirm: 'Are you sure to logout from MinaPlay?',
@@ -501,6 +506,8 @@ export default {
       danmakuDescription: 'Play live danmaku by default.',
       joinVoice: 'Auto Join Live Voice',
       joinVoiceDescription: 'Join live voice room by default.',
+      autoContinue: 'Auto Resume',
+      autoContinueDescription: 'Automatically resume playback from last watched position',
       homepage: 'Homepage Content',
       visiblePlates: 'Visible Plates',
       hiddenPlates: 'Hidden Plates',
@@ -556,6 +563,18 @@ export default {
     [StatusEnum.PAUSED]: 'Paused',
     [StatusEnum.FAILED]: 'Failed',
     unknown: 'Unknown',
+  },
+  notification: {
+    markAsRead: 'Mark as Read',
+    markAsUnread: 'Mark as Unread',
+    titles: {
+      [NotificationEventEnum.NEW_MEDIA]: 'New Media Updated',
+      [NotificationEventEnum.NEW_EPISODE]: 'New Episode Updated',
+    },
+    descriptions: {
+      [NotificationEventEnum.NEW_MEDIA]: `A new media "{name}" updated in MinaPlay.`,
+      [NotificationEventEnum.NEW_EPISODE]: `A new episode "{series} #{no}" updated in MinaPlay.`,
+    },
   },
   error: {
     [ErrorCodeEnum.BAD_REQUEST]: 'Request failed! Params invalid',

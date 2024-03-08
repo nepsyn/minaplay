@@ -1,5 +1,5 @@
 <script setup>
-import {useData} from 'vitepress';
+import {useData, withBase} from 'vitepress';
 const data = useData();
 </script>
 
@@ -199,7 +199,7 @@ const hooks: RuleHooks = {
 要在 MinaPlay 中添加订阅规则，只需要在管理页面中新建订阅规则即可。
 之后填入订阅规则的基本参数，选择绑定 RSS 订阅源，并修改订阅规则代码。
 
-<img :src="data.isDark.value ? '../assets/new-rule-dark.png' : '../assets/new-rule.png'" alt="new rule">
+<img :src="data.isDark.value ? withBase('/new-rule-dark.png') : withBase('/new-rule.png')" alt="new rule">
 
 - __备注__ - 订阅规则的备注，通常可以填写规则对应的剧集名称。
 - __RSS 订阅源__ - 选择订阅规则的作用范围，此订阅规则只会在选定的 RSS 订阅源被 MinaPlay 解析时生效。

@@ -8,7 +8,7 @@
 
 MinaPlay 是一个视频聚合 RSS 订阅的自动下载管理工具
 
-<img width="1024" src="packages/docs/assets/homepage.png">
+<img width="1024" src="packages/docs/public/homepage.png">
 
 </div>
 

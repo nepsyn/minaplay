@@ -1,5 +1,5 @@
 <script setup>
-import {useData} from 'vitepress';
+import {useData, withBase} from 'vitepress';
 const data = useData();
 </script>
 
@@ -101,7 +101,7 @@ RSS 订阅模式是指 RSS 资源站点提供的订阅方式，不是 MinaPlay �
 
 之后在 MinaPlay 中新建 RSS 订阅源，你将看到如下的信息参数页面。
 
-<img :src="data.isDark.value ? '../assets/new-rss-source-dark.png' : '../assets/new-rss-source.png'" alt="new rss source">
+<img :src="data.isDark.value ? withBase('/new-rss-source-dark.png') : withBase('/new-rss-source.png')" alt="new rss source">
 
 填入 RSS 订阅源的基本参数并保存信息：
 

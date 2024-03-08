@@ -1,0 +1,11 @@
+<svg width="480" height="480" xmlns="http://www.w3.org/2000/svg">
+ <title>MinaPlay</title>
+
+ <g>
+  <title>Layer 1</title>
+  <path id="svg_3" d="m240,434.50001c-107.45856,0 -194.5,-87.04144 -194.5,-194.5c0,-107.45856 87.04144,-194.5 194.5,-194.5c107.45856,0 194.5,87.04144 194.5,194.5c0,107.45856 -87.04144,194.5 -194.5,194.5z" opacity="undefined" stroke-width="8" stroke="#000000" fill-opacity="0" fill="#ffffff"/>
+  <ellipse stroke="#3499ed" stroke-width="12" ry="184.99999" rx="184.99999" id="svg_1" cy="240" cx="239.99999" fill="#ffffff"/>
+  <path transform="rotate(90 258.5 238.5)" id="svg_9" d="m175.07144,311.49999l83.42856,-145.99998l83.42856,145.99998l-166.85712,0z" stroke-width="7" stroke="#000000" fill="#3499ed"/>
+  <path transform="rotate(180 240 314.851)" stroke="#000000" id="svg_2" d="m110.99997,346.35097l48.37501,-62.99998l161.25003,0l48.37499,62.99998l-258.00003,0z" stroke-width="7" fill="#3499ed"/>
+ </g>
+</svg>

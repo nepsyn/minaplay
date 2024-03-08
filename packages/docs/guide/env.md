@@ -1,142 +1,9 @@
-<div align="center">
-
-<img width="100" src="assets/minaplay.svg" alt="logo">
-<br/>
-<img width="200" src="assets/minaplay.png" alt="title">
-
-----
-
-MinaPlay 是一个视频聚合 RSS 订阅的自动下载管理工具
-
-<img width="1024" src="packages/docs/assets/homepage.png">
-
-</div>
-
-## 项目说明
-
-MinaPlay 是一个用于追番 / 追剧的个人媒体库。MinaPlay 根据用户创建的 RSS 订阅源、订阅规则自动下载媒体文件并生成描述信息。
-
-### 主要功能
-
-- 个性化配置 RSS 订阅源、下载规则，打造独一无二属于自己的追番 / 追剧管家。
-- 同步观影放映室，支持聊天消息和多人语音，叫上好朋友一起观影共享欢乐。
-- 高度可拓展、可自定义模板的应用程序通知服务，新内容的更新时间不再错过。
-- 简单易用的插件系统，像使用命令行一样调用各种插件提供的服务。
-
-## 快速开始
-
-### Docker Compose 部署
-
-推荐使用 [Docker Compose](https://docs.docker.com/compose/) 快速部署 MinaPlay。
-
-将以下代码保存到文件 `docker-compose.yml` 中，或直接使用预设的 [docker-compose.yml](docker-compose.yml) 文件。
-
-```yaml
-version: '3.8'
-
-services:
-  minaplay-mysql:
-    image: "mysql:8"
-    container_name: minaplay-mysql
-    networks:
-      - minaplay-network
-    environment:
-      - TZ=Asia/Shanghai
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-      - MYSQL_DATABASE=minaplay
-    restart: always
-
-  minaplay-redis:
-    image: "redis:latest"
-    container_name: minaplay-redis
-    networks:
-      - minaplay-network
-    restart: always
-
-  minaplay:
-    image: "nepsyn/minaplay:beta"
-    container_name: minaplay
-    networks:
-      - minaplay-network
-    volumes:
-      - ./data:/app/data
-    environment:
-      - DB_HOST=minaplay-mysql
-      - REDIS_HOST=minaplay-redis
-      - MS_ANNOUNCED_IP=127.0.0.1  # 在需要放映室语音通话服务的情况下改为宿主机外部访问 IP
-    ports:
-      - "3000:3000"
-      - "12000-12999:12000-12999"
-    depends_on:
-      - minaplay-mysql
-      - minaplay-redis
-    restart: unless-stopped
-
-networks:
-  minaplay-network:
-```
-
-使用命令运行 MinaPlay 服务。
-
-```shell
-docker compose up -d
-```
-
-### Docker 部署
-
-使用 [Docker](https://docs.docker.com/engine/install/) 部署 MinaPlay。
-复制以下命令并修改相关配置。
-
-```shell
-# 创建网络
-docker network create minaplay-network 
-
-# 启动 MySQL
-docker run -d \
-  --name minaplay-mysql \
-  --network minaplay-network \
-  --restart always \
-  -e TZ=Asia/Shanghai \
-  -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
-  -e MYSQL_DATABASE=minaplay \
-  mysql:8
-
-# 启动 Redis
-docker run -d \
-  --name minaplay-redis \
-  --network minaplay-network \
-  --restart always \
-  redis:latest
-
-# 启动 MinaPlay
-# 在需要放映室语音通话服务的情况下，将命令中 `-e MS_ANNOUNCED_IP=127.0.0.1` 更改为宿主机的外部访问 IP 地址
-docker run -d \
-  --name minaplay \
-  --network minaplay-network \
-  --restart unless-stopped \
-  -v ./data:/app/data \
-  -p 3000:3000 \
-  -p 12000-12999:12000-12999 \
-  -e DB_HOST=minaplay-mysql \
-  -e REDIS_HOST=minaplay-redis \
-  -e MS_ANNOUNCED_IP=127.0.0.1 \
-  nepsyn/minaplay:beta
-```
-
-### 开始使用
-
-首次启动时，系统将会打印默认超级管理员 minaplay 用户及其密码，可通过命令 `docker logs minaplay` 查看。
-
-```
-[Nest] 14  - 02/28/2024, 3:25:37 PM     LOG [UserManagerPlugin] Default root user created, username: minaplay, password: xxxxxxx
-```
-
-启动成功后，在浏览器中访问 `http://127.0.0.1:3000` 即可跳转到 MinaPlay 的登录页面。
-
-### 启动参数
+# 启动参数
 
 MinaPlay 启动时会读取当前环境变量中的启动参数。
-全部的选项列表可在 [packages/server/.env.template](packages/server/.env.template) 文件中查看。
+全部的选项列表可在 [.env.template](https://github.com/nepsyn/minaplay/blob/master/packages/server/.env.template) 文件中查看。
+
+## 配置说明
 
 | 参数名                         | 说明                        | 默认值                                                                         |
 |-----------------------------|---------------------------|-----------------------------------------------------------------------------|
@@ -184,17 +51,60 @@ MinaPlay 启动时会读取当前环境变量中的启动参数。
 | NOTIFY_EMAIL_ORIGIN         | SMTP 发信来源                 | `MinaPlay <minaplay@example.com>`                                           |
 | NOTIFY_EMAIL_SUBJECT        | SMTP 发信主题                 | `MinaPlay Email Notification`                                               |
 
-## 构建过程
+## 应用配置
 
-请移步不同子项目的说明文档：
+### Docker Compose 应用配置
 
-- [MinaPlay server](packages/server/README.md) - MinaPlay 服务器端，用于提供 MinaPlay 的各项服务。
-- [MinaPlay web](packages/web/README.md) - MinaPlay 网页端，用于提供 MinaPlay 用户界面。
+```yaml
+version: '3.8'
 
-## 相关群组
+services:
+  ...
+  
+  minaplay:
+    ...
+    environment: // [!code focus:5]
+      - DB_HOST=minaplay-mysql
+      - REDIS_HOST=minaplay-redis
+      - MS_ANNOUNCED_IP=127.0.0.1
+      - CUSTOM_KEY=CUSTOM_VALUE # 用户自定义的配置 // [!code ++]
+    ...
 
-- [QQ 讨论群](https://qm.qq.com/q/t0QzNLAldm)
+networks:
+  minaplay-network:
+```
 
-## License
+### Docker cli 应用配置
 
-[AGPL-3.0 License](LICENSE)
+```shell {13}
+# 启动 MinaPlay
+# 在需要放映室语音通话服务的情况下，将命令中 `-e MS_ANNOUNCED_IP=127.0.0.1` 更改为宿主机的外部访问 IP 地址
+$ docker run -d \
+  --name minaplay \
+  --network minaplay-network \
+  --restart unless-stopped \
+  -v ./data:/app/data \
+  -p 3000:3000 \
+  -p 12000-12999:12000-12999 \
+  -e DB_HOST=minaplay-mysql \
+  -e REDIS_HOST=minaplay-redis \
+  -e MS_ANNOUNCED_IP=127.0.0.1 \
+  -e CUSTOM_KEY=CUSTOM_VALUE \
+  nepsyn/minaplay:beta
+```
+
+### 宿主机启动应用配置
+
+- 直接更改目录下 `.env` 文件。
+
+```shell
+$ cd minaplay/packages/server
+$ vi .env
+```
+
+- 使用命令行环境变量。
+
+```shell {2}
+$ cd minaplay/packages/server
+$ CUSTOM_KEY=CUSTOM_VALUE node dist/main
+```

@@ -72,7 +72,7 @@ MinaPlay server 是 MinaPlay 使用 [NestJS](https://nestjs.com/) + [TypeORM](ht
     yarn run start
     ```
 
-5. 编译 MinaPlay 应用程序
+5. 编译 MinaPlay 应用程序。
 
     ```shell
     yarn run build

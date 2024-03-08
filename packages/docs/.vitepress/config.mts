@@ -1,6 +1,5 @@
 import { defineConfig } from 'vitepress';
 import { zh } from './zh.mjs';
-import { en } from './en.mjs';
 
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
@@ -8,6 +7,7 @@ export default defineConfig({
   description: 'MinaPlay official document',
   lastUpdated: true,
   base: '/minaplay/',
+  srcExclude: ['README.md'],
   locales: {
     root: {
       label: '简体中文',

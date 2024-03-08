@@ -23,7 +23,8 @@ features:
     details: 简单易用的插件系统，像使用命令行一样调用各种插件提供的服务。
 ---
 
-<script setup>import {useData} from 'vitepress';
+<script setup>
+import {useData, withBase} from 'vitepress';
 const data = useData();
 </script>
 
@@ -36,4 +37,4 @@ const data = useData();
 
 <br/>
 
-<img :src="data.isDark.value ? 'assets/homepage-dark.png' : 'assets/homepage.png'" alt="homepage">
+<img :src="data.isDark.value ? withBase('/homepage-dark.png') : withBase('/homepage.png')" alt="homepage">

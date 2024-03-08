@@ -1,5 +1,5 @@
 <script setup>
-import {useData} from 'vitepress';
+import {useData, withBase} from 'vitepress';
 const data = useData();
 </script>
 
@@ -8,7 +8,7 @@ const data = useData();
 MinaPlay 是一个视频聚合 RSS 订阅的自动下载管理工具，专为追番 / 追剧用户量身打造的个人媒体库。
 MinaPlay 通过解析 RSS 订阅链接，配合用户自定义订阅规则自动下载、整理媒体资源。
 
-<img :src="data.isDark.value ? '../assets/homepage-dark.png' : '../assets/homepage.png'" alt="homepage">
+<img :src="data.isDark.value ? withBase('/homepage-dark.png') : withBase('/homepage.png')" alt="homepage">
 
 ## 主要功能
 

@@ -334,7 +334,6 @@
                 :close-on-content-click="false"
                 v-model="updateStreamMenu"
                 @update:model-value="updateStreamMenu && (edit.stream = { ...state?.stream } as any)"
-                max-width="40%"
               >
                 <v-card>
                   <v-card-text>
@@ -577,7 +576,7 @@ import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { useRoute, useRouter } from 'vue-router';
 import VideoPlayer from '@/components/app/VideoPlayer.vue';
-import { computed, nextTick, onMounted, onUnmounted, ref, shallowRef } from 'vue';
+import { computed, nextTick, onUnmounted, ref, shallowRef } from 'vue';
 import {
   mdiAccountMultiple,
   mdiAnimationPlayOutline,
@@ -655,10 +654,6 @@ const { socket, request: emit } = useSocketIOConnection<LiveEventMap>(api.Live.s
   },
   reconnectionAttempts: 5,
   reconnectionDelay: 5000,
-  autoConnect: false,
-});
-onMounted(() => {
-  socket.connect();
 });
 onUnmounted(() => {
   socket.disconnect();

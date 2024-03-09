@@ -5,14 +5,39 @@
         {{ rule.remark || t('rule.unnamed') }}
       </span>
       <v-spacer></v-spacer>
-      <v-menu max-height="320" width="40%" :close-on-content-click="false">
-        <v-card>
-          <hightlightjs class="text-pre-wrap flex-grow-1" languaue="typescript" :code="rule.code"></hightlightjs>
+      <v-bottom-sheet max-height="80vh" :inset="display.smAndUp.value" :close-on-content-click="false">
+        <v-card class="d-flex flex-column">
+          <v-layout>
+            <v-main>
+              <div class="h-100 overflow-y-auto">
+                <hightlightjs class="text-pre-wrap" languaue="typescript" :code="rule.code"></hightlightjs>
+              </div>
+            </v-main>
+            <v-app-bar location="bottom" flat border density="comfortable">
+              <v-row dense class="pa-2">
+                <v-col cols="auto">
+                  <v-btn :prepend-icon="mdiContentCopy" variant="flat" color="success" @click="copyCode()">
+                    {{ t('app.actions.copy') }}
+                  </v-btn>
+                </v-col>
+                <v-col cols="auto">
+                  <v-btn
+                    :prepend-icon="mdiPencil"
+                    variant="flat"
+                    color="primary"
+                    @click="router.push({ path: `/rule/${rule.id}` })"
+                  >
+                    {{ t('app.actions.edit') }}
+                  </v-btn>
+                </v-col>
+              </v-row>
+            </v-app-bar>
+          </v-layout>
         </v-card>
         <template #activator="{ props }">
           <v-btn variant="text" density="comfortable" :icon="mdiCodeBraces" v-bind="props"></v-btn>
         </template>
-      </v-menu>
+      </v-bottom-sheet>
     </v-card-title>
     <v-card-subtitle class="pb-2">
       <span>{{ t('rule.entity.updateAt') }} {{ new Date(rule.updateAt).toLocaleString(locale) }}</span>
@@ -74,14 +99,18 @@ import { useRouter } from 'vue-router';
 import 'highlight.js/lib/common';
 import hljsVuePlugin from '@highlightjs/vue-plugin';
 import BlankFavicon from '@/assets/blank-favicon.png';
-import { mdiCodeBraces, mdiDelete } from '@mdi/js';
+import { mdiCodeBraces, mdiContentCopy, mdiDelete, mdiPencil } from '@mdi/js';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useApiStore } from '@/store/api';
 import { useToastStore } from '@/store/toast';
+import { useDisplay } from 'vuetify';
+import { VBottomSheet, VMenu } from 'vuetify/components';
+import { copyContent } from '@/utils/utils';
 
 const hightlightjs = hljsVuePlugin.component;
 const { t, locale } = useI18n();
 const router = useRouter();
+const display = useDisplay();
 const api = useApiStore();
 const toast = useToastStore();
 
@@ -122,6 +151,16 @@ const getFaviconUrl = (url: string) => {
   } catch {
     return '://favicon.ico';
   }
+};
+
+const copyCode = () => {
+  copyContent(props.rule.code)
+    .then(() => {
+      toast.toastSuccess(t('utils.copied'));
+    })
+    .catch(() => {
+      toast.toastError(t('utils.copyFailed'));
+    });
 };
 </script>
 

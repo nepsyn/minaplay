@@ -80,6 +80,7 @@ const zh: MessageSchema = {
       pause: '暂停',
       unpause: '继续',
       cancel: '取消',
+      copy: '复制',
       saveToast: '对象已保存',
       deleteTitle: '删除确认',
       deleteConfirm: '确定要删除此{item}吗？',

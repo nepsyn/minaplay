@@ -121,7 +121,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, onUpdated, ref } from 'vue';
+import { onUnmounted, onUpdated, ref } from 'vue';
 import {
   mdiArrowCollapseDown,
   mdiArrowDown,
@@ -166,23 +166,19 @@ const { socket, request } = useSocketIOConnection<PluginEventMap>(api.Plugin.soc
   },
   reconnectionAttempts: 5,
   reconnectionDelay: 5000,
-  autoConnect: false,
 });
-onMounted(() => {
-  socket.once('connect', async () => {
-    await loadPrograms();
-    messages.value.push({
-      from: 'plugin',
-      messages: [
-        {
-          type: 'Text',
-          color: '#0288d1',
-          content: t('plugin.welcome'),
-        },
-      ],
-    });
+socket.once('connect', async () => {
+  await loadPrograms();
+  messages.value.push({
+    from: 'plugin',
+    messages: [
+      {
+        type: 'Text',
+        color: '#0288d1',
+        content: t('plugin.welcome'),
+      },
+    ],
   });
-  socket.connect();
 });
 onUnmounted(() => {
   socket.disconnect();

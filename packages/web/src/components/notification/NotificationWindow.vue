@@ -89,7 +89,7 @@ import { computed, ref } from 'vue';
 import { useNotificationStore } from '@/store/notification';
 import NotificationContent from '@/components/notification/NotificationContent.vue';
 
-const { t, locale } = useI18n();
+const { t } = useI18n();
 const layout = useLayoutStore();
 const display = useDisplay();
 const notification = useNotificationStore();

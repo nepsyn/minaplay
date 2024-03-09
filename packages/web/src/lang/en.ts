@@ -79,6 +79,7 @@ export default {
       pause: 'Pause',
       unpause: 'Unpause',
       cancel: 'Cancel',
+      copy: 'Copy',
       saveToast: 'Item saved',
       deleteTitle: 'Delete Item Confirm',
       deleteConfirm: 'Are you sure to delete this {item}?',

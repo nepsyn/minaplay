@@ -5,11 +5,19 @@ import { MinaPlayMessage } from '../../common/application.message.js';
 import { PluginListenerContext } from './plugin-listener-context.js';
 
 export interface MinaPlayPluginMetadata extends Pick<ModuleMetadata, 'imports' | 'providers'> {
+  /** Plugin unique ID */
   id: string;
+  /** Plugin icon url */
+  icon?: string;
+  /** Plugin version */
   version?: string;
+  /** Plugin description */
   description?: string;
+  /** Plugin author */
   author?: string;
+  /** Plugin Git repository */
   repo?: string;
+  /** Plugin license */
   license?: string;
 }
 

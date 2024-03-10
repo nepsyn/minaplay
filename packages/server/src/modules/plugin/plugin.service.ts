@@ -60,6 +60,7 @@ export class PluginService implements OnModuleInit {
     try {
       const control = new PluginControl({
         id: metadata.id,
+        icon: metadata.icon,
         version: metadata.version,
         description: metadata.description,
         author: metadata.author,

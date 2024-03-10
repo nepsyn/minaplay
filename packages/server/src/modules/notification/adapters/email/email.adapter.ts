@@ -3,11 +3,8 @@ import { NotificationModuleOptions } from '../../notification.module.interface.j
 import { NOTIFICATION_MODULE_OPTIONS_TOKEN } from '../../notification.module-definition.js';
 import { createTransport, SendMailOptions, Transporter } from 'nodemailer';
 import { NotificationEventMap } from '../../notification-event.interface.js';
-import Handlebars from 'handlebars';
 import path from 'node:path';
-import fs from 'fs-extra';
 import { isDefined } from 'class-validator';
-import { isUndefined } from '@nestjs/common/utils/shared.utils.js';
 import { ApplicationLogger } from '../../../../common/application.logger.service.js';
 import { fileURLToPath } from 'node:url';
 import { NotificationServiceAdapter } from '../../notification-service-adapter.interface.js';
@@ -17,11 +14,12 @@ import { EmailConfig } from './email.config.js';
 import { generateMD5 } from '../../../../utils/generate-md5.util.js';
 import { EmailVerifyCache } from './email-verify-cache.interface.js';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
+import { compileTemplate } from '../../../../utils/compile-template.util.js';
+import { TEMPLATE_DIR } from '../../../../constants.js';
 
 @Injectable()
 export class EmailAdapter implements NotificationServiceAdapter<EmailConfig> {
   private transporter: Transporter;
-  private templates: Record<NotificationEventEnum | string, Handlebars.TemplateDelegate> = {};
 
   private logger = new ApplicationLogger(EmailAdapter.name);
 
@@ -60,22 +58,6 @@ export class EmailAdapter implements NotificationServiceAdapter<EmailConfig> {
     } catch (error) {
       this.logger.error('Email notification service connect SMTP failed', error.stack, EmailAdapter.name);
     }
-  }
-
-  private async compileTemplate(event: NotificationEventEnum | string) {
-    const __dirname = path.dirname(fileURLToPath(import.meta.url));
-    const candidates = [`${event}.${this.options.appEnv}.handlebars`, `${event}.handlebars`].map((name) =>
-      path.join(__dirname, 'templates', name),
-    );
-
-    for (const candidate of candidates) {
-      if (await fs.exists(candidate)) {
-        const code = await fs.readFile(candidate);
-        return Handlebars.compile(code.toString());
-      }
-    }
-
-    return null;
   }
 
   async sendMail(options: SendMailOptions) {
@@ -159,17 +141,19 @@ export class EmailAdapter implements NotificationServiceAdapter<EmailConfig> {
     config: EmailConfig,
   ): Promise<any>;
   async notify(event: string, data: object, _userId: number, config: EmailConfig) {
-    if (isUndefined(this.templates[event])) {
-      this.templates[event] = await this.compileTemplate(event);
-    }
+    const __dirname = path.dirname(fileURLToPath(import.meta.url));
+    const templateFn = await compileTemplate(`${event}.handlebars`, [
+      path.join(TEMPLATE_DIR, this.adapterServiceType),
+      path.join(__dirname, 'templates'),
+    ]);
 
-    if (!isDefined(this.templates[event])) {
+    if (!isDefined(templateFn)) {
       this.logger.warn(`No handlebars template found for event: ${event}`);
       return;
     }
 
     return await this.sendMail({
-      html: this.templates[event](data),
+      html: templateFn(data),
       to: config.address,
     });
   }

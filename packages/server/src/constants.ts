@@ -14,6 +14,7 @@ export const RULE_CODE_DIR = path.join(DATA_DIR, 'rule');
 export const GENERATED_DIR = path.join(DATA_DIR, 'generated');
 export const LIVE_STREAM_DIR = path.join(DATA_DIR, 'live');
 export const PLUGIN_DIR = path.join(DATA_DIR, 'plugin');
+export const TEMPLATE_DIR = path.join(DATA_DIR, 'template');
 
 export const VALID_IMAGE_MIME = ['image/png', 'image/jpeg', 'image/gif'];
 export const VALID_VIDEO_MIME = [

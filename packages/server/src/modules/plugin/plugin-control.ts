@@ -14,6 +14,9 @@ export class PluginControl {
   id: string;
 
   @Expose()
+  icon?: string;
+
+  @Expose()
   version?: string;
 
   @Expose()

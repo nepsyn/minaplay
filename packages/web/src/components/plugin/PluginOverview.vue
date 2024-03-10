@@ -1,6 +1,9 @@
 <template>
   <v-card flat border class="d-flex flex-column">
     <v-card-title class="d-flex align-center">
+      <v-avatar size="small" v-if="plugin.icon" class="mr-2">
+        <v-img height="24" :src="plugin.icon"></v-img>
+      </v-avatar>
       <span>{{ plugin.id }}</span>
       <v-spacer></v-spacer>
       <v-tooltip v-if="plugin.repo">

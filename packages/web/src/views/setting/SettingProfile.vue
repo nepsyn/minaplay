@@ -252,11 +252,14 @@
         <v-card-actions class="px-4">
           <v-btn
             variant="text"
-            color="warning"
+            color="secondary"
             :prepend-icon="mdiCheckAll"
             @click="editSubscriptions = subscriptions.concat()"
           >
             {{ t('app.actions.selectAll') }}
+          </v-btn>
+          <v-btn variant="text" color="warning" :prepend-icon="mdiSelectionRemove" @click="editSubscriptions = []">
+            {{ t('app.actions.unselectAll') }}
           </v-btn>
           <v-spacer></v-spacer>
           <v-btn variant="text" @click="editSubscriptionsSheet = false">
@@ -314,6 +317,7 @@ import {
   mdiEyeOff,
   mdiKeyVariant,
   mdiPlus,
+  mdiSelectionRemove,
   mdiSquareRoundedBadgeOutline,
   mdiUpload,
 } from '@mdi/js';

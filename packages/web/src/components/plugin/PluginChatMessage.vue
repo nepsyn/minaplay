@@ -2,7 +2,10 @@
   <div class="d-flex flex-column mb-6">
     <div class="d-flex flex-row">
       <template v-if="message.from === 'plugin' && message.control">
-        <v-avatar size="small" :color="getHashColor(message.control.id)">{{ message.control.id.slice(0, 2) }}</v-avatar>
+        <v-avatar size="small" :color="message.control.icon ? undefined : getHashColor(message.control.id)">
+          <v-img height="24" v-if="message.control.icon" :src="message.control.icon"></v-img>
+          <span v-else>{{ message.control.id.slice(0, 2) }}</span>
+        </v-avatar>
         <span class="ml-4 text-subtitle-1 font-weight-bold">{{ message.control.id }}</span>
       </template>
       <template v-else-if="message.from === 'user' && api.user">

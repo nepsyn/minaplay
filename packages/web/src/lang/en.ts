@@ -73,6 +73,7 @@ export default {
       download: 'Download',
       select: 'Select',
       selectAll: 'Select All',
+      unselectAll: 'Unselect All',
       send: 'Send',
       more: '[more]',
       collapse: '[collapse]',

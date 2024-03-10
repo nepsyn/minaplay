@@ -74,6 +74,7 @@ const zh: MessageSchema = {
       download: '下载',
       select: '选择',
       selectAll: '全选',
+      unselectAll: '全不选',
       send: '发送',
       more: '[展开]',
       collapse: '[收起]',

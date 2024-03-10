@@ -110,7 +110,7 @@ const toast = useToastStore();
 
 const page = ref(1);
 const size = ref(10);
-const sortBy = ref<any[]>([]);
+const sortBy = ref<any[]>([{ key: 'createAt', order: 'DESC' }]);
 const total = ref(0);
 const filters = ref<ActionLogQueryDto>({});
 const {

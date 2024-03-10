@@ -2,6 +2,7 @@ import { MinaPlayMessage } from '@/api/interfaces/message.interface';
 
 export interface PluginControl {
   id: string;
+  icon?: string;
   version?: string;
   description?: string;
   author?: string;

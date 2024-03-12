@@ -1,4 +1,4 @@
-import { Controller, Get, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Delete, Get, UseGuards, UseInterceptors } from '@nestjs/common';
 import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
@@ -41,5 +41,14 @@ export class SystemController {
     return {
       logs: ApplicationLogger.getHistoryMessages().join(''),
     };
+  }
+
+  @Delete('logs')
+  @ApiOperation({
+    description: '清空程序日志',
+  })
+  async clearApplicationLogs() {
+    ApplicationLogger.clearMessages();
+    return {};
   }
 }

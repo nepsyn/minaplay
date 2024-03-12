@@ -14,6 +14,10 @@ export class ApplicationLogger extends ConsoleLogger {
     return [].concat(this.messages);
   }
 
+  public static clearMessages() {
+    this.messages = [];
+  }
+
   protected printMessages(
     messages: unknown[],
     context?: string,

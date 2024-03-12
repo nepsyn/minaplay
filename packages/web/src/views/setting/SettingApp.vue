@@ -12,7 +12,14 @@
           </v-container>
         </v-container>
         <v-container class="pa-0">
-          <v-select :items="languages" v-model="settings.locale" hide-details density="compact" variant="outlined">
+          <v-select
+            :items="languages"
+            v-model="settings.locale"
+            hide-details
+            density="compact"
+            variant="outlined"
+            @update:model-value="onLanguageChanged"
+          >
           </v-select>
         </v-container>
       </v-container>
@@ -26,7 +33,14 @@
           </v-container>
         </v-container>
         <v-container class="pa-0">
-          <v-select :items="themes" v-model="settings.theme" hide-details density="compact" variant="outlined">
+          <v-select
+            :items="themes"
+            v-model="settings.theme"
+            hide-details
+            density="compact"
+            variant="outlined"
+            @update:model-value="onThemeChanged"
+          >
           </v-select>
         </v-container>
       </v-container>
@@ -64,7 +78,7 @@
             <p class="text-caption">{{ t('settings.app.danmakuDescription') }}</p>
           </v-container>
         </v-container>
-        <v-switch v-model="settings.showDanmaku" hide-details density="compact" color="primary"> </v-switch>
+        <v-switch v-model="settings.showDanmaku" hide-details density="compact" color="primary"></v-switch>
       </v-container>
       <v-divider class="ml-4"></v-divider>
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
@@ -158,9 +172,11 @@ import {
 import { Sortable as VueSortable } from 'sortablejs-vue3';
 import { onMounted, onUpdated, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import { useLayoutStore } from '@/store/layout';
 
 const { t } = useI18n();
 const route = useRoute();
+const layout = useLayoutStore();
 const { settings } = useSettingsStore();
 
 const languages = [
@@ -173,6 +189,9 @@ const languages = [
     value: 'en-US',
   },
 ];
+const onLanguageChanged = () => {
+  window.location.reload();
+};
 const themes = [
   {
     title: t('app.auto'),
@@ -187,6 +206,16 @@ const themes = [
     value: 'dark',
   },
 ];
+const onThemeChanged = () => {
+  try {
+    if (settings.theme === 'auto') {
+      const themeMedia = matchMedia('(prefers-color-scheme: dark)');
+      layout.toggleDarkMode(themeMedia.matches);
+    } else {
+      layout.toggleDarkMode(settings.theme === 'dark');
+    }
+  } catch {}
+};
 const allPlates = [
   {
     name: t('resource.seriesUpdates'),

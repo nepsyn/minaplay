@@ -250,7 +250,7 @@ export const useApiStore = defineStore('api', () => {
   const System = {
     getStatus: apiGet<SystemStatus>('/api/v1/system/status'),
     getLogs: apiGet<{ logs: string }>('/api/v1/system/logs'),
-    restart: apiPost('/api/v1/system/restart'),
+    clearLogs: apiDelete('/api/v1/system/logs'),
   };
 
   const Plugin = {

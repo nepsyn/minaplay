@@ -489,6 +489,10 @@ export default {
     workedTime: 'Worked for',
     version: 'Version',
   },
+  logs: {
+    clearTitle: 'Clear All Confirm',
+    clearConfirm: 'Are you sure to clear all logs?',
+  },
   settings: {
     title: 'Settings',
     sections: {
@@ -498,9 +502,9 @@ export default {
     app: {
       ui: 'UI Interface',
       language: 'Default Language',
-      languageDescription: 'MinaPlay UI interface default language, refresh page to apply.',
+      languageDescription: 'MinaPlay UI interface default language.',
       theme: 'Default Theme',
-      themeDescription: 'MinaPlay UI interface default theme, refresh page to apply.',
+      themeDescription: 'MinaPlay UI interface default theme.',
       common: 'Common',
       subtitle: 'Show Subtitle',
       subtitleDescription: 'Display video subtitles by default.',

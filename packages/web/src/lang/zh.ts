@@ -489,6 +489,10 @@ const zh: MessageSchema = {
     workedTime: '已持续运行',
     version: '版本',
   },
+  logs: {
+    clearTitle: '清空确认',
+    clearConfirm: '确定要清空所有日志吗？',
+  },
   settings: {
     title: '设置',
     sections: {
@@ -498,9 +502,9 @@ const zh: MessageSchema = {
     app: {
       ui: '显示',
       language: '默认语言',
-      languageDescription: 'MinaPlay 页面默认显示语言，更改后刷新页面生效。',
+      languageDescription: 'MinaPlay 页面默认显示语言。',
       theme: '默认主题样式',
-      themeDescription: 'MinaPlay 页面默认主题样式，更改后刷新页面生效。',
+      themeDescription: 'MinaPlay 页面默认主题样式。',
       common: '通用',
       subtitle: '视频字幕',
       subtitleDescription: '是否在视频播放时自动播放视频字幕。',

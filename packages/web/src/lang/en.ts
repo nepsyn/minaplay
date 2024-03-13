@@ -386,12 +386,13 @@ export default {
       noStream: 'No Streaming Content',
       stopStreaming: 'Stop Streaming',
       stream: {
-        clientSync: 'Client Sync',
-        serverPush: 'Server Push',
-        liveStream: 'Live Stream',
+        'client-sync': 'Client Sync',
+        'server-push': 'Server Push',
+        'live-stream': 'Live Stream',
         type: 'Type',
         url: 'URL',
       },
+      playing: 'Playing: ',
       voice: {
         single: `You've booked the whole live room!`,
         voiceNotConnected: 'Live voice service not connected',

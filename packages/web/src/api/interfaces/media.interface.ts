@@ -16,8 +16,6 @@ export interface MediaEntity {
   poster?: FileEntity;
   /**对应文件 */
   file?: FileEntity;
-  /** 字幕文件 */
-  subtitles: FileEntity[];
   /** duration */
   duration?: number;
   /** 附件 */

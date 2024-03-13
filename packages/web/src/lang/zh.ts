@@ -386,12 +386,13 @@ const zh: MessageSchema = {
       noStream: '无直播流',
       stopStreaming: '停止直播',
       stream: {
-        clientSync: '用户同步',
-        serverPush: '服务端推流',
-        liveStream: '第三方视频流',
+        'client-sync': '客户端同步',
+        'server-push': '服务端推流',
+        'live-stream': '第三方视频流',
         type: '直播流类型',
         url: '链接',
       },
+      playing: '正在看： ',
       voice: {
         single: '您包场了此语音房间！',
         voiceNotConnected: '放映室语音服务未连接',

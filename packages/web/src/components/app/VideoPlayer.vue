@@ -54,15 +54,15 @@
         >
           <v-list class="rounded py-0" density="compact">
             <v-list-item
-              v-for="(subtitle, index) in subtitleFiles"
+              v-for="(subtitle, index) in subtitles"
               :key="index"
-              :active="currentSubtitle?.id === subtitle.id"
-              :color="currentSubtitle?.id === subtitle.id ? 'primary' : undefined"
+              :active="currentSubtitle?.title === subtitle.title"
+              :color="currentSubtitle?.title === subtitle.title ? 'primary' : undefined"
               link
               density="compact"
               @click="renderSubtitle(index)"
             >
-              {{ getSubtitleName(subtitle) }}
+              {{ subtitle.title }}
             </v-list-item>
             <v-list-item
               :active="!currentSubtitle"
@@ -77,7 +77,7 @@
           <template #activator="{ props }">
             <button
               v-bind="props"
-              v-if="!live && subtitleFiles.length > 0"
+              v-if="!live && subtitles && subtitles.length > 0"
               class="plyr__controls__item plyr__control"
               :class="{ 'plyr__control--pressed': renderer !== undefined }"
               type="button"
@@ -212,9 +212,9 @@
           />
         </div>
         <a
-          v-if="!live && media?.file"
+          v-if="!live"
           class="plyr__controls__item plyr__control d-none d-sm-flex"
-          :href="api.File.buildDownloadPath(media.file.id, media.file.name)"
+          :href="src"
           target="_blank"
           download
           data-plyr="download"
@@ -251,125 +251,113 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue';
-import MediaPosterFallback from '@/assets/banner.jpeg';
+import { onMounted, onUnmounted, ref, shallowRef, watch } from 'vue';
 import Plyr from 'plyr';
 import 'plyr/dist/plyr.css';
-import { MediaEntity } from '@/api/interfaces/media.interface';
-import { useApiStore } from '@/store/api';
 import JASSUB from 'jassub';
 import jassubWorkerUrl from 'jassub/dist/jassub-worker.js?url';
 import jassubWasmUrl from 'jassub/dist/jassub-worker.wasm?url';
 import { useI18n } from 'vue-i18n';
-import { FileEntity } from '@/api/interfaces/file.interface';
 import { mdiArrowCollapseAll, mdiStretchToPageOutline } from '@mdi/js';
-import { LiveStream } from '@/api/interfaces/live.interface';
 import MpegTs from 'mpegts.js';
 import Hls from 'hls.js';
-import { getFullUrl } from '@/utils/utils';
 // @ts-ignore
 import DanmuJs from 'danmu.js';
 import { useSettingsStore } from '@/store/settings';
 
-const SUBTITLE_EXTENSIONS = ['.ass', '.ssa'];
-const FONT_EXTENSIONS = ['.otf', '.ttf', '.woff'];
-
 const { t } = useI18n();
 const { settings } = useSettingsStore();
-const api = useApiStore();
 
 const props = withDefaults(
   defineProps<{
-    media?: MediaEntity;
-    duration?: number;
+    src?: string;
+    poster?: string;
+    subtitles?: { title: string; url: string }[];
+    fonts?: string[];
+    position?: number;
     live?: boolean;
-    stream?: LiveStream;
     ratio?: string;
   }>(),
   {
     live: false,
     ratio: '16:9',
+    subtitles: [] as any,
+    fonts: [] as any,
   },
 );
 
-const src = ref('');
-const poster = ref('');
-
-const initLive = (url: string) => {
-  if (!URL.canParse(url)) {
+const src = ref<string | undefined>('');
+const poster = ref<string | undefined>('');
+const loadResource = () => {
+  if (!props.src || !player.value) {
     return;
   }
 
-  const { pathname } = new URL(url);
-  if (videoRef.value) {
+  player.value.stop();
+  if (livePlayer) {
+    livePlayer.destroy();
+    livePlayer = undefined;
+  }
+
+  if (props.live) {
+    if (!videoRef.value) {
+      return;
+    }
+    if (!URL.canParse(props.src)) {
+      return;
+    }
+    const { pathname } = new URL(props.src);
+
     if (pathname.endsWith('.flv')) {
       livePlayer = MpegTs.createPlayer({
         type: 'flv',
         isLive: true,
-        url,
+        url: props.src,
       });
       livePlayer.attachMediaElement(videoRef.value);
       livePlayer.load();
       player.value?.play();
     } else if (pathname.endsWith('.m3u8')) {
       livePlayer = new Hls();
-      livePlayer.loadSource(url);
+      livePlayer.loadSource(props.src);
       livePlayer.attachMedia(videoRef.value);
       player.value?.play();
+    } else {
+      src.value = props.src;
+      if (videoRef.value) {
+        videoRef.value.src = src.value;
+      }
+
+      if (props.position) {
+        player.value.once('canplay', () => {
+          player.value!.currentTime = props.position!;
+        });
+      }
     }
-  }
-};
-const loadResource = () => {
-  if (player.value) {
-    player.value.stop();
-    if (livePlayer) {
-      livePlayer.destroy();
-      livePlayer = undefined;
-    }
+  } else {
+    src.value = props.src;
+    poster.value = props.poster;
 
-    src.value = '';
-    poster.value = '';
-  }
-
-  if (props.media && !props.live) {
-    src.value = api.File.buildRawPath(props.media.file!.id, props.media.file!.name);
-    poster.value = props.media.poster
-      ? api.File.buildRawPath(props.media.poster.id, props.media.poster.name)
-      : MediaPosterFallback;
-  }
-
-  if (props.stream && props.live) {
-    if (props.stream.type === 'server-push') {
-      initLive(getFullUrl(api.Live.buildStreamPath(props.stream.url)));
-    } else if (props.stream.type === 'live-stream') {
-      initLive(props.stream.url);
+    if (props.position) {
+      player.value.once('canplay', () => {
+        player.value!.currentTime = props.position!;
+      });
     }
   }
 };
 watch(
-  () => [props.media, props.stream],
+  () => props.src,
   () => {
     loadResource();
   },
 );
-
-const subtitleFiles = computed(
-  () =>
-    props.media?.attachments?.filter(({ name }) => {
-      const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
-      return SUBTITLE_EXTENSIONS.includes(ext);
-    }) ?? [],
-);
-const getSubtitleName = (subtitle: FileEntity) => {
-  const lastIndex = subtitle.name.lastIndexOf('.');
-  return subtitle.name.slice(0, lastIndex > -1 ? lastIndex : subtitle.name.length);
-};
-const fontFiles = computed(
-  () =>
-    props.media?.attachments?.filter(({ name }) => {
-      const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
-      return FONT_EXTENSIONS.includes(ext);
-    }) ?? [],
+watch(
+  () => props.poster,
+  () => {
+    if (player.value) {
+      player.value.poster = props.poster ?? '';
+    }
+  },
 );
 
 const videoRef = ref<HTMLVideoElement | undefined>(undefined);
@@ -378,20 +366,20 @@ const player = shallowRef<Plyr | undefined>(undefined);
 let livePlayer: MpegTs.Player | Hls | undefined = undefined;
 let danmakuPlayer: DanmuJs | undefined = undefined;
 let renderer = shallowRef<JASSUB | undefined>(undefined);
-const currentSubtitle = ref<FileEntity | undefined>(undefined);
+const currentSubtitle = ref<{ title: string; url: string } | undefined>(undefined);
 const renderSubtitle = (index: number) => {
   if (renderer.value) {
     renderer.value.destroy();
     renderer.value = undefined;
   }
 
-  const subtitle = subtitleFiles.value[index];
+  const subtitle = props.subtitles![index];
   currentSubtitle.value = subtitle;
   if (subtitle && videoRef.value) {
     renderer.value = new JASSUB({
       video: videoRef.value,
-      subUrl: api.File.buildRawPath(subtitle.id, subtitle.name),
-      fonts: fontFiles.value.map(({ id, name }) => api.File.buildRawPath(id, name)),
+      subUrl: subtitle.url,
+      fonts: props.fonts!,
       onDemandRender: false,
       workerUrl: jassubWorkerUrl,
       wasmUrl: jassubWasmUrl,
@@ -409,11 +397,6 @@ onMounted(async () => {
         global: true,
       },
     });
-    player.value.once('canplay', () => {
-      if (props.duration != null && player.value) {
-        player.value.currentTime = props.duration / 1000;
-      }
-    });
     player.value.on('exitfullscreen', () => {
       pageFullscreen.value = false;
     });
@@ -426,7 +409,7 @@ onMounted(async () => {
 
     loadResource();
 
-    if (subtitleFiles.value && settings.showSubtitle) {
+    if (props.subtitles!.length > 0 && settings.showSubtitle) {
       renderSubtitle(0);
     }
 

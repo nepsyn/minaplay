@@ -99,6 +99,7 @@ export type LiveEventMap = {
   chat: (arg: { message: MinaPlayText | MinaPlayNetworkImage }) => undefined;
   messages: (arg: { start: string; end?: string }) => LiveChatEntity[];
 
+  'stream-client-sync': (arg: Omit<ClientSyncMediaStream, 'type'>) => ClientSyncMediaStream;
   'stream-server-push': (arg: { id: string }) => ServerPushMediaStream;
   'stream-third-party': (arg: { url: string }) => ThirdPartyLiveStream;
   'stop-stream': () => undefined;

@@ -8,19 +8,27 @@
       >
         <v-container class="d-none d-md-flex flex-row">
           <template v-if="live">
-            <user-avatar
-              size="64"
-              :src="live.user?.avatar && api.File.buildRawPath(live.user.avatar.id, live.user.avatar.name)"
-            ></user-avatar>
+            <v-tooltip location="left">
+              {{ live.user?.username ?? t('user.deleted') }}
+              <template #activator="{ props }">
+                <user-avatar
+                  v-bind="props"
+                  size="64"
+                  :src="live.user?.avatar && api.File.buildRawPath(live.user.avatar.id, live.user.avatar.name)"
+                ></user-avatar>
+              </template>
+            </v-tooltip>
+
             <v-container class="py-0 d-flex flex-column justify-space-around">
               <div class="d-flex align-center">
                 <span class="text-h6">{{ live.title ?? t('live.unnamed') }}</span>
                 <v-icon class="ml-2 text-medium-emphasis" v-if="live.hasPassword" :icon="mdiLock" size="small"></v-icon>
               </div>
-              <div class="text-subtitle-2 text-medium-emphasis">
-                <span>{{ live.user?.username ?? t('user.deleted') }}</span>
-                ·
-                <time-ago :time="live.createAt" interval="60000"></time-ago>
+              <div v-if="state?.stream?.title" class="text-subtitle-2 text-medium-emphasis">
+                <span>
+                  {{ t('live.play.playing') }}
+                  {{ state.stream.title }}
+                </span>
               </div>
             </v-container>
           </template>
@@ -32,7 +40,7 @@
         </v-container>
         <v-divider class="py-0 d-flex d-md-none"></v-divider>
         <v-responsive class="pa-0 flex-grow-1" :class="display.mdAndUp.value ? 'rounded-b' : undefined">
-          <video-player ref="playerRef" live :stream="state?.stream"></video-player>
+          <video-player v-if="state" ref="playerRef" live :src="liveSrc"></video-player>
         </v-responsive>
         <v-divider class="py-0 d-flex d-md-none"></v-divider>
       </v-container>
@@ -349,9 +357,9 @@
                       :items="streamTypes"
                     >
                     </v-select>
-                    <template v-if="edit.stream.type === 'server-push'">
-                      <media-selector v-model="mediaSelectDialog" @selected="onStreamMediaSelected"></media-selector>
-                      <series-selector v-model="seriesSelectDialog" @selected="onSeresSelected"></series-selector>
+                    <media-selector v-model="mediaSelectDialog" @selected="onStreamMediaSelected"></media-selector>
+                    <series-selector v-model="seriesSelectDialog" @selected="onSeresSelected"></series-selector>
+                    <template v-if="edit.stream.type === 'client-sync' || edit.stream.type === 'server-push'">
                       <v-row class="mt-2" dense>
                         <v-col cols="auto">
                           <v-btn
@@ -467,7 +475,7 @@
                     </template>
                     <template #append>
                       <span class="text-medium-emphasis text-break text-wrap ml-4">
-                        {{ state?.stream?.url || t('live.play.noStream') }}
+                        {{ t(state?.stream ? `live.play.stream.${state.stream.type}` : 'live.play.noStream') }}
                       </span>
                     </template>
                   </v-list-item>
@@ -601,6 +609,7 @@ import {
 } from '@mdi/js';
 import { TimeoutError, useSocketIOConnection } from '@/composables/use-socket-io-connection';
 import {
+  ClientSyncMediaStream,
   LiveChatEntity,
   LiveDto,
   LiveEvent,
@@ -622,7 +631,6 @@ import { MediaEntity } from '@/api/interfaces/media.interface';
 import { useDisplay } from 'vuetify';
 import LivePosterFallback from '@/assets/live-poster-fallback.png';
 import UserAvatar from '@/components/user/UserAvatar.vue';
-import TimeAgo from '@/components/app/TimeAgo.vue';
 import LiveMessage from '@/components/live/LiveMessage.vue';
 import ZoomImg from '@/components/app/ZoomImg.vue';
 import { VBottomSheet, VMenu } from 'vuetify/components';
@@ -647,6 +655,17 @@ const display = useDisplay();
 const state = ref<LiveState | undefined>(undefined);
 const live = computed(() => state.value?.live);
 const playerRef = ref<InstanceType<typeof VideoPlayer> | undefined>(undefined);
+const getLiveStatus = (): Omit<ClientSyncMediaStream, 'type'> | undefined => {
+  if (playerRef.value && selectedMedia.value?.file) {
+    return {
+      title: selectedMedia.value?.name,
+      url: selectedMedia.value?.file ? api.File.buildRawPath(selectedMedia.value.file.id) : '',
+      position: playerRef.value?.player?.currentTime ?? 0,
+      status: playerRef.value.player?.paused ? 'paused' : 'playing',
+      updateAt: new Date(),
+    };
+  }
+};
 
 const { socket, request: emit } = useSocketIOConnection<LiveEventMap>(api.Live.socketPath, {
   extraHeaders: {
@@ -694,6 +713,9 @@ socket.on('disconnect', () => {
 socket.on('stream', (data: { stream: LiveStream }) => {
   if (state.value) {
     state.value.stream = data.stream;
+    if (data.stream?.type === 'client-sync') {
+      syncClientState(data.stream);
+    }
   }
 });
 socket.on('member-join', (data: { user: UserEntity }) => {
@@ -1240,17 +1262,54 @@ const {
 onEpisodesLoadFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
-const streamTypes = [
-  { title: t('live.play.stream.serverPush'), value: 'server-push' },
-  { title: t('live.play.stream.liveStream'), value: 'live-stream' },
-];
+const streamTypes = ['client-sync', 'server-push', 'live-stream'].map((value) => ({
+  title: t(`live.play.stream.${value}`),
+  value,
+}));
+const liveSrc = computed(() => {
+  if (!state.value?.stream) {
+    return state.value?.live ? api.Live.getDefaultStreamUrl(state.value.live.id) : '';
+  } else if (state.value.stream.type === 'server-push') {
+    return getFullUrl(api.Live.buildStreamPath(state.value.stream.url));
+  } else if (state.value.stream.type === 'live-stream') {
+    return state.value.stream.url;
+  } else if (state.value.stream.type === 'client-sync') {
+    return state.value.stream.url;
+  }
+});
+const syncClientState = (stream: ClientSyncMediaStream) => {
+  if (!playerRef.value?.player) {
+    return;
+  }
+
+  const expectedTime = (Date.now() - new Date(stream.updateAt).getTime()) / 1000 + stream.position;
+  const delta = Math.abs(expectedTime - playerRef.value.player.currentTime);
+  // delta >= 3s
+  if (delta >= 3) {
+    playerRef.value.player.currentTime = expectedTime;
+  }
+};
+const syncInterval = setInterval(async () => {
+  if (state.value?.stream?.type !== 'client-sync') {
+    return;
+  }
+
+  if (playerRef.value?.player?.playing) {
+    syncClientState(state.value.stream);
+  }
+}, 2000);
+onUnmounted(() => {
+  clearInterval(syncInterval);
+});
 const {
   pending: streamSwitching,
   request: switchStream,
   onResolved: onStreamSwitched,
   onRejected: onStreamSwitchFailed,
 } = useAsyncTask(async () => {
-  if (edit.value.stream.type === 'server-push') {
+  if (edit.value.stream.type === 'client-sync') {
+    return await emit('stream-client-sync', getLiveStatus()!);
+  } else if (edit.value.stream.type === 'server-push') {
     return await emit('stream-server-push', { id: selectedMedia.value!.id });
   } else if (edit.value.stream.type === 'live-stream') {
     return await emit('stream-third-party', { url: edit.value.stream.url });

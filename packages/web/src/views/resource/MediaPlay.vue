@@ -5,7 +5,14 @@
         <v-col cols="12" md="8">
           <single-item-loader class="pa-0" :loader="isMedia ? mediaLoader : currentEpisodeLoader">
             <v-responsive class="rounded-lg" :aspect-ratio="16 / 9" max-height="520">
-              <video-player ref="playerRef" :duration="duration" :media="media!"></video-player>
+              <video-player
+                ref="playerRef"
+                :position="position && position / 1000"
+                :src="media?.file && api.File.buildRawPath(media.file.id)"
+                :poster="media?.poster && api.File.buildRawPath(media.poster.id)"
+                :subtitles="subtitles"
+                :fonts="fonts"
+              ></video-player>
             </v-responsive>
             <v-container fluid class="pa-0 mt-4 d-flex flex-column">
               <span v-if="isMedia" class="text-h6 text-wrap">{{ media!.name }}</span>
@@ -263,6 +270,29 @@ const currentEpisodeLoader = useAxiosRequest(async (id?: number) => {
 const media = computed<MediaEntity | undefined>(() =>
   isMedia.value ? mediaLoader.data.value : currentEpisodeLoader.data.value?.media,
 );
+const subtitles = computed(() => {
+  return (media.value?.attachments ?? [])
+    .filter(({ name }) => {
+      const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
+      return ['.ass', '.ssa'].includes(ext);
+    })
+    .map(({ name, id }) => {
+      const lastIndex = name.lastIndexOf('.');
+      const title = name.slice(0, lastIndex > -1 ? lastIndex : name.length);
+      return {
+        title,
+        url: api.File.buildRawPath(id),
+      };
+    });
+});
+const fonts = computed(() => {
+  return (media.value?.attachments ?? [])
+    .filter(({ name }) => {
+      const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
+      return ['.otf', '.ttf', '.woff'].includes(ext);
+    })
+    .map(({ id }) => api.File.buildRawPath(id));
+});
 const currentEpisode = computed<EpisodeEntity | undefined>(() => currentEpisodeLoader.data.value);
 onBeforeRouteUpdate(async (to, from) => {
   if (to.name === 'media' && to.params.mediaId !== from.params.mediaId) {
@@ -326,7 +356,7 @@ const series = computed(() => {
 });
 
 const playerRef = ref<typeof VideoPlayer | undefined>(undefined);
-const duration = ref<number | undefined>(undefined);
+const position = ref<number | undefined>(undefined);
 const watchTimeStart = ref(0);
 const onResourceReady = async () => {
   if (!settings.autoContinue) {
@@ -343,7 +373,7 @@ const onResourceReady = async () => {
           data.progress / 1000 > media.value.duration * 0.1 &&
           data.progress / 1000 < media.value.duration * 0.9
         ) {
-          duration.value = data.progress;
+          position.value = data.progress;
           toast.toastSuccess(t('resource.continuePlay'));
         }
       }

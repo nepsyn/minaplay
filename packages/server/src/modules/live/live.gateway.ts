@@ -19,13 +19,12 @@ import { AuthorizationWsGuard } from '../authorization/authorization.ws.guard.js
 import { LiveService } from './live.service.js';
 import { LiveStateWsInterceptor } from './live-state.ws.interceptor.js';
 import { RequirePermissions } from '../authorization/require-permissions.decorator.js';
-import { PermissionEnum } from '../../enums/permission.enum.js';
+import { ErrorCodeEnum, PermissionEnum } from '../../enums/index.js';
 import { RemoteSocket, Server, Socket } from 'socket.io';
 import { buildException } from '../../utils/build-exception.util.js';
-import { ErrorCodeEnum } from '../../enums/error-code.enum.js';
 import { LiveAudienceWsGuard } from './live-audience.ws.guard.js';
 import { WsLiveState } from './live-state.ws.decorator.js';
-import { LiveState } from './live-state.insterface.js';
+import { ClientSyncMediaStream, LiveState } from './live-state.insterface.js';
 import { MinaPlayMessage, parseMessage } from '../../common/application.message.js';
 import { LiveChatService } from './live-chat.service.js';
 import { Between } from 'typeorm';
@@ -41,7 +40,7 @@ import { ForbiddenException } from '@nestjs/common/exceptions/forbidden.exceptio
 import { compare } from 'bcrypt';
 import { ApplicationGatewayInterceptor } from '../../common/application.gateway.interceptor.js';
 import { ApplicationGatewayExceptionFilter } from '../../common/application.gateway.exception.filter.js';
-import { isDefined } from 'class-validator';
+import { isDefined, isURL } from 'class-validator';
 
 @WebSocketGateway({
   namespace: 'live',
@@ -282,6 +281,35 @@ export class LiveGateway implements OnGatewayDisconnect {
     }
   }
 
+  @SubscribeMessage('stream-client-sync')
+  @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
+  @UseGuards(LiveAudienceWsGuard)
+  @RoomOwnerOnly()
+  async handleStreamClientSync(
+    @ConnectedSocket() socket: Socket,
+    @WsLiveState() state: LiveState,
+    @MessageBody() stream: ClientSyncMediaStream,
+  ) {
+    if (!isDefined(stream) || !isURL(stream.url)) {
+      throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
+    state.stream = {
+      type: 'client-sync',
+      title: stream.title,
+      url: stream.url,
+      position: stream.position ?? 0,
+      status: stream.status ?? 'playing',
+      updateAt: stream.updateAt ?? new Date(),
+    };
+
+    this.server.to(socket.data.live.id).emit('stream', {
+      stream: state.stream,
+    });
+
+    return state.stream;
+  }
+
   @SubscribeMessage('stream-server-push')
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.LIVE_OP)
   @UseGuards(LiveAudienceWsGuard)
@@ -307,7 +335,7 @@ export class LiveGateway implements OnGatewayDisconnect {
     state.stream = {
       type: 'server-push',
       title: media.name,
-      url: address.http.path,
+      url: address.flv,
       updateAt: new Date(),
     };
 
@@ -331,9 +359,7 @@ export class LiveGateway implements OnGatewayDisconnect {
       throw buildException(WsException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    if (state.stream?.type === 'server-push') {
-      await this.liveStreamService.stopPublish(socket.data.live.id);
-    }
+    await this.liveStreamService.stopPublish(socket.data.live.id);
 
     state.stream = {
       type: 'live-stream',

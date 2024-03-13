@@ -7,7 +7,6 @@ import { generateMD5 } from '../../utils/generate-md5.util.js';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
 import type { ExecaChildProcess } from 'execa';
 import { execa } from 'execa';
-import { randomUUID } from 'node:crypto';
 
 @Injectable()
 export class LiveStreamService implements OnModuleInit {
@@ -43,6 +42,13 @@ export class LiveStreamService implements OnModuleInit {
     this.logger.log(`LiveStream service is running`);
   }
 
+  getLiveStreamPath(liveId: string) {
+    return {
+      flv: `/live/${liveId}/stream.flv`,
+      hls: `/live/${liveId}/stream.m3u8`,
+    };
+  }
+
   private async generateSign(streamId: string) {
     const time = new Date();
     time.setDate(time.getDate() + 7);
@@ -54,8 +60,7 @@ export class LiveStreamService implements OnModuleInit {
   async publishVideoFile(liveId: string, path: string) {
     await this.stopPublish(liveId);
 
-    const streamId = randomUUID().replace(/-/g, '');
-    const sign = await this.generateSign(streamId);
+    const sign = await this.generateSign(liveId);
     const cp = execa(
       this.options.streamFfmpegPath,
       [
@@ -66,7 +71,7 @@ export class LiveStreamService implements OnModuleInit {
         'copy',
         '-f',
         'flv',
-        `rtmp://127.0.0.1:${this.options.streamRtmpPort}/live/${streamId}?sign=${sign}`,
+        `rtmp://127.0.0.1:${this.options.streamRtmpPort}/live/${liveId}?sign=${sign}`,
       ],
       {
         cleanup: true,
@@ -79,20 +84,7 @@ export class LiveStreamService implements OnModuleInit {
       }
     });
 
-    return {
-      rtmp: {
-        port: this.options.streamRtmpPort,
-        path: `/live/${streamId}`,
-      },
-      http: {
-        port: this.options.streamHttpPort,
-        path: `/live/${streamId}/stream.flv`,
-      },
-      ws: {
-        port: this.options.streamHttpPort,
-        path: `/live/${streamId}/stream.flv`,
-      },
-    };
+    return this.getLiveStreamPath(liveId);
   }
 
   async stopPublish(liveId: string) {

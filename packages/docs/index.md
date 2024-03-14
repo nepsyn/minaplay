@@ -5,7 +5,7 @@ layout: home
 hero:
   name: "MinaPlay"
   text: "个性化追番 / 追剧管家"
-  tagline: 叫上好友，应有尽有！MinaPlay，津津有味！
+  tagline: 基于 RSS 的媒体文件自动下载管理工具
   actions:
     - theme: brand
       text: 快速开始

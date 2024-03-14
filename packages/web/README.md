@@ -16,7 +16,7 @@ MinaPlay web 属于 [MinaPlay](../../README.md) 项目的一部分
 
 MinaPlay 是一个用于追番 / 追剧的个人媒体库。MinaPlay 根据用户创建的 RSS 订阅源、订阅规则自动下载媒体文件并生成描述信息。
 
-MinaPlay server 是 MinaPlay
+MinaPlay web 是 MinaPlay
 使用 [Vue](https://vuejs.org/) + [Vuetify](https://vuetifyjs.com/) + [Vite](https://vitejs.dev/) 构建的应用程序界面。
 我们欢迎各种形式的贡献，如果您有比较好的想法和建议，欢迎提出 issue。
 

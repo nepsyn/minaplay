@@ -166,7 +166,7 @@ const hooks: RuleHooks = {
       episode: {
         title: entry.title, // 单集的标题
         no: groups?.[1], // 单集的集号
-      }，
+      },
       overwriteEpisode: true, // 当存在重复单集时覆盖原有单集
     }
   }

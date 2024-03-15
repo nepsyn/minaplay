@@ -52,7 +52,7 @@
           v-model:value="edit!.code"
           language="typescript"
           @save="save()"
-          style="min-height: 240px"
+          style="min-height: 360px"
         ></monaco-editor>
         <div class="d-flex flex-row mt-4">
           <v-btn

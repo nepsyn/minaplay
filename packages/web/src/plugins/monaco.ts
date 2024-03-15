@@ -1,27 +1,44 @@
 import * as monaco from 'monaco-editor';
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker';
-import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker';
-import TypeScriptWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker';
-import RuleDeclarationCode from '@/api/templates/rule.d.ts?raw';
+import { editor } from 'monaco-editor';
 
 self.MonacoEnvironment = {
-  getWorker: function (_, label) {
+  getWorker: async function (_, label) {
+    let worker: { default: any };
+
     switch (label) {
       case 'json':
-        return new JsonWorker();
+        worker = await import('monaco-editor/esm/vs/language/json/json.worker?worker');
+        break;
       case 'typescript':
       case 'javascript':
-        return new TypeScriptWorker();
+        worker = await import('monaco-editor/esm/vs/language/typescript/ts.worker?worker');
+        break;
       default:
-        return new EditorWorker();
+        worker = await import('monaco-editor/esm/vs/editor/editor.worker?worker');
     }
+
+    return new worker.default();
   },
 };
 
-monaco.languages.typescript.typescriptDefaults.setExtraLibs([
-  { content: RuleDeclarationCode, filePath: 'ts:rule.d.ts' },
-]);
-monaco.editor.createModel(RuleDeclarationCode, 'typescript', monaco.Uri.parse('ts:rule.d.ts'));
+monaco.editor.addEditorAction({
+  id: 'Find Definition',
+  label: 'Find Definition',
+  keybindings: [monaco.KeyMod.Alt | monaco.KeyCode.F12],
+  precondition: undefined,
+  keybindingContext: undefined,
+  run(editor: editor.ICodeEditor, ...args) {
+    editor.trigger('source', 'editor.action.peekDefinition', args);
+  },
+});
+monaco.editor.onDidCreateEditor((editor) => {
+  editor.onMouseDown((e) => {
+    if (e.event.ctrlKey && e.event.leftButton) {
+      e.event.preventDefault();
+      editor.trigger('source', 'editor.action.peekDefinition', null);
+    }
+  });
+});
 monaco.languages.typescript.javascriptDefaults.setDiagnosticsOptions({
   ...monaco.languages.typescript.javascriptDefaults.getDiagnosticsOptions(),
   noSemanticValidation: false,

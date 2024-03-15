@@ -38,7 +38,7 @@ try {
 watch(
   () => layout.darkMode,
   () => {
-    document.getElementsByTagName('html')[0].dataset.codeTheme = layout.darkMode ? 'github-dark' : 'github-light';
+    document.getElementsByTagName('html')[0].dataset.codeTheme = layout.darkMode ? 'hljs-dark' : 'hljs-light';
     monaco.editor.setTheme(layout.darkMode ? 'vs-dark' : 'vs');
   },
   { immediate: true },

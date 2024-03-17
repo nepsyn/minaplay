@@ -4287,10 +4287,10 @@ uuid@^9.0.0:
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-9.0.1.tgz#e188d4c8853cc722220392c424cd637f32293f30"
   integrity sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==
 
-vite-plugin-pwa@^0.19.3:
-  version "0.19.3"
-  resolved "https://registry.yarnpkg.com/vite-plugin-pwa/-/vite-plugin-pwa-0.19.3.tgz#746e82ab1668cdb36e76377dcfe0f15bf331c248"
-  integrity sha512-ajY7Vn39hFbkWyqkyoJT40hPJcfU9AAfCugARJ3AdqK258z3mi3dmG88PB0+1WqJwUsedRRPkScH5HnQBzmRMQ==
+vite-plugin-pwa@^0.19.4:
+  version "0.19.4"
+  resolved "https://registry.yarnpkg.com/vite-plugin-pwa/-/vite-plugin-pwa-0.19.4.tgz#98c29f9f3e60838a523d032ec6044e03223ac947"
+  integrity sha512-KiEFXaYEj2Hg1it+yECy75oqNmlXimI7BaLx7Sxl7Qsd9EIVxaf3GX1mZdLpHe83pDgHBNwm9USGQxSCNp5m7A==
   dependencies:
     debug "^4.3.4"
     fast-glob "^3.3.2"

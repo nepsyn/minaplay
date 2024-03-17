@@ -2,6 +2,10 @@
 
 ## Docker Compose 部署（推荐）
 
+:::tip 提示
+如果还没有安装 Docker，请移步 [Get Docker](https://docs.docker.com/get-docker/) 先在部署环境中安装 Docker 服务。
+:::
+
 将以下代码保存到文件 `docker-compose.yml` 中。
 
 ```yaml

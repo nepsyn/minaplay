@@ -81,4 +81,4 @@ $ docker compose up -d
 - 要了解如何配置 RSS 订阅源，请参阅 [RSS 订阅源](/guide/rss-source) 章节。
 - 要探索如何编写订阅规则，请参阅 [订阅规则](/guide/rule) 章节。
 - 如果想要创建同步观影放映室，请参阅 [放映室](/guide/live) 章节。
-- 如果要掌握使用 MinaPlay 插件控制台的技巧，请参阅 [插件控制台](/guide/plugin-console) 章节。
+- 如果要掌握使用 MinaPlay 插件的技巧，请参阅 [插件](/guide/plugin) 章节。

@@ -20,7 +20,10 @@ export const zh = defineConfig({
         timeStyle: 'medium',
       },
     },
-    nav: [{ text: '指南', link: '/guide/what-is-minaplay' }],
+    nav: [
+      { text: '快速开始', link: '/guide/getting-started' },
+      { text: '指南', link: '/guide/rss-source' },
+    ],
     sidebar: {
       '/guide/': [
         {
@@ -40,7 +43,7 @@ export const zh = defineConfig({
             { text: 'RSS 订阅源', link: '/guide/rss-source' },
             { text: '订阅规则', link: '/guide/rule' },
             { text: '放映室', link: '/guide/live' },
-            { text: '插件控制台', link: '/guide/plugin-console' },
+            { text: '插件', link: '/guide/plugin' },
           ],
         },
         {

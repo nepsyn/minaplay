@@ -171,6 +171,7 @@ const hooks: RuleHooks = {
     }
   }
 }
+export default hooks;
 ```
 
 可以看到，我们仅仅通过一个正则表达式便完成了指定资源的解析判断和媒体文件描述。

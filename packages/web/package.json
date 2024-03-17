@@ -35,7 +35,7 @@
     "sortablejs": "^1.15.2",
     "sortablejs-vue3": "^1.2.11",
     "timeago.js": "^4.0.2",
-    "ts-ebml": "^2.0.2",
+    "ts-ebml": "^3.0.1",
     "vue": "^3.4.19",
     "vue-chartjs": "^5.3.0",
     "vue-i18n": "^9.9.1",

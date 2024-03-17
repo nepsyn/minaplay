@@ -31,7 +31,7 @@
     "pinia": "^2.1.7",
     "plyr": "^3.7.8",
     "roboto-fontface": "*",
-    "socket.io-client": "^4.7.4",
+    "socket.io-client": "^4.7.5",
     "sortablejs": "^1.15.2",
     "sortablejs-vue3": "^1.2.11",
     "timeago.js": "^4.0.2",

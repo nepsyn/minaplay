@@ -4,9 +4,14 @@
 
 <script setup lang="ts">
 import * as monaco from 'monaco-editor';
-
+import RuleDeclarationCode from '@/api/templates/rule.d.ts?raw';
 import { onMounted, onUnmounted, ref } from 'vue';
 import { useLayoutStore } from '@/store/layout';
+
+monaco.languages.typescript.typescriptDefaults.setExtraLibs([
+  { content: RuleDeclarationCode, filePath: 'ts:rule.d.ts' },
+]);
+// monaco.editor.createModel(RuleDeclarationCode, 'typescript', monaco.Uri.parse('ts:rule.d.ts'));
 
 const layout = useLayoutStore();
 

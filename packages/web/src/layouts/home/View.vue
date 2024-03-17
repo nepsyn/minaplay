@@ -218,8 +218,14 @@ onLogoutResolved(async () => {
     },
   });
 });
-onLogoutRejected((error: any) => {
+onLogoutRejected(async (error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+  await router.replace({
+    path: '/login',
+    query: {
+      redirectUrl: route.fullPath,
+    },
+  });
 });
 
 const actions = ref([

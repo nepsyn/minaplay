@@ -30,7 +30,7 @@
         class="d-flex flex-column justify-center align-center text-body-2"
         v-intersect="(isIntersecting: boolean) => isIntersecting && auto && loader.request()"
       >
-        <v-btn variant="plain" color="primary" @click="loader.request()">
+        <v-btn variant="plain" color="primary" :prepend-icon="mdiArrowDown" @click="loader.request()">
           {{ t('app.loader.moreBtn') }}
         </v-btn>
       </v-container>
@@ -50,7 +50,7 @@ import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { computed, onMounted } from 'vue';
 import { useI18n } from 'vue-i18n';
 import { MessageSchema } from '@/lang';
-import { mdiEmoticonDeadOutline, mdiHelpCircleOutline } from '@mdi/js';
+import { mdiArrowDown, mdiEmoticonDeadOutline, mdiHelpCircleOutline } from '@mdi/js';
 
 const { t } = useI18n<{ message: MessageSchema }>();
 

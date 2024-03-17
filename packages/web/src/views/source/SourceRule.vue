@@ -31,13 +31,11 @@
     </v-row>
     <v-divider class="my-2"></v-divider>
     <multi-items-loader class="px-0 py-3 mt-2" :loader="rulesLoader" auto>
-      <rule-overview
-        class="mb-3"
-        v-for="item in rules"
-        :key="item.id"
-        :rule="item"
-        @deleted="onItemDeleted"
-      ></rule-overview>
+      <v-row dense>
+        <v-col v-for="item in rules" :key="item.id" cols="12" md="6">
+          <rule-overview class="h-100" :rule="item" hide-sources @deleted="onItemDeleted"></rule-overview>
+        </v-col>
+      </v-row>
     </multi-items-loader>
   </v-container>
 </template>

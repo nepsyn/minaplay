@@ -37,6 +37,7 @@ export default defineConfig({
       manifest: {
         name: 'MinaPlay',
         description: 'MinaPlay - Play together everywhere',
+        theme_color: '#ffffff',
         icons: [
           {
             src: 'pwa-64x64.png',

@@ -254,7 +254,7 @@ const zh: MessageSchema = {
     unnamed: '未命名 RSS 订阅源',
     working: '已启用',
     paused: '已停止',
-    nextTriggerTimes: '触发时间:',
+    nextTriggerTimes: '解析时间:',
     wrongCronExp: '错误的 CRON 表达式',
     entity: {
       id: 'ID',
@@ -514,7 +514,7 @@ const zh: MessageSchema = {
       joinVoice: '自动加入放映室语音',
       joinVoiceDescription: '是否在放映室连接时自动加入语音房间。',
       autoContinue: '自动续播',
-      autoContinueDescription: '自动续播到上次播放位置',
+      autoContinueDescription: '是否自动续播到上次播放位置',
       homepage: '主页内容',
       visiblePlates: '可见板块',
       hiddenPlates: '隐藏板块',

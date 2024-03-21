@@ -49,7 +49,7 @@
       <div class="my-1 px-1 text-caption">
         <span>{{ t(`file.source.${media.file?.source ?? 'other'}`) }}</span>
         ·
-        <time-ago :time="media.createAt"></time-ago>
+        <span>{{ new Date(media.createAt).toLocaleDateString(locale) }}</span>
       </div>
     </slot>
   </v-container>
@@ -59,10 +59,9 @@
 import { MediaEntity } from '@/api/interfaces/media.interface';
 import { useApiStore } from '@/store/api';
 import MediaPosterFallback from '@/assets/banner.jpeg';
-import TimeAgo from '@/components/app/TimeAgo.vue';
 import { useI18n } from 'vue-i18n';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const api = useApiStore();
 
 defineProps<{

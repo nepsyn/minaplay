@@ -47,15 +47,16 @@
             <span class="ml-2 px-1 media-title font-weight-bold" :title="media.name">
               {{ media.name || media.file?.name }}
             </span>
-            <v-spacer></v-spacer>
           </slot>
           <slot v-if="showChips" name="chips"></slot>
+          <v-spacer></v-spacer>
 
           <slot name="append">
-            <div class="ml-2 px-1 text-caption">
+            <div class="ml-2 px-1 text-caption d-flex flex-column">
               <span>{{ t(`file.source.${media.file?.source ?? 'other'}`) }}</span>
-              ·
-              <time-ago :time="media.createAt"></time-ago>
+              <span>
+                {{ new Date(media.createAt).toLocaleString(locale) }}
+              </span>
             </div>
           </slot>
         </v-container>
@@ -67,11 +68,10 @@
 <script setup lang="ts">
 import { MediaEntity } from '@/api/interfaces/media.interface';
 import MediaCoverFallback from '@/assets/banner.jpeg';
-import TimeAgo from '@/components/app/TimeAgo.vue';
 import { useApiStore } from '@/store/api';
 import { useI18n } from 'vue-i18n';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const api = useApiStore();
 
 withDefaults(

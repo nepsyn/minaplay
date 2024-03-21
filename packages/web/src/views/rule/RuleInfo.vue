@@ -45,7 +45,34 @@
           :filter-keys="['title', 'remark', 'url']"
           :item-props="(item) => ({ density: 'comfortable', subtitle: item.url })"
         ></v-autocomplete>
-        <span class="text-h6 mt-4">{{ t('rule.info.code') }}</span>
+        <div class="mt-4 d-flex flex-row justify-space-between align-center">
+          <span class="text-h6">{{ t('rule.info.code') }}</span>
+          <v-menu location="bottom right">
+            <v-list density="compact">
+              <v-list-item
+                density="compact"
+                link
+                v-for="(template, index) in templates"
+                :prepend-icon="template.icon"
+                :key="index"
+                @click="selectTemplate(template.value as any)"
+              >
+                {{ t(`rule.templates.${template.key}`) }}
+              </v-list-item>
+            </v-list>
+            <template #activator="{ props }">
+              <v-btn
+                v-bind="props"
+                :append-icon="mdiChevronDown"
+                density="comfortable"
+                variant="tonal"
+                color="secondary"
+              >
+                {{ t('rule.template') }}
+              </v-btn>
+            </template>
+          </v-menu>
+        </div>
         <monaco-editor
           ref="editorRef"
           class="border rounded mt-2"
@@ -120,7 +147,16 @@ import { ref } from 'vue';
 import { useApiStore } from '@/store/api';
 import { useRoute, useRouter } from 'vue-router';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
-import { mdiCheck, mdiClose, mdiPencilLock } from '@mdi/js';
+import {
+  mdiApplicationBracketsOutline,
+  mdiCheck,
+  mdiCheckAll,
+  mdiChevronDown,
+  mdiClose,
+  mdiFilterCogOutline,
+  mdiPencilLock,
+  mdiRegex,
+} from '@mdi/js';
 import { useToastStore } from '@/store/toast';
 import MonacoEditor from '@/components/app/MonacoEditor.vue';
 
@@ -142,6 +178,16 @@ const edit = ref({ ...rule.value, sourceIds: rule.value?.sources.map(({ id }) =>
 const sourcesLoader = useAxiosRequest(async () => {
   return await api.Source.query({ size: 1024 });
 });
+
+const templates = [
+  { key: 'default', icon: mdiApplicationBracketsOutline, value: () => import('@/api/templates/default.ts?raw') },
+  { key: 'regexp', icon: mdiRegex, value: () => import('@/api/templates/regexp.ts?raw') },
+  { key: 'filter', icon: mdiFilterCogOutline, value: () => import('@/api/templates/filter.ts?raw') },
+  { key: 'download-all', icon: mdiCheckAll, value: () => import('@/api/templates/download-all.ts?raw') },
+];
+const selectTemplate = async (loader: () => Promise<{ default: string }>) => {
+  editorRef.value?.getEditor()?.setValue((await loader()).default);
+};
 
 const {
   pending: saving,

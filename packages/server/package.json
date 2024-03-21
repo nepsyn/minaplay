@@ -13,6 +13,9 @@
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main"
   },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@extractus/feed-extractor": "^7.0.9",
     "@nestjs/bull": "^10.1.0",

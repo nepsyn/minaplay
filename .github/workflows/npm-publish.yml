@@ -11,14 +11,17 @@ jobs:
   publish-npm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm install @nestjs/cli -g
-      - run: npm run build
+      - run: yarn install
+        working-directory: packages/server
+      - run: yarn global add @nestjs/cli
+      - run: yarn run build
+        working-directory: packages/server
       - run: npm publish
+        working-directory: packages/server
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

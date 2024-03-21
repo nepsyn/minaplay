@@ -21,7 +21,7 @@ jobs:
       - run: yarn global add @nestjs/cli
       - run: yarn run build
         working-directory: packages/server
-      - run: npm publish
+      - run: npm publish --access public
         working-directory: packages/server
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}

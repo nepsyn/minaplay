@@ -3,7 +3,7 @@ import { MINAPLAY_VERSION } from '../../../../constants.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from '../../../user/user.entity.js';
 import { Permission } from '../../../authorization/permission.entity.js';
-import { CreateDefaultRootUserService } from './create-default-root-user.service.js';
+import { DefaultRootUserService } from './default-root-user.service.js';
 import { UserManagerCommand } from './user-manager.command.js';
 
 @MinaPlayPlugin({
@@ -14,6 +14,6 @@ import { UserManagerCommand } from './user-manager.command.js';
   repo: 'https://github.com/nepsyn/minaplay',
   license: 'AGPL-3.0',
   imports: [TypeOrmModule.forFeature([User, Permission])],
-  providers: [CreateDefaultRootUserService, UserManagerCommand],
+  providers: [DefaultRootUserService, UserManagerCommand],
 })
 export default class UserManagerPlugin {}

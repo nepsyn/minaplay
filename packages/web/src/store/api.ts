@@ -33,6 +33,7 @@ import {
   EpisodeDto,
   EpisodeEntity,
   EpisodeQueryDto,
+  EpisodeUpdateQueryDto,
   SeriesDto,
   SeriesEntity,
   SeriesQueryDto,
@@ -219,7 +220,7 @@ export const useApiStore = defineStore('api', () => {
     update: (id: number) => apiPut<EpisodeEntity, EpisodeDto>(`/api/v1/series/episode/${id}`),
     delete: (id: number) => apiDelete(`/api/v1/series/episode/${id}`),
     query: apiGet<ApiQueryResult<EpisodeEntity>, EpisodeQueryDto>(`/api/v1/series/episode`),
-    queryUpdate: apiGet<ApiQueryResult<EpisodeEntity>, ApiQueryDto<EpisodeEntity>>(`/api/v1/series/episode/update`),
+    queryUpdate: apiGet<ApiQueryResult<EpisodeEntity>, EpisodeUpdateQueryDto>(`/api/v1/series/episode/update`),
   };
 
   const Live = {

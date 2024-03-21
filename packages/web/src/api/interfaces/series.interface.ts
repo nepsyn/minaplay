@@ -112,3 +112,8 @@ export interface EpisodeQueryDto extends ApiQueryDto<EpisodeEntity> {
   start?: string;
   end?: string;
 }
+
+export interface EpisodeUpdateQueryDto extends ApiQueryDto<EpisodeEntity> {
+  start?: string;
+  end?: string;
+}

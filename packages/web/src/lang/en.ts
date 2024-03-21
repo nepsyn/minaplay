@@ -167,6 +167,7 @@ export default {
     noDescription: 'No Description',
     continuePlay: 'Positioned to the last playback location',
     watched: 'Watched',
+    fin: 'Fin',
     episode: {
       next: 'Next',
       previous: 'Prev',
@@ -311,6 +312,13 @@ export default {
   rule: {
     title: 'Rules',
     unnamed: 'Unnamed Subscribe Rule',
+    template: 'Select Template',
+    templates: {
+      default: 'Default Template',
+      regexp: 'Regexp Expression Template',
+      filter: 'Content Filter Template',
+      'download-all': 'Download All Template',
+    },
     entity: {
       id: 'ID',
       remark: 'Remark',

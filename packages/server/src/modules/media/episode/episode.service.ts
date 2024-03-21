@@ -1,7 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Episode } from './episode.entity.js';
-import { DataSource, DeepPartial, FindManyOptions, FindOneOptions, FindOptionsWhere, In, Repository } from 'typeorm';
+import {
+  Between,
+  DataSource,
+  DeepPartial,
+  FindManyOptions,
+  FindOneOptions,
+  FindOptionsWhere,
+  In,
+  Repository,
+} from 'typeorm';
+import { EpisodeUpdateQueryDto } from './episode-update-query.dto.js';
 
 @Injectable()
 export class EpisodeService {
@@ -26,7 +36,8 @@ export class EpisodeService {
     return await this.episodeRepository.findAndCount(options);
   }
 
-  async findUpdateAndCount(options?: FindManyOptions<Episode>) {
+  async findUpdateAndCount(query: EpisodeUpdateQueryDto) {
+    const { page, size, start, end } = query;
     const resultRaw: { id: number }[] = await this.dataSource
       .createQueryBuilder()
       .select('id,updateAt,pubAt')
@@ -38,11 +49,14 @@ export class EpisodeService {
             .from(Episode, 'ep'),
         'ranked',
       )
-      .where({ row_num: 1 })
+      .where({
+        row_num: 1,
+        ...(start ? { pubAt: Between(new Date(start), end ? new Date(end) : new Date()) } : {}),
+      })
       .orderBy('pubAt', 'DESC')
       .addOrderBy('updateAt', 'DESC')
-      .skip(options.skip)
-      .take(options.take)
+      .skip(page)
+      .take(size)
       .getRawMany();
     const result = await this.episodeRepository.find({
       where: {

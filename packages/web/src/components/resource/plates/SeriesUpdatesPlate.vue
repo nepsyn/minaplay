@@ -18,7 +18,7 @@
           <series-overview
             :series="episode.series"
             :label="episode.pubAt && new Date(episode.pubAt).toLocaleDateString(locale)"
-            :note="episode.no"
+            :note="getEpisodeNote(episode)"
             @click="router.push({ path: `/episode/${episode.id}` })"
           ></series-overview>
         </v-col>
@@ -50,6 +50,14 @@ const { t, locale } = useI18n();
 const api = useApiStore();
 const router = useRouter();
 const display = useDisplay();
+
+const getEpisodeNote = (episode: EpisodeEntity) => {
+  if (episode.series.count && episode.series.count === Number(episode.no)) {
+    return `${episode.no} ${t('resource.fin')}`;
+  } else {
+    return episode.no;
+  }
+};
 
 const updatesLoader = useAxiosPageLoader(
   async (query: ApiQueryDto<EpisodeEntity> = {}) => {

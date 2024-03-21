@@ -22,7 +22,10 @@ export class ApiQueryDto<T extends { createAt: Date }> {
   })
   @IsOptional()
   @IsInt()
-  @Transform(({ value }) => Number(value))
+  @Transform(({ value }) => {
+    const size = Number(value);
+    return size < 0 ? 9999 : size;
+  })
   size = 40;
 
   @ApiProperty({

@@ -2,13 +2,11 @@
   <v-app-bar order="1" border="b" color="background" flat>
     <v-app-bar-nav-icon variant="text" @click.stop="layout.navDrawer = !layout.navDrawer"></v-app-bar-nav-icon>
 
-    <v-badge color="info" content="beta">
-      <v-toolbar-title>
-        <router-link to="/" class="title-link" active-class="title-link">
-          {{ t('app.name') }}
-        </router-link>
-      </v-toolbar-title>
-    </v-badge>
+    <v-toolbar-title>
+      <router-link to="/" class="title-link" active-class="title-link">
+        {{ t('app.name') }}
+      </router-link>
+    </v-toolbar-title>
     <template v-slot:append>
       <div class="d-flex flex-row align-center">
         <div class="d-none d-sm-flex">

@@ -168,6 +168,7 @@ const zh: MessageSchema = {
     noDescription: '无描述内容',
     continuePlay: '已定位到上次播放位置',
     watched: '看过',
+    fin: '已完结',
     episode: {
       next: '下集',
       previous: '上集',
@@ -311,6 +312,13 @@ const zh: MessageSchema = {
   rule: {
     title: '订阅规则',
     unnamed: '未命名订阅规则',
+    template: '选择模板',
+    templates: {
+      default: '默认模板',
+      regexp: '正则表达式模板',
+      filter: '内容过滤器模板',
+      'download-all': '全部下载模板',
+    },
     entity: {
       id: 'ID',
       remark: '备注',

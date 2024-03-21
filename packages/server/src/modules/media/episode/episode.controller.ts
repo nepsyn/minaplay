@@ -24,7 +24,7 @@ import { buildQueryOptions } from '../../../utils/build-query-options.util.js';
 import { Between } from 'typeorm';
 import { EpisodeQueryDto } from './episode-query.dto.js';
 import { ApiPaginationResultDto } from '../../../common/api.pagination.result.dto.js';
-import { ApiQueryDto } from '../../../common/api.query.dto.js';
+import { EpisodeUpdateQueryDto } from './episode-update-query.dto.js';
 
 @Controller('series/episode')
 @UseGuards(AuthorizationGuard)
@@ -62,11 +62,8 @@ export class EpisodeController {
     description: '查询更新单集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
-  async queryUpdateEpisodes(@Query() query: ApiQueryDto<Episode>) {
-    const [result, total] = await this.episodeService.findUpdateAndCount({
-      skip: query.page * query.size,
-      take: query.size,
-    });
+  async queryUpdateEpisodes(@Query() query: EpisodeUpdateQueryDto) {
+    const [result, total] = await this.episodeService.findUpdateAndCount(query);
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
   }
@@ -98,7 +95,7 @@ export class EpisodeController {
 
     const { id } = await this.episodeService.save({
       ...data,
-      pubAt: data.pubAt && new Date(data.pubAt),
+      pubAt: data.pubAt ? new Date(data.pubAt) : new Date(),
       series: { id: data.seriesId },
       media: { id: data.mediaId },
     });

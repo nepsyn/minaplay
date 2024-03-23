@@ -1,4 +1,4 @@
-name: Build and publish Dev Docker image
+name: Build and publish dev-latest Docker image
 
 on:
   push:

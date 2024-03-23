@@ -1,8 +1,8 @@
-name: Build and publish Docker image
+name: Build and publish Dev Docker image
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: [dev]
 
   workflow_dispatch:
 
@@ -13,8 +13,6 @@ jobs:
       -
         name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: master
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v3
@@ -32,4 +30,4 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: nepsyn/minaplay:latest
+          tags: nepsyn/minaplay:dev-latest

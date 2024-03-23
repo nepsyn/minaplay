@@ -7,11 +7,15 @@ on:
   release:
     types: [created]
 
+  workflow_dispatch:
+
 jobs:
   publish-npm:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: master
       - uses: actions/setup-node@v4
         with:
           node-version: 20

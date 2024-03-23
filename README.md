@@ -58,7 +58,7 @@ services:
     restart: always
 
   minaplay:
-    image: "nepsyn/minaplay:beta"
+    image: "nepsyn/minaplay:latest"
     container_name: minaplay
     networks:
       - minaplay-network
@@ -124,7 +124,7 @@ docker run -d \
   -e DB_HOST=minaplay-mysql \
   -e REDIS_HOST=minaplay-redis \
   -e MS_ANNOUNCED_IP=127.0.0.1 \
-  nepsyn/minaplay:beta
+  nepsyn/minaplay:latest
 ```
 
 ### 开始使用

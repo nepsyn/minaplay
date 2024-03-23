@@ -33,7 +33,7 @@ services:
     restart: always
 
   minaplay:
-    image: "nepsyn/minaplay:beta"
+    image: "nepsyn/minaplay:latest"
     container_name: minaplay
     networks:
       - minaplay-network

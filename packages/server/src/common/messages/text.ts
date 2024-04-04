@@ -1,5 +1,5 @@
 import { Expose } from 'class-transformer';
-import { Equals, IsHexColor, IsOptional, IsString, Length } from 'class-validator';
+import { Equals, IsHexColor, IsOptional, IsString } from 'class-validator';
 
 /** Plain Text */
 export class Text {
@@ -23,7 +23,6 @@ export class Text {
   /** Content */
   @Expose()
   @IsString()
-  @Length(1, 40)
   content: string;
 
   constructor(content: string, color?: string) {

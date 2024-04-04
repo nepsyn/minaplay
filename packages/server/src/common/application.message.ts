@@ -4,7 +4,6 @@ import { Text } from './messages/text.js';
 import {
   Action,
   Base64Image,
-  ConsumableFeedback,
   ConsumableGroup,
   Consumed,
   NetworkImage,
@@ -13,15 +12,16 @@ import {
   ResourceSeries,
   Timeout,
 } from './messages/index.js';
+import { MarkdownText } from './messages/markdown-text.js';
 
 export const MinaPlayMessageMap = {
   Text,
+  MarkdownText,
   NetworkImage,
   Base64Image,
   Action,
   Timeout,
   ConsumableGroup,
-  ConsumableFeedback,
   Consumed,
   Pending,
   ResourceSeries,
@@ -29,12 +29,12 @@ export const MinaPlayMessageMap = {
 };
 export type MinaPlayMessage =
   | Text
+  | MarkdownText
   | NetworkImage
   | Base64Image
   | Action
   | Timeout
   | ConsumableGroup
-  | ConsumableFeedback
   | Consumed
   | Pending
   | ResourceSeries

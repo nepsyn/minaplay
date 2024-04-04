@@ -11,6 +11,8 @@ export interface MinaPlayPluginMetadata extends Pick<ModuleMetadata, 'imports' |
   icon?: string;
   /** Plugin version */
   version?: string;
+  /** Plugin min support of MinaPlay version */
+  supportVersion?: string;
   /** Plugin description */
   description?: string;
   /** Plugin author */

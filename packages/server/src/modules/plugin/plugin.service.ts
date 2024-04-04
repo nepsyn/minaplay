@@ -13,8 +13,9 @@ import { Socket } from 'socket.io';
 import { PluginListenerContext } from './plugin-listener-context.js';
 import { instanceToPlain } from 'class-transformer';
 import { register } from 'node:module';
-import { PLUGIN_DIR } from '../../constants.js';
+import { MINAPLAY_VERSION, PLUGIN_DIR } from '../../constants.js';
 import { isDefined, isEmpty } from 'class-validator';
+import semver from 'semver';
 
 @Injectable()
 export class PluginService implements OnModuleInit {
@@ -62,6 +63,7 @@ export class PluginService implements OnModuleInit {
         id: metadata.id,
         icon: metadata.icon,
         version: metadata.version,
+        supportVersion: metadata.supportVersion,
         description: metadata.description,
         author: metadata.author,
         repo: metadata.repo,
@@ -72,6 +74,14 @@ export class PluginService implements OnModuleInit {
         contexts: new Map(),
       });
       this.controls.push(control);
+
+      if (metadata.supportVersion && !semver.satisfies(MINAPLAY_VERSION, metadata.supportVersion)) {
+        this.logger.warn(
+          `Plugin ${control.id}(${control.version ?? 'Unknown version'}) has unmet MinaPlay version '${
+            control.supportVersion
+          }'`,
+        );
+      }
 
       // initialize services
       control.module = await this.lazyModuleLoader.load(() => plugin, { logger: false });

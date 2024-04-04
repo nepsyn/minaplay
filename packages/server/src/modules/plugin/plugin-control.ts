@@ -20,6 +20,9 @@ export class PluginControl {
   version?: string;
 
   @Expose()
+  supportVersion?: string;
+
+  @Expose()
   description?: string;
 
   @Expose()

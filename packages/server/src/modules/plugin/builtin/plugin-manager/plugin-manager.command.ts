@@ -36,6 +36,7 @@ export class PluginManagerCommand {
 
   @MinaPlayCommand('enable', {
     aliases: ['e'],
+    description: 'enable a plugin in MinaPlay',
     parent: () => PluginManagerCommand.prototype.handlePm,
   })
   async handleEnable(
@@ -55,6 +56,7 @@ export class PluginManagerCommand {
 
   @MinaPlayCommand('disable', {
     aliases: ['d'],
+    description: 'disable a plugin in MinaPlay',
     parent: () => PluginManagerCommand.prototype.handlePm,
   })
   async handleDisable(
@@ -74,6 +76,7 @@ export class PluginManagerCommand {
 
   @MinaPlayCommand('install', {
     aliases: ['add', 'i'],
+    description: 'install a MinaPlay plugin in NPM registry',
     parent: () => PluginManagerCommand.prototype.handlePm,
   })
   async handleInstall(
@@ -81,7 +84,7 @@ export class PluginManagerCommand {
       description: 'plugin ID',
     })
     id: string,
-    @MinaPlayCommandOption('-r,--registry', {
+    @MinaPlayCommandOption('-r,--registry <url>', {
       description: 'Registry url',
       default: 'https://registry.npmjs.com',
     })
@@ -131,7 +134,7 @@ export class PluginManagerCommand {
         ]);
         try {
           const resp = await chat.receive(30000);
-          if (resp.type !== 'ConsumableFeedback' || resp.id !== groupId || resp.value !== 'yes') {
+          if (resp.type !== 'Text' || !['yes', 'y'].includes(resp.content.toLowerCase())) {
             return [new Consumed(groupId), new Text(`Install '${packageId}@${version}' canceled`)];
           }
         } catch {
@@ -180,6 +183,7 @@ export class PluginManagerCommand {
 
   @MinaPlayCommand('uninstall', {
     aliases: ['remove', 'u'],
+    description: 'uninstall a plugin in MinaPlay',
     parent: () => PluginManagerCommand.prototype.handlePm,
   })
   async handleUninstall(
@@ -215,7 +219,7 @@ export class PluginManagerCommand {
       ]);
       try {
         const resp = await chat.receive(30000);
-        if (resp.type !== 'ConsumableFeedback' || resp.id !== groupId || resp.value !== 'yes') {
+        if (resp.type !== 'Text' || !['yes', 'y'].includes(resp.content.toLowerCase())) {
           return [new Consumed(groupId), new Text(`Uninstall '${id}' canceled`)];
         }
       } catch {

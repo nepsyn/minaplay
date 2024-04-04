@@ -54,6 +54,7 @@ export class UserManagerCommand {
   }
 
   @MinaPlayCommand('add', {
+    description: 'add a user in MinaPlay',
     parent: () => UserManagerCommand.prototype.handleUm,
   })
   async handleAddRootUser(
@@ -103,6 +104,7 @@ export class UserManagerCommand {
   }
 
   @MinaPlayCommand('grant', {
+    description: 'grant permissions for a user',
     parent: () => UserManagerCommand.prototype.handleUm,
   })
   async handleGrantUser(
@@ -147,6 +149,7 @@ export class UserManagerCommand {
 
   @MinaPlayCommand('del', {
     aliases: ['delete'],
+    description: 'delete a user in MinaPlay',
     parent: () => UserManagerCommand.prototype.handleUm,
   })
   async handleDeleteUser(
@@ -178,7 +181,7 @@ export class UserManagerCommand {
     ]);
     try {
       const resp = await chat.receive(30000);
-      if (resp.type === 'ConsumableFeedback' && resp.id === groupId && resp.value === 'yes') {
+      if (resp.type === 'Text' && ['yes', 'y'].includes(resp.content.toLowerCase())) {
         try {
           await this.userRepository.delete({ username });
           return [new Consumed(groupId), new Text(`User '${username}' deleted`, Text.Colors.SUCCESS)];

@@ -1852,13 +1852,14 @@ cache-manager-redis-yet@^4.2.0:
     cache-manager "^5.4.0"
     redis "^4.6.13"
 
-cache-manager@^5.4.0:
-  version "5.4.0"
-  resolved "https://registry.yarnpkg.com/cache-manager/-/cache-manager-5.4.0.tgz#cec47dbea8e49e0f6970d117be10172b4e621358"
-  integrity sha512-FS7o8vqJosnLpu9rh2gQTo8EOzCRJLF1BJ4XDEUDMqcfvs7SJZs5iuoFTXLauzQ3S5v8sBAST1pCwMaurpyi1A==
+cache-manager@^5.4.0, cache-manager@^5.5.0:
+  version "5.5.0"
+  resolved "https://registry.yarnpkg.com/cache-manager/-/cache-manager-5.5.0.tgz#d93eeb8d4612fcf729465ebbaa2d5a5d7055359a"
+  integrity sha512-zndX+tczQ7jzlYiXW5++2iCkJicDjNWjHom60gC7B4Epn+Bro8/NZyrTYhBWLT3tbz0UCPv+zf9CkX6fI3yK7A==
   dependencies:
+    eventemitter3 "^5.0.1"
     lodash.clonedeep "^4.5.0"
-    lru-cache "^10.1.0"
+    lru-cache "^10.2.0"
     promise-coalesce "^1.1.2"
 
 call-bind@^1.0.0:
@@ -2550,6 +2551,11 @@ etag@~1.8.1:
   version "1.8.1"
   resolved "https://registry.yarnpkg.com/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
   integrity sha512-aIL5Fx7mawVa300al2BnEE4iNvo1qETxLrPI/o05L7z6go7fCw1J6EQmbK4FmJ2AS7kgVF/KEZWufBfdClMcPg==
+
+eventemitter3@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/eventemitter3/-/eventemitter3-5.0.1.tgz#53f5ffd0a492ac800721bb42c66b841de96423c4"
+  integrity sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==
 
 execa@^5.0.0:
   version "5.1.1"
@@ -3966,10 +3972,10 @@ long@^5.2.1:
   resolved "https://registry.yarnpkg.com/long/-/long-5.2.3.tgz#a3ba97f3877cf1d778eccbcb048525ebb77499e1"
   integrity sha512-lcHwpNoggQTObv5apGNCTdJrO69eHOZMi4BNC+rTLER8iHAqGrUVeLh/irVIM7zTw2bOXA8T6uNPeujwOLg/2Q==
 
-lru-cache@^10.1.0, "lru-cache@^9.1.1 || ^10.0.0":
-  version "10.1.0"
-  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-10.1.0.tgz#2098d41c2dc56500e6c88584aa656c84de7d0484"
-  integrity sha512-/1clY/ui8CzjKFyjdvwPWJUYKiFVXG2I2cY0ssG7h4+hwk+XOIX7ZSG9Q7TW8TW3Kp3BUSqgFWBLgL4PJ+Blag==
+lru-cache@^10.2.0, "lru-cache@^9.1.1 || ^10.0.0":
+  version "10.2.0"
+  resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-10.2.0.tgz#0bd445ca57363465900f4d1f9bd8db343a4d95c3"
+  integrity sha512-2bIM8x+VAf6JT4bKAljS1qUWgMsqZRPGJS6FSahIMPVvctcNhyVp7AJu7quxOW9jwkryBReKZY5tY5JYv2n/7Q==
 
 lru-cache@^5.1.1:
   version "5.1.1"

@@ -2,7 +2,7 @@ import { Injectable, OnModuleInit, Type } from '@nestjs/common';
 import { LazyModuleLoader } from '@nestjs/core';
 import { MinaPlayCommandMetadata, MinaPlayMessageListenerMetadata, MinaPlayPluginHooks } from './plugin.interface.js';
 import { PluginControl } from './plugin-control.js';
-import { getMinaPlayPluginMetadata, isMinaPlayPlugin } from './plugin.decorator.js';
+import { getMinaPlayPluginMetadata, isMinaPlayPlugin, isMinaPlaySourceParser } from './plugin.decorator.js';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -88,6 +88,7 @@ export class PluginService implements OnModuleInit {
       control.commands = [];
       control.listeners = [];
       control.services = [];
+      control.parsers = [];
       for (const provider of metadata.providers ?? []) {
         if (typeof provider === 'function') {
           // commands
@@ -113,6 +114,9 @@ export class PluginService implements OnModuleInit {
 
           const service = control.module.get(provider);
           control.services.push(service);
+          if (isMinaPlaySourceParser(service.constructor)) {
+            control.parsers.push(service);
+          }
         }
       }
 

@@ -99,3 +99,88 @@ export interface MinaPlayCommandArgumentOptions {
   default?: any;
   factory?: (option: Argument) => Argument;
 }
+
+export interface MinaPlayPluginSource {
+  name: string;
+  url: string;
+  site?: string;
+}
+
+export interface MinaPlayPluginSourceEpisode {
+  id: string | number;
+  title?: string;
+  no: string;
+  pubAt?: Date;
+  posterUrl?: string;
+  downloadUrl?: string;
+}
+
+export interface MinaPlayPluginSourceSeries {
+  id: string | number;
+  name: string;
+  season?: string;
+  posterUrl?: string;
+  pubAt?: Date;
+  finished?: boolean;
+  count?: number;
+  description?: string;
+  tags?: string[];
+}
+
+export interface MinaPlayPluginSourceCalendarItem {
+  /** week day(Sunday=0) */
+  day: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  series: MinaPlayPluginSourceSeries[];
+}
+
+export interface MinaPlayPluginSourceCalendar {
+  items: MinaPlayPluginSourceCalendarItem[];
+}
+
+export interface PluginSourceParser {
+  /**
+   * Get subscribe source
+   */
+  getSource(): MinaPlayPluginSource | Promise<MinaPlayPluginSource>;
+
+  /**
+   * Get update calendar
+   */
+  getCalendar?(): MinaPlayPluginSourceCalendar | Promise<MinaPlayPluginSourceCalendar>;
+
+  /**
+   * Get series by ID
+   * @param id series ID
+   */
+  getSeriesById?(id: string): MinaPlayPluginSourceSeries | Promise<MinaPlayPluginSourceSeries>;
+
+  /**
+   * Search series by keyword
+   * @param keyword search keyword
+   * @param page result page
+   * @param size result page size
+   */
+  searchSeries?(
+    keyword: string,
+    page?: number,
+    size?: number,
+  ): MinaPlayPluginSourceSeries[] | Promise<MinaPlayPluginSourceSeries[]>;
+
+  /**
+   * Build rule code for series
+   * @param series series
+   */
+  buildRuleCodeForSeries?(series: MinaPlayPluginSourceSeries): string | Promise<string>;
+
+  /**
+   * Get episodes of series by series ID
+   * @param id series ID
+   * @param page result page
+   * @param size result page size
+   */
+  getEpisodesBySeriesId?(
+    id: string | number,
+    page?: number,
+    size?: number,
+  ): MinaPlayPluginSourceEpisode[] | Promise<MinaPlayPluginSourceEpisode[]>;
+}

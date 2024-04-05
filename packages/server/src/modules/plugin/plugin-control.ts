@@ -1,4 +1,9 @@
-import { MinaPlayCommandMetadata, MinaPlayMessageListenerMetadata, MinaPlayPluginHooks } from './plugin.interface.js';
+import {
+  MinaPlayCommandMetadata,
+  MinaPlayMessageListenerMetadata,
+  MinaPlayPluginHooks,
+  PluginSourceParser,
+} from './plugin.interface.js';
 import { Type } from '@nestjs/common';
 import { Exclude, Expose } from 'class-transformer';
 import { ModuleRef } from '@nestjs/core';
@@ -39,6 +44,9 @@ export class PluginControl {
 
   @Exclude()
   services: MinaPlayPluginHooks[];
+
+  @Exclude()
+  parsers: PluginSourceParser[];
 
   @Exclude()
   type: Type;

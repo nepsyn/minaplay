@@ -9,7 +9,7 @@ import {
   MinaPlayParamMetadata,
   MinaPlayPluginMetadata,
 } from './plugin.interface.js';
-import { InjectionToken, Module, Provider, Type } from '@nestjs/common';
+import { Injectable, InjectionToken, Module, Provider, Type } from '@nestjs/common';
 import { isDefined } from 'class-validator';
 import {
   COMMAND_ARGUMENTS_TOKEN,
@@ -21,6 +21,7 @@ import {
   MINAPLAY_LISTENER_METADATA,
   MINAPLAY_PLUGIN_ID_TOKEN,
   MINAPLAY_PLUGIN_METADATA,
+  PLUGIN_SOURCE_PARSER_TOKEN,
 } from './constants.js';
 import { extendArrayMetadata } from '@nestjs/common/utils/extend-metadata.util.js';
 import { Argument, Command, Option } from 'commander';
@@ -52,6 +53,17 @@ export function getMinaPlayPluginMetadata(target: Function): MinaPlayPluginMetad
 export function isMinaPlayPlugin(target: Type) {
   const descriptor = getMinaPlayPluginMetadata(target);
   return isDefined(descriptor?.id);
+}
+
+export function MinaPlaySourceParser() {
+  return function (target: Function) {
+    Reflect.decorate([Injectable()], target);
+    Reflect.defineMetadata(PLUGIN_SOURCE_PARSER_TOKEN, true, target);
+  };
+}
+
+export function isMinaPlaySourceParser(target: Function) {
+  return Reflect.getMetadata(PLUGIN_SOURCE_PARSER_TOKEN, target) === true;
 }
 
 export function MinaPlayMessageListener(options: MinaPlayMessageListenerOptions = {}): MethodDecorator {

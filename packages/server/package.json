@@ -63,7 +63,7 @@
     "sharp": "^0.33.3",
     "swagger-ui-express": "^5.0.0",
     "typeorm": "^0.3.20",
-    "typescript": "^5.4.3",
+    "typescript": "^5.4.4",
     "ws": "^8.16.0"
   },
   "devDependencies": {

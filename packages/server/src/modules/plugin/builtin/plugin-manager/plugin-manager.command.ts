@@ -21,6 +21,7 @@ import { Timeout } from '../../../../common/messages/timeout.js';
 import { Consumed } from '../../../../common/messages/consumed.js';
 import { ConsumableGroup, Pending } from '../../../../common/messages/index.js';
 import { execaCommand } from 'execa';
+import process from 'node:process';
 
 @Injectable()
 export class PluginManagerCommand {
@@ -113,7 +114,7 @@ export class PluginManagerCommand {
 
     const groupId = Date.now().toString();
     try {
-      const proxyUrl = this.configService.get('APP_HTTP_PROXY');
+      const proxyUrl = process.env.HTTP_PROXY ?? this.configService.get('APP_HTTP_PROXY');
       const metadataResponse = await fetch(`${registry}/${packageId}/${version}`, {
         agent: proxyUrl && new HttpsProxyAgent(proxyUrl),
       });

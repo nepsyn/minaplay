@@ -29,6 +29,7 @@ import { ApplicationExceptionFilter } from './common/application.exception.filte
 import { ApplicationTimeoutInterceptor } from './common/application.timeout.interceptor.js';
 import { ApplicationLogger } from './common/application.logger.service.js';
 import { MINAPLAY_VERSION } from './constants.js';
+import process from 'node:process';
 
 @Module({
   imports: [
@@ -110,7 +111,7 @@ import { MINAPLAY_VERSION } from './constants.js';
         rpcSecret: configService.get('ARIA2_RPC_SECRET'),
         trackerAutoUpdate: Number(configService.get('ARIA2_AUTO_UPDATE_TRACKER', 0)) === 1,
         trackerUpdateUrl: configService.get('ARIA2_TRACKER_LIST_URL'),
-        httpProxy: configService.get('APP_HTTP_PROXY'),
+        httpProxy: process.env.HTTP_PROXY ?? configService.get('APP_HTTP_PROXY'),
       }),
     }),
     NotificationModule.registerAsync({

@@ -68,14 +68,6 @@ export class PluginController {
     return new ApiPaginationResultDto(controls, controls.length, 0, -1);
   }
 
-  @Get(':id/parser/:parser/source')
-  @ApiOperation({
-    description: '获取插件 parser 订阅源',
-  })
-  async getParserSource(@Param('id') id: string, @Param('parser') name: string) {
-    return await this.invokeParser(id, name, 'getSource');
-  }
-
   @Get(':id/parser/:parser/calendar')
   @ApiOperation({
     description: '获取插件 parser 更新表',
@@ -86,7 +78,7 @@ export class PluginController {
 
   @Get(':pluginId/parser/:parser/series/:seriesId')
   @ApiOperation({
-    description: '根据 ID 获取插件 parser 剧集',
+    description: '获取插件 parser 剧集',
   })
   async getParserSeriesById(
     @Param('pluginId') pluginId: string,
@@ -100,9 +92,9 @@ export class PluginController {
     return await this.invokeParser(pluginId, name, 'getSeriesById', seriesId);
   }
 
-  @Get(':pluginId/parser/:parser/series/:seriesId/code')
+  @Get(':pluginId/parser/:parser/series/:seriesId/subscribe')
   @ApiOperation({
-    description: '根据 ID 获取插件 parser 剧集对应订阅规则',
+    description: '获取插件 parser 剧集订阅信息',
   })
   async getParserSeriesCodeBySeriesId(
     @Param('pluginId') pluginId: string,
@@ -114,8 +106,9 @@ export class PluginController {
     }
 
     const series = await this.invokeParser(pluginId, name, 'getSeriesById', seriesId);
-    const code = await this.invokeParser(pluginId, name, 'buildRuleCodeForSeries', series);
-    return { series, code };
+    const source = await this.invokeParser(pluginId, name, 'buildSourceOfSeries', series);
+    const code = await this.invokeParser(pluginId, name, 'buildRuleCodeOfSeries', series);
+    return { series, source, code };
   }
 
   @Get(':pluginId/parser/:parser/series')

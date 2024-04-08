@@ -56,11 +56,11 @@ export function MinaPlayPluginParser(options?: Partial<Pick<MinaPlayParserMetada
   return function (target: Function) {
     Reflect.decorate([Injectable()], target);
     const features: (keyof PluginSourceParser)[] = [
-      'getSource',
       'getCalendar',
       'getSeriesById',
       'searchSeries',
-      'buildRuleCodeForSeries',
+      'buildSourceOfSeries',
+      'buildRuleCodeOfSeries',
       'getEpisodesBySeriesId',
     ];
     const metadata: MinaPlayParserMetadata = {

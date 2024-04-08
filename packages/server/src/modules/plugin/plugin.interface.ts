@@ -141,11 +141,6 @@ export interface MinaPlayPluginSourceCalendarDay {
 
 export interface PluginSourceParser {
   /**
-   * Get subscribe source
-   */
-  getSource(): MinaPlayPluginSource | Promise<MinaPlayPluginSource>;
-
-  /**
    * Get update calendar
    */
   getCalendar?(): MinaPlayPluginSourceCalendarDay[] | Promise<MinaPlayPluginSourceCalendarDay[]>;
@@ -169,10 +164,16 @@ export interface PluginSourceParser {
   ): MinaPlayPluginSourceSeries[] | Promise<MinaPlayPluginSourceSeries[]>;
 
   /**
+   * Build subscribeSource for series
+   * @param series series
+   */
+  buildSourceOfSeries?(series: MinaPlayPluginSourceSeries): MinaPlayPluginSource | Promise<MinaPlayPluginSource>;
+
+  /**
    * Build rule code for series
    * @param series series
    */
-  buildRuleCodeForSeries?(series: MinaPlayPluginSourceSeries): string | Promise<string>;
+  buildRuleCodeOfSeries?(series: MinaPlayPluginSourceSeries): string | Promise<string>;
 
   /**
    * Get episodes of series by series ID

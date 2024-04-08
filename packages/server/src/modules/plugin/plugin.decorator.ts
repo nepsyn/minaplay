@@ -7,9 +7,11 @@ import {
   MinaPlayMessageListenerMetadata,
   MinaPlayMessageListenerOptions,
   MinaPlayParamMetadata,
+  MinaPlayParserMetadata,
   MinaPlayPluginMetadata,
+  PluginSourceParser,
 } from './plugin.interface.js';
-import { Injectable, InjectionToken, Module, Provider, Type } from '@nestjs/common';
+import { Injectable, InjectionToken, Module, Provider } from '@nestjs/common';
 import { isDefined } from 'class-validator';
 import {
   COMMAND_ARGUMENTS_TOKEN,
@@ -50,20 +52,29 @@ export function getMinaPlayPluginMetadata(target: Function): MinaPlayPluginMetad
   return Reflect.getMetadata(MINAPLAY_PLUGIN_METADATA, target);
 }
 
-export function isMinaPlayPlugin(target: Type) {
-  const descriptor = getMinaPlayPluginMetadata(target);
-  return isDefined(descriptor?.id);
-}
-
-export function MinaPlaySourceParser() {
+export function MinaPlayPluginParser(options?: Partial<Pick<MinaPlayParserMetadata, 'name'>>) {
   return function (target: Function) {
     Reflect.decorate([Injectable()], target);
-    Reflect.defineMetadata(PLUGIN_SOURCE_PARSER_TOKEN, true, target);
+    const features: (keyof PluginSourceParser)[] = [
+      'getSource',
+      'getCalendar',
+      'getSeriesById',
+      'searchSeries',
+      'buildRuleCodeForSeries',
+      'getEpisodesBySeriesId',
+    ];
+    const metadata: MinaPlayParserMetadata = {
+      name: options?.name ?? target.name,
+      features: Object.fromEntries(
+        features.map((feature) => [feature, isDefined(target.prototype[feature])]),
+      ) as Record<keyof PluginSourceParser, boolean>,
+    };
+    Reflect.defineMetadata(PLUGIN_SOURCE_PARSER_TOKEN, metadata, target);
   };
 }
 
-export function isMinaPlaySourceParser(target: Function) {
-  return Reflect.getMetadata(PLUGIN_SOURCE_PARSER_TOKEN, target) === true;
+export function getMinaPlayPluginParserMetadata(target: Function): MinaPlayParserMetadata {
+  return Reflect.getMetadata(PLUGIN_SOURCE_PARSER_TOKEN, target);
 }
 
 export function MinaPlayMessageListener(options: MinaPlayMessageListenerOptions = {}): MethodDecorator {

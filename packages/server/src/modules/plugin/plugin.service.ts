@@ -1,8 +1,13 @@
 import { Injectable, OnModuleInit, Type } from '@nestjs/common';
 import { LazyModuleLoader } from '@nestjs/core';
-import { MinaPlayCommandMetadata, MinaPlayMessageListenerMetadata, MinaPlayPluginHooks } from './plugin.interface.js';
+import {
+  MinaPlayCommandMetadata,
+  MinaPlayMessageListenerMetadata,
+  MinaPlayPluginHooks,
+  PluginSourceParser,
+} from './plugin.interface.js';
 import { PluginControl } from './plugin-control.js';
-import { getMinaPlayPluginMetadata, isMinaPlayPlugin, isMinaPlaySourceParser } from './plugin.decorator.js';
+import { getMinaPlayPluginMetadata, getMinaPlayPluginParserMetadata } from './plugin.decorator.js';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -39,7 +44,7 @@ export class PluginService implements OnModuleInit {
       try {
         const module: object = await import(pathToFileURL(path.join(file.path, file.name)).href);
         for (const attr of Object.values(module)) {
-          if (isMinaPlayPlugin(attr)) {
+          if (isDefined(getMinaPlayPluginMetadata(attr)?.id)) {
             plugins.push([attr, file]);
           }
         }
@@ -88,7 +93,7 @@ export class PluginService implements OnModuleInit {
       control.commands = [];
       control.listeners = [];
       control.services = [];
-      control.parsers = [];
+      control.parserMap = new Map();
       for (const provider of metadata.providers ?? []) {
         if (typeof provider === 'function') {
           // commands
@@ -114,8 +119,13 @@ export class PluginService implements OnModuleInit {
 
           const service = control.module.get(provider);
           control.services.push(service);
-          if (isMinaPlaySourceParser(service.constructor)) {
-            control.parsers.push(service);
+
+          const parserMetadata = getMinaPlayPluginParserMetadata(service.constructor);
+          if (isDefined(parserMetadata?.name)) {
+            control.parserMap.set(parserMetadata.name, {
+              ...parserMetadata,
+              service,
+            });
           }
         }
       }
@@ -126,7 +136,11 @@ export class PluginService implements OnModuleInit {
       // logs
       this.logger.log(`Plugin '${metadata.id}(${metadata.version ?? 'unknown version'})' registered`);
       const bins = control.commands.map(({ bin }) => bin);
-      this.logger.log(`Plugin '${metadata.id}' registered command { ${bins.length > 1 ? bins.join(', ') : bins[0]} }`);
+      if (bins.length > 0) {
+        this.logger.log(
+          `Plugin '${metadata.id}' registered command { ${bins.length > 1 ? bins.join(', ') : bins[0]} }`,
+        );
+      }
 
       return control;
     } catch (error) {
@@ -220,6 +234,23 @@ export class PluginService implements OnModuleInit {
 
     this.controls = this.controls.filter(({ path }) => path !== control.path);
     return controls;
+  }
+
+  async emitParserAction<T extends keyof PluginSourceParser>(
+    parser: PluginSourceParser,
+    action: T,
+    ...args: Parameters<PluginSourceParser[T]>
+  ): Promise<ReturnType<PluginSourceParser[T]>> {
+    try {
+      return await parser[action].apply(parser, args);
+    } catch (error) {
+      const { name } = getMinaPlayPluginParserMetadata(parser.constructor);
+      this.logger.error(
+        `Error occurred while invoking parser action '${action}' on parser '${name}'`,
+        error.stack,
+        PluginService.name,
+      );
+    }
   }
 
   async handleGatewayMessage(message: MinaPlayMessage, socket: Socket, locale?: string) {

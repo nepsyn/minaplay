@@ -100,6 +100,11 @@ export interface MinaPlayCommandArgumentOptions {
   factory?: (option: Argument) => Argument;
 }
 
+export interface MinaPlayParserMetadata {
+  name: string;
+  features: Record<keyof PluginSourceParser, boolean>;
+}
+
 export interface MinaPlayPluginSource {
   name: string;
   url: string;
@@ -113,6 +118,7 @@ export interface MinaPlayPluginSourceEpisode {
   pubAt?: Date;
   posterUrl?: string;
   downloadUrl?: string;
+  playUrl?: string;
 }
 
 export interface MinaPlayPluginSourceSeries {
@@ -127,14 +133,10 @@ export interface MinaPlayPluginSourceSeries {
   tags?: string[];
 }
 
-export interface MinaPlayPluginSourceCalendarItem {
+export interface MinaPlayPluginSourceCalendarDay {
   /** week day(Sunday=0) */
-  day: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  series: MinaPlayPluginSourceSeries[];
-}
-
-export interface MinaPlayPluginSourceCalendar {
-  items: MinaPlayPluginSourceCalendarItem[];
+  weekday: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  items: MinaPlayPluginSourceSeries[];
 }
 
 export interface PluginSourceParser {
@@ -146,7 +148,7 @@ export interface PluginSourceParser {
   /**
    * Get update calendar
    */
-  getCalendar?(): MinaPlayPluginSourceCalendar | Promise<MinaPlayPluginSourceCalendar>;
+  getCalendar?(): MinaPlayPluginSourceCalendarDay[] | Promise<MinaPlayPluginSourceCalendarDay[]>;
 
   /**
    * Get series by ID

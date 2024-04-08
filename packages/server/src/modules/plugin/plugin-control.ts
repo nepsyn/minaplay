@@ -1,6 +1,7 @@
 import {
   MinaPlayCommandMetadata,
   MinaPlayMessageListenerMetadata,
+  MinaPlayParserMetadata,
   MinaPlayPluginHooks,
   PluginSourceParser,
 } from './plugin.interface.js';
@@ -46,7 +47,12 @@ export class PluginControl {
   services: MinaPlayPluginHooks[];
 
   @Exclude()
-  parsers: PluginSourceParser[];
+  parserMap: Map<string, MinaPlayParserMetadata & { service: PluginSourceParser }>;
+
+  @Expose()
+  get parsers(): MinaPlayParserMetadata[] {
+    return [...this.parserMap.values()].map(({ name, features }) => ({ name, features }));
+  }
 
   @Exclude()
   type: Type;

@@ -33,6 +33,17 @@ export class SystemController {
     };
   }
 
+  @Get('update')
+  @ApiOperation({
+    description: '检查 MinaPlay 更新',
+  })
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60 * 1000)
+  @RequestTimeout(30000)
+  async getUpdate() {
+    return await this.systemService.checkUpdate();
+  }
+
   @Get('logs')
   @ApiOperation({
     description: '获取程序日志',

@@ -1,4 +1,4 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import fs from 'fs-extra';
 import {
   Column,
@@ -58,6 +58,12 @@ export class File {
     length: 1024,
   })
   path: string;
+
+  /** File url */
+  @Expose()
+  get url() {
+    return this.source === FileSourceEnum.NETWORK ? this.path : undefined;
+  }
 
   /** 过期时间 */
   @Exclude()

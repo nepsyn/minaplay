@@ -7,7 +7,7 @@ import { USER_UPLOAD_IMAGE_DIR } from '../../constants.js';
 import { randomUUID } from 'node:crypto';
 import path from 'node:path';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
-import { FileSourceEnum } from '../../enums/file-source.enum.js';
+import { FileSourceEnum } from '../../enums/index.js';
 
 @EventSubscriber()
 export class UserEntitySubscriber implements EntitySubscriberInterface<User> {
@@ -26,15 +26,8 @@ export class UserEntitySubscriber implements EntitySubscriberInterface<User> {
       try {
         const filename = randomUUID().replace(/-/g, '') + '.png';
         const filepath = path.join(USER_UPLOAD_IMAGE_DIR, filename);
-        const { file: identicon, md5 } = await createIdenticon(await generateMD5(event.entity.username), filepath);
-        event.entity.avatar = await this.fileService.save({
-          filename,
-          name: filename,
-          size: identicon.size,
-          md5,
-          source: FileSourceEnum.AUTO_GENERATED,
-          path: filepath,
-        });
+        await createIdenticon(await generateMD5(event.entity.username), filepath);
+        event.entity.avatar = await this.fileService.saveLocalFile(filepath, FileSourceEnum.AUTO_GENERATED);
       } catch (error) {
         this.logger.error(
           `Create identicon for user '${event.entity.username}' failed`,

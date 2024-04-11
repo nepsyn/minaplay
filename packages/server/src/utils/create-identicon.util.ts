@@ -1,5 +1,4 @@
 import fs from 'fs-extra';
-import { generateMD5 } from './generate-md5.util.js';
 import sharp from 'sharp';
 
 export async function createIdenticon(hash: string, path: string) {
@@ -86,10 +85,6 @@ export async function createIdenticon(hash: string, path: string) {
   const data = await identicon.composite(layers).png().toBuffer();
   await fs.ensureFile(path);
   await fs.writeFile(path, data);
-  return {
-    md5: await generateMD5(data.toString()),
-    file: await fs.stat(path),
-  };
 }
 
 function hls2rgb(h: number, s: number, b: number) {

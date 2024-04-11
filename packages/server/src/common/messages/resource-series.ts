@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 import { Equals } from 'class-validator';
-import { Series } from '../../modules/index.js';
+import { Series } from '../../modules/media/series/series.entity.js';
 
 /** Resource Series */
 export class ResourceSeries {

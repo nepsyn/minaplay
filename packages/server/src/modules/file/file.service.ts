@@ -8,6 +8,9 @@ import fs from 'fs-extra';
 import sharp from 'sharp';
 import path from 'node:path';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
+import { generateMD5 } from '../../utils/generate-md5.util.js';
+import { FileSourceEnum } from '../../enums/index.js';
+import { isDefined } from 'class-validator';
 
 @Injectable()
 export class FileService implements OnModuleInit {
@@ -36,7 +39,31 @@ export class FileService implements OnModuleInit {
   }
 
   async save(file: DeepPartial<File>) {
+    if (isDefined(file.size) && isDefined(file.md5)) {
+      const localFile = await this.fileRepository.findOneBy({ md5: file.md5, size: file.size });
+      file = {
+        ...file,
+        id: localFile?.id,
+      };
+    }
+
     return await this.fileRepository.save(file);
+  }
+
+  async saveLocalFile(filepath: string, source = FileSourceEnum.LOCAL) {
+    const stat = await fs.stat(filepath);
+    if (!stat.isFile()) {
+      throw new Error('Invalid file type');
+    }
+
+    return await this.save({
+      filename: path.basename(filepath),
+      name: path.basename(filepath),
+      size: stat.size,
+      md5: await generateMD5(fs.createReadStream(filepath)),
+      source,
+      path: filepath,
+    });
   }
 
   async findOneBy(where: FindOptionsWhere<File>) {

@@ -23,10 +23,7 @@ export class ParseLog {
   downloads: Relation<DownloadItem[]>;
 
   /** 状态 */
-  @Column({
-    type: 'enum',
-    enum: StatusEnum,
-  })
+  @Column()
   status: StatusEnum;
 
   /** 错误内容 */

@@ -1,6 +1,6 @@
-import { Media } from '../../modules/index.js';
 import { Expose } from 'class-transformer';
 import { Equals } from 'class-validator';
+import { Media } from '../../modules/media/media.entity.js';
 
 /** Resource Media */
 export class ResourceMedia {

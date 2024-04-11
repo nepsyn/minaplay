@@ -2,4 +2,6 @@ export enum FileSourceEnum {
   USER_UPLOAD = 'USER_UPLOAD',
   DOWNLOAD = 'DOWNLOAD',
   AUTO_GENERATED = 'AUTO_GENERATED',
+  LOCAL = 'LOCAL',
+  NETWORK = 'NETWORK',
 }

@@ -10,7 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from '../user/user.entity.js';
-import { FileSourceEnum } from '../../enums/file-source.enum.js';
+import { FileSourceEnum } from '../../enums/index.js';
 
 /** 文件实体 */
 @Entity()
@@ -21,7 +21,9 @@ export class File {
 
   /** 本地文件名 */
   @Exclude()
-  @Column()
+  @Column({
+    nullable: true,
+  })
   filename: string;
 
   /** 文件名 */
@@ -29,12 +31,16 @@ export class File {
   name: string;
 
   /** 文件大小(字节) */
-  @Column()
+  @Column({
+    nullable: true,
+  })
   size: number;
 
   /** 文件 md5 */
-  @Column()
-  md5: string;
+  @Column({
+    nullable: true,
+  })
+  md5?: string;
 
   /** 文件 mimetype */
   @Column({
@@ -43,13 +49,10 @@ export class File {
   mimetype?: string;
 
   /** 文件来源 */
-  @Column({
-    type: 'enum',
-    enum: FileSourceEnum,
-  })
+  @Column()
   source: FileSourceEnum;
 
-  /** 本地文件路径 */
+  /** 文件路径 */
   @Exclude()
   @Column({
     length: 1024,
@@ -82,6 +85,6 @@ export class File {
   /** 本地文件是否存在 */
   @Exclude()
   get isExist() {
-    return fs.pathExistsSync(this.path);
+    return this.source === FileSourceEnum.NETWORK || fs.pathExistsSync(this.path);
   }
 }

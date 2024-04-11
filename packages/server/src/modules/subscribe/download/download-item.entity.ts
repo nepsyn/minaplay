@@ -42,10 +42,7 @@ export class DownloadItem {
   hash: string;
 
   /** 下载状态 */
-  @Column({
-    type: 'enum',
-    enum: StatusEnum,
-  })
+  @Column()
   status?: StatusEnum;
 
   /** 错误内容 */

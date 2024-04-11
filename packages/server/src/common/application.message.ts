@@ -1,18 +1,18 @@
 import { ClassConstructor, plainToInstance } from 'class-transformer';
 import { validateSync } from 'class-validator';
-import { Text } from './messages/text.js';
 import {
   Action,
   Base64Image,
   ConsumableGroup,
   Consumed,
+  MarkdownText,
   NetworkImage,
   Pending,
   ResourceMedia,
   ResourceSeries,
+  Text,
   Timeout,
 } from './messages/index.js';
-import { MarkdownText } from './messages/markdown-text.js';
 
 export const MinaPlayMessageMap = {
   Text,

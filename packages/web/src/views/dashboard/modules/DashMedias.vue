@@ -67,7 +67,7 @@
               :aspect-ratio="16 / 9"
               min-width="120"
               max-width="160"
-              :src="item.poster ? api.File.buildRawPath(item.poster.id, item.poster.name) : MediaPosterFallback"
+              :src="item.poster ? api.File.buildRawPath(item.poster) : MediaPosterFallback"
             ></zoom-img>
           </div>
         </template>
@@ -160,10 +160,7 @@
             </span>
             <v-row class="mt-1">
               <v-col cols="12" md="8">
-                <zoom-img
-                  class="rounded"
-                  :src="editItem.poster && api.File.buildRawPath(editItem.poster.id)"
-                ></zoom-img>
+                <zoom-img class="rounded" :src="editItem.poster && api.File.buildRawPath(editItem.poster)"></zoom-img>
                 <v-btn
                   class="mt-2"
                   :prepend-icon="mdiCloudUploadOutline"

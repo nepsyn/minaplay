@@ -7,7 +7,7 @@
       <v-img
         :aspect-ratio="1 / 1.4"
         cover
-        :src="series.poster ? api.File.buildRawPath(series.poster.id, series.poster.name) : SeriesCoverFallback"
+        :src="series.poster ? api.File.buildRawPath(series.poster) : SeriesCoverFallback"
         class="series-img rounded-lg"
       >
         <template #placeholder>

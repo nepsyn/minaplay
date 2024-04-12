@@ -65,7 +65,6 @@
                       <plugin-chat-message
                         v-if="message.messages.filter(canRender).length > 0"
                         :message="message"
-                        @action="onAction"
                       ></plugin-chat-message>
                     </template>
                   </v-slide-x-reverse-transition>
@@ -121,7 +120,7 @@
 </template>
 
 <script setup lang="ts">
-import { onUnmounted, onUpdated, ref } from 'vue';
+import { onUnmounted, onUpdated, provide, ref } from 'vue';
 import {
   mdiArrowCollapseDown,
   mdiArrowDown,
@@ -244,15 +243,12 @@ onUpdated(async () => {
   await loadPrograms();
 });
 
-const onAction = async (id: string | undefined, value: string) => {
-  if (id != null) {
-    await sendChat({
-      type: 'ConsumableFeedback',
-      id,
-      value,
-    });
-  }
-};
+provide('send-action', async (content: string) => {
+  await sendChat({
+    type: 'Text',
+    content,
+  });
+});
 
 const atBottom = ref(false);
 const messageContainerRef = ref<{ $el: HTMLElement } | undefined>(undefined);

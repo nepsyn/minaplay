@@ -497,6 +497,9 @@ const zh: MessageSchema = {
     startTime: '启动时间',
     workedTime: '已持续运行',
     version: '版本',
+    currentVersion: '当前版本',
+    latestVersion: '最新版本',
+    updateAvailable: '可更新',
   },
   logs: {
     clearTitle: '清空确认',

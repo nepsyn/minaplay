@@ -497,6 +497,9 @@ export default {
     startTime: 'Start Time',
     workedTime: 'Worked for',
     version: 'Version',
+    currentVersion: 'Current Version',
+    latestVersion: 'LatestVersion',
+    updateAvailable: 'Update Available',
   },
   logs: {
     clearTitle: 'Clear All Confirm',

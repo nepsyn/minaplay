@@ -80,11 +80,7 @@
               :aspect-ratio="3 / 4"
               min-width="60"
               max-width="100"
-              :src="
-                item.series?.poster
-                  ? api.File.buildRawPath(item.series.poster.id, item.series.poster.name)
-                  : SeriesPosterFallback
-              "
+              :src="item.series?.poster ? api.File.buildRawPath(item.series.poster) : SeriesPosterFallback"
             ></zoom-img>
           </div>
         </template>
@@ -95,11 +91,7 @@
               :aspect-ratio="16 / 9"
               min-width="120"
               max-width="160"
-              :src="
-                item.media?.poster
-                  ? api.File.buildRawPath(item.media.poster.id, item.media.poster.name)
-                  : MediaPosterFallback
-              "
+              :src="item.media?.poster ? api.File.buildRawPath(item.media.poster) : MediaPosterFallback"
             ></zoom-img>
           </div>
         </template>

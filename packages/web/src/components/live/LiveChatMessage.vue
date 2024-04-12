@@ -1,10 +1,6 @@
 <template>
   <v-container fluid class="pa-0 d-flex flex-row align-start">
-    <user-avatar
-      v-bind="props"
-      size="48"
-      :src="user.avatar && api.File.buildRawPath(user.avatar.id, user.avatar.name)"
-    ></user-avatar>
+    <user-avatar v-bind="props" size="48" :src="user.avatar && api.File.buildRawPath(user.avatar)"></user-avatar>
     <v-container fluid class="pa-0 d-flex flex-column justify-start">
       <v-container fluid class="px-5 py-0 d-flex align-center">
         <div class="grey--text message-caption flex-shrink-0">

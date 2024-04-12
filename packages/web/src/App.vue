@@ -1,8 +1,10 @@
 <template>
-  <router-view />
-  <v-layout>
-    <messages-container></messages-container>
-  </v-layout>
+  <v-defaults-provider :defaults="defaults">
+    <router-view />
+    <v-layout>
+      <messages-container></messages-container>
+    </v-layout>
+  </v-defaults-provider>
 </template>
 
 <script setup lang="ts">
@@ -12,7 +14,7 @@ import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useI18n } from 'vue-i18n';
 import { useToastStore } from '@/store/toast';
 import { useApiStore } from '@/store/api';
-import { onBeforeMount, watch } from 'vue';
+import { onBeforeMount, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import * as monaco from 'monaco-editor';
@@ -34,6 +36,12 @@ try {
     layout.toggleDarkMode(settings.theme === 'dark');
   }
 } catch {}
+
+const defaults = ref({
+  VImg: {
+    referrerpolicy: 'no-referrer',
+  },
+});
 
 watch(
   () => layout.darkMode,

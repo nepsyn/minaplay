@@ -29,12 +29,6 @@ export interface MinaPlayConsumableGroup {
   items: MinaPlayMessage[];
 }
 
-export interface MinaPlayConsumableFeedback {
-  type: 'ConsumableFeedback';
-  id: string;
-  value: string;
-}
-
 export interface MinaPlayConsumed {
   type: 'Consumed';
   id: string;
@@ -48,6 +42,11 @@ export interface MinaPlayTimeout {
 export interface MinaPlayPending {
   type: 'Pending';
   color?: string;
+}
+
+export interface MinaPlayMarkdownText {
+  type: 'MarkdownText';
+  content: string;
 }
 
 export interface MinaPlayResourceSeries {
@@ -66,9 +65,9 @@ export type MinaPlayMessage =
   | MinaPlayBase64Image
   | MinaPlayAction
   | MinaPlayConsumableGroup
-  | MinaPlayConsumableFeedback
   | MinaPlayConsumed
   | MinaPlayTimeout
   | MinaPlayPending
+  | MinaPlayMarkdownText
   | MinaPlayResourceSeries
   | MinaPlayResourceMedia;

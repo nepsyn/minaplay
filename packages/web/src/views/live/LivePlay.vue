@@ -14,7 +14,7 @@
                 <user-avatar
                   v-bind="props"
                   size="64"
-                  :src="live.user?.avatar && api.File.buildRawPath(live.user.avatar.id, live.user.avatar.name)"
+                  :src="live.user?.avatar && api.File.buildRawPath(live.user.avatar)"
                 ></user-avatar>
               </template>
             </v-tooltip>
@@ -117,7 +117,7 @@
                     <user-avatar
                       :class="voice.level > 10 && voice.volume > 0 ? 'avatar-speaking' : undefined"
                       size="50"
-                      :src="voice.user.avatar && api.File.buildRawPath(voice.user.avatar.id, voice.user.avatar.name)"
+                      :src="voice.user.avatar && api.File.buildRawPath(voice.user.avatar)"
                     ></user-avatar>
                     <v-container class="pa-0 mx-4 d-flex flex-column justify-space-around">
                       <span class="px-2 text-body-1 text-medium-emphasis">
@@ -165,7 +165,7 @@
                         :class="selfSpeaking ? 'avatar-speaking' : undefined"
                         v-bind="props"
                         size="48"
-                        :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
+                        :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar)"
                       ></user-avatar>
                     </template>
                   </v-tooltip>
@@ -320,7 +320,7 @@
                     min-width="120"
                     max-width="240"
                     :aspect-ratio="16 / 9"
-                    :src="live?.poster ? api.File.buildRawPath(live.poster.id, live.poster.name) : LivePosterFallback"
+                    :src="live?.poster ? api.File.buildRawPath(live.poster) : LivePosterFallback"
                   >
                     <v-btn
                       class="position-absolute"
@@ -659,7 +659,7 @@ const getLiveStatus = (): Omit<ClientSyncMediaStream, 'type'> | undefined => {
   if (playerRef.value && selectedMedia.value?.file) {
     return {
       title: selectedMedia.value?.name,
-      url: selectedMedia.value?.file ? api.File.buildRawPath(selectedMedia.value.file.id) : '',
+      url: selectedMedia.value?.file ? api.File.buildRawPath(selectedMedia.value.file) : '',
       position: playerRef.value?.player?.currentTime ?? 0,
       status: playerRef.value.player?.paused ? 'paused' : 'playing',
       updateAt: new Date(),
@@ -928,7 +928,7 @@ const selectAndSendImage = () => {
         await emit('chat', {
           message: {
             type: 'NetworkImage',
-            url: getFullUrl(api.File.buildRawPath(uploadFile.data.id, uploadFile.data.name)),
+            url: getFullUrl(api.File.buildRawPath(uploadFile.data)),
           },
         });
       } catch (error: any) {

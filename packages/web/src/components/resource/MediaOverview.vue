@@ -4,7 +4,7 @@
       <v-img
         :aspect-ratio="16 / 9"
         cover
-        :src="media.poster ? api.File.buildRawPath(media.poster.id, media.poster.name) : MediaPosterFallback"
+        :src="media.poster ? api.File.buildRawPath(media.poster) : MediaPosterFallback"
         class="media-img rounded-lg"
       >
         <template #placeholder>

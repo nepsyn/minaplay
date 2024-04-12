@@ -78,7 +78,7 @@
             <template #activator="{ props }">
               <user-avatar
                 v-bind="props"
-                :src="item.avatar && api.File.buildRawPath(item.avatar.id)"
+                :src="item.avatar && api.File.buildRawPath(item.avatar)"
                 size="40"
               ></user-avatar>
             </template>

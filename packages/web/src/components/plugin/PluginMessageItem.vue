@@ -5,24 +5,19 @@
   <template v-else-if="message.type === 'NetworkImage'">
     <zoom-img class="rounded" :src="message.url" eager max-width="240">
       <template #placeholder>
-        <v-skeleton-loader height="100%" type="image"></v-skeleton-loader>
+        <v-img cover :src="ImagePlaceholder"></v-img>
       </template>
     </zoom-img>
   </template>
   <template v-else-if="message.type === 'Base64Image'">
     <zoom-img class="rounded" :src="message.content" eager max-width="240">
       <template #placeholder>
-        <v-skeleton-loader height="100%" type="image"></v-skeleton-loader>
+        <v-img cover :src="ImagePlaceholder"></v-img>
       </template>
     </zoom-img>
   </template>
   <template v-else-if="message.type === 'Action'">
-    <v-btn
-      :color="message.text.color"
-      variant="outlined"
-      density="comfortable"
-      @click="emits('action', undefined, message.value)"
-    >
+    <v-btn :color="message.text.color" variant="outlined" density="comfortable" @click="sendAction?.(message.value)">
       {{ message.text.content }}
     </v-btn>
   </template>
@@ -38,7 +33,7 @@
     <v-row dense class="align-center">
       <template v-for="(item, index) in message.items" :key="index">
         <v-col cols="auto" v-if="canRender(item)">
-          <plugin-message-item :message="item" @action="handleAction"></plugin-message-item>
+          <plugin-message-item :message="item"></plugin-message-item>
         </v-col>
       </template>
     </v-row>
@@ -69,6 +64,9 @@
       </v-col>
     </v-row>
   </template>
+  <template v-else-if="message.type === 'MarkdownText'">
+    <div class="text-subtitle-2 text-wrap" v-html="markdown.render(message.content)"></div>
+  </template>
   <template v-else>
     <slot></slot>
   </template>
@@ -77,15 +75,30 @@
 <script setup lang="ts">
 import { MinaPlayMessage, MinaPlayTimeout } from '@/api/interfaces/message.interface';
 import ZoomImg from '@/components/app/ZoomImg.vue';
-import { onBeforeMount, onUnmounted, ref } from 'vue';
+import { inject, onBeforeMount, onUnmounted, ref } from 'vue';
 import { canRender } from '@/utils/utils';
 import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 import { useRouter } from 'vue-router';
 import MediaOverview from '@/components/resource/MediaOverview.vue';
 import { useLayoutStore } from '@/store/layout';
+import ImagePlaceholder from '@/assets/banner.jpeg';
+// @ts-ignore
+import MarkdownIt from 'markdown-it';
+import hljs from 'highlight.js';
 
 const layout = useLayoutStore();
 const router = useRouter();
+const markdown = new MarkdownIt({
+  highlight: function (str: string, lang: string) {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(str, { language: lang }).value;
+      } catch (__) {}
+    }
+
+    return '';
+  },
+});
 
 const props = defineProps<{
   message: MinaPlayMessage;
@@ -113,13 +126,7 @@ onUnmounted(() => {
   clearInterval(interval);
 });
 
-const handleAction = async (id: string | undefined, value: string) => {
-  if (!id && props.message.type === 'ConsumableGroup') {
-    emits('action', props.message.id, value);
-  } else {
-    emits('action', id, value);
-  }
-};
+const sendAction = inject<Function>('send-action');
 </script>
 
 <style scoped lang="sass"></style>

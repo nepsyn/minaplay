@@ -15,7 +15,7 @@ withDefaults(
 
 <template>
   <v-avatar :rounded="tile ? 0 : undefined" :size="size">
-    <v-img :src="src" cover>
+    <v-img referrerpolicy="no-referrer" :src="src" cover>
       <template #placeholder>
         <v-icon :size="size" :icon="mdiAccountCircle"></v-icon>
       </template>

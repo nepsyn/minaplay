@@ -69,6 +69,7 @@ export function canRender(message: MinaPlayMessage) {
     'Action',
     'Timeout',
     'Pending',
+    'MarkdownText',
     'ResourceSeries',
     'ResourceMedia',
   ].includes(message.type);

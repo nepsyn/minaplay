@@ -34,7 +34,7 @@
             show-chips
             :media="history.media"
             @click="
-              router.push({ path: history.episode ? `/episode/${history.episode.id}` : `/media/${history.media.id}` })
+              router.push({ path: history.episodeId ? `/episode/${history.episodeId}` : `/media/${history.media.id}` })
             "
             :history-duration="history.progress"
           >

@@ -60,47 +60,49 @@
         </v-col>
       </v-row>
     </v-card-text>
-    <v-divider></v-divider>
-    <v-card-text class="d-flex flex-row align-center py-2">
-      <v-tooltip>
-        {{ plugin.enabled ? t('plugin.enabled') : t('plugin.disabled') }}
-        <template #activator="{ props }">
-          <v-icon v-bind="props" :icon="mdiCircle" :color="plugin.enabled ? 'success' : 'error'"></v-icon>
-        </template>
-      </v-tooltip>
-      <v-spacer></v-spacer>
-      <v-menu location="top center">
-        <v-card>
-          <v-card-title>{{ t('plugin.uninstallTitle') }}</v-card-title>
-          <v-card-text>{{ t('plugin.uninstallHint') }}</v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn variant="text" color="primary">{{ t('app.cancel') }}</v-btn>
-            <v-btn variant="plain" color="error" @click="uninstall">{{ t('app.ok') }}</v-btn>
-          </v-card-actions>
-        </v-card>
-        <template #activator="{ props }">
-          <v-btn
-            v-if="!plugin.isBuiltin"
-            v-bind="props"
-            density="comfortable"
-            class="mr-1"
-            variant="plain"
-            :loading="uninstalling"
-            color="error"
-            :icon="mdiDelete"
-          ></v-btn>
-        </template>
-      </v-menu>
-      <v-btn
-        variant="outlined"
-        density="comfortable"
-        :loading="enabledChanging"
-        @click="changeEnabled(!plugin.enabled)"
-      >
-        {{ plugin.enabled ? t('plugin.disablePlugin') : t('plugin.enablePlugin') }}
-      </v-btn>
-    </v-card-text>
+    <template v-if="!hideActions">
+      <v-divider></v-divider>
+      <v-card-text class="d-flex flex-row align-center py-2">
+        <v-tooltip>
+          {{ plugin.enabled ? t('plugin.enabled') : t('plugin.disabled') }}
+          <template #activator="{ props }">
+            <v-icon v-bind="props" :icon="mdiCircle" :color="plugin.enabled ? 'success' : 'error'"></v-icon>
+          </template>
+        </v-tooltip>
+        <v-spacer></v-spacer>
+        <v-menu location="top center">
+          <v-card>
+            <v-card-title>{{ t('plugin.uninstallTitle') }}</v-card-title>
+            <v-card-text>{{ t('plugin.uninstallHint') }}</v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn variant="text" color="primary">{{ t('app.cancel') }}</v-btn>
+              <v-btn variant="plain" color="error" @click="uninstall">{{ t('app.ok') }}</v-btn>
+            </v-card-actions>
+          </v-card>
+          <template #activator="{ props }">
+            <v-btn
+              v-if="!plugin.isBuiltin"
+              v-bind="props"
+              density="comfortable"
+              class="mr-1"
+              variant="plain"
+              :loading="uninstalling"
+              color="error"
+              :icon="mdiDelete"
+            ></v-btn>
+          </template>
+        </v-menu>
+        <v-btn
+          variant="outlined"
+          density="comfortable"
+          :loading="enabledChanging"
+          @click="changeEnabled(!plugin.enabled)"
+        >
+          {{ plugin.enabled ? t('plugin.disablePlugin') : t('plugin.enablePlugin') }}
+        </v-btn>
+      </v-card-text>
+    </template>
   </v-card>
 </template>
 
@@ -119,6 +121,7 @@ const toast = useToastStore();
 
 const props = defineProps<{
   plugin: PluginControl;
+  hideActions?: boolean;
 }>();
 const emits = defineEmits<{
   (ev: 'update', plugin: PluginControl): any;

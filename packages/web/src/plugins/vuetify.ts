@@ -22,8 +22,10 @@ const light = {
 const dark = {
   dark: true,
   colors: {
-    background: '#000000',
-    surface: '#000000',
+    background: '#18181b',
+    surface: '#18181b',
+    'on-background': '#d1d5db',
+    'on-surface': '#d1d5db',
     primary: '#1976d2',
     secondary: '#f50057',
     error: '#d32f2f',

@@ -9,7 +9,7 @@
           <v-img
             :aspect-ratio="16 / 9"
             cover
-            :src="live.poster ? api.File.buildRawPath(live.poster.id, live.poster.name) : LivePosterFallback"
+            :src="live.poster ? api.File.buildRawPath(live.poster) : LivePosterFallback"
             class="rounded-lg"
             v-bind="props"
           >
@@ -22,10 +22,7 @@
     </v-responsive>
 
     <div class="d-flex flex-row mt-1 align-center">
-      <user-avatar
-        size="40"
-        :src="live?.user?.avatar && api.File.buildRawPath(live.user.avatar.id, live.user.avatar.name)"
-      ></user-avatar>
+      <user-avatar size="40" :src="live?.user?.avatar && api.File.buildRawPath(live.user.avatar)"></user-avatar>
       <div class="d-flex flex-column px-1 ml-2 justify-space-around">
         <div class="mt-2 d-flex flex-row align-center font-weight-bold live-title">
           <span class="live-title">{{ live.title || t('live.unnamed') }}</span>

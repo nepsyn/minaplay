@@ -43,10 +43,7 @@
         <v-menu v-if="api.user">
           <v-card min-width="240" max-width="360" class="overflow-x-hidden">
             <v-container fluid class="d-flex flex-row align-center">
-              <user-avatar
-                :src="api.user.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
-                size="64"
-              ></user-avatar>
+              <user-avatar :src="api.user.avatar && api.File.buildRawPath(api.user.avatar)" size="64"></user-avatar>
               <v-container fluid class="py-0 d-flex flex-column">
                 <span class="text-h6 text-truncate">{{ api.user!.username }}</span>
                 <v-container fluid class="pa-0">
@@ -114,7 +111,7 @@
                 v-bind="props"
                 v-if="api.user"
                 class="cursor-pointer"
-                :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar?.id, api.user?.avatar?.name)"
+                :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar)"
                 size="40"
               >
               </user-avatar>

@@ -13,11 +13,7 @@
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
         <p class="text-subtitle-1">{{ t('settings.profile.avatar') }}</p>
         <div class="d-flex flex-column align-end">
-          <user-avatar
-            tile
-            :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar.id, api.user.avatar.name)"
-            size="52"
-          ></user-avatar>
+          <user-avatar tile :src="api.user?.avatar && api.File.buildRawPath(api.user.avatar)" size="52"></user-avatar>
           <v-btn
             density="comfortable"
             class="mt-2"

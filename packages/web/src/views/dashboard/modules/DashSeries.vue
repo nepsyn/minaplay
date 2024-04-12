@@ -70,7 +70,7 @@
               :aspect-ratio="3 / 4"
               min-width="60"
               max-width="100"
-              :src="item.poster ? api.File.buildRawPath(item.poster.id, item.poster.name) : SeriesPosterFallback"
+              :src="item.poster ? api.File.buildRawPath(item.poster) : SeriesPosterFallback"
             ></zoom-img>
           </div>
         </template>
@@ -227,11 +227,7 @@
                   :aspect-ratio="1 / 1.4"
                   min-width="80"
                   class="rounded"
-                  :src="
-                    editItem.poster
-                      ? api.File.buildRawPath(editItem.poster.id, editItem.poster.name)
-                      : SeriesPosterFallback
-                  "
+                  :src="editItem.poster ? api.File.buildRawPath(editItem.poster) : SeriesPosterFallback"
                 ></zoom-img>
                 <v-btn
                   class="mt-2"

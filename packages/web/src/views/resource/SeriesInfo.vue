@@ -23,20 +23,13 @@
                   </span>
                 </div>
               </div>
-              <v-row class="mt-1 flex-grow-0" dense>
-                <v-col cols="auto" v-for="(tag, index) in series.tags" :key="index">
-                  <v-chip color="primary" density="compact" label :text="tag.name"></v-chip>
-                </v-col>
-              </v-row>
               <v-divider class="my-2"></v-divider>
               <v-row>
                 <v-col cols="4" class="d-block d-sm-none">
                   <zoom-img
                     class="rounded-lg"
                     :aspect-ratio="1 / 1.4"
-                    :src="
-                      series.poster ? api.File.buildRawPath(series.poster.id, series.poster.name) : SeriesPosterFallback
-                    "
+                    :src="series.poster ? api.File.buildRawPath(series.poster) : SeriesPosterFallback"
                     :placeholder="SeriesPosterFallback"
                   ></zoom-img>
                 </v-col>
@@ -49,13 +42,11 @@
                 </v-col>
               </v-row>
             </v-col>
-            <v-col class="d-none d-sm-flex" cols="3">
+            <v-col class="d-none d-sm-block" cols="3">
               <zoom-img
                 class="rounded-lg"
                 :aspect-ratio="1 / 1.4"
-                :src="
-                  series.poster ? api.File.buildRawPath(series.poster.id, series.poster.name) : SeriesPosterFallback
-                "
+                :src="series.poster ? api.File.buildRawPath(series.poster) : SeriesPosterFallback"
                 :placeholder="SeriesPosterFallback"
               ></zoom-img>
             </v-col>

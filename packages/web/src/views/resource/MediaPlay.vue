@@ -8,8 +8,8 @@
               <video-player
                 ref="playerRef"
                 :position="position && position / 1000"
-                :src="media?.file && api.File.buildRawPath(media.file.id)"
-                :poster="media?.poster && api.File.buildRawPath(media.poster.id)"
+                :src="media?.file && api.File.buildRawPath(media.file)"
+                :poster="media?.poster && api.File.buildRawPath(media.poster)"
                 :subtitles="subtitles"
                 :fonts="fonts"
               ></video-player>
@@ -158,7 +158,7 @@
                       :aspect-ratio="1 / 1.4"
                       :src="
                         currentEpisode?.series?.poster
-                          ? api.File.buildRawPath(currentEpisode.series.poster.id, currentEpisode.series.poster.name)
+                          ? api.File.buildRawPath(currentEpisode.series.poster)
                           : SeriesPosterFallback
                       "
                       :placeholder="SeriesPosterFallback"
@@ -276,12 +276,12 @@ const subtitles = computed(() => {
       const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
       return ['.ass', '.ssa'].includes(ext);
     })
-    .map(({ name, id }) => {
-      const lastIndex = name.lastIndexOf('.');
-      const title = name.slice(0, lastIndex > -1 ? lastIndex : name.length);
+    .map((file) => {
+      const lastIndex = file.name.lastIndexOf('.');
+      const title = file.name.slice(0, lastIndex > -1 ? lastIndex : file.name.length);
       return {
         title,
-        url: api.File.buildRawPath(id),
+        url: api.File.buildRawPath(file),
       };
     });
 });
@@ -291,7 +291,7 @@ const fonts = computed(() => {
       const ext = name.slice(name.lastIndexOf('.'), name.length).toLowerCase();
       return ['.otf', '.ttf', '.woff'].includes(ext);
     })
-    .map(({ id }) => api.File.buildRawPath(id));
+    .map((file) => api.File.buildRawPath(file));
 });
 const currentEpisode = computed<EpisodeEntity | undefined>(() => currentEpisodeLoader.data.value);
 onBeforeRouteUpdate(async (to, from) => {
@@ -402,7 +402,7 @@ const actions = [
     color: 'info',
     click: () => {
       if (media.value) {
-        let path = getFullUrl(api.File.buildRawPath(media.value.file!.id, media.value.file!.name));
+        let path = getFullUrl(api.File.buildRawPath(media.value.file!));
         copyContent(path)
           .then(() => {
             toast.toastSuccess(t('utils.copied'));
@@ -420,7 +420,7 @@ const actions = [
     color: 'warning',
     click: () => {
       if (media.value) {
-        let path = getFullUrl(api.File.buildRawPath(media.value.file!.id, media.value.file!.name));
+        let path = getFullUrl(api.File.buildRawPath(media.value.file!));
         const a = document.createElement('a');
         a.href = `vlc://${path}`;
         a.click();

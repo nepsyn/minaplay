@@ -61,6 +61,7 @@ import {
   NotificationMetaDto,
   NotificationMetaEntity,
 } from '@/api/interfaces/notification.interface';
+import { FileSourceEnum } from '@/api/enums/file-source.enum';
 
 export const useApiStore = defineStore('api', () => {
   const user = ref<UserEntity | undefined>(undefined);
@@ -145,8 +146,16 @@ export const useApiStore = defineStore('api', () => {
   };
 
   const File = {
-    buildRawPath: (id: string, name?: string) => encodeURI(baseUrl + `/api/v1/file/${id}/raw/${name ?? ''}`),
-    buildDownloadPath: (id: string, name?: string) => encodeURI(baseUrl + `/api/v1/file/${id}/download/${name ?? ''}`),
+    buildRawPath: (file: FileEntity) => {
+      return file.source === FileSourceEnum.NETWORK
+        ? file.url!
+        : encodeURI(baseUrl + `/api/v1/file/${file.id}/raw/${file.name ?? ''}`);
+    },
+    buildDownloadPath: (file: FileEntity) => {
+      return file.source === FileSourceEnum.NETWORK
+        ? file.url!
+        : encodeURI(baseUrl + `/api/v1/file/${file.id}/download/${file.name ?? ''}`);
+    },
     fetchRaw: (id: string, config?: AxiosRequestConfig) => apiGet(`/api/v1/file/${id}/raw`, config),
     uploadImage: apiUpload<FileEntity>('/api/v1/file/image'),
     uploadVideo: apiUpload<FileEntity>('/api/v1/file/video'),
@@ -253,6 +262,7 @@ export const useApiStore = defineStore('api', () => {
   const System = {
     getStatus: apiGet<SystemStatus>('/api/v1/system/status'),
     getLogs: apiGet<{ logs: string }>('/api/v1/system/logs'),
+    getUpdate: apiGet<{ current: string; latest: string }>('/api/v1/system/update'),
     clearLogs: apiDelete('/api/v1/system/logs'),
   };
 

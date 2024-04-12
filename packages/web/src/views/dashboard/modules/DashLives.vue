@@ -57,7 +57,7 @@
               :aspect-ratio="16 / 9"
               min-width="120"
               max-width="160"
-              :src="item.poster ? api.File.buildRawPath(item.poster.id, item.poster.name) : LivePosterFallback"
+              :src="item.poster ? api.File.buildRawPath(item.poster) : LivePosterFallback"
             ></zoom-img>
           </div>
         </template>
@@ -67,7 +67,7 @@
             <template #activator="{ props }">
               <user-avatar
                 v-bind="props"
-                :src="item.user.avatar && api.File.buildRawPath(item.user.avatar.id)"
+                :src="item.user.avatar && api.File.buildRawPath(item.user.avatar)"
                 size="40"
               ></user-avatar>
             </template>

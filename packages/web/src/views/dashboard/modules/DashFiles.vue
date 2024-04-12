@@ -193,7 +193,7 @@ const actions = [
     show: (item: FileEntity) => true,
     click: (item: FileEntity) => {
       const el = document.createElement('a');
-      el.href = api.File.buildDownloadPath(item.id, item.name);
+      el.href = api.File.buildDownloadPath(item);
       el.click();
     },
   },

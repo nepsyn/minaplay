@@ -67,7 +67,7 @@
             <template #activator="{ props }">
               <user-avatar
                 v-bind="props"
-                :src="item.operator.avatar && api.File.buildRawPath(item.operator.avatar.id)"
+                :src="item.operator.avatar && api.File.buildRawPath(item.operator.avatar)"
                 size="40"
               ></user-avatar>
             </template>
@@ -79,7 +79,7 @@
             <template #activator="{ props }">
               <user-avatar
                 v-bind="props"
-                :src="item.target.avatar && api.File.buildRawPath(item.target.avatar.id)"
+                :src="item.target.avatar && api.File.buildRawPath(item.target.avatar)"
                 size="40"
               ></user-avatar>
             </template>

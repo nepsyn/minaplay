@@ -10,6 +10,8 @@ export interface FileEntity {
   size: number;
   /** 文件 md5 */
   md5: string;
+  /** 文件 url */
+  url?: string;
   /** 文件 mimetype */
   mimetype?: string;
   /** 文件来源 */

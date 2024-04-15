@@ -141,6 +141,12 @@ export class PluginService implements OnModuleInit {
           `Plugin '${metadata.id}' registered command { ${bins.length > 1 ? bins.join(', ') : bins[0]} }`,
         );
       }
+      const parsers = control.parsers.map(({ name }) => name);
+      if (parsers.length > 0) {
+        this.logger.log(
+          `Plugin '${metadata.id}' registered parser { ${parsers.length > 1 ? parsers.join(', ') : parsers[0]} }`,
+        );
+      }
 
       return control;
     } catch (error) {

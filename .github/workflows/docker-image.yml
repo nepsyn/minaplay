@@ -28,8 +28,16 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       -
+        name: Get package version
+        id: package-version
+        uses: martinbeentjes/npm-get-version-action@v1.3.1
+        with:
+          path: packages/server
+      -
         name: Build and push
         uses: docker/build-push-action@v5
         with:
           push: true
-          tags: nepsyn/minaplay:latest
+          tags: |
+            nepsyn/minaplay:latest
+            nepsyn/minaplay:${{ steps.package-version.outputs.current-version }}

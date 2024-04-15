@@ -1,0 +1,42 @@
+name: "\U0001F41B Bug 反馈"
+description: "有些东西不太对劲 \U0001F914"
+title: "[Bug] 请在此处简单描述你的问题"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "请按照模板描述您遇到的问题"
+  - type: checkboxes
+    attributes:
+      label: "现存的 issue 中存在您想提的问题吗"
+      description: "请查看 [现存 issue](../issues?q=is%3Aissue) 中是否存在你目前遇到的问题"
+      options:
+        - label: "我已查阅现存 issue，并且我目前的问题不在其中"
+          required: true
+  - type: input
+    attributes:
+      label: "MinaPlay 版本"
+      description: "遇到问题时 MinaPlay 的版本"
+    validations:
+      required: true
+  - type: dropdown
+    attributes:
+      label: "问题定位"
+      description: "您在哪里遇到的这个问题"
+      options:
+        - "server 服务端"
+        - "web 用户界面"
+        - "其他位置"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "问题描述"
+      description: "在这里描述您遇到的问题"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "系统日志"
+      description: "请把问题发生时的运行日志粘贴到这里（如果有）"
+      render: text

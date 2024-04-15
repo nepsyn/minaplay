@@ -1,0 +1,7 @@
+blank_issues_enabled: false
+
+contact_links:
+  - name: "\u2049 说明文档"
+    url: "https://nepsyn.github.io/minaplay"
+  - name: "\u2753 FAQ"
+    url: "https://nepsyn.github.io/minaplay/guide/faq.html"

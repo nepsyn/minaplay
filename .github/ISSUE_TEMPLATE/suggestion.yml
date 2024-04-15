@@ -1,0 +1,13 @@
+name: "\U0001F525 项目建议"
+description: "我想提一些建议 \U00002728"
+title: "[Suggestion] 请在此处简单描述你建议"
+body:
+  - type: markdown
+    attributes:
+      value: "请按照模板描述您的新建议"
+  - type: textarea
+    attributes:
+      label: "项目建议"
+      description: "在这里描述您的宝贵建议"
+    validations:
+      required: true

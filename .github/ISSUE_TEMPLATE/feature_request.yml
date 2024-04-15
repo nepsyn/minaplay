@@ -1,0 +1,21 @@
+name: "\U0001F680 功能请求"
+description: "我有个新点子 \U0001F63B"
+title: "[Feature Request] 请在此处简单描述你的新功能请求"
+labels: ["feature request"]
+body:
+  - type: markdown
+    attributes:
+      value: "请按照模板描述您的新功能请求"
+  - type: checkboxes
+    attributes:
+      label: "现存的 issue 中存在您想提的功能请求吗"
+      description: "请查看 [现存 issue](../issues?q=is%3Aissue) 中是否存在你目前想要的功能请求"
+      options:
+        - label: "我已查阅现存 issue，并且我目前的功能请求不在其中"
+          required: true
+  - type: textarea
+    attributes:
+      label: "功能描述"
+      description: "在这里描述您希望添加的新功能"
+    validations:
+      required: true

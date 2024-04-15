@@ -40,7 +40,6 @@
     "class-validator": "^0.14.1",
     "commander": "^12.0.0",
     "compressing": "^1.10.0",
-    "cron": "^3.1.6",
     "diskusage": "^1.2.0",
     "execa": "^8.0.1",
     "fast-folder-size": "^2.2.0",

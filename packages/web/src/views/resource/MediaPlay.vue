@@ -62,6 +62,32 @@
                     </template>
                   </v-tooltip>
                 </div>
+                <v-menu activator="#openInPlayer" location="top center">
+                  <v-card>
+                    <v-card-text>
+                      <v-list-subheader class="font-weight-bold">
+                        {{ t('resource.actions.openInPlayer') }}
+                      </v-list-subheader>
+                      <v-row class="pa-0" dense>
+                        <v-col cols="auto" v-for="app in playerApps">
+                          <v-tooltip location="top">
+                            {{ app.name }}
+                            <template #activator="{ props }">
+                              <a
+                                v-ripple
+                                v-bind="props"
+                                class="rounded"
+                                :href="app.buildHref(getFullUrl(api.File.buildRawPath(media!.file!)))"
+                              >
+                                <v-img :src="app.icon" cover width="24" height="24"></v-img>
+                              </a>
+                            </template>
+                          </v-tooltip>
+                        </v-col>
+                      </v-row>
+                    </v-card-text>
+                  </v-card>
+                </v-menu>
                 <v-menu activator="#live" location="top center">
                   <v-card>
                     <v-card-text>
@@ -236,6 +262,7 @@ import {
   mdiInformationVariantCircleOutline,
   mdiMotionPlayOutline,
   mdiMultimedia,
+  mdiOpenInApp,
   mdiPlus,
   mdiVideoVintage,
   mdiViewComfy,
@@ -252,6 +279,10 @@ import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 import LiveSelector from '@/components/live/LiveSelector.vue';
 import { LiveEntity } from '@/api/interfaces/live.interface';
 import { useSettingsStore } from '@/store/settings';
+import VlcImg from '@/assets/vlc.svg';
+import PotPlayerImg from '@/assets/potplayer.webp';
+import MxPlayerImg from '@/assets/mxplayer.webp';
+import MxPlayerProImg from '@/assets/mxplayer-pro.webp';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
@@ -414,24 +445,44 @@ const actions = [
     },
   },
   {
-    id: 'openInVLC',
-    text: t('resource.actions.openInVLC'),
-    icon: 'M12,1C11.58,1 11.19,1.23 11,1.75L9.88,4.88C10.36,5.4 11.28,5.5 12,5.5C12.72,5.5 13.64,5.4 14.13,4.88L13,1.75C12.82,1.25 12.42,1 12,1M8.44,8.91L7,12.91C8.07,14.27 10.26,14.5 12,14.5C13.74,14.5 15.93,14.27 17,12.91L15.56,8.91C14.76,9.83 13.24,10 12,10C10.76,10 9.24,9.83 8.44,8.91M5.44,15C4.62,15 3.76,15.65 3.53,16.44L2.06,21.56C1.84,22.35 2.3,23 3.13,23H20.88C21.7,23 22.16,22.35 21.94,21.56L20.47,16.44C20.24,15.65 19.38,15 18.56,15H17.75L18.09,15.97C18.21,16.29 18.29,16.69 18.09,16.97C16.84,18.7 14.14,19 12,19C9.86,19 7.16,18.7 5.91,16.97C5.71,16.69 5.79,16.29 5.91,15.97L6.25,15H5.44Z',
+    id: 'openInPlayer',
+    text: t('resource.actions.openInPlayer'),
+    icon: mdiOpenInApp,
     color: 'warning',
-    click: () => {
-      if (media.value) {
-        let path = getFullUrl(api.File.buildRawPath(media.value.file!));
-        const a = document.createElement('a');
-        a.href = `vlc://${path}`;
-        a.click();
-      }
-    },
   },
   {
     id: 'live',
     text: t('resource.actions.play'),
     icon: mdiMotionPlayOutline,
     color: 'secondary',
+  },
+];
+const playerApps = [
+  {
+    name: 'Pot Player',
+    icon: PotPlayerImg,
+    buildHref: (src: string) => `potplayer://${src}`,
+    color: '#F9A825',
+  },
+  {
+    name: 'VLC',
+    icon: VlcImg,
+    buildHref: (src: string) => `vlc://${src}`,
+    color: 'warning',
+  },
+  {
+    name: 'MX Player',
+    icon: MxPlayerImg,
+    buildHref: (src: string) =>
+      `intent:${src}#Intent;package=com.mxtech.videoplayer.ad;S.title=${media.value?.file?.name};end`,
+    color: 'primary',
+  },
+  {
+    name: 'MX Player',
+    icon: MxPlayerProImg,
+    buildHref: (src: string) =>
+      `intent:${src}#Intent;package=com.mxtech.videoplayer.pro;S.title=${media.value?.file?.name};end`,
+    color: 'primary',
   },
 ];
 

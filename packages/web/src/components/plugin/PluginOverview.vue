@@ -27,7 +27,14 @@
           <v-chip label color="primary" density="comfortable">{{ t('plugin.official') }}</v-chip>
         </v-col>
         <v-col cols="auto" v-for="(program, index) in plugin.programs ?? []" :key="index">
-          <v-chip label color="warning" density="comfortable">{{ t('plugin.program', { program }) }}</v-chip>
+          <v-chip label color="warning" density="comfortable">
+            {{ t('plugin.program', { program }) }}
+          </v-chip>
+        </v-col>
+        <v-col cols="auto" v-for="({ name }, index) in plugin.parsers ?? []" :key="index">
+          <v-chip label color="secondary" density="comfortable">
+            {{ t('plugin.parser', { parser: name }) }}
+          </v-chip>
         </v-col>
       </v-row>
       <v-row class="mt-4">

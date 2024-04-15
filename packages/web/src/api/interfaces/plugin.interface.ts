@@ -4,6 +4,7 @@ export interface PluginControl {
   id: string;
   icon?: string;
   version?: string;
+  supportVersion?: string;
   description?: string;
   author?: string;
   repo?: string;
@@ -11,6 +12,7 @@ export interface PluginControl {
   enabled: boolean;
   isBuiltin: boolean;
   programs: string[];
+  parsers: MinaPlayParserMetadata[];
 }
 
 export interface PluginCommandDescriptor {
@@ -29,3 +31,49 @@ export type PluginEventMap = {
   console: (arg: { message: MinaPlayMessage; locale?: string }) => MinaPlayMessage[] | undefined;
   commands: () => PluginCommandDescriptor[];
 };
+
+export interface MinaPlayParserMetadata {
+  name: string;
+  features: {
+    getCalendar: boolean;
+    getSeriesById: boolean;
+    searchSeries: boolean;
+    buildSourceOfSeries: boolean;
+    buildRuleCodeOfSeries: boolean;
+    getEpisodesBySeriesId: boolean;
+  };
+}
+
+export interface MinaPlayPluginSource {
+  name: string;
+  url: string;
+  site?: string;
+}
+
+export interface MinaPlayPluginSourceEpisode {
+  id: string | number;
+  title?: string;
+  no: string;
+  pubAt?: Date;
+  posterUrl?: string;
+  downloadUrl?: string;
+  playUrl?: string;
+}
+
+export interface MinaPlayPluginSourceSeries {
+  id: string | number;
+  name: string;
+  season?: string;
+  posterUrl?: string;
+  pubAt?: Date;
+  finished?: boolean;
+  count?: number;
+  description?: string;
+  tags?: string[];
+}
+
+export interface MinaPlayPluginSourceCalendarDay {
+  /** week day(Sunday=0) */
+  weekday: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  items: MinaPlayPluginSourceSeries[];
+}

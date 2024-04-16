@@ -1,8 +1,8 @@
 <template>
   <v-container class="d-flex flex-column pa-md-12">
     <v-row dense>
-      <v-col cols="auto">
-        <v-btn variant="flat" color="info" :prepend-icon="mdiRefresh" :loading="loading" @click="request()">
+      <v-col sm="auto">
+        <v-btn variant="flat" block color="info" :prepend-icon="mdiRefresh" :loading="loading" @click="request()">
           {{ t('app.actions.refresh') }}
         </v-btn>
       </v-col>
@@ -34,7 +34,12 @@
     <multi-items-loader class="pa-0 mt-4" :loader="pluginsLoader" hide-load-more :hide-empty="plugins.length > 0">
       <v-row dense>
         <v-col cols="12" sm="6" md="4" v-for="(plugin, index) in filteredPlugins" :key="index">
-          <plugin-overview :plugin="plugin" @update="onPluginUpdate" @uninstall="onPluginUninstall"></plugin-overview>
+          <plugin-overview
+            class="h-100"
+            :plugin="plugin"
+            @update="onPluginUpdate"
+            @uninstall="onPluginUninstall"
+          ></plugin-overview>
         </v-col>
       </v-row>
     </multi-items-loader>

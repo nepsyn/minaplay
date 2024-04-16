@@ -1,64 +1,44 @@
 <template>
-  <v-layout class="page-height">
-    <v-navigation-drawer class="d-none d-md-flex" mobile-breakpoint="md" location="right">
-      <v-list :lines="false" density="compact" nav>
-        <template v-for="(section, index) in sections" :key="index">
-          <v-list-subheader>{{ section.nav }}</v-list-subheader>
-          <v-list-item
-            v-for="(tab, index) in section.tabs"
-            :key="index"
-            color="primary"
-            :prepend-icon="tab.icon"
-            :title="tab.text"
-            :to="tab.to"
-            replace
-          ></v-list-item>
-        </template>
-      </v-list>
-    </v-navigation-drawer>
-    <v-main>
-      <v-container class="pa-0 d-flex flex-column page-height">
-        <nav-tabs class="d-flex d-md-none" :tabs="tabs">
-          <template #append>
-            <v-bottom-sheet close-on-content-click scrollable>
-              <v-card>
-                <v-card-text>
-                  <template v-for="(section, index) in sections" :key="index">
-                    <v-list-subheader>{{ section.nav }}</v-list-subheader>
-                    <v-row no-gutters>
-                      <v-col cols="3" v-for="(tab, index) in section.tabs" :key="index">
-                        <v-btn
-                          class="w-100 text-caption text-center"
-                          variant="text"
-                          :color="route.path === tab.to ? 'primary' : undefined"
-                          :prepend-icon="tab.icon"
-                          stacked
-                          :to="tab.to"
-                          replace
-                        >
-                          {{ tab.text }}
-                        </v-btn>
-                      </v-col>
-                    </v-row>
-                  </template>
-                </v-card-text>
-              </v-card>
-              <template #activator="{ props }">
-                <v-btn variant="text" :icon="mdiApps" v-bind="props"></v-btn>
+  <div class="pa-0 d-flex flex-column page-height">
+    <nav-tabs class="d-flex d-md-none" :tabs="tabs">
+      <template #append>
+        <v-bottom-sheet close-on-content-click scrollable>
+          <v-card>
+            <v-card-text>
+              <template v-for="(section, index) in sections" :key="index">
+                <v-list-subheader>{{ section.nav }}</v-list-subheader>
+                <v-row no-gutters>
+                  <v-col cols="3" v-for="(tab, index) in section.tabs" :key="index">
+                    <v-btn
+                      class="w-100 text-caption text-center"
+                      variant="text"
+                      :color="route.path === tab.to ? 'primary' : undefined"
+                      :prepend-icon="tab.icon"
+                      stacked
+                      :to="tab.to"
+                      replace
+                    >
+                      {{ tab.text }}
+                    </v-btn>
+                  </v-col>
+                </v-row>
               </template>
-            </v-bottom-sheet>
+            </v-card-text>
+          </v-card>
+          <template #activator="{ props }">
+            <v-btn variant="text" :icon="mdiApps" v-bind="props"></v-btn>
           </template>
-        </nav-tabs>
-        <to-top-container class="scrollable-container">
-          <authed-router-view match="^/dashboard/[^/]+$" v-slot="{ Component }">
-            <keep-alive>
-              <component :is="Component" />
-            </keep-alive>
-          </authed-router-view>
-        </to-top-container>
-      </v-container>
-    </v-main>
-  </v-layout>
+        </v-bottom-sheet>
+      </template>
+    </nav-tabs>
+    <to-top-container class="scrollable-container">
+      <authed-router-view match="^/dashboard/[^/]+$" v-slot="{ Component }">
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
+      </authed-router-view>
+    </to-top-container>
+  </div>
 </template>
 
 <script setup lang="ts">

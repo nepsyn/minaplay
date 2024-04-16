@@ -192,6 +192,12 @@ const routes: RouteRecordRaw[] = [
         ],
       },
       {
+        name: 'download',
+        path: '/download',
+        component: () => import('@/views/common/SubscribeDownload.vue'),
+        props: () => ({ standalone: true }),
+      },
+      {
         path: '/dashboard',
         name: 'dashboard',
         component: () => import('@/views/Dashboard.vue'),
@@ -312,6 +318,11 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/setting/SettingProfile.vue'),
           },
         ],
+      },
+      {
+        name: 'about',
+        path: '/about',
+        component: () => import('@/views/About.vue'),
       },
       {
         name: 'not-found',

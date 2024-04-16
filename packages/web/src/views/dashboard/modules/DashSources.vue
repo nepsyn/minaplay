@@ -1,14 +1,14 @@
 <template>
   <v-container class="d-flex flex-column pa-md-12">
     <v-row dense>
-      <v-col cols="auto">
-        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus" :loading="creating" @click="createSource()">
-          {{ t('app.actions.add') }}
+      <v-col sm="auto">
+        <v-btn variant="flat" block color="info" :prepend-icon="mdiRefresh" :loading="loading" @click="request()">
+          {{ t('app.actions.refresh') }}
         </v-btn>
       </v-col>
       <v-col cols="auto">
-        <v-btn variant="flat" color="info" :prepend-icon="mdiRefresh" :loading="loading" @click="request()">
-          {{ t('app.actions.refresh') }}
+        <v-btn variant="flat" color="success" :prepend-icon="mdiPlus" @click="createSource()">
+          {{ t('app.actions.add') }}
         </v-btn>
       </v-col>
     </v-row>

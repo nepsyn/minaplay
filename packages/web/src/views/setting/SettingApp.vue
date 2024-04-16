@@ -104,7 +104,8 @@
       </v-container>
     </v-sheet>
     <v-sheet id="plates" class="mt-6 rounded-lg border">
-      <v-card-title class="py-4">{{ t('settings.app.homepage') }}</v-card-title>
+      <v-card-title class="pt-4">{{ t('settings.app.homepage') }}</v-card-title>
+      <v-card-subtitle>{{ t('settings.app.homepageHint') }}</v-card-subtitle>
       <v-row class="pa-4">
         <v-col cols="12" sm="6">
           <v-sheet class="rounded border h-100" min-height="100">

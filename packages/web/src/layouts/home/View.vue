@@ -13,9 +13,7 @@
           <v-tooltip v-for="(action, index) in actions" :key="index" location="bottom" open-delay="500">
             {{ action.text }}
             <template #activator="{ props }">
-              <v-btn v-if="action.show" v-bind="props" icon @click="action.click()">
-                <v-icon :icon="action.icon" size="large"></v-icon>
-              </v-btn>
+              <v-btn v-if="action.show" v-bind="props" :icon="action.icon" @click="action.click()"> </v-btn>
             </template>
           </v-tooltip>
         </div>
@@ -39,7 +37,6 @@
             </v-btn>
           </template>
         </v-menu>
-        <v-divider v-if="api.user" class="mx-2" inset vertical></v-divider>
         <v-menu v-if="api.user">
           <v-card min-width="240" max-width="360" class="overflow-x-hidden">
             <v-container fluid class="d-flex flex-row align-center">
@@ -110,7 +107,7 @@
               <user-avatar
                 v-bind="props"
                 v-if="api.user"
-                class="cursor-pointer"
+                class="cursor-pointer ml-2"
                 :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar)"
                 size="40"
               >
@@ -122,23 +119,39 @@
     </template>
   </v-app-bar>
 
-  <v-navigation-drawer order="1" v-model="layout.navDrawer" :width="navDrawerWidth" elevation="0">
-    <v-list class="py-0" density="compact">
+  <v-navigation-drawer order="1" v-model="layout.navDrawer" elevation="0">
+    <v-list nav slim density="comfortable" :lines="false">
       <template v-for="(nav, index) in navs" :key="index">
+        <v-list-group v-if="nav.children">
+          <template v-slot:activator="{ props }">
+            <v-list-item v-bind="props" :prepend-icon="nav.icon" :title="nav.name" draggable="false"></v-list-item>
+          </template>
+          <template v-for="(subNav, subIndex) in nav.children" :item="subIndex">
+            <v-list-subheader v-if="subNav.isHeader" class="font-weight-black text-high-emphasis">
+              {{ subNav.name }}
+            </v-list-subheader>
+            <v-divider class="my-3 ml-10" v-else-if="subNav.isDivider"></v-divider>
+            <v-list-item
+              v-else
+              :to="subNav.route"
+              :prepend-icon="subNav.icon"
+              exact
+              color="primary"
+              :title="subNav.name"
+              draggable="false"
+            >
+            </v-list-item>
+          </template>
+        </v-list-group>
         <v-list-item
-          :ripple="false"
-          :style="{ height: `${navDrawerWidth * 0.85}px` }"
+          v-else
           :to="nav.route"
-          active-class="nav-active"
+          exact
           color="primary"
+          :prepend-icon="nav.icon"
+          :title="nav.name"
           draggable="false"
-          link
         >
-          <div class="ban position-absolute h-100"></div>
-          <div class="d-flex flex-column align-center text-center">
-            <v-icon :icon="nav.icon" size="large"></v-icon>
-            <span class="text-caption mt-2">{{ nav.name }}</span>
-          </div>
         </v-list-item>
       </template>
     </v-list>
@@ -157,18 +170,33 @@ import { useLayoutStore } from '@/store/layout';
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
 import {
+  mdiAccountCog,
+  mdiAccountMultipleOutline,
+  mdiAnimationPlayOutline,
   mdiBell,
   mdiCloudUploadOutline,
-  mdiCodeBracesBox,
+  mdiCodeBraces,
   mdiCog,
   mdiConsole,
+  mdiCookieCog,
   mdiDotsVertical,
+  mdiDownload,
+  mdiFileMultipleOutline,
+  mdiGaugeFull,
+  mdiHome,
+  mdiInformation,
   mdiLogout,
   mdiMagnify,
   mdiMovieOpenPlay,
+  mdiMultimedia,
   mdiPencil,
+  mdiPuzzleOutline,
+  mdiRss,
   mdiRssBox,
+  mdiScriptTextOutline,
+  mdiShieldKeyOutline,
   mdiVideoVintage,
+  mdiViewComfy,
   mdiViewDashboard,
   mdiWeatherNight,
   mdiWeatherSunny,
@@ -192,8 +220,6 @@ const route = useRoute();
 const router = useRouter();
 const notification = useNotificationStore();
 const toast = useToastStore();
-
-const navDrawerWidth = ref(108);
 
 const {
   request: logout,
@@ -224,14 +250,6 @@ onLogoutRejected(async (error: any) => {
 });
 
 const actions = ref([
-  {
-    text: t('layout.actions.search'),
-    icon: mdiMagnify,
-    click: async () => {
-      await router.push({ path: '/resource/search' });
-    },
-    show: true,
-  },
   {
     text: t('layout.actions.pluginConsole'),
     icon: mdiConsole,
@@ -264,7 +282,18 @@ const navs = [
   {
     name: t('layout.navs.resource'),
     icon: mdiMovieOpenPlay,
-    route: '/resource',
+    children: [
+      {
+        route: '/resource',
+        icon: mdiHome,
+        name: t('layout.navs.home'),
+      },
+      {
+        route: '/resource/search',
+        icon: mdiMagnify,
+        name: t('layout.navs.search'),
+      },
+    ],
   },
   {
     name: t('layout.navs.live'),
@@ -272,36 +301,128 @@ const navs = [
     route: '/live',
   },
   {
-    name: t('layout.navs.source'),
+    name: t('layout.navs.subscribe'),
     icon: mdiRssBox,
-    route: '/source',
-  },
-  {
-    name: t('layout.navs.rule'),
-    icon: mdiCodeBracesBox,
-    route: '/rule',
+    children: [
+      {
+        icon: mdiRss,
+        route: '/source',
+        name: t('layout.navs.source'),
+      },
+      {
+        route: '/rule',
+        icon: mdiCodeBraces,
+        name: t('layout.navs.rule'),
+      },
+      {
+        route: '/download',
+        icon: mdiDownload,
+        name: t('layout.navs.download'),
+      },
+    ],
   },
   {
     name: t('layout.navs.dashboard'),
     icon: mdiViewDashboard,
-    route: '/dashboard',
+    children: [
+      {
+        isHeader: true,
+        name: t('dashboard.nav.application'),
+      },
+      {
+        route: '/dashboard/system',
+        icon: mdiGaugeFull,
+        name: t('dashboard.system'),
+      },
+      {
+        route: '/dashboard/logs',
+        icon: mdiScriptTextOutline,
+        name: t('dashboard.logs'),
+      },
+      {
+        route: '/dashboard/action-logs',
+        icon: mdiShieldKeyOutline,
+        name: t('dashboard.actionLogs'),
+      },
+      {
+        route: '/dashboard/plugins',
+        icon: mdiPuzzleOutline,
+        name: t('dashboard.plugins'),
+      },
+      {
+        isDivider: true,
+      },
+      {
+        isHeader: true,
+        name: t('dashboard.nav.module'),
+      },
+      {
+        route: '/dashboard/user',
+        icon: mdiAccountMultipleOutline,
+        name: t('dashboard.user'),
+      },
+      {
+        route: '/dashboard/source',
+        icon: mdiRss,
+        name: t('dashboard.source'),
+      },
+      {
+        route: '/dashboard/rule',
+        icon: mdiCodeBraces,
+        name: t('dashboard.rule'),
+      },
+      {
+        route: '/dashboard/media',
+        icon: mdiMultimedia,
+        name: t('dashboard.media'),
+      },
+      {
+        route: '/dashboard/series',
+        icon: mdiAnimationPlayOutline,
+        name: t('dashboard.series'),
+      },
+      {
+        route: '/dashboard/episode',
+        icon: mdiViewComfy,
+        name: t('dashboard.episode'),
+      },
+      {
+        route: '/dashboard/live',
+        icon: mdiVideoVintage,
+        name: t('dashboard.live'),
+      },
+      {
+        route: '/dashboard/file',
+        icon: mdiFileMultipleOutline,
+        name: t('dashboard.file'),
+      },
+    ],
   },
   {
     name: t('layout.navs.setting'),
     icon: mdiCog,
-    route: '/setting',
+    children: [
+      {
+        route: '/setting/app',
+        icon: mdiCookieCog,
+        name: t('settings.sections.app'),
+      },
+      {
+        route: '/setting/profile',
+        icon: mdiAccountCog,
+        name: t('settings.sections.profile'),
+      },
+    ],
+  },
+  {
+    name: t('layout.navs.about'),
+    icon: mdiInformation,
+    route: '/about',
   },
 ];
 </script>
 
 <style lang="sass" scoped>
-.ban
-  left: 0
-  top: 0
-
-.nav-active .ban
-  border-left: 4px solid rgb(var(--v-theme-primary-lighten-1))
-
 .title-link
   color: rgb(var(--v-theme-on-background))
   text-decoration: none

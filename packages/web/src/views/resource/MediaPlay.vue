@@ -62,7 +62,12 @@
                     </template>
                   </v-tooltip>
                 </div>
-                <v-menu activator="#openInPlayer" location="top center">
+                <component
+                  :is="display.smAndUp.value ? VMenu : VBottomSheet"
+                  close-on-content-click
+                  activator="#openInPlayer"
+                  location="top center"
+                >
                   <v-card>
                     <v-card-text>
                       <v-list-subheader class="font-weight-bold">
@@ -73,21 +78,22 @@
                           <v-tooltip location="top">
                             {{ app.name }}
                             <template #activator="{ props }">
-                              <a
-                                v-ripple
+                              <v-btn
                                 v-bind="props"
-                                class="rounded"
+                                variant="text"
+                                size="x-small"
+                                stacked
                                 :href="app.buildHref(getFullUrl(api.File.buildRawPath(media!.file!)))"
                               >
-                                <v-img :src="app.icon" cover width="24" height="24"></v-img>
-                              </a>
+                                <v-img :src="app.icon" cover width="32" height="32"></v-img>
+                              </v-btn>
                             </template>
                           </v-tooltip>
                         </v-col>
                       </v-row>
                     </v-card-text>
                   </v-card>
-                </v-menu>
+                </component>
                 <v-menu activator="#live" location="top center">
                   <v-card>
                     <v-card-text>
@@ -262,7 +268,7 @@ import {
   mdiInformationVariantCircleOutline,
   mdiMotionPlayOutline,
   mdiMultimedia,
-  mdiOpenInApp,
+  mdiOpenInNew,
   mdiPlus,
   mdiVideoVintage,
   mdiViewComfy,
@@ -283,11 +289,14 @@ import VlcImg from '@/assets/vlc.svg';
 import PotPlayerImg from '@/assets/potplayer.webp';
 import MxPlayerImg from '@/assets/mxplayer.webp';
 import MxPlayerProImg from '@/assets/mxplayer-pro.webp';
+import { VBottomSheet, VMenu } from 'vuetify/components';
+import { useDisplay } from 'vuetify';
 
 const { t, locale } = useI18n();
 const api = useApiStore();
 const route = useRoute();
 const router = useRouter();
+const display = useDisplay();
 const toast = useToastStore();
 const { settings } = useSettingsStore();
 
@@ -447,7 +456,7 @@ const actions = [
   {
     id: 'openInPlayer',
     text: t('resource.actions.openInPlayer'),
-    icon: mdiOpenInApp,
+    icon: mdiOpenInNew,
     color: 'warning',
   },
   {
@@ -478,7 +487,7 @@ const playerApps = [
     color: 'primary',
   },
   {
-    name: 'MX Player',
+    name: 'MX Player Pro',
     icon: MxPlayerProImg,
     buildHref: (src: string) =>
       `intent:${src}#Intent;package=com.mxtech.videoplayer.pro;S.title=${media.value?.file?.name};end`,

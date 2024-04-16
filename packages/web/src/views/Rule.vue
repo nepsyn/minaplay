@@ -29,7 +29,20 @@
             @update:model-value="rulesLoader.reload()"
           ></v-select>
         </v-col>
-        <v-col cols="12" sm="auto" class="flex-grow-0">
+        <v-col sm="auto">
+          <v-btn
+            variant="flat"
+            block
+            height="40"
+            color="info"
+            :prepend-icon="mdiRefresh"
+            :loading="loading"
+            @click="request()"
+          >
+            {{ t('app.actions.refresh') }}
+          </v-btn>
+        </v-col>
+        <v-col cols="auto">
           <v-btn
             height="40"
             color="success"
@@ -58,7 +71,7 @@
 <script setup lang="ts">
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import { useI18n } from 'vue-i18n';
-import { mdiMagnify, mdiPlus } from '@mdi/js';
+import { mdiMagnify, mdiPlus, mdiRefresh } from '@mdi/js';
 import { ref } from 'vue';
 import { debounce } from '@/utils/utils';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
@@ -97,7 +110,7 @@ const rulesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 24 },
 );
-const { items: rules } = rulesLoader;
+const { items: rules, pending: loading, reload: request } = rulesLoader;
 
 const filters = ref<Partial<RuleQueryDto>>({
   keyword: '',

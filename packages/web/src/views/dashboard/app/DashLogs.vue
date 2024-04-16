@@ -1,9 +1,10 @@
 <template>
   <v-container class="d-flex flex-column pa-md-12 h-100">
     <v-row dense class="flex-grow-0">
-      <v-col cols="auto">
+      <v-col sm="auto">
         <v-btn
           variant="flat"
+          block
           color="info"
           :prepend-icon="mdiRefresh"
           :loading="logsLoader.pending.value"

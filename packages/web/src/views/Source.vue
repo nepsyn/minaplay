@@ -17,7 +17,20 @@
             @update:model-value="useQuery"
           ></v-text-field>
         </v-col>
-        <v-col cols="12" sm="auto" class="flex-grow-0">
+        <v-col sm="auto">
+          <v-btn
+            variant="flat"
+            block
+            height="40"
+            color="info"
+            :prepend-icon="mdiRefresh"
+            :loading="loading"
+            @click="request()"
+          >
+            {{ t('app.actions.refresh') }}
+          </v-btn>
+        </v-col>
+        <v-col cols="auto">
           <v-btn
             height="40"
             color="success"
@@ -52,7 +65,7 @@ import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import SourceOverview from '@/components/source/SourceOverview.vue';
 import { SourceEntity, SourceQueryDto } from '@/api/interfaces/subscribe.interface';
 import { ref } from 'vue';
-import { mdiMagnify, mdiPlus } from '@mdi/js';
+import { mdiMagnify, mdiPlus, mdiRefresh } from '@mdi/js';
 import { debounce } from '@/utils/utils';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { useRouter } from 'vue-router';
@@ -73,7 +86,7 @@ const sourcesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 24 },
 );
-const { items: sources } = sourcesLoader;
+const { items: sources, pending: loading, reload: request } = sourcesLoader;
 
 const keyword = ref('');
 const useQuery = debounce(sourcesLoader.reload, 1000);

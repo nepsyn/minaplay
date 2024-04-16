@@ -1,8 +1,8 @@
 <template>
   <v-container class="d-flex flex-column pa-md-12">
     <v-row dense>
-      <v-col cols="auto">
-        <v-btn variant="flat" color="info" :prepend-icon="mdiRefresh" :loading="loading" @click="request()">
+      <v-col sm="auto">
+        <v-btn variant="flat" block color="info" :prepend-icon="mdiRefresh" :loading="loading" @click="request()">
           {{ t('app.actions.refresh') }}
         </v-btn>
       </v-col>

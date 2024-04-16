@@ -28,7 +28,21 @@
           @update:model-value="logsLoader.reload()"
         ></v-select>
       </v-col>
-      <v-col class="flex-grow-1 text-end">
+      <v-spacer></v-spacer>
+      <v-col sm="auto">
+        <v-btn
+          variant="flat"
+          block
+          color="info"
+          height="40"
+          :prepend-icon="mdiRefresh"
+          :loading="logsLoader.pending.value"
+          @click="logsLoader.reload()"
+        >
+          {{ t('app.actions.refresh') }}
+        </v-btn>
+      </v-col>
+      <v-col cols="auto">
         <v-menu location="bottom">
           <v-card>
             <v-card-title>{{ t('source.logs.clearLogsTitle') }}</v-card-title>
@@ -84,7 +98,7 @@ import { useRoute } from 'vue-router';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { computed, ref } from 'vue';
 import { StatusEnum } from '@/api/enums/status.enum';
-import { mdiAlertCircle, mdiCheckCircle, mdiClock, mdiDelete, mdiHelpCircle } from '@mdi/js';
+import { mdiAlertCircle, mdiCheckCircle, mdiClock, mdiDelete, mdiHelpCircle, mdiRefresh } from '@mdi/js';
 import { ParseLogQueryDto } from '@/api/interfaces/subscribe.interface';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useToastStore } from '@/store/toast';

@@ -100,11 +100,16 @@ const zh: MessageSchema = {
     },
     navs: {
       resource: '媒体库',
+      home: '主页',
+      search: '搜索',
       live: '放映室',
-      source: '订阅源',
+      subscribe: '订阅',
+      source: 'RSS 订阅源',
       rule: '订阅规则',
+      download: '下载任务',
       dashboard: '控制台',
       setting: '设置',
+      about: '关于',
     },
     user: {
       edit: '编辑用户资料',
@@ -141,7 +146,7 @@ const zh: MessageSchema = {
   },
   common: {
     download: {
-      title: '下载',
+      title: '下载任务',
       item: '下载项目',
       sorts: {
         createAt: '创建时间',
@@ -152,6 +157,9 @@ const zh: MessageSchema = {
       linkCopyFailed: '链接复制失败',
       createAt: '创建于',
       deleteConfirm: '确定要删除此下载项目吗？该操作可能导致资源文件的重复下载。',
+      create: '创建下载任务',
+      url: '下载链接',
+      name: '任务名称（可选）',
     },
   },
   resource: {
@@ -530,6 +538,7 @@ const zh: MessageSchema = {
       autoContinue: '自动续播',
       autoContinueDescription: '是否自动续播到上次播放位置',
       homepage: '主页内容',
+      homepageHint: '拖拽下方板块进行排序或隐藏',
       visiblePlates: '可见板块',
       hiddenPlates: '隐藏板块',
       noPlate: '这里似乎没有可见板块',

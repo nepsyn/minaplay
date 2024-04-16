@@ -2,20 +2,7 @@
   <v-container class="pa-0 pb-12">
     <span class="text-h4">{{ t('source.sections.rule') }}</span>
     <v-row class="py-2 mt-3" dense>
-      <v-col cols="auto">
-        <v-btn
-          variant="flat"
-          block
-          color="success"
-          height="40"
-          :prepend-icon="mdiPlus"
-          :loading="ruleCreating"
-          @click="createRule()"
-        >
-          {{ t('app.actions.add') }}
-        </v-btn>
-      </v-col>
-      <v-col cols="auto">
+      <v-col sm="auto">
         <v-btn
           variant="flat"
           block
@@ -26,6 +13,18 @@
           @click="rulesLoader.reload()"
         >
           {{ t('app.actions.refresh') }}
+        </v-btn>
+      </v-col>
+      <v-col cols="auto">
+        <v-btn
+          variant="flat"
+          color="success"
+          height="40"
+          :prepend-icon="mdiPlus"
+          :loading="ruleCreating"
+          @click="createRule()"
+        >
+          {{ t('app.actions.add') }}
         </v-btn>
       </v-col>
     </v-row>

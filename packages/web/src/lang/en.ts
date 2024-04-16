@@ -98,12 +98,17 @@ export default {
       github: 'Github',
     },
     navs: {
-      resource: 'RESOURCES',
-      live: 'LIVES',
-      source: 'SOURCES',
-      rule: 'RULES',
-      dashboard: 'DASHBOARD',
-      setting: 'SETTINGS',
+      resource: 'Resources',
+      home: 'Home',
+      search: 'Search',
+      live: 'Lives',
+      subscribe: 'Subscribes',
+      source: 'RSS Sources',
+      rule: 'Rules',
+      download: 'Downloads',
+      dashboard: 'Dashboard',
+      setting: 'Settings',
+      about: 'About',
     },
     user: {
       edit: 'Edit User Profile',
@@ -140,7 +145,7 @@ export default {
   },
   common: {
     download: {
-      title: 'Download',
+      title: 'Download Tasks',
       item: 'download task',
       sorts: {
         createAt: 'Create Time',
@@ -151,6 +156,9 @@ export default {
       linkCopyFailed: 'Download link copy failed',
       createAt: 'Create at',
       deleteConfirm: 'Are you sure to delete this download item? This action may cause duplicated download tasks.',
+      create: 'Create Download Task',
+      url: 'URL',
+      name: 'Task Name(Optional)',
     },
   },
   resource: {
@@ -530,6 +538,7 @@ export default {
       autoContinue: 'Auto Resume Playback',
       autoContinueDescription: 'Automatically resume playback from last watched position by default.',
       homepage: 'Homepage Content',
+      homepageHint: 'Drag plates to sort or hide',
       visiblePlates: 'Visible Plates',
       hiddenPlates: 'Hidden Plates',
       noPlate: 'There seems to be no visible plate',

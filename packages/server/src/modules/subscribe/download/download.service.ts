@@ -223,6 +223,12 @@ export class DownloadService implements OnModuleInit {
 
   async createTask(url: string, props?: DeepPartial<DownloadItem>) {
     const trackers = await this.cacheStore.get<string>(DownloadService.TRACKER_CACHE_KEY);
+    const gid = await aria2.addUri(this.conn, [url], {
+      'http-proxy': this.options.httpProxy,
+      'seed-time': '0',
+      'bt-tracker': trackers ?? '',
+      dir: path.join(DOWNLOAD_DIR, randomUUID().replace(/-/g, '')),
+    });
 
     const hash = await generateMD5(url);
     const item = await this.save({
@@ -231,12 +237,7 @@ export class DownloadService implements OnModuleInit {
       hash,
       status: StatusEnum.PENDING,
     });
-    const gid = await aria2.addUri(this.conn, [url], {
-      'http-proxy': this.options.httpProxy,
-      'seed-time': '0',
-      'bt-tracker': trackers ?? '',
-      dir: path.join(DOWNLOAD_DIR, randomUUID().replace(/-/g, '')),
-    });
+
     const task = new DownloadTask(gid, item.id, this.conn);
     this.tasks.set(gid, task);
 

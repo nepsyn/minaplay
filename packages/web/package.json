@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@highlightjs/vue-plugin": "^2.1.0",
-    "@mdi/font": "7.4.47",
     "@mdi/js": "^7.4.47",
     "ansi_up": "^6.0.2",
     "axios": "^1.6.8",

@@ -1,11 +1,11 @@
 <template>
-  <v-container class="h-100 overflow-auto d-flex flex-column align-center justify-center">
+  <div class="h-100 overflow-auto d-flex flex-column align-center justify-center py-6">
     <v-icon :icon="mdiEmoticonDeadOutline" size="128"></v-icon>
     <span class="text-h6 font-italic font-weight-bold mt-4">{{ t('layout.error.noPermission') }}</span>
     <v-btn class="mt-2" variant="outlined" :prepend-icon="mdiArrowLeft" @click="router.back()">
       {{ t('layout.error.back') }}
     </v-btn>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">

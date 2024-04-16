@@ -4,14 +4,14 @@
     <div v-if="item.url" class="d-flex flex-row align-center">
       <span class="text-caption text-truncate" v-text="item.url"></span>
       <v-tooltip>
-        {{ t('common.download.copyLink') }}
+        {{ t('download.copyLink') }}
         <template #activator="{ props }">
           <v-btn v-bind="props" :icon="mdiContentCopy" variant="text" size="x-small" @click="copyLink()"></v-btn>
         </template>
       </v-tooltip>
     </div>
     <p class="text-caption">
-      {{ t('common.download.createAt') }}
+      {{ t('download.createAt') }}
       {{ new Date(item.createAt).toLocaleString(locale) }}
       -
       {{ downloadItemProps.text }}
@@ -43,7 +43,7 @@
         <v-card>
           <v-card-title>{{ t('app.actions.deleteTitle') }}</v-card-title>
           <v-card-text>
-            {{ t('common.download.deleteConfirm') }}
+            {{ t('download.deleteConfirm') }}
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -134,10 +134,10 @@ const downloadItemProps = computed(() => {
 const copyLink = () => {
   copyContent(props.item.url)
     .then(() => {
-      toast.toastSuccess(t('common.download.linkCopied'));
+      toast.toastSuccess(t('download.linkCopied'));
     })
     .catch(() => {
-      toast.toastError(t('common.download.linkCopyFailed'));
+      toast.toastError(t('download.linkCopyFailed'));
     });
 };
 

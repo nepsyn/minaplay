@@ -1,13 +1,13 @@
 <template>
   <component :is="standalone ? ToTopContainer : 'div'" :class="standalone ? 'page-height overflow-auto' : undefined">
     <v-container :class="standalone ? 'd-flex flex-column py-md-12' : 'pa-0 pb-12'">
-      <span class="text-h4">{{ t('common.download.title') }}</span>
+      <span class="text-h4">{{ t('download.title') }}</span>
       <v-row class="py-2 mt-3" dense>
         <v-col cols="12" sm="4">
           <v-text-field
             variant="outlined"
             :label="t('app.input.keyword')"
-            :placeholder="t('app.input.placeholder', { item: t('common.download.item') })"
+            :placeholder="t('app.input.placeholder', { item: t('download.item') })"
             density="compact"
             v-model="filters.keyword"
             hide-details
@@ -67,14 +67,14 @@
             <v-card min-width="320">
               <v-card-text>
                 <v-list-subheader class="font-weight-bold">
-                  {{ t('common.download.create') }}
+                  {{ t('download.create') }}
                 </v-list-subheader>
                 <v-text-field
                   hide-details
                   density="compact"
                   variant="outlined"
                   color="primary"
-                  :label="t('common.download.url')"
+                  :label="t('download.url')"
                   autofocus
                   v-model="editTask.url"
                 ></v-text-field>
@@ -84,7 +84,7 @@
                   density="compact"
                   variant="outlined"
                   color="primary"
-                  :label="t('common.download.name')"
+                  :label="t('download.name')"
                   v-model="editTask.name"
                 ></v-text-field>
               </v-card-text>

@@ -27,6 +27,7 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'script-defer',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ttf,ico,svg}'],
       },

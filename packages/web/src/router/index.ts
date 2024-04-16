@@ -34,14 +34,6 @@ const routes: RouteRecordRaw[] = [
             },
           },
           {
-            path: '/resource/search',
-            name: 'search',
-            component: () => import('@/views/resource/ResourceSearch.vue'),
-            meta: {
-              permissions: [PermissionEnum.MEDIA_VIEW, PermissionEnum.MEDIA_OP, PermissionEnum.ROOT_OP],
-            },
-          },
-          {
             path: '/media/:mediaId',
             name: 'media',
             component: () => import('@/views/resource/MediaPlay.vue'),
@@ -66,6 +58,14 @@ const routes: RouteRecordRaw[] = [
             },
           },
         ],
+      },
+      {
+        path: '/search',
+        name: 'search',
+        component: () => import('@/views/resource/ResourceSearch.vue'),
+        meta: {
+          permissions: [PermissionEnum.MEDIA_VIEW, PermissionEnum.MEDIA_OP, PermissionEnum.ROOT_OP],
+        },
       },
       {
         path: '/live',
@@ -195,7 +195,18 @@ const routes: RouteRecordRaw[] = [
         name: 'download',
         path: '/download',
         component: () => import('@/views/common/SubscribeDownload.vue'),
+        meta: {
+          permissions: [PermissionEnum.SUBSCRIBE_OP, PermissionEnum.ROOT_OP],
+        },
         props: () => ({ standalone: true }),
+      },
+      {
+        name: 'parser',
+        path: '/parser',
+        component: () => import('@/views/Parser.vue'),
+        meta: {
+          permissions: [PermissionEnum.ROOT_OP],
+        },
       },
       {
         path: '/dashboard',
@@ -318,11 +329,6 @@ const routes: RouteRecordRaw[] = [
             component: () => import('@/views/setting/SettingProfile.vue'),
           },
         ],
-      },
-      {
-        name: 'about',
-        path: '/about',
-        component: () => import('@/views/About.vue'),
       },
       {
         name: 'not-found',

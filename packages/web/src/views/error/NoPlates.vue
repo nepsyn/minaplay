@@ -1,5 +1,5 @@
 <template>
-  <v-container class="h-100 overflow-auto d-flex flex-column align-center justify-center">
+  <div class="h-100 overflow-auto d-flex flex-column align-center justify-center py-6">
     <v-icon :icon="mdiEmoticonConfusedOutline" size="128"></v-icon>
     <span class="text-h6 font-italic font-weight-bold mt-4">{{ t('settings.app.noPlate') }}</span>
     <v-btn
@@ -10,7 +10,7 @@
     >
       {{ t('layout.navs.setting') }}
     </v-btn>
-  </v-container>
+  </div>
 </template>
 
 <script setup lang="ts">

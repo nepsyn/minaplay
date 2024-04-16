@@ -135,7 +135,6 @@
               v-else
               :to="subNav.route"
               :prepend-icon="subNav.icon"
-              exact
               color="primary"
               :title="subNav.name"
               draggable="false"
@@ -146,7 +145,6 @@
         <v-list-item
           v-else
           :to="nav.route"
-          exact
           color="primary"
           :prepend-icon="nav.icon"
           :title="nav.name"
@@ -173,6 +171,7 @@ import {
   mdiAccountCog,
   mdiAccountMultipleOutline,
   mdiAnimationPlayOutline,
+  mdiAutoMode,
   mdiBell,
   mdiCloudUploadOutline,
   mdiCodeBraces,
@@ -184,7 +183,6 @@ import {
   mdiFileMultipleOutline,
   mdiGaugeFull,
   mdiHome,
-  mdiInformation,
   mdiLogout,
   mdiMagnify,
   mdiMovieOpenPlay,
@@ -289,7 +287,7 @@ const navs = [
         name: t('layout.navs.home'),
       },
       {
-        route: '/resource/search',
+        route: '/search',
         icon: mdiMagnify,
         name: t('layout.navs.search'),
       },
@@ -318,6 +316,11 @@ const navs = [
         route: '/download',
         icon: mdiDownload,
         name: t('layout.navs.download'),
+      },
+      {
+        route: '/parser',
+        icon: mdiAutoMode,
+        name: t('layout.navs.parser'),
       },
     ],
   },
@@ -413,11 +416,6 @@ const navs = [
         name: t('settings.sections.profile'),
       },
     ],
-  },
-  {
-    name: t('layout.navs.about'),
-    icon: mdiInformation,
-    route: '/about',
   },
 ];
 </script>

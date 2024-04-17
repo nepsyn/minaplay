@@ -28,6 +28,8 @@ import { EmailVerifyDto } from './adapters/email/email-verify.dto.js';
 import { EmailAdapter } from './adapters/email/email.adapter.js';
 import { AdapterEnabledGuard } from './adapter-enabled.guard.js';
 import { RequireAdapter } from './require-adapter.decorator.js';
+import { ServerChanConfig } from './adapters/server-chan/server-chan.config.js';
+import { TelegramConfig } from './adapters/telegram/telegram.config.js';
 
 @Controller('notification')
 @ApiTags('notification')
@@ -171,6 +173,56 @@ export class NotificationController {
       service: NotificationServiceEnum.EMAIL,
       enabled: true,
       config: JSON.stringify({ address: cache.email }),
+    });
+    return await this.notificationMetaService.findOneBy({ id });
+  }
+
+  @Post('serverChan/bind')
+  @ApiOperation({
+    description: '添加 ServerChan 通知',
+  })
+  @RequireAdapter(NotificationServiceEnum.SERVER_CHAN)
+  @UseGuards(AdapterEnabledGuard)
+  @HttpCode(200)
+  async bindServerChan(@RequestUser() user: User, @Body() data: ServerChanConfig) {
+    const meta = await this.notificationMetaService.findOneBy({
+      user: { id: user.id },
+      service: NotificationServiceEnum.SERVER_CHAN,
+    });
+    if (meta) {
+      throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATED_NOTIFICATION_SERVICE);
+    }
+
+    const { id } = await this.notificationMetaService.save({
+      user: { id: user.id },
+      service: NotificationServiceEnum.SERVER_CHAN,
+      enabled: true,
+      config: JSON.stringify({ token: data.token }),
+    });
+    return await this.notificationMetaService.findOneBy({ id });
+  }
+
+  @Post('telegram/bind')
+  @ApiOperation({
+    description: '添加 Telegram 通知',
+  })
+  @RequireAdapter(NotificationServiceEnum.TELEGRAM)
+  @UseGuards(AdapterEnabledGuard)
+  @HttpCode(200)
+  async bindTelegram(@RequestUser() user: User, @Body() data: TelegramConfig) {
+    const meta = await this.notificationMetaService.findOneBy({
+      user: { id: user.id },
+      service: NotificationServiceEnum.TELEGRAM,
+    });
+    if (meta) {
+      throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATED_NOTIFICATION_SERVICE);
+    }
+
+    const { id } = await this.notificationMetaService.save({
+      user: { id: user.id },
+      service: NotificationServiceEnum.TELEGRAM,
+      enabled: true,
+      config: JSON.stringify({ token: data.token, chatId: data.chatId }),
     });
     return await this.notificationMetaService.findOneBy({ id });
   }

@@ -129,8 +129,13 @@ import process from 'node:process';
         emailSmtpPassword: configService.get('NOTIFY_EMAIL_SMTP_PASSWORD'),
         emailOrigin: configService.get('NOTIFY_EMAIL_ORIGIN'),
         emailSubject: configService.get('NOTIFY_EMAIL_SUBJECT'),
+        // server-chan
+        serverChanEnabled: Number(configService.get('NOTIFY_SERVER_CHAN', 0)) === 1,
+        // Telegram Bot
+        telegramEnabled: Number(configService.get('NOTIFY_TELEGRAM', 0)) === 1,
         // others
         appEnv: configService.get('APP_ENV', 'dev'),
+        httpProxy: process.env.HTTP_PROXY ?? configService.get('APP_HTTP_PROXY'),
       }),
     }),
     FileModule,

@@ -13,6 +13,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { NotificationMeta } from './notification-meta.entity.js';
 import { BullModule } from '@nestjs/bull';
 import { NotificationConsumer } from './notification.consumer.js';
+import { ServerChanAdapter } from './adapters/server-chan/server-chan.adapter.js';
+import { TelegramAdapter } from './adapters/telegram/telegram.adapter.js';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { NotificationConsumer } from './notification.consumer.js';
     EmailAdapter,
     NotificationGateway,
     WsAdapter,
+    ServerChanAdapter,
+    TelegramAdapter,
     NotificationConsumer,
   ],
   controllers: [NotificationController],

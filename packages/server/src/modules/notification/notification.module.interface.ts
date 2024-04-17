@@ -4,13 +4,20 @@ export interface NotificationModuleOptions {
 
   // email
   emailEnabled: boolean;
-  emailSmtpHost: string;
-  emailSmtpPort: number;
+  emailSmtpHost?: string;
+  emailSmtpPort?: number;
   emailSmtpSecure?: boolean;
-  emailSmtpUser: string;
-  emailSmtpPassword: string;
+  emailSmtpUser?: string;
+  emailSmtpPassword?: string;
   emailOrigin?: string;
   emailSubject?: string;
 
+  // server-chan
+  serverChanEnabled: boolean;
+
+  // telegram
+  telegramEnabled: boolean;
+
   appEnv: 'dev' | 'prod';
+  httpProxy?: string;
 }

@@ -56,7 +56,7 @@ export class MediaFileService {
         reject: false,
       },
     );
-    if (await fs.exists(posterFilePath)) {
+    if (await fs.pathExists(posterFilePath)) {
       await this.fileService.compressImage(posterFilePath);
       const fileStat = await fs.stat(posterFilePath);
       return await this.fileService.save({
@@ -87,7 +87,7 @@ export class MediaFileService {
         timeout: 60000,
         reject: false,
       });
-      if (await fs.exists(filepath)) {
+      if (await fs.pathExists(filepath)) {
         const stat = await fs.stat(filepath);
         const file = await this.fileService.save({
           filename: filename,
@@ -116,7 +116,7 @@ export class MediaFileService {
           reject: false,
         },
       );
-      if (await fs.exists(filepath)) {
+      if (await fs.pathExists(filepath)) {
         const stat = await fs.stat(filepath);
         const file = await this.fileService.save({
           filename: filename,

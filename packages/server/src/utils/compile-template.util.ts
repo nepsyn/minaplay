@@ -6,7 +6,7 @@ export async function compileTemplate(file: string, searchDirs: string[]) {
   const candidates = searchDirs.map((dir) => path.join(dir, file));
 
   for (const candidate of candidates) {
-    if (await fs.exists(candidate)) {
+    if (await fs.pathExists(candidate)) {
       const code = await fs.readFile(candidate);
       return Handlebars.compile(code.toString());
     }

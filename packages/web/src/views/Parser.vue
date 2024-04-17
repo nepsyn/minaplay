@@ -12,16 +12,22 @@
             :prepend-avatar="parser.plugin.icon"
             :title="parser.name"
             color="primary"
-            link
+            :to="`/parser/${parser.plugin.id}/${parser.name}`"
             draggable="false"
           >
+            <template #append>
+              <v-menu open-on-hover>
+                <plugin-overview hide-actions :plugin="parser.plugin"></plugin-overview>
+                <template #activator="{ props }">
+                  <v-icon v-bind="props" size="small" :icon="mdiInformationVariantCircleOutline"></v-icon>
+                </template>
+              </v-menu>
+            </template>
           </v-list-item>
         </multi-items-loader>
       </v-list>
     </v-navigation-drawer>
-    <v-main>
-      <authed-router-view match="^/parser/[^/]+$" />
-    </v-main>
+    <v-main> </v-main>
   </v-layout>
 </template>
 
@@ -31,7 +37,8 @@ import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { useApiStore } from '@/store/api';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { computed } from 'vue';
-import AuthedRouterView from '@/components/app/AuthedRouterView.vue';
+import PluginOverview from '@/components/plugin/PluginOverview.vue';
+import { mdiInformationVariantCircleOutline } from '@mdi/js';
 
 const { t } = useI18n();
 const api = useApiStore();

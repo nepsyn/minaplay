@@ -1,5 +1,12 @@
 <template>
-  <v-dialog width="auto" v-model="dialog" scrollable close-on-back>
+  <v-dialog
+    :width="display.smAndUp.value ? 'auto' : '100%'"
+    min-width="400"
+    :fullscreen="!display.smAndUp.value"
+    v-model="dialog"
+    scrollable
+    close-on-back
+  >
     <v-card>
       <v-toolbar color="primary">
         <v-btn :icon="mdiClose" @click="dialog = false"></v-btn>
@@ -74,10 +81,12 @@ import { useToastStore } from '@/store/toast';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
 import { NotificationMetaEntity } from '@/api/interfaces/notification.interface';
+import { useDisplay } from 'vuetify';
 
 const { t } = useI18n();
 const api = useApiStore();
 const toast = useToastStore();
+const display = useDisplay();
 
 const props = withDefaults(
   defineProps<{

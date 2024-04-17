@@ -568,6 +568,8 @@ export default {
       adapters: {
         [NotificationServiceEnum.WS]: 'Client Notification',
         [NotificationServiceEnum.EMAIL]: 'Email Notification',
+        [NotificationServiceEnum.SERVER_CHAN]: 'ServerChan Notification',
+        [NotificationServiceEnum.TELEGRAM]: 'Telegram Notification',
       },
       editSubscriptions: ' Edit Notification Subscriptions',
       subscriptions: {
@@ -580,6 +582,13 @@ export default {
         resend: 'Resend in {timeout} seconds',
         verifyCode: 'Email Verification Code',
         verify: 'Verify',
+      },
+      serverChan: {
+        token: 'Token',
+      },
+      telegram: {
+        token: 'Token',
+        chatId: 'Chat ID',
       },
     },
   },

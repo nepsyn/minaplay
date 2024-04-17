@@ -32,7 +32,7 @@
           </v-chip>
         </v-col>
         <v-col cols="auto" v-for="({ name }, index) in plugin.parsers ?? []" :key="index">
-          <v-chip label color="secondary" density="comfortable">
+          <v-chip label color="secondary" density="comfortable" :to="`/parser/${plugin.id}/${name}`">
             {{ t('plugin.parser', { parser: name }) }}
           </v-chip>
         </v-col>

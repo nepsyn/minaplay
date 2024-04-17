@@ -182,7 +182,6 @@ import {
   mdiDownload,
   mdiFileMultipleOutline,
   mdiGaugeFull,
-  mdiHome,
   mdiLogout,
   mdiMagnify,
   mdiMovieOpenPlay,
@@ -278,20 +277,14 @@ const actions = ref([
 
 const navs = [
   {
-    name: t('layout.navs.resource'),
+    route: '/resource',
     icon: mdiMovieOpenPlay,
-    children: [
-      {
-        route: '/resource',
-        icon: mdiHome,
-        name: t('layout.navs.home'),
-      },
-      {
-        route: '/search',
-        icon: mdiMagnify,
-        name: t('layout.navs.search'),
-      },
-    ],
+    name: t('layout.navs.resource'),
+  },
+  {
+    route: '/search',
+    icon: mdiMagnify,
+    name: t('layout.navs.search'),
   },
   {
     name: t('layout.navs.live'),
@@ -317,12 +310,12 @@ const navs = [
         icon: mdiDownload,
         name: t('layout.navs.download'),
       },
-      {
-        route: '/parser',
-        icon: mdiAutoMode,
-        name: t('layout.navs.parser'),
-      },
     ],
+  },
+  {
+    route: '/parser',
+    icon: mdiAutoMode,
+    name: t('layout.navs.parser'),
   },
   {
     name: t('layout.navs.dashboard'),

@@ -204,6 +204,15 @@ const routes: RouteRecordRaw[] = [
         name: 'parser',
         path: '/parser',
         component: () => import('@/views/Parser.vue'),
+        children: [
+          {
+            path: '/parser/:pluginId/:parserId',
+            component: () => import('@/views/Parser.vue'),
+            meta: {
+              permissions: [PermissionEnum.ROOT_OP],
+            },
+          },
+        ],
         meta: {
           permissions: [PermissionEnum.ROOT_OP],
         },

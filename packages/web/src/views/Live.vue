@@ -29,7 +29,20 @@
             @update:model-value="livesLoader.reload()"
           ></v-select>
         </v-col>
-        <v-col cols="12" sm="auto" class="flex-grow-0">
+        <v-col sm="auto">
+          <v-btn
+            variant="flat"
+            block
+            height="40"
+            color="info"
+            :prepend-icon="mdiRefresh"
+            :loading="loading"
+            @click="request()"
+          >
+            {{ t('app.actions.refresh') }}
+          </v-btn>
+        </v-col>
+        <v-col cols="auto">
           <v-btn
             v-if="api.hasPermission(PermissionEnum.LIVE_OP, PermissionEnum.ROOT_OP)"
             height="40"
@@ -66,7 +79,7 @@ import { LiveQueryDto } from '@/api/interfaces/live.interface';
 import { debounce } from '@/utils/utils';
 import { useToastStore } from '@/store/toast';
 import { useAxiosRequest } from '@/composables/use-axios-request';
-import { mdiMagnify, mdiPlus } from '@mdi/js';
+import { mdiMagnify, mdiPlus, mdiRefresh } from '@mdi/js';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import LiveOverview from '@/components/live/LiveOverview.vue';
@@ -98,7 +111,7 @@ const livesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 24 },
 );
-const { items: lives } = livesLoader;
+const { items: lives, pending: loading, reload: request } = livesLoader;
 
 const filters = ref<Partial<LiveQueryDto>>({
   keyword: '',

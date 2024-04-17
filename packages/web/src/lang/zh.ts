@@ -568,6 +568,8 @@ const zh: MessageSchema = {
       adapters: {
         [NotificationServiceEnum.WS]: '客户端通知',
         [NotificationServiceEnum.EMAIL]: '邮箱通知',
+        [NotificationServiceEnum.SERVER_CHAN]: 'ServerChan 通知',
+        [NotificationServiceEnum.TELEGRAM]: 'Telegram 通知',
       },
       editSubscriptions: '编辑消息订阅',
       subscriptions: {
@@ -580,6 +582,13 @@ const zh: MessageSchema = {
         resend: '{timeout}秒后重新发送',
         verifyCode: '邮箱验证码',
         verify: '验证',
+      },
+      serverChan: {
+        token: 'Token',
+      },
+      telegram: {
+        token: 'Token',
+        chatId: 'Chat ID',
       },
     },
   },

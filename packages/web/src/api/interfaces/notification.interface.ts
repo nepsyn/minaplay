@@ -39,6 +39,15 @@ export interface EmailVerifyDto {
   code: string;
 }
 
+export interface ServerChanConfigDto {
+  token: string;
+}
+
+export interface TelegramConfigDto {
+  token: string;
+  chatId: string;
+}
+
 export type NotificationEventMap = {
   [NotificationEventEnum.NEW_EPISODE]: {
     episode: EpisodeEntity;

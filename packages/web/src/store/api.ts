@@ -60,6 +60,8 @@ import {
   EmailVerifyDto,
   NotificationMetaDto,
   NotificationMetaEntity,
+  ServerChanConfigDto,
+  TelegramConfigDto,
 } from '@/api/interfaces/notification.interface';
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
 
@@ -283,6 +285,8 @@ export const useApiStore = defineStore('api', () => {
     bindWs: apiPost<NotificationMetaEntity>('/api/v1/notification/ws/bind'),
     bindEmail: apiPost<EmailBindData, Pick<EmailBindData, 'email'>>('/api/v1/notification/email/bind'),
     verifyEmail: apiPost<NotificationMetaEntity, EmailVerifyDto>('/api/v1/notification/email/verify'),
+    bindServerChan: apiPost<NotificationMetaEntity, ServerChanConfigDto>('/api/v1/notification/serverChan/bind'),
+    bindTelegram: apiPost<NotificationMetaEntity, TelegramConfigDto>('/api/v1/notification/telegram/bind'),
   };
 
   return {

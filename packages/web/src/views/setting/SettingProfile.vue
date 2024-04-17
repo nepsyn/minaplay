@@ -59,6 +59,8 @@
     </v-sheet>
     <v-sheet class="mt-6 rounded-lg border">
       <email-bind-prompt v-model="emailBindDialog"></email-bind-prompt>
+      <server-chan-bind-prompt v-model="serverChanBindDialog"></server-chan-bind-prompt>
+      <telegram-bind-prompt v-model="telegramBindDialog"></telegram-bind-prompt>
       <v-card-title class="py-6 d-flex align-center">
         <span>{{ t('settings.profile.notification') }}</span>
         <v-spacer></v-spacer>
@@ -303,6 +305,7 @@ import { useApiStore } from '@/store/api';
 import { computed, ref } from 'vue';
 import UserAvatar from '@/components/user/UserAvatar.vue';
 import {
+  mdiAlphaSBox,
   mdiBellCog,
   mdiCheck,
   mdiCheckAll,
@@ -326,11 +329,13 @@ import axios from 'axios';
 import { useAsyncTask } from '@/composables/use-async-task';
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
-import { EmailConfigDto, NotificationMetaDto, NotificationMetaEntity } from '@/api/interfaces/notification.interface';
+import { NotificationMetaDto, NotificationMetaEntity } from '@/api/interfaces/notification.interface';
 import { useDisplay } from 'vuetify';
 import { useRouter } from 'vue-router';
 import { NotificationEventEnum } from '@/api/enums/notification-event.enum';
 import EmailBindPrompt from '@/components/notification/EmailBindPrompt.vue';
+import ServerChanBindPrompt from '@/components/notification/ServerChanBindPrompt.vue';
+import TelegramBindPrompt from '@/components/notification/TelegramBindPrompt.vue';
 
 const { t } = useI18n();
 const display = useDisplay();
@@ -402,7 +407,25 @@ const availableAdapters = computed(() => {
       id: NotificationServiceEnum.EMAIL,
       name: t(`settings.profile.adapters.${NotificationServiceEnum.EMAIL}`),
       icon: mdiEmailFastOutline,
-      click: () => (emailBindDialog.value = true),
+      click: () => {
+        emailBindDialog.value = true;
+      },
+    },
+    {
+      id: NotificationServiceEnum.SERVER_CHAN,
+      name: t(`settings.profile.adapters.${NotificationServiceEnum.SERVER_CHAN}`),
+      icon: mdiAlphaSBox,
+      click: () => {
+        serverChanBindDialog.value = true;
+      },
+    },
+    {
+      id: NotificationServiceEnum.TELEGRAM,
+      name: t(`settings.profile.adapters.${NotificationServiceEnum.TELEGRAM}`),
+      icon: 'm9.45782,19.57309l0.31901,-4.81932l8.74997,-7.88409c0.38737,-0.35319 -0.07975,-0.52409 -0.59245,-0.21647l-10.80075,6.82452l-4.67121,-1.48112c-1.0026,-0.28483 -1.01399,-0.97981 0.22786,-1.48112l18.19493,-7.01821c0.8317,-0.37598 1.62923,0.20508 1.31022,1.48112l-3.09895,14.59468c-0.21647,1.03678 -0.8431,1.28743 -1.70898,0.80892l-4.71678,-3.48632l-2.26725,2.19889c-0.26204,0.26204 -0.47851,0.47851 -0.94564,0.47851z',
+      click: () => {
+        telegramBindDialog.value = true;
+      },
     },
   ].filter(
     ({ id }) =>
@@ -413,6 +436,8 @@ const availableAdapters = computed(() => {
 });
 const subscriptions = [...Object.values(NotificationEventEnum)];
 const emailBindDialog = ref(false);
+const serverChanBindDialog = ref(false);
+const telegramBindDialog = ref(false);
 
 const editItem = ref<NotificationMetaEntity | undefined>(undefined);
 
@@ -527,12 +552,22 @@ onWsBindFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
+const generateTokenView = (token: string = '') => {
+  if (token.length <= 8) {
+    return '*'.repeat(token.length);
+  } else {
+    return token.slice(0, 4) + '*'.repeat(8) + token.slice(token.length - 4, token.length);
+  }
+};
 const getNotificationMetaConfigLabel = (meta: NotificationMetaEntity) => {
   try {
     const config = JSON.parse(meta.config as string);
     switch (meta.service) {
       case NotificationServiceEnum.EMAIL:
-        return (config as EmailConfigDto).address;
+        return config.address;
+      case NotificationServiceEnum.SERVER_CHAN:
+      case NotificationServiceEnum.TELEGRAM:
+        return `Token: ${generateTokenView(config.token)}`;
       default:
         return undefined;
     }

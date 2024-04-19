@@ -27,6 +27,7 @@
             maxlength="256"
             v-model="edit.token"
             @keydown.enter="edit.token.trim().length > 0 && bindServerChan()"
+            autofocus
           >
           </v-text-field>
           <v-btn

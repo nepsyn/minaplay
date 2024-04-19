@@ -32,9 +32,7 @@
             </v-list>
           </v-card>
           <template #activator="{ props }">
-            <v-btn v-bind="props" class="d-flex d-sm-none" icon>
-              <v-icon :icon="mdiDotsVertical" size="large"></v-icon>
-            </v-btn>
+            <v-btn v-bind="props" class="d-flex d-sm-none" :icon="mdiDotsVertical"></v-btn>
           </template>
         </v-menu>
         <v-menu v-if="api.user">
@@ -152,6 +150,14 @@
         >
         </v-list-item>
       </template>
+      <v-list-item
+        v-if="installEvent"
+        :prepend-icon="mdiInboxArrowDown"
+        :title="t('layout.navs.install')"
+        draggable="false"
+        @click="installEvent?.prompt()"
+      >
+      </v-list-item>
     </v-list>
   </v-navigation-drawer>
 
@@ -166,7 +172,7 @@
 <script lang="ts" setup>
 import { useLayoutStore } from '@/store/layout';
 import { useI18n } from 'vue-i18n';
-import { computed, ref } from 'vue';
+import { computed, ref, shallowRef } from 'vue';
 import {
   mdiAccountCog,
   mdiAccountMultipleOutline,
@@ -182,6 +188,7 @@ import {
   mdiDownload,
   mdiFileMultipleOutline,
   mdiGaugeFull,
+  mdiInboxArrowDown,
   mdiLogout,
   mdiMagnify,
   mdiMovieOpenPlay,
@@ -243,6 +250,16 @@ onLogoutRejected(async (error: any) => {
     query: {
       redirectUrl: route.fullPath,
     },
+  });
+});
+
+const installEvent = shallowRef();
+window.addEventListener('beforeinstallprompt', (e: any) => {
+  installEvent.value = e;
+  e.userChoice.then((outcome: 'installed' | 'dismissed') => {
+    if (outcome === 'installed') {
+      installEvent.value = undefined;
+    }
   });
 });
 

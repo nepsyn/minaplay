@@ -26,6 +26,7 @@
             density="compact"
             maxlength="256"
             v-model="edit.token"
+            autofocus
           >
           </v-text-field>
           <span class="text-body-1 font-weight-bold mt-3">{{ t('settings.profile.telegram.chatId') }}</span>

@@ -109,7 +109,7 @@ export default {
       parser: 'Parsers',
       dashboard: 'Dashboard',
       setting: 'Settings',
-      about: 'About',
+      install: 'Install MinaPlay',
     },
     user: {
       edit: 'Edit User Profile',

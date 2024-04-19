@@ -4,7 +4,6 @@ import App from './App.vue';
 import '@/plugins/monaco';
 import '@/css/main.sass';
 import '@/css/highlightjs.sass';
-// @ts-ignore
 import { registerSW } from 'virtual:pwa-register';
 
 registerSW({ immediate: true });

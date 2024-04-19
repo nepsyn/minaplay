@@ -110,7 +110,7 @@ const zh: MessageSchema = {
       parser: '解析器',
       dashboard: '控制台',
       setting: '设置',
-      about: '关于',
+      install: '安装 MinaPlay 应用',
     },
     user: {
       edit: '编辑用户资料',

@@ -1,3 +1,27 @@
+<template>
+  <div ref="containerRef" @scroll="onScroll">
+    <slot></slot>
+    <slot name="activator" :to-top="toTop">
+      <v-layout-item
+        order="1"
+        :model-value="showToTop"
+        position="bottom"
+        class="text-end pointer-events-none"
+        size="80"
+      >
+        <v-btn
+          class="me-8 pointer-events-initial"
+          :size="size!"
+          color="primary"
+          elevation="8"
+          :icon="mdiChevronUp"
+          @click="toTop()"
+        ></v-btn>
+      </v-layout-item>
+    </slot>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref } from 'vue';
 import { mdiChevronUp } from '@mdi/js';
@@ -33,29 +57,5 @@ defineExpose({
   toTop,
 });
 </script>
-
-<template>
-  <div ref="containerRef" @scroll="onScroll">
-    <slot></slot>
-    <slot name="activator" :to-top="toTop">
-      <v-layout-item
-        order="1"
-        :model-value="showToTop"
-        position="bottom"
-        class="text-end pointer-events-none"
-        size="80"
-      >
-        <v-btn
-          class="me-8 pointer-events-initial"
-          :size="size!"
-          color="primary"
-          elevation="8"
-          :icon="mdiChevronUp"
-          @click="toTop()"
-        ></v-btn>
-      </v-layout-item>
-    </slot>
-  </div>
-</template>
 
 <style lang="sass" scoped></style>

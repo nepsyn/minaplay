@@ -28,6 +28,7 @@
             maxlength="40"
             v-model="edit.address"
             @keydown.enter="sendCode()"
+            autofocus
           >
           </v-text-field>
           <v-btn

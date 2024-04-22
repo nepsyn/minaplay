@@ -53,7 +53,13 @@ import {
 import { FileEntity, FileQueryDto } from '@/api/interfaces/file.interface';
 import { SystemStatus } from '@/api/interfaces/system.interface';
 import { LiveDto, LiveEntity, LiveQueryDto } from '@/api/interfaces/live.interface';
-import { PluginControl } from '@/api/interfaces/plugin.interface';
+import {
+  MinaPlayPluginSourceCalendarDay,
+  MinaPlayPluginSourceEpisode,
+  MinaPlayPluginSourceSeries,
+  MinaPlayPluginSourceSeriesSubscribe,
+  PluginControl,
+} from '@/api/interfaces/plugin.interface';
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
 import {
   EmailBindData,
@@ -274,6 +280,22 @@ export const useApiStore = defineStore('api', () => {
     enable: (id: string) => apiPost<PluginControl>(`/api/v1/plugins/${id}/enable`),
     disable: (id: string) => apiPost<PluginControl>(`/api/v1/plugins/${id}/disable`),
     uninstall: (id: string) => apiDelete<PluginControl[]>(`/api/v1/plugins/${id}`),
+    getParserCalendar: (pluginId: string, parserId: string) =>
+      apiGet<MinaPlayPluginSourceCalendarDay[]>(`/api/v1/plugins/${pluginId}/parser/${parserId}/calendar`),
+    getParserSeries: (pluginId: string, parserId: string, seriesId: string) =>
+      apiGet<MinaPlayPluginSourceSeries>(`/api/v1/plugins/${pluginId}/parser/${parserId}/series/${seriesId}`),
+    getParserSeriesSubscribe: (pluginId: string, parserId: string, seriesId: string) =>
+      apiGet<MinaPlayPluginSourceSeriesSubscribe>(
+        `/api/v1/plugins/${pluginId}/parser/${parserId}/series/${seriesId}/subscribe`,
+      ),
+    queryParserSeries: (pluginId: string, parserId: string) =>
+      apiGet<ApiQueryResult<MinaPlayPluginSourceSeries>, { keyword: string; page?: number; size?: number }>(
+        `/api/v1/plugins/${pluginId}/parser/${parserId}/series`,
+      ),
+    queryParserSeriesEpisode: (pluginId: string, parserId: string, seriesId: string) =>
+      apiGet<ApiQueryResult<MinaPlayPluginSourceEpisode>, { page?: number; size?: number }>(
+        `/api/v1/plugins/${pluginId}/parser/${parserId}/series/${seriesId}/episode`,
+      ),
   };
 
   const Notification = {

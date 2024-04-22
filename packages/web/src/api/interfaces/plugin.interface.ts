@@ -54,7 +54,7 @@ export interface MinaPlayPluginSourceEpisode {
   id: string | number;
   title?: string;
   no: string;
-  pubAt?: Date;
+  pubAt?: string;
   posterUrl?: string;
   downloadUrl?: string;
   playUrl?: string;
@@ -65,11 +65,17 @@ export interface MinaPlayPluginSourceSeries {
   name: string;
   season?: string;
   posterUrl?: string;
-  pubAt?: Date;
+  pubAt?: string;
   finished?: boolean;
   count?: number;
   description?: string;
   tags?: string[];
+}
+
+export interface MinaPlayPluginSourceSeriesSubscribe {
+  series: MinaPlayPluginSourceSeries;
+  source: MinaPlayPluginSource;
+  code: string;
 }
 
 export interface MinaPlayPluginSourceCalendarDay {

@@ -158,6 +158,18 @@ export default {
   },
   parser: {
     available: 'Available Parsers',
+    calendar: 'Update Calendar',
+    weekdays: {
+      today: 'Today',
+      0: 'SUN',
+      1: 'MON',
+      2: 'Tue',
+      3: 'WED',
+      4: 'THUR',
+      5: 'FRI',
+      6: 'SAT',
+    },
+    search: 'Search Series',
   },
   resource: {
     seriesUpdates: 'Series Updates',

@@ -159,6 +159,18 @@ const zh: MessageSchema = {
   },
   parser: {
     available: '可用解析器',
+    calendar: '更新日期表',
+    weekdays: {
+      today: '今天',
+      0: '周日',
+      1: '周一',
+      2: '周二',
+      3: '周三',
+      4: '周四',
+      5: '周五',
+      6: '周六',
+    },
+    search: '查找剧集',
   },
   resource: {
     seriesUpdates: '最新剧集',

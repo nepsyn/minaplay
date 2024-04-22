@@ -2,119 +2,121 @@
   <v-app-bar order="1" border="b" color="background" flat>
     <v-app-bar-nav-icon variant="text" @click.stop="layout.navDrawer = !layout.navDrawer"></v-app-bar-nav-icon>
 
-    <v-toolbar-title>
+    <v-app-bar-title>
       <router-link to="/" class="title-link" active-class="title-link">
         {{ t('app.name') }}
       </router-link>
-    </v-toolbar-title>
-    <template v-slot:append>
-      <div class="d-flex flex-row align-center">
-        <div class="d-none d-sm-flex">
-          <v-tooltip v-for="(action, index) in actions" :key="index" location="bottom" open-delay="500">
-            {{ action.text }}
-            <template #activator="{ props }">
-              <v-btn v-if="action.show" v-bind="props" :icon="action.icon" @click="action.click()"> </v-btn>
-            </template>
-          </v-tooltip>
-        </div>
-        <v-menu>
-          <v-card max-width="360" class="overflow-x-hidden">
-            <v-list density="compact" class="pa-0">
-              <template v-for="(action, index) in actions" :key="index">
-                <v-list-item
-                  link
-                  v-if="action.show"
-                  @click="action.click()"
-                  :title="action.text"
-                  :prepend-icon="action.icon"
-                ></v-list-item>
-              </template>
-            </v-list>
-          </v-card>
-          <template #activator="{ props }">
-            <v-btn v-bind="props" class="d-flex d-sm-none" :icon="mdiDotsVertical"></v-btn>
+    </v-app-bar-title>
+
+    <v-spacer></v-spacer>
+
+    <v-tooltip v-for="(action, index) in actions" :key="index" location="bottom" open-delay="500">
+      {{ action.text }}
+      <template #activator="{ props }">
+        <v-btn class="d-none d-sm-block" v-if="action.show" v-bind="props" :icon="action.icon" @click="action.click()">
+        </v-btn>
+      </template>
+    </v-tooltip>
+
+    <v-menu>
+      <v-card max-width="360" class="overflow-x-hidden">
+        <v-list density="compact" class="pa-0">
+          <template v-for="(action, index) in actions" :key="index">
+            <v-list-item
+              link
+              v-if="action.show"
+              @click="action.click()"
+              :title="action.text"
+              :prepend-icon="action.icon"
+            ></v-list-item>
           </template>
-        </v-menu>
-        <v-menu v-if="api.user">
-          <v-card min-width="240" max-width="360" class="overflow-x-hidden">
-            <v-container fluid class="d-flex flex-row align-center">
-              <user-avatar :src="api.user.avatar && api.File.buildRawPath(api.user.avatar)" size="64"></user-avatar>
-              <v-container fluid class="py-0 d-flex flex-column">
-                <span class="text-h6 text-truncate">{{ api.user!.username }}</span>
-                <v-container fluid class="pa-0">
-                  <v-btn
-                    variant="tonal"
-                    color="primary"
-                    size="x-small"
-                    :prepend-icon="mdiPencil"
-                    @click="router.push({ path: '/setting/profile' })"
-                  >
-                    {{ t('layout.user.edit') }}
-                  </v-btn>
-                </v-container>
-              </v-container>
-            </v-container>
-            <v-divider></v-divider>
-            <v-list density="compact">
-              <v-list-item color="primary" @click="layout.notificationWindow = true">
-                <template #prepend>
-                  <v-icon :icon="mdiBell"></v-icon>
-                </template>
-                {{ t('layout.user.notification.title') }}
-                <template #append>
-                  <v-badge
-                    inline
-                    v-if="notification.unread.length > 0"
-                    color="error-darken-1"
-                    :content="notification.unread.length"
-                  ></v-badge>
-                </template>
-              </v-list-item>
-              <v-dialog width="auto">
-                <template #default="{ isActive }">
-                  <v-card>
-                    <v-card-title>{{ t('layout.user.logout.title') }}</v-card-title>
-                    <v-card-text>{{ t('layout.user.logout.confirm') }}</v-card-text>
-                    <v-card-actions>
-                      <v-spacer></v-spacer>
-                      <v-btn color="primary" variant="text" @click="isActive.value = false">
-                        {{ t('app.cancel') }}
-                      </v-btn>
-                      <v-btn color="error" variant="plain" @click="logout()" :loading="logoutPending">
-                        {{ t('app.ok') }}
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
-                </template>
-                <template #activator="{ props }">
-                  <v-list-item :prepend-icon="mdiLogout" v-bind="props" variant="plain" base-color="error">
-                    {{ t('layout.user.logout.btn') }}
-                  </v-list-item>
-                </template>
-              </v-dialog>
-            </v-list>
-          </v-card>
-          <template #activator="{ props }">
-            <v-badge
-              color="error-darken-1"
-              :model-value="notification.unread.length > 0"
-              offset-x="4"
-              offset-y="4"
-              :content="notification.unread.length"
-            >
-              <user-avatar
-                v-bind="props"
-                v-if="api.user"
-                class="cursor-pointer ml-2"
-                :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar)"
-                size="40"
+        </v-list>
+      </v-card>
+      <template #activator="{ props }">
+        <v-btn v-bind="props" class="d-block d-sm-none" :icon="mdiDotsVertical"></v-btn>
+      </template>
+    </v-menu>
+
+    <v-divider class="mx-3 align-self-center" length="32" vertical></v-divider>
+
+    <v-menu v-if="api.user">
+      <v-card min-width="240" max-width="360" class="overflow-x-hidden">
+        <v-container fluid class="d-flex flex-row align-center">
+          <user-avatar :src="api.user.avatar && api.File.buildRawPath(api.user.avatar)" size="64"></user-avatar>
+          <v-container fluid class="py-0 d-flex flex-column">
+            <span class="text-h6 text-truncate">{{ api.user!.username }}</span>
+            <v-container fluid class="pa-0">
+              <v-btn
+                variant="tonal"
+                color="primary"
+                size="x-small"
+                :prepend-icon="mdiPencil"
+                @click="router.push({ path: '/setting/profile' })"
               >
-              </user-avatar>
-            </v-badge>
-          </template>
-        </v-menu>
-      </div>
-    </template>
+                {{ t('layout.user.edit') }}
+              </v-btn>
+            </v-container>
+          </v-container>
+        </v-container>
+        <v-divider></v-divider>
+        <v-list density="compact">
+          <v-list-item color="primary" @click="layout.notificationWindow = true">
+            <template #prepend>
+              <v-icon :icon="mdiBell"></v-icon>
+            </template>
+            {{ t('layout.user.notification.title') }}
+            <template #append>
+              <v-badge
+                inline
+                v-if="notification.unread.length > 0"
+                color="error-darken-1"
+                :content="notification.unread.length"
+              ></v-badge>
+            </template>
+          </v-list-item>
+          <v-dialog width="auto">
+            <template #default="{ isActive }">
+              <v-card>
+                <v-card-title>{{ t('layout.user.logout.title') }}</v-card-title>
+                <v-card-text>{{ t('layout.user.logout.confirm') }}</v-card-text>
+                <v-card-actions>
+                  <v-spacer></v-spacer>
+                  <v-btn color="primary" variant="text" @click="isActive.value = false">
+                    {{ t('app.cancel') }}
+                  </v-btn>
+                  <v-btn color="error" variant="plain" @click="logout()" :loading="logoutPending">
+                    {{ t('app.ok') }}
+                  </v-btn>
+                </v-card-actions>
+              </v-card>
+            </template>
+            <template #activator="{ props }">
+              <v-list-item :prepend-icon="mdiLogout" v-bind="props" variant="plain" base-color="error">
+                {{ t('layout.user.logout.btn') }}
+              </v-list-item>
+            </template>
+          </v-dialog>
+        </v-list>
+      </v-card>
+      <template #activator="{ props }">
+        <v-badge
+          color="error-darken-1"
+          :model-value="notification.unread.length > 0"
+          offset-x="4"
+          offset-y="4"
+          :content="notification.unread.length"
+        >
+          <user-avatar
+            v-bind="props"
+            v-if="api.user"
+            class="cursor-pointer mr-3"
+            :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar)"
+            size="40"
+          >
+          </user-avatar>
+        </v-badge>
+      </template>
+    </v-menu>
   </v-app-bar>
 
   <v-navigation-drawer order="1" v-model="layout.navDrawer" elevation="0">

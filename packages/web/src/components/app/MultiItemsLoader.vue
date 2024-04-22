@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <slot></slot>
+    <slot v-if="!waitData || loader.loaded.value"></slot>
     <slot name="loading" v-if="loader.pending.value && !hideLoading">
       <v-container class="d-flex flex-column justify-center align-center text-body-2">
         <v-progress-circular color="primary" indeterminate></v-progress-circular>
@@ -64,6 +64,7 @@ const props = withDefaults(
     hideEmpty?: boolean;
     auto?: boolean;
     lazy?: boolean;
+    waitData?: boolean;
   }>(),
   {
     hideLoadMore: false,
@@ -73,6 +74,7 @@ const props = withDefaults(
     hideEmpty: false,
     auto: false,
     lazy: false,
+    waitData: false,
   },
 );
 

@@ -1,11 +1,11 @@
 <template>
   <v-layout class="page-height">
     <v-navigation-drawer class="d-none d-md-flex" mobile-breakpoint="md" location="right">
-      <v-list :lines="false" density="compact" nav>
+      <v-list slim :lines="false" density="compact" nav>
         <v-list-subheader class="font-weight-bold">
           {{ t('parser.available') }}
         </v-list-subheader>
-        <multi-items-loader class="pa-0" :loader="pluginsLoader" hide-load-more :hide-empty="plugins.length > 0">
+        <multi-items-loader lazy class="pa-0" :loader="pluginsLoader" hide-load-more :hide-empty="plugins.length > 0">
           <v-list-item
             v-for="(parser, index) in parsers"
             :key="index"
@@ -27,7 +27,19 @@
         </multi-items-loader>
       </v-list>
     </v-navigation-drawer>
-    <v-main> </v-main>
+    <v-main>
+      <to-top-container class="page-height overflow-auto">
+        <multi-items-loader
+          wait-data
+          class="pa-md-8 text-wrap text-break"
+          :loader="pluginsLoader"
+          hide-load-more
+          :hide-empty="plugins.length > 0"
+        >
+          <authed-router-view match="^/parser/[^/]+$"></authed-router-view>
+        </multi-items-loader>
+      </to-top-container>
+    </v-main>
   </v-layout>
 </template>
 
@@ -36,9 +48,11 @@ import { useI18n } from 'vue-i18n';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { useApiStore } from '@/store/api';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
-import { computed } from 'vue';
+import { computed, provide } from 'vue';
 import PluginOverview from '@/components/plugin/PluginOverview.vue';
 import { mdiInformationVariantCircleOutline } from '@mdi/js';
+import ToTopContainer from '@/components/app/ToTopContainer.vue';
+import AuthedRouterView from '@/components/app/AuthedRouterView.vue';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -46,7 +60,7 @@ const api = useApiStore();
 const pluginsLoader = useAxiosPageLoader(async () => {
   return await api.Plugin.getAll();
 });
-const { items: plugins, reload: loadPlugins } = pluginsLoader;
+const { items: plugins } = pluginsLoader;
 const parsers = computed(() => {
   return plugins.value
     .map((plugin) => {
@@ -54,6 +68,7 @@ const parsers = computed(() => {
     })
     .flat();
 });
+provide('parsers', parsers);
 </script>
 
 <style scoped lang="sass"></style>

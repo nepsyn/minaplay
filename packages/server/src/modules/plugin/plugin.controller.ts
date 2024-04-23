@@ -13,6 +13,7 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { AuthorizationGuard } from '../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -23,6 +24,7 @@ import { buildException } from '../../utils/build-exception.util.js';
 import { isDefined, isEmpty, isString } from 'class-validator';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { PluginSourceParser } from './plugin.interface.js';
+import { CacheInterceptor, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('plugins')
 @UseGuards(AuthorizationGuard)
@@ -68,18 +70,22 @@ export class PluginController {
     return new ApiPaginationResultDto(controls, controls.length, 0, -1);
   }
 
-  @Get(':id/parser/:parser/calendar')
+  @Get(':pluginId/parser/:parser/calendar')
   @ApiOperation({
     description: '获取插件 parser 更新表',
   })
-  async getParserCalendar(@Param('id') id: string, @Param('parser') name: string) {
-    return await this.invokeParser(id, name, 'getCalendar');
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(60 * 60 * 1000)
+  async getParserCalendar(@Param('pluginId') pluginId: string, @Param('parser') name: string) {
+    return await this.invokeParser(pluginId, name, 'getCalendar');
   }
 
   @Get(':pluginId/parser/:parser/series/:seriesId')
   @ApiOperation({
     description: '获取插件 parser 剧集',
   })
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30 * 60 * 1000)
   async getParserSeriesById(
     @Param('pluginId') pluginId: string,
     @Param('parser') name: string,
@@ -96,6 +102,8 @@ export class PluginController {
   @ApiOperation({
     description: '获取插件 parser 剧集订阅信息',
   })
+  @UseInterceptors(CacheInterceptor)
+  @CacheTTL(30 * 60 * 1000)
   async getParserSeriesCodeBySeriesId(
     @Param('pluginId') pluginId: string,
     @Param('parser') name: string,

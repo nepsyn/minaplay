@@ -170,6 +170,7 @@ export default {
       6: 'SAT',
     },
     search: 'Search Series',
+    backToHome: 'Back to Parser Home',
   },
   resource: {
     seriesUpdates: 'Series Updates',

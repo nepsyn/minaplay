@@ -171,6 +171,7 @@ const zh: MessageSchema = {
       6: '周六',
     },
     search: '查找剧集',
+    backToHome: '返回到解析器首页',
   },
   resource: {
     seriesUpdates: '最新剧集',

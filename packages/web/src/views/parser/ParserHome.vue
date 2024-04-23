@@ -17,7 +17,30 @@
         :label="t('app.input.keyword')"
         :placeholder="t('app.input.placeholder', { item: t('app.entities.series') })"
         clearable
+        v-model.trim="keyword"
+        @update:model-value="useSeriesQuery()"
       ></v-text-field>
+
+      <multi-items-loader
+        v-if="seriesLoading || seriesLoaded"
+        class="pa-0 mt-4"
+        :loader="seriesLoader"
+        :hide-empty="series.length > 0"
+        lazy
+      >
+        <v-row :dense="display.mdAndDown.value">
+          <v-col v-for="item in series" :key="item.id" cols="4" sm="3" md="2">
+            <series-overview :series="item as any" @click="onSeriesClick(item)"></series-overview>
+          </v-col>
+        </v-row>
+        <template #loading>
+          <v-row :dense="display.mdAndDown.value">
+            <v-col v-for="index in 12" :key="index" cols="4" sm="3" md="2">
+              <v-skeleton-loader type="image,list-item-two-line"></v-skeleton-loader>
+            </v-col>
+          </v-row>
+        </template>
+      </multi-items-loader>
     </div>
 
     <div class="mb-8" v-if="parser?.features.getCalendar">
@@ -68,6 +91,9 @@ import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
 import { useToastStore } from '@/store/toast';
 import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
+import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
+import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
+import { debounce } from '@/utils/utils';
 
 const { t } = useI18n();
 const api = useApiStore();
@@ -81,6 +107,40 @@ const parser = computed(() => {
   return (parsers?.value ?? []).find(
     ({ name, plugin }) => name === route.params.parserId && plugin.id === route.params.pluginId,
   );
+});
+
+const keyword = ref('');
+const seriesLoader = useAxiosPageLoader(
+  async (query) => {
+    if (!parser.value || !parser.value.features.searchSeries) {
+      throw new Error('not implemented');
+    }
+    return await api.Plugin.queryParserSeries(
+      parser.value.plugin.id,
+      parser.value.name,
+    )({
+      keyword: keyword.value,
+      ...query,
+    });
+  },
+  { page: 0, size: 12 },
+);
+const { reload: querySeries, pending: seriesLoading, reset: resetSeries, loaded: seriesLoaded } = seriesLoader;
+const useSeriesQuery = debounce(() => {
+  if (keyword.value?.length > 0) {
+    return querySeries();
+  } else {
+    resetSeries();
+  }
+}, 1000);
+const series = computed(() => {
+  return (seriesLoader.items.value ?? []).map((item) => ({
+    ...item,
+    poster: {
+      source: FileSourceEnum.NETWORK,
+      url: item.posterUrl,
+    },
+  }));
 });
 
 const weekday = ref(new Date().getDay());

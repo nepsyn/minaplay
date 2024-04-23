@@ -121,7 +121,7 @@ export class PluginService implements OnModuleInit {
           control.services.push(service);
 
           const parserMetadata = getMinaPlayPluginParserMetadata(service.constructor);
-          if (isDefined(parserMetadata?.name)) {
+          if (isDefined(parserMetadata?.name) && isDefined(parserMetadata?.features)) {
             control.parserMap.set(parserMetadata.name, {
               ...parserMetadata,
               service,

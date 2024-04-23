@@ -3,6 +3,7 @@ import { Argument, Command, Option } from 'commander';
 import { Observable } from 'rxjs';
 import { MinaPlayMessage } from '../../common/application.message.js';
 import { PluginListenerContext } from './plugin-listener-context.js';
+import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 
 export interface MinaPlayPluginMetadata extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   /** Plugin unique ID */
@@ -127,6 +128,7 @@ export interface MinaPlayPluginSourceSeries {
   season?: string;
   posterUrl?: string;
   pubAt?: Date;
+  updateTime?: string;
   finished?: boolean;
   count?: number;
   description?: string;
@@ -139,17 +141,19 @@ export interface MinaPlayPluginSourceCalendarDay {
   items: MinaPlayPluginSourceSeries[];
 }
 
+export type MaybePromise<T> = T | Promise<T>;
+
 export interface PluginSourceParser {
   /**
    * Get update calendar
    */
-  getCalendar?(): MinaPlayPluginSourceCalendarDay[] | Promise<MinaPlayPluginSourceCalendarDay[]>;
+  getCalendar?(): MaybePromise<MinaPlayPluginSourceCalendarDay[]>;
 
   /**
    * Get series by ID
    * @param id series ID
    */
-  getSeriesById?(id: string): MinaPlayPluginSourceSeries | Promise<MinaPlayPluginSourceSeries>;
+  getSeriesById?(id: string): MaybePromise<MinaPlayPluginSourceSeries>;
 
   /**
    * Search series by keyword
@@ -161,19 +165,19 @@ export interface PluginSourceParser {
     keyword: string,
     page?: number,
     size?: number,
-  ): MinaPlayPluginSourceSeries[] | Promise<MinaPlayPluginSourceSeries[]>;
+  ): MaybePromise<ApiPaginationResultDto<MinaPlayPluginSourceSeries>>;
 
   /**
    * Build subscribeSource for series
    * @param series series
    */
-  buildSourceOfSeries?(series: MinaPlayPluginSourceSeries): MinaPlayPluginSource | Promise<MinaPlayPluginSource>;
+  buildSourceOfSeries?(series: MinaPlayPluginSourceSeries): MaybePromise<MinaPlayPluginSource>;
 
   /**
    * Build rule code for series
    * @param series series
    */
-  buildRuleCodeOfSeries?(series: MinaPlayPluginSourceSeries): string | Promise<string>;
+  buildRuleCodeOfSeries?(series: MinaPlayPluginSourceSeries): MaybePromise<string>;
 
   /**
    * Get episodes of series by series ID
@@ -185,5 +189,5 @@ export interface PluginSourceParser {
     id: string | number,
     page?: number,
     size?: number,
-  ): MinaPlayPluginSourceEpisode[] | Promise<MinaPlayPluginSourceEpisode[]>;
+  ): MaybePromise<ApiPaginationResultDto<MinaPlayPluginSourceEpisode>>;
 }

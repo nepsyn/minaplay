@@ -142,7 +142,8 @@ export class PluginController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    return await this.invokeParser(pluginId, name, 'searchSeries', keyword, page, size);
+    const items = await this.invokeParser(pluginId, name, 'searchSeries', keyword, page, size);
+    return new ApiPaginationResultDto(items, -1, page, size);
   }
 
   @Get(':pluginId/parser/:parser/series/:seriesId/episode')
@@ -168,7 +169,8 @@ export class PluginController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    return await this.invokeParser(pluginId, name, 'getEpisodesBySeriesId', seriesId, page, size);
+    const items = await this.invokeParser(pluginId, name, 'getEpisodesBySeriesId', seriesId, page, size);
+    return new ApiPaginationResultDto(items, -1, page, size);
   }
 
   @Post(':id/enable')

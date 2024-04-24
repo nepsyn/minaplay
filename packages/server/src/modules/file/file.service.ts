@@ -80,19 +80,21 @@ export class FileService implements OnModuleInit {
     const files = await this.fileRepository.find({ where });
     for (const file of files) {
       await this.fileRepository.delete({ id: file.id });
-      try {
-        await fs.unlink(file.path);
-      } catch (error) {
-        this.logger.error(`Delete file '${file.id}' error`, error.stack, FileService.name);
-      }
-
-      try {
-        const files = await fs.readdir(path.dirname(file.path));
-        if (files.length === 0) {
-          await fs.rmdir(path.dirname(file.path));
+      if (file.source !== FileSourceEnum.NETWORK) {
+        try {
+          await fs.unlink(file.path);
+        } catch (error) {
+          this.logger.error(`Delete file '${file.id}' error`, error.stack, FileService.name);
         }
-      } catch (error) {
-        this.logger.error(`Delete empty dir '${path.dirname(file.path)}' error`, error.stack, FileService.name);
+
+        try {
+          const files = await fs.readdir(path.dirname(file.path));
+          if (files.length === 0) {
+            await fs.rmdir(path.dirname(file.path));
+          }
+        } catch (error) {
+          this.logger.error(`Delete empty dir '${path.dirname(file.path)}' error`, error.stack, FileService.name);
+        }
       }
     }
 

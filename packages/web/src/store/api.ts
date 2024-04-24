@@ -58,6 +58,7 @@ import {
   MinaPlayPluginSourceEpisode,
   MinaPlayPluginSourceSeries,
   MinaPlayPluginSourceSeriesSubscribe,
+  MinaPlayPluginSourceSeriesSubscribeResult,
   PluginControl,
 } from '@/api/interfaces/plugin.interface';
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
@@ -286,6 +287,10 @@ export const useApiStore = defineStore('api', () => {
       apiGet<MinaPlayPluginSourceSeries>(`/api/v1/plugins/${pluginId}/parser/${parserId}/series/${seriesId}`),
     getParserSeriesSubscribe: (pluginId: string, parserId: string, seriesId: string) =>
       apiGet<MinaPlayPluginSourceSeriesSubscribe>(
+        `/api/v1/plugins/${pluginId}/parser/${parserId}/series/${seriesId}/subscribe`,
+      ),
+    createParserSeriesSubscribe: (pluginId: string, parserId: string, seriesId: string) =>
+      apiPost<MinaPlayPluginSourceSeriesSubscribeResult, { seriesOnly?: boolean }>(
         `/api/v1/plugins/${pluginId}/parser/${parserId}/series/${seriesId}/subscribe`,
       ),
     queryParserSeries: (pluginId: string, parserId: string) =>

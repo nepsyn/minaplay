@@ -99,9 +99,7 @@ const {
 } = useAxiosRequest(async () => {
   return await api.Source.create({
     title: t('source.unnamed'),
-    cron: '0 */30 * * * *',
     url: 'https://example.com/rss.xml',
-    enabled: false,
   });
 });
 onCreated(async (data) => {

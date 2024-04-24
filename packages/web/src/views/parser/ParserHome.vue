@@ -78,7 +78,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ComputedRef, inject, ref } from 'vue';
+import { computed, ComputedRef, inject, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
@@ -90,7 +90,6 @@ import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
 import { useToastStore } from '@/store/toast';
-import { ErrorCodeEnum } from '@/api/enums/error-code.enum';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { debounce } from '@/utils/utils';
@@ -108,6 +107,14 @@ const parser = computed(() => {
     ({ name, plugin }) => name === route.params.parserId && plugin.id === route.params.pluginId,
   );
 });
+watch(
+  () => parser.value,
+  async () => {
+    if (!parser.value) {
+      await router.replace({ path: '/parser' });
+    }
+  },
+);
 
 const keyword = ref('');
 const seriesLoader = useAxiosPageLoader(
@@ -123,7 +130,7 @@ const seriesLoader = useAxiosPageLoader(
       ...query,
     });
   },
-  { page: 0, size: 12 },
+  { page: 0, size: 36 },
 );
 const { reload: querySeries, pending: seriesLoading, reset: resetSeries, loaded: seriesLoaded } = seriesLoader;
 const useSeriesQuery = debounce(() => {
@@ -161,11 +168,7 @@ const weekdayItems = computed(() => {
   }));
 });
 const onSeriesClick = async (item: MinaPlayPluginSourceSeries) => {
-  if (parser.value?.features.getSeriesById) {
-    await router.push({ path: `/parser/${parser.value!.plugin.id}/${parser.value!.name}/${item.id}` });
-  } else {
-    toast.toastError(t(`error.${ErrorCodeEnum.NOT_IMPLEMENTED}`));
-  }
+  await router.push({ path: `/parser/${parser.value!.plugin.id}/${parser.value!.name}/${item.id}` });
 };
 </script>
 

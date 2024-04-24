@@ -172,6 +172,10 @@ const zh: MessageSchema = {
     },
     search: '查找剧集',
     backToHome: '返回到解析器首页',
+    createSubscribe: '创建订阅',
+    subscribeCreated: '订阅已创建',
+    addSeries: '添加剧集',
+    seriesAdded: '剧集已添加',
   },
   resource: {
     seriesUpdates: '最新剧集',

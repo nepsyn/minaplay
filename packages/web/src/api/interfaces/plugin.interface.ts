@@ -1,4 +1,6 @@
 import { MinaPlayMessage } from '@/api/interfaces/message.interface';
+import { SeriesEntity } from '@/api/interfaces/series.interface';
+import { RuleEntity, SourceEntity } from '@/api/interfaces/subscribe.interface';
 
 export interface PluginControl {
   id: string;
@@ -51,7 +53,6 @@ export interface MinaPlayPluginSource {
 }
 
 export interface MinaPlayPluginSourceEpisode {
-  id: string | number;
   title?: string;
   no: string;
   pubAt?: string;
@@ -76,6 +77,12 @@ export interface MinaPlayPluginSourceSeriesSubscribe {
   series: MinaPlayPluginSourceSeries;
   source: MinaPlayPluginSource;
   code: string;
+}
+
+export interface MinaPlayPluginSourceSeriesSubscribeResult {
+  series: SeriesEntity;
+  source: SourceEntity;
+  rule: RuleEntity;
 }
 
 export interface MinaPlayPluginSourceCalendarDay {

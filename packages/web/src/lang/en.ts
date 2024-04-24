@@ -171,6 +171,10 @@ export default {
     },
     search: 'Search Series',
     backToHome: 'Back to Parser Home',
+    createSubscribe: 'Create Subscribe',
+    subscribeCreated: 'Subscribe Created',
+    addSeries: 'Add Series',
+    seriesAdded: 'Series Added',
   },
   resource: {
     seriesUpdates: 'Series Updates',

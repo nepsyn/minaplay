@@ -18,6 +18,35 @@
               </span>
             </div>
           </div>
+          <v-row dense class="pa-0 mt-1">
+            <v-col cols="auto">
+              <v-btn
+                v-if="parser?.features.buildRuleCodeOfSeries && parser?.features.buildSourceOfSeries"
+                :loading="subscribeCreating"
+                :disabled="subscribeCreated"
+                variant="tonal"
+                color="warning"
+                density="comfortable"
+                :prepend-icon="subscribeCreated ? mdiCheck : mdiRss"
+                @click="createSubscribe"
+              >
+                {{ t(subscribeCreated ? 'parser.subscribeCreated' : 'parser.createSubscribe') }}
+              </v-btn>
+            </v-col>
+            <v-col cols="auto">
+              <v-btn
+                :loading="seriesCreating"
+                :disabled="seriesCreated"
+                variant="tonal"
+                color="primary"
+                density="comfortable"
+                :prepend-icon="seriesCreated ? mdiCheck : mdiAnimationPlayOutline"
+                @click="createSeries"
+              >
+                {{ t(seriesCreated ? 'parser.seriesAdded' : 'parser.addSeries') }}
+              </v-btn>
+            </v-col>
+          </v-row>
           <v-row class="mt-2">
             <v-col cols="4" class="d-block d-sm-none">
               <zoom-img
@@ -29,6 +58,7 @@
             </v-col>
             <v-col cols="8" sm="12">
               <expandable-text
+                ratio="0.25"
                 class="text-subtitle-1"
                 :content="series.description ?? t('resource.noDescription')"
                 style="min-height: 100px"
@@ -45,29 +75,47 @@
           ></zoom-img>
         </v-col>
       </v-row>
-      <v-divider class="my-3"></v-divider>
-      <v-row dense class="d-flex justify-start"> </v-row>
+    </v-sheet>
+    <v-divider v-if="parser?.features.getEpisodesBySeriesId" class="my-3"></v-divider>
+    <v-sheet v-if="parser?.features.getEpisodesBySeriesId" class="pa-4">
+      <div class="d-flex align-center">
+        <v-icon :icon="mdiViewComfy" size="large"></v-icon>
+        <span class="text-h6 ml-3">{{ t('resource.episodes') }}</span>
+      </div>
+      <multi-items-loader class="px-0 py-3" :loader="episodesLoader" :hide-empty="episodes.length > 0">
+        <v-row dense>
+          <v-col cols="auto" v-for="(episode, index) in episodes" :key="index">
+            <v-btn variant="outlined">
+              {{ episode.no }}
+            </v-btn>
+          </v-col>
+        </v-row>
+      </multi-items-loader>
     </v-sheet>
   </single-item-loader>
 </template>
 
 <script setup lang="ts">
-import { computed, ComputedRef, inject } from 'vue';
+import { computed, ComputedRef, inject, ref } from 'vue';
 import { MinaPlayParserMetadata, PluginControl } from '@/api/interfaces/plugin.interface';
 import { useRoute, useRouter } from 'vue-router';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useApiStore } from '@/store/api';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
-import { mdiChevronLeft } from '@mdi/js';
+import { mdiAnimationPlayOutline, mdiCheck, mdiChevronLeft, mdiRss, mdiViewComfy } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import SeriesPosterFallback from '@/assets/banner-portrait.jpeg';
 import ExpandableText from '@/components/app/ExpandableText.vue';
 import ZoomImg from '@/components/app/ZoomImg.vue';
+import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
+import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
+import { useToastStore } from '@/store/toast';
 
 const { t } = useI18n();
 const api = useApiStore();
 const route = useRoute();
 const router = useRouter();
+const toast = useToastStore();
 
 const backToHome = async () => {
   await router.replace({ path: `/parser/${parser.value!.plugin.id}/${parser.value!.name}` });
@@ -88,10 +136,68 @@ onSeriesLoaded(async (data) => {
   if (!data.name || !data.id) {
     await router.replace({ path: '/404' });
   }
+
+  try {
+    const series = await api.Series.query({ name: data.name, season: data.season });
+    seriesCreated.value = series.data.items.length > 0;
+  } catch {}
 });
 onSeriesLoadFailed(async () => {
   await router.replace({ path: '/404' });
 });
+
+const subscribeCreated = ref(false);
+const {
+  request: createSubscribe,
+  pending: subscribeCreating,
+  onResolved: onSubscribeCreated,
+  onRejected: onSubscribeCreateFailed,
+} = useAxiosRequest(async () => {
+  return api.Plugin.createParserSeriesSubscribe(
+    parser.value!.plugin.id,
+    parser.value!.name,
+    route.params.seriesId as string,
+  )();
+});
+onSubscribeCreated(() => {
+  subscribeCreated.value = true;
+  seriesCreated.value = true;
+});
+onSubscribeCreateFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const seriesCreated = ref(false);
+const {
+  request: createSeries,
+  pending: seriesCreating,
+  onResolved: onSeriesCreated,
+  onRejected: onSeriesCreateFailed,
+} = useAxiosRequest(async () => {
+  return api.Plugin.createParserSeriesSubscribe(
+    parser.value!.plugin.id,
+    parser.value!.name,
+    route.params.seriesId as string,
+  )({ seriesOnly: true });
+});
+onSeriesCreated(() => {
+  seriesCreated.value = true;
+});
+onSeriesCreateFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const episodesLoader = useAxiosPageLoader(
+  async (query) => {
+    return api.Plugin.queryParserSeriesEpisode(
+      parser.value!.plugin.id,
+      parser.value!.name,
+      route.params.seriesId as string,
+    )(query);
+  },
+  { page: 0, size: 60 },
+);
+const { items: episodes } = episodesLoader;
 </script>
 
 <style scoped lang="sass"></style>

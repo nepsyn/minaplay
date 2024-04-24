@@ -52,14 +52,16 @@ export class SourceController {
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
   async createSource(@RequestUser() user: User, @Body() data: SourceDto) {
-    if (!isDefined(data.url) || !isDefined(data.enabled) || !isDefined(data.cron)) {
+    if (!isDefined(data.url)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    try {
-      new CronTime(data.cron);
-    } catch {
-      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    if (isDefined(data.cron)) {
+      try {
+        new CronTime(data.cron);
+      } catch {
+        throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+      }
     }
 
     const { id } = await this.sourceService.save({

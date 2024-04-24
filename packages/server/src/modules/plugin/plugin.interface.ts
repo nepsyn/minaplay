@@ -113,7 +113,6 @@ export interface MinaPlayPluginSource {
 }
 
 export interface MinaPlayPluginSourceEpisode {
-  id: string | number;
   title?: string;
   no: string;
   pubAt?: Date;

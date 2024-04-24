@@ -7,7 +7,9 @@ import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'type
 export class SeriesTagService {
   constructor(@InjectRepository(SeriesTag) private seriesTagRepository: Repository<SeriesTag>) {}
 
-  async save(tag: DeepPartial<SeriesTag>) {
+  save(tag: DeepPartial<SeriesTag>): Promise<SeriesTag>;
+  save(tag: DeepPartial<SeriesTag>[]): Promise<SeriesTag[]>;
+  async save(tag: any) {
     return await this.seriesTagRepository.save(tag);
   }
 

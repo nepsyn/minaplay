@@ -5,10 +5,11 @@ import { UserModule } from '../user/user.module.js';
 import { PluginController } from './plugin.controller.js';
 import { PluginGateway } from './plugin.gateway.js';
 import { PLUGIN_SERVICE_TOKEN } from './constants.js';
+import { FileModule } from '../file/file.module.js';
 
 @Global()
 @Module({
-  imports: [AuthorizationModule, UserModule],
+  imports: [AuthorizationModule, UserModule, FileModule],
   controllers: [PluginController],
   providers: [
     PluginService,

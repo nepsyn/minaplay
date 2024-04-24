@@ -6,6 +6,13 @@ import { FileService } from '../../file/file.service.js';
 import IsolatedVM from 'isolated-vm';
 import { RuleHooks, RuleVm } from './rule.interface.js';
 import TypeScript from 'typescript';
+import { randomUUID } from 'node:crypto';
+import path from 'node:path';
+import { RULE_CODE_DIR } from '../../../constants.js';
+import fs from 'fs-extra';
+import { generateMD5 } from '../../../utils/generate-md5.util.js';
+import { FileSourceEnum } from '../../../enums/index.js';
+import { User } from '../../user/user.entity.js';
 
 @Injectable()
 export class RuleService {
@@ -69,6 +76,23 @@ export class RuleService {
       hooks,
       release,
     };
+  }
+
+  async createCodeFile(code: string, user?: User) {
+    const filename = randomUUID().replace(/-/g, '') + '.ts';
+    const filepath = path.join(RULE_CODE_DIR, filename);
+    await fs.ensureDir(RULE_CODE_DIR);
+    await fs.writeFile(filepath, code);
+    const fileStat = await fs.stat(filepath);
+    return await this.fileService.save({
+      user: user && { id: user.id },
+      filename: filename,
+      name: filename,
+      size: fileStat.size,
+      md5: await generateMD5(code),
+      source: FileSourceEnum.USER_UPLOAD,
+      path: filepath,
+    });
   }
 
   async save(rule: DeepPartial<Rule>) {

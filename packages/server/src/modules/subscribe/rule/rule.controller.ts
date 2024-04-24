@@ -16,13 +16,11 @@ import { AuthorizationGuard } from '../../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RuleService } from './rule.service.js';
 import { RequirePermissions } from '../../authorization/require-permissions.decorator.js';
-import { ErrorCodeEnum, FileSourceEnum, PermissionEnum } from '../../../enums/index.js';
+import { ErrorCodeEnum, PermissionEnum } from '../../../enums/index.js';
 import { RequestUser } from '../../../common/request.user.decorator.js';
 import { User } from '../../user/user.entity.js';
 import { RuleDto } from './rule.dto.js';
 import { buildException } from '../../../utils/build-exception.util.js';
-import { randomUUID } from 'node:crypto';
-import path from 'node:path';
 import { RULE_CODE_DIR } from '../../../constants.js';
 import fs from 'fs-extra';
 import { generateMD5 } from '../../../utils/generate-md5.util.js';
@@ -57,21 +55,7 @@ export class RuleController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    const filename = randomUUID().replace(/-/g, '') + '.ts';
-    const filepath = path.join(RULE_CODE_DIR, filename);
-    await fs.ensureDir(RULE_CODE_DIR);
-    await fs.writeFile(filepath, data.code);
-    const fileStat = await fs.stat(filepath);
-    const file = await this.fileService.save({
-      user: { id: user.id },
-      filename: filename,
-      name: filename,
-      size: fileStat.size,
-      md5: await generateMD5(data.code),
-      source: FileSourceEnum.USER_UPLOAD,
-      path: filepath,
-    });
-
+    const file = await this.ruleService.createCodeFile(data.code, user);
     const { id } = await this.ruleService.save({
       ...data,
       sources: data.sourceIds?.map((id) => ({ id })),

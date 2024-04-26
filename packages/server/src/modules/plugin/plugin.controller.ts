@@ -119,8 +119,6 @@ export class PluginController {
   @ApiOperation({
     description: '获取插件 parser 剧集订阅信息',
   })
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(30 * 60 * 1000)
   async getParserSeriesSubscribe(
     @Param('pluginId') pluginId: string,
     @Param('parser') name: string,
@@ -130,18 +128,24 @@ export class PluginController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    const series = await this.invokeParser(pluginId, name, 'getSeriesById', seriesId);
-    const source = await this.invokeParser(pluginId, name, 'buildSourceOfSeries', series);
-    const code = await this.invokeParser(pluginId, name, 'buildRuleCodeOfSeries', series);
-    return { series, source, code };
+    const parserSeries = await this.invokeParser(pluginId, name, 'getSeriesById', seriesId);
+    const series = await this.seriesService.findOneBy({ name: parserSeries.name, season: parserSeries.season });
+
+    let source = undefined;
+    try {
+      const parserSource = await this.invokeParser(pluginId, name, 'buildSourceOfSeries', parserSeries);
+      source = await this.sourceService.findOneBy({ url: parserSource.url });
+    } catch {}
+
+    const rule = await this.ruleService.findOneBy({ remark: `${pluginId}-${name}-${seriesId}` });
+
+    return { series, source, rule };
   }
 
   @Post(':pluginId/parser/:parser/series/:seriesId/subscribe')
   @ApiOperation({
     description: '添加插件 parser 剧集订阅',
   })
-  @UseInterceptors(CacheInterceptor)
-  @CacheTTL(30 * 60 * 1000)
   async createParserSeriesSubscribe(
     @RequestUser() user: User,
     @Param('pluginId') pluginId: string,
@@ -180,8 +184,6 @@ export class PluginController {
     }
 
     const parserSource = await this.invokeParser(pluginId, name, 'buildSourceOfSeries', parserSeries);
-    const parserCode = await this.invokeParser(pluginId, name, 'buildRuleCodeOfSeries', parserSeries);
-
     let source = await this.sourceService.findOneBy({ url: parserSource.url });
     if (!source) {
       source = await this.sourceService.save({
@@ -192,6 +194,7 @@ export class PluginController {
       });
     }
 
+    const parserCode = await this.invokeParser(pluginId, name, 'buildRuleCodeOfSeries', parserSeries);
     let rule = await this.ruleService.findOneBy({ remark: `${pluginId}-${name}-${seriesId}` });
     if (!rule) {
       const file = await this.ruleService.createCodeFile(parserCode, user);

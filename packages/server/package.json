@@ -17,7 +17,7 @@
     "dist"
   ],
   "dependencies": {
-    "@extractus/feed-extractor": "^7.1.0",
+    "@extractus/feed-extractor": "^7.1.2",
     "@nestjs/bull": "^10.1.1",
     "@nestjs/cache-manager": "^2.2.2",
     "@nestjs/common": "^10.3.8",

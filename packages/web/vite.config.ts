@@ -29,7 +29,7 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ttf,ico,svg}'],
+        globPatterns: ['**/*.{js,css,html,ttf,ico,svg,webp}'],
       },
       devOptions: {
         enabled: true,

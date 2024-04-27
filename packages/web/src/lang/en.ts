@@ -163,7 +163,7 @@ export default {
       today: 'Today',
       0: 'SUN',
       1: 'MON',
-      2: 'Tue',
+      2: 'TUE',
       3: 'WED',
       4: 'THUR',
       5: 'FRI',
@@ -175,6 +175,8 @@ export default {
     subscribeCreated: 'Subscribe Created',
     addSeries: 'Add Series',
     seriesAdded: 'Series Added',
+    play: 'Play',
+    download: 'Download',
   },
   resource: {
     seriesUpdates: 'Series Updates',

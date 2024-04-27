@@ -1,5 +1,5 @@
 <template>
-  <div class="d-flex flex-column">
+  <div class="d-flex flex-column" :key="parserKey">
     <div class="mb-8" v-if="parser?.features.searchSeries">
       <v-row dense class="pa-0 mb-3">
         <v-col cols="auto" class="d-flex flex-row align-center">
@@ -89,7 +89,6 @@ import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 import SeriesOverview from '@/components/resource/SeriesOverview.vue';
 import { useI18n } from 'vue-i18n';
 import { useDisplay } from 'vuetify';
-import { useToastStore } from '@/store/toast';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { debounce } from '@/utils/utils';
@@ -99,13 +98,15 @@ const api = useApiStore();
 const route = useRoute();
 const router = useRouter();
 const display = useDisplay();
-const toast = useToastStore();
 
 const parsers = inject<ComputedRef<(MinaPlayParserMetadata & { plugin: PluginControl })[]>>('parsers');
 const parser = computed(() => {
   return (parsers?.value ?? []).find(
     ({ name, plugin }) => name === route.params.parserId && plugin.id === route.params.pluginId,
   );
+});
+const parserKey = computed(() => {
+  return `${parser.value?.plugin.id ?? ''}-${parser.value?.name ?? ''}`;
 });
 watch(
   () => parser.value,

@@ -9,7 +9,6 @@
     :min-height="minHeight"
     :max-height="maxHeight"
     :src="src"
-    :eager="eager"
   >
     <template #placeholder>
       <slot name="placeholder">
@@ -45,11 +44,9 @@ withDefaults(
     height?: string | number;
     minHeight?: string | number;
     maxHeight?: string | number;
-    eager?: boolean;
   }>(),
   {
     placeholder: MediaPosterFallback,
-    eager: false,
   },
 );
 </script>

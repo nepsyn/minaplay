@@ -18,10 +18,10 @@
               </span>
             </div>
           </div>
-          <v-row dense class="pa-0 mt-1">
-            <v-col cols="auto">
+          <v-row dense class="pa-0 mt-1 flex-grow-0">
+            <v-col cols="auto" v-if="parser?.features.buildRuleCodeOfSeries && parser?.features.buildSourceOfSeries">
               <v-btn
-                v-if="parser?.features.buildRuleCodeOfSeries && parser?.features.buildSourceOfSeries"
+                v-if="!subscribeFetching"
                 :loading="subscribeCreating"
                 :disabled="subscribeCreated"
                 variant="tonal"
@@ -35,6 +35,7 @@
             </v-col>
             <v-col cols="auto">
               <v-btn
+                v-if="!subscribeFetching"
                 :loading="seriesCreating"
                 :disabled="seriesCreated"
                 variant="tonal"
@@ -83,13 +84,47 @@
         <span class="text-h6 ml-3">{{ t('resource.episodes') }}</span>
       </div>
       <multi-items-loader class="px-0 py-3" :loader="episodesLoader" :hide-empty="episodes.length > 0">
-        <v-row dense>
-          <v-col cols="auto" v-for="(episode, index) in episodes" :key="index">
-            <v-btn variant="outlined">
-              {{ episode.no }}
-            </v-btn>
-          </v-col>
-        </v-row>
+        <v-list slim density="compact" class="py-0">
+          <template v-for="(episode, index) in episodes" :key="index">
+            <v-list-item link>
+              <template #prepend>
+                <span class="font-weight-bold">{{ episode.no }}</span>
+              </template>
+              <v-list-item-title class="px-4">
+                {{ episode.title ?? '' }}
+              </v-list-item-title>
+              <template #append>
+                <v-tooltip location="bottom">
+                  {{ t('parser.play') }}
+                  <template #activator="{ props }">
+                    <v-btn
+                      variant="text"
+                      v-bind="props"
+                      :disabled="!episode.playUrl"
+                      density="comfortable"
+                      color="primary"
+                      :icon="mdiPlay"
+                    ></v-btn>
+                  </template>
+                </v-tooltip>
+                <v-tooltip location="bottom">
+                  {{ t('parser.download') }}
+                  <template #activator="{ props }">
+                    <v-btn
+                      variant="text"
+                      v-bind="props"
+                      :disabled="!episode.downloadUrl"
+                      density="comfortable"
+                      color="secondary"
+                      :icon="mdiDownload"
+                    ></v-btn>
+                  </template>
+                </v-tooltip>
+              </template>
+            </v-list-item>
+            <v-divider v-if="index < episodes.length - 1"></v-divider>
+          </template>
+        </v-list>
       </multi-items-loader>
     </v-sheet>
   </single-item-loader>
@@ -102,7 +137,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useApiStore } from '@/store/api';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
-import { mdiAnimationPlayOutline, mdiCheck, mdiChevronLeft, mdiRss, mdiViewComfy } from '@mdi/js';
+import { mdiAnimationPlayOutline, mdiCheck, mdiChevronLeft, mdiDownload, mdiPlay, mdiRss, mdiViewComfy } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import SeriesPosterFallback from '@/assets/banner-portrait.jpeg';
 import ExpandableText from '@/components/app/ExpandableText.vue';
@@ -137,13 +172,26 @@ onSeriesLoaded(async (data) => {
     await router.replace({ path: '/404' });
   }
 
-  try {
-    const series = await api.Series.query({ name: data.name, season: data.season });
-    seriesCreated.value = series.data.items.length > 0;
-  } catch {}
+  await getSubscribe();
 });
 onSeriesLoadFailed(async () => {
   await router.replace({ path: '/404' });
+});
+
+const {
+  request: getSubscribe,
+  pending: subscribeFetching,
+  onResolved: onSubscribeFetched,
+} = useAxiosRequest(async () => {
+  return await api.Plugin.getParserSeriesSubscribe(
+    parser.value!.plugin.id,
+    parser.value!.name,
+    route.params.seriesId as string,
+  )();
+});
+onSubscribeFetched((data) => {
+  seriesCreated.value = data.series != undefined;
+  subscribeCreated.value = data.source != undefined && data.rule != undefined;
 });
 
 const subscribeCreated = ref(false);

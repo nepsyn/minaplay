@@ -79,7 +79,7 @@ import {
 } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted } from 'vue';
 import { useToastStore } from '@/store/toast';
 import { copyContent } from '@/utils/utils';
 import { useAxiosRequest } from '@/composables/use-axios-request';
@@ -242,34 +242,34 @@ onDeleteFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
-const actions = ref([
+const actions = computed(() => [
   {
-    show: computed(() => props.item.status === StatusEnum.FAILED),
+    show: props.item.status === StatusEnum.FAILED,
     text: t('app.actions.retry'),
     icon: mdiRefresh,
     click: retry,
-    loading: computed(() => retrying.value),
+    loading: retrying.value,
   },
   {
-    show: computed(() => props.item.status === StatusEnum.PENDING),
+    show: props.item.status === StatusEnum.PENDING,
     text: t('app.actions.pause'),
     icon: mdiPause,
     click: pause,
-    loading: computed(() => pausing.value),
+    loading: pausing.value,
   },
   {
-    show: computed(() => props.item.status === StatusEnum.PAUSED),
+    show: props.item.status === StatusEnum.PAUSED,
     text: t('app.actions.unpause'),
     icon: mdiPlay,
     click: unpause,
-    loading: computed(() => unpausing.value),
+    loading: unpausing.value,
   },
   {
-    show: computed(() => [StatusEnum.PENDING, StatusEnum.PAUSED].includes(props.item.status)),
+    show: [StatusEnum.PENDING, StatusEnum.PAUSED].includes(props.item.status),
     text: t('app.actions.cancel'),
     icon: mdiClose,
     click: cancel,
-    loading: computed(() => canceling.value),
+    loading: canceling.value,
   },
 ]);
 </script>

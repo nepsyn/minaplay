@@ -3,14 +3,14 @@
     <pre class="text-subtitle-2 text-pre-wrap" :style="{ color: message.color }">{{ message.content }}</pre>
   </template>
   <template v-else-if="message.type === 'NetworkImage'">
-    <zoom-img class="rounded" :src="message.url" eager max-width="240">
+    <zoom-img class="rounded" :src="message.url" max-width="240">
       <template #placeholder>
         <v-img cover :src="ImagePlaceholder"></v-img>
       </template>
     </zoom-img>
   </template>
   <template v-else-if="message.type === 'Base64Image'">
-    <zoom-img class="rounded" :src="message.content" eager max-width="240">
+    <zoom-img class="rounded" :src="message.content" max-width="240">
       <template #placeholder>
         <v-img cover :src="ImagePlaceholder"></v-img>
       </template>

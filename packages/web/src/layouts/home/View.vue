@@ -13,8 +13,13 @@
     <v-tooltip v-for="(action, index) in actions" :key="index" location="bottom" open-delay="500">
       {{ action.text }}
       <template #activator="{ props }">
-        <v-btn class="d-none d-sm-block" v-if="action.show" v-bind="props" :icon="action.icon" @click="action.click()">
-        </v-btn>
+        <v-btn
+          class="d-none d-sm-block"
+          v-if="action.show"
+          :icon="action.icon"
+          v-bind="props"
+          @click="action.click()"
+        ></v-btn>
       </template>
     </v-tooltip>
 
@@ -102,14 +107,14 @@
         <v-badge
           color="error-darken-1"
           :model-value="notification.unread.length > 0"
-          offset-x="4"
-          offset-y="4"
+          offset-x="2"
+          offset-y="2"
           :content="notification.unread.length"
         >
           <user-avatar
             v-bind="props"
             v-if="api.user"
-            class="cursor-pointer mr-3"
+            class="cursor-pointer mr-4"
             :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar)"
             size="40"
           >
@@ -174,7 +179,7 @@
 <script lang="ts" setup>
 import { useLayoutStore } from '@/store/layout';
 import { useI18n } from 'vue-i18n';
-import { computed, ref, shallowRef } from 'vue';
+import { computed, shallowRef } from 'vue';
 import {
   mdiAccountCog,
   mdiAccountMultipleOutline,
@@ -265,14 +270,14 @@ window.addEventListener('beforeinstallprompt', (e: any) => {
   });
 });
 
-const actions = ref([
+const actions = computed(() => [
   {
     text: t('layout.actions.pluginConsole'),
     icon: mdiConsole,
     click: () => {
       layout.pluginConsoleSheet = !layout.pluginConsoleSheet;
     },
-    show: computed(() => api.hasPermission(PermissionEnum.ROOT_OP)),
+    show: api.hasPermission(PermissionEnum.ROOT_OP),
   },
   {
     text: t('layout.actions.upload'),
@@ -280,13 +285,11 @@ const actions = ref([
     click: () => {
       layout.uploadDrawer = !layout.uploadDrawer;
     },
-    show: computed(() =>
-      api.hasPermission(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP, PermissionEnum.FILE_UPLOAD_VIDEO),
-    ),
+    show: api.hasPermission(PermissionEnum.ROOT_OP, PermissionEnum.FILE_OP, PermissionEnum.FILE_UPLOAD_VIDEO),
   },
   {
-    text: computed(() => (layout.darkMode ? t('layout.light') : t('layout.dark'))),
-    icon: computed(() => (layout.darkMode ? mdiWeatherSunny : mdiWeatherNight)),
+    text: layout.darkMode ? t('layout.light') : t('layout.dark'),
+    icon: layout.darkMode ? mdiWeatherSunny : mdiWeatherNight,
     click: () => {
       layout.toggleDarkMode(!layout.darkMode);
     },

@@ -46,12 +46,6 @@ export interface MinaPlayParserMetadata {
   };
 }
 
-export interface MinaPlayPluginSource {
-  name: string;
-  url: string;
-  site?: string;
-}
-
 export interface MinaPlayPluginSourceEpisode {
   title?: string;
   no: string;
@@ -74,9 +68,9 @@ export interface MinaPlayPluginSourceSeries {
 }
 
 export interface MinaPlayPluginSourceSeriesSubscribe {
-  series: MinaPlayPluginSourceSeries;
-  source: MinaPlayPluginSource;
-  code: string;
+  series?: SeriesEntity;
+  source?: SourceEntity;
+  rule?: RuleEntity;
 }
 
 export interface MinaPlayPluginSourceSeriesSubscribeResult {

@@ -95,20 +95,20 @@ const display = useDisplay();
 const notification = useNotificationStore();
 
 const tab = ref('unread');
-const tabs = [
+const tabs = computed(() => [
   {
     value: 'unread',
     text: t('layout.user.notification.unread'),
     icon: mdiEmailMultipleOutline,
-    notifications: computed(() => notification.unread),
+    notifications: notification.unread,
   },
   {
     value: 'read',
     text: t('layout.user.notification.read'),
     icon: mdiEmailOpenMultipleOutline,
-    notifications: computed(() => notification.read),
+    notifications: notification.read,
   },
-];
+]);
 </script>
 
 <style scoped lang="sass"></style>

@@ -176,6 +176,8 @@ const zh: MessageSchema = {
     subscribeCreated: '订阅已创建',
     addSeries: '添加剧集',
     seriesAdded: '剧集已添加',
+    play: '播放',
+    download: '下载',
   },
   resource: {
     seriesUpdates: '最新剧集',

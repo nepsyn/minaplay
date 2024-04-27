@@ -16,13 +16,7 @@
         <span class="plain-text ml-5 mr-2">{{ message.content }}</span>
       </template>
       <template v-else-if="message.type === 'NetworkImage'">
-        <zoom-img
-          class="ml-5 rounded chat-image"
-          :src="message.url"
-          eager
-          max-width="200px"
-          @load="emits('load')"
-        ></zoom-img>
+        <zoom-img class="ml-5 rounded" :src="message.url" max-width="200px" @load="emits('load')"></zoom-img>
       </template>
       <template v-else>
         <span class="plain-text">{{ t('live.play.unknownChatType') }}</span>

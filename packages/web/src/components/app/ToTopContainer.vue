@@ -23,7 +23,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { provide, ref } from 'vue';
 import { mdiChevronUp } from '@mdi/js';
 
 const props = withDefaults(
@@ -43,7 +43,7 @@ const onScroll = (e: any) => {
   showToTop.value = e.target.scrollTop >= Number(props.threshold);
 };
 
-const containerRef = ref<any>(null);
+const containerRef = ref<HTMLElement>();
 const toTop = () => {
   if (containerRef.value) {
     containerRef.value.scrollTo({
@@ -52,6 +52,7 @@ const toTop = () => {
     });
   }
 };
+provide('toTop', toTop);
 
 defineExpose({
   toTop,

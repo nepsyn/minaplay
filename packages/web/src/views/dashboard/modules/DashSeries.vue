@@ -367,7 +367,7 @@ const headers = ref([
   },
 ]);
 
-const editItem = ref<SeriesEntity | undefined>(undefined);
+const editItem = ref<SeriesEntity>();
 
 const editDialog = ref(false);
 const createNew = () => {

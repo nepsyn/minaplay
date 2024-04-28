@@ -7,8 +7,8 @@ export function useAxiosRequest<
   R = Awaited<ReturnType<T>>['data'],
 >(api: T) {
   const pending = ref(false);
-  const error = ref<AxiosError<ApiError> | Error | undefined>(undefined);
-  const data = ref<R | undefined>(undefined);
+  const error = ref<AxiosError<ApiError> | Error>();
+  const data = ref<R>();
 
   const resolved: ((data: R) => any)[] = [];
   const onResolved = (handler: (data: R) => any) => {

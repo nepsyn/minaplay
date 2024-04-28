@@ -12,6 +12,8 @@ export default {
     cancel: 'Cancel',
     on: 'ON',
     off: 'OFF',
+    yes: 'YES',
+    no: 'NO',
     unknown: 'Unknown',
     auto: 'Auto',
     or: 'Or',
@@ -236,6 +238,12 @@ export default {
       media: 'Media',
       pubAt: 'Publish Time',
       createAt: 'Create At',
+    },
+    info: {
+      count: 'Total Episodes:',
+      pubAt: 'Published at:',
+      finished: 'Finished:',
+      tags: 'Tags:',
     },
   },
   user: {

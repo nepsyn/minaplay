@@ -13,6 +13,8 @@ const zh: MessageSchema = {
     cancel: '取消',
     on: '已开启',
     off: '已关闭',
+    yes: '是',
+    no: '否',
     auto: '自动',
     unknown: '未知',
     or: '或',
@@ -237,6 +239,12 @@ const zh: MessageSchema = {
       media: '媒体文件',
       pubAt: '发布时间',
       createAt: '创建时间',
+    },
+    info: {
+      count: '集数:',
+      pubAt: '发布:',
+      finished: '完结:',
+      tags: '标签:',
     },
   },
   user: {

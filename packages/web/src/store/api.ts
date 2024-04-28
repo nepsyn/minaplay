@@ -73,7 +73,7 @@ import {
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
 
 export const useApiStore = defineStore('api', () => {
-  const user = ref<UserEntity | undefined>(undefined);
+  const user = ref<UserEntity>();
   const hasPermission = (...permissions: PermissionEnum[]) => {
     return user.value && permissions.some((name) => user.value?.permissionNames.includes(name));
   };

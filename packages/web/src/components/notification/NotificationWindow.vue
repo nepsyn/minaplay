@@ -33,9 +33,9 @@
             >
               {{ item.text }}
               <template #append>
-                <span class="text-caption" v-if="item.notifications.value.length > 0">{{
-                  item.notifications.value.length
-                }}</span>
+                <span class="text-caption" v-if="item.notifications.length > 0">
+                  {{ item.notifications.length }}
+                </span>
               </template>
             </v-list-item>
           </v-list>
@@ -50,14 +50,14 @@
           <v-window v-model="tab">
             <v-window-item v-for="item in tabs" :key="item.value" :value="item.value">
               <v-container
-                v-if="item.notifications.value.length === 0"
+                v-if="item.notifications.length === 0"
                 class="pt-16 d-flex flex-column align-center justify-center"
               >
                 <v-icon class="text-medium-emphasis" :icon="mdiMailboxOpenOutline" size="240"></v-icon>
                 <span class="text-subtitle-1 font-weight-bold text-medium-emphasis">{{ t('app.loader.empty') }}</span>
               </v-container>
               <v-list v-else class="py-0">
-                <template v-for="(notificationItem, index) in item.notifications.value" :key="index">
+                <template v-for="(notificationItem, index) in item.notifications" :key="index">
                   <notification-content
                     class="py-4"
                     :item="notificationItem"

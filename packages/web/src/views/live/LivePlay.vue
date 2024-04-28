@@ -584,7 +584,7 @@ import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { useRoute, useRouter } from 'vue-router';
 import VideoPlayer from '@/components/app/VideoPlayer.vue';
-import { computed, nextTick, onUnmounted, ref, shallowRef } from 'vue';
+import { ComponentPublicInstance, computed, nextTick, onUnmounted, ref, shallowRef } from 'vue';
 import {
   mdiAccountMultiple,
   mdiAnimationPlayOutline,
@@ -652,9 +652,9 @@ const router = useRouter();
 const toast = useToastStore();
 const display = useDisplay();
 
-const state = ref<LiveState | undefined>(undefined);
+const state = ref<LiveState>();
 const live = computed(() => state.value?.live);
-const playerRef = ref<InstanceType<typeof VideoPlayer> | undefined>(undefined);
+const playerRef = ref<InstanceType<typeof VideoPlayer>>();
 const getLiveStatus = (): Omit<ClientSyncMediaStream, 'type'> | undefined => {
   if (playerRef.value && selectedMedia.value?.file) {
     return {
@@ -818,7 +818,7 @@ socket.on('live-dispose', () => {
 
 const password = ref('');
 const validated = ref(true);
-const validateError = ref<string | undefined>(undefined);
+const validateError = ref<string>();
 const validateDialog = ref(false);
 const {
   pending: validating,
@@ -947,7 +947,7 @@ const selectAndSendImage = () => {
   });
 };
 
-const eventContainerRef = ref<{ $el: HTMLElement } | undefined>(undefined);
+const eventContainerRef = ref<{ $el: HTMLElement }>();
 const events = ref<LiveEvent[]>([]);
 const onMessageLoad = () => {
   nextTick(() => {
@@ -968,9 +968,9 @@ const push = (message: LiveEvent) => {
 
 const device = new Device();
 const voiceConnecting = ref(false);
-let producerTransport = shallowRef<Transport | undefined>(undefined);
-const consumerTransport = shallowRef<Transport | undefined>(undefined);
-const producer = ref<Producer | undefined>(undefined);
+let producerTransport = shallowRef<Transport>();
+const consumerTransport = shallowRef<Transport>();
+const producer = ref<Producer>();
 const voiceMembers = ref<RoomVoice[]>([]);
 const disconnectVoice = async () => {
   socket.off('voice-new-producer');
@@ -1235,14 +1235,14 @@ const selectAndUploadPoster = async () => {
 };
 
 const mediaSelectDialog = ref(false);
-const selectedMedia = ref<MediaEntity | undefined>(undefined);
+const selectedMedia = ref<MediaEntity>();
 const onStreamMediaSelected = async (media: MediaEntity) => {
   selectedMedia.value = media;
   selectedSeries.value = undefined;
   await switchStream();
 };
 const seriesSelectDialog = ref(false);
-const selectedSeries = ref<SeriesEntity | undefined>(undefined);
+const selectedSeries = ref<SeriesEntity>();
 const onSeresSelected = async (series: SeriesEntity) => {
   selectedSeries.value = series;
   await reloadEpisodes();

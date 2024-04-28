@@ -10,7 +10,7 @@ export const useNotificationStore = defineStore('notification', () => {
   const api = useApiStore();
 
   const connected = ref(false);
-  const connectError = ref<Error | undefined>(undefined);
+  const connectError = ref<Error>();
   const notifications: Ref<NotificationItem[]> = ref([]);
 
   const read = computed(() => notifications.value.filter(({ read }) => read));

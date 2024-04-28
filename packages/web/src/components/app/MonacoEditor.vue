@@ -15,7 +15,7 @@ monaco.languages.typescript.typescriptDefaults.setExtraLibs([
 
 const layout = useLayoutStore();
 
-const editorRef = ref<HTMLElement | undefined>(undefined);
+const editorRef = ref<HTMLElement>();
 let editor: monaco.editor.IStandaloneCodeEditor | undefined = undefined;
 
 const props = withDefaults(

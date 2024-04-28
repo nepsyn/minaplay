@@ -367,7 +367,7 @@ const headers = ref([
   },
 ]);
 
-const editItem = ref<EpisodeEntity | undefined>(undefined);
+const editItem = ref<EpisodeEntity>();
 const editSeriesKeyword = ref('');
 const editMediaKeyword = ref('');
 const {

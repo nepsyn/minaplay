@@ -2,8 +2,8 @@ import { ref } from 'vue';
 
 export function useAsyncTask<T extends (...args: any[]) => Promise<any>, R = Awaited<ReturnType<T>>>(task: T) {
   const pending = ref(false);
-  const error = ref<any>(undefined);
-  const data = ref<R | undefined>(undefined);
+  const error = ref<any>();
+  const data = ref<R>();
 
   const resolved: ((data: R) => any)[] = [];
   const onResolved = (handler: (data: R) => any) => {

@@ -289,7 +289,7 @@ const headers = ref([
   },
 ]);
 
-const editItem = ref<MediaEntity | undefined>(undefined);
+const editItem = ref<MediaEntity>();
 
 const editDialog = ref(false);
 const {

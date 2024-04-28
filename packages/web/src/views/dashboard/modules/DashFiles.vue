@@ -163,7 +163,7 @@ const headers = ref([
   },
 ]);
 
-const editItem = ref<FileEntity | undefined>(undefined);
+const editItem = ref<FileEntity>();
 
 const deleteDialog = ref(false);
 const {

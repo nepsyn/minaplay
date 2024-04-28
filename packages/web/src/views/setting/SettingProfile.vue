@@ -439,7 +439,7 @@ const emailBindDialog = ref(false);
 const serverChanBindDialog = ref(false);
 const telegramBindDialog = ref(false);
 
-const editItem = ref<NotificationMetaEntity | undefined>(undefined);
+const editItem = ref<NotificationMetaEntity>();
 
 const {
   pending: metaUpdating,

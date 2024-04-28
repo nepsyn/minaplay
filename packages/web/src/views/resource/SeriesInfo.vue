@@ -33,12 +33,51 @@
                     :placeholder="SeriesPosterFallback"
                   ></zoom-img>
                 </v-col>
-                <v-col cols="8" sm="12">
+                <v-col cols="8" sm="12" class="d-flex flex-column flex-grow-0">
                   <expandable-text
                     class="text-subtitle-1"
                     :content="series.description ?? t('resource.noDescription')"
-                    style="min-height: 100px"
                   ></expandable-text>
+                  <v-divider class="my-2"></v-divider>
+                  <v-list slim :lines="false" class="pa-0">
+                    <v-list-item class="px-0 text-subtitle-2" density="compact">
+                      <template #prepend>
+                        <span class="font-weight-bold">{{ t('episode.info.count') }}</span>
+                      </template>
+                      <span class="ml-2">{{ series.count ?? t('app.unknown') }}</span>
+                    </v-list-item>
+                    <v-list-item class="px-0 text-subtitle-2" density="compact">
+                      <template #prepend>
+                        <span class="font-weight-bold">{{ t('episode.info.pubAt') }}</span>
+                      </template>
+                      <span class="ml-2">
+                        {{
+                          Date.parse(series.pubAt!) ? new Date(series.pubAt!).toLocaleString(locale) : t('app.unknown')
+                        }}
+                      </span>
+                    </v-list-item>
+                    <v-list-item class="px-0 text-subtitle-2" density="compact">
+                      <template #prepend>
+                        <span class="font-weight-bold">{{ t('episode.info.finished') }}</span>
+                      </template>
+                      <span class="ml-2">
+                        {{
+                          series.finished != undefined ? t(series.finished ? 'app.yes' : 'app.no') : t('app.unknown')
+                        }}
+                      </span>
+                    </v-list-item>
+                    <v-list-item class="px-0 text-subtitle-2" density="compact">
+                      <template #prepend>
+                        <span class="font-weight-bold">{{ t('episode.info.tags') }}</span>
+                      </template>
+                      <expandable-text
+                        v-if="series.tags && series.tags.length > 0"
+                        :content="(series.tags ?? []).map(({ name }) => name).join('  ')"
+                        class="ml-2"
+                      ></expandable-text>
+                      <span v-else class="ml-2">{{ t('app.none') }}</span>
+                    </v-list-item>
+                  </v-list>
                 </v-col>
               </v-row>
             </v-col>
@@ -147,7 +186,7 @@ import { useToastStore } from '@/store/toast';
 import { LiveEntity } from '@/api/interfaces/live.interface';
 import LiveSelector from '@/components/live/LiveSelector.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const api = useApiStore();
 const toast = useToastStore();
 const route = useRoute();

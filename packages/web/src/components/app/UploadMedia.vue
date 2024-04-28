@@ -87,10 +87,10 @@ const props = defineProps<{
 
 const progress = ref(0);
 const finished = ref(false);
-const error = ref<string | undefined>(undefined);
+const error = ref<string>();
 const controller = new AbortController();
 
-const media = ref<MediaEntity | undefined>(undefined);
+const media = ref<MediaEntity>();
 
 const doCancel = () => {
   controller.abort();

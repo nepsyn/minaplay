@@ -210,7 +210,7 @@ const headers = ref([
   },
 ]);
 
-const editItem = ref<SourceEntity | undefined>(undefined);
+const editItem = ref<SourceEntity>();
 
 const {
   pending: creating,

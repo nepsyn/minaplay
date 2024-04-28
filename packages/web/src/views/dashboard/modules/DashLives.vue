@@ -199,7 +199,7 @@ const headers = ref([
   },
 ]);
 
-const editItem = ref<LiveEntity | undefined>(undefined);
+const editItem = ref<LiveEntity>();
 
 const deleteDialog = ref(false);
 const {

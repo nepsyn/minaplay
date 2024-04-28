@@ -23,7 +23,7 @@
                   color="info"
                   :prepend-icon="mdiArrowLeft"
                   @click="toEpisode(-1)"
-                  :disabled="!hasEpisode(1)"
+                  :disabled="!hasEpisode(-1)"
                 >
                   {{ t('resource.episode.previous') }}
                 </v-btn>
@@ -395,8 +395,8 @@ const series = computed(() => {
   return (seriesLoader.items.value ?? []).filter((series) => series.id !== currentEpisode.value?.series?.id);
 });
 
-const playerRef = ref<typeof VideoPlayer | undefined>(undefined);
-const position = ref<number | undefined>(undefined);
+const playerRef = ref<typeof VideoPlayer>();
+const position = ref<number>();
 const watchTimeStart = ref(0);
 const onResourceReady = async () => {
   if (!settings.autoContinue) {

@@ -244,7 +244,7 @@ const headers = ref([
   },
 ]);
 
-const editItem = ref<RuleEntity | undefined>(undefined);
+const editItem = ref<RuleEntity>();
 
 const {
   pending: creating,

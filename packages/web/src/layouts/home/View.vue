@@ -105,10 +105,11 @@
       </v-card>
       <template #activator="{ props }">
         <v-badge
+          :max="9"
           color="error-darken-1"
           :model-value="notification.unread.length > 0"
-          offset-x="2"
-          offset-y="2"
+          offset-x="16"
+          offset-y="4"
           :content="notification.unread.length"
         >
           <user-avatar

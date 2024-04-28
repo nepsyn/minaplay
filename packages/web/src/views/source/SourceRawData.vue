@@ -198,7 +198,7 @@ const tab = ref(0);
 const page = ref(1);
 const search = ref('');
 
-const currentEntry = ref<FeedEntry | undefined>(undefined);
+const currentEntry = ref<FeedEntry>();
 const {
   pending: downloadCreating,
   request: createDownload,

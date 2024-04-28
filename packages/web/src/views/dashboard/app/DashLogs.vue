@@ -87,7 +87,7 @@ onLogsClearFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
-const logsContainerRef = ref<{ $el: HTMLElement } | undefined>(undefined);
+const logsContainerRef = ref<{ $el: HTMLElement }>();
 const onMutated = () => {
   if (logsContainerRef.value) {
     const el = logsContainerRef.value.$el;

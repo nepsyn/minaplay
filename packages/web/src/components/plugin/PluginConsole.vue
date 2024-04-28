@@ -153,11 +153,11 @@ const layout = useLayoutStore();
 const toast = useToastStore();
 const api = useApiStore();
 
-const command = ref<string | undefined>(undefined);
+const command = ref<string>();
 const messages = ref<MinaPlayPluginMessage[]>([]);
 const programs = ref<PluginCommandDescriptor[]>([]);
 const connected = ref(false);
-const connectError = ref<Error | undefined>(undefined);
+const connectError = ref<Error>();
 
 const { socket, request } = useSocketIOConnection<PluginEventMap>(api.Plugin.socketPath, {
   extraHeaders: {
@@ -251,7 +251,7 @@ provide('send-action', async (content: string) => {
 });
 
 const atBottom = ref(false);
-const messageContainerRef = ref<{ $el: HTMLElement } | undefined>(undefined);
+const messageContainerRef = ref<{ $el: HTMLElement }>();
 const scrollToBottom = () => {
   setTimeout(() => {
     if (messageContainerRef.value) {

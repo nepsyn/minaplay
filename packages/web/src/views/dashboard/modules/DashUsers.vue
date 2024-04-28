@@ -320,7 +320,7 @@ const headers = ref([
   },
 ]);
 
-const editItem = ref<(UserEntity & { password: string }) | undefined>(undefined);
+const editItem = ref<UserEntity & { password: string }>();
 
 const editDialog = ref(false);
 const passwordView = ref(false);

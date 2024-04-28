@@ -67,17 +67,13 @@ export interface MinaPlayPluginSourceSeries {
   tags?: string[];
 }
 
-export interface MinaPlayPluginSourceSeriesSubscribe {
-  series?: SeriesEntity;
-  source?: SourceEntity;
-  rule?: RuleEntity;
-}
-
 export interface MinaPlayPluginSourceSeriesSubscribeResult {
   series: SeriesEntity;
   source: SourceEntity;
   rule: RuleEntity;
 }
+
+export type MinaPlayPluginSourceSeriesSubscribe = Partial<MinaPlayPluginSourceSeriesSubscribeResult>;
 
 export interface MinaPlayPluginSourceCalendarDay {
   /** week day(Sunday=0) */

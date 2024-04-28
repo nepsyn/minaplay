@@ -6,6 +6,39 @@
     </v-toolbar-title>
   </div>
   <v-divider class="my-3"></v-divider>
+  <v-expand-transition>
+    <v-sheet v-if="playingEpisode?.playUrl" class="d-flex flex-column pa-4">
+      <v-responsive class="rounded-lg" :aspect-ratio="16 / 9" max-height="520">
+        <video-player :src="playingEpisode.playUrl ?? ''" :poster="playingEpisode.posterUrl"></video-player>
+      </v-responsive>
+      <div class="text-h6 mt-2 d-flex justify-space-between align-center">
+        <v-btn
+          variant="flat"
+          size="small"
+          color="info"
+          :prepend-icon="mdiArrowLeft"
+          @click="toEpisode(-1)"
+          :disabled="!hasEpisode(-1)"
+        >
+          {{ t('resource.episode.previous') }}
+        </v-btn>
+        <span class="text-h6 px-2 text-truncate">
+          {{ playingEpisode.no }}
+        </span>
+        <v-btn
+          variant="flat"
+          size="small"
+          color="info"
+          :append-icon="mdiArrowRight"
+          @click="toEpisode(1)"
+          :disabled="!hasEpisode(1)"
+        >
+          {{ t('resource.episode.next') }}
+        </v-btn>
+      </div>
+      <v-divider class="mt-3"></v-divider>
+    </v-sheet>
+  </v-expand-transition>
   <single-item-loader class="pa-0" :loader="seriesLoader">
     <v-sheet v-if="series" class="pa-4">
       <v-row>
@@ -48,7 +81,7 @@
               </v-btn>
             </v-col>
           </v-row>
-          <v-row class="mt-2">
+          <v-row class="mt-2 flex-grow-0">
             <v-col cols="4" class="d-block d-sm-none">
               <zoom-img
                 class="rounded-lg"
@@ -62,10 +95,45 @@
                 ratio="0.25"
                 class="text-subtitle-1"
                 :content="series.description ?? t('resource.noDescription')"
-                style="min-height: 100px"
               ></expandable-text>
             </v-col>
           </v-row>
+          <v-divider class="my-2"></v-divider>
+          <v-list slim :lines="false" class="pa-0">
+            <v-list-item class="px-0 text-subtitle-2" density="compact">
+              <template #prepend>
+                <span class="font-weight-bold">{{ t('episode.info.count') }}</span>
+              </template>
+              <span class="ml-2">{{ series.count ?? t('app.unknown') }}</span>
+            </v-list-item>
+            <v-list-item class="px-0 text-subtitle-2" density="compact">
+              <template #prepend>
+                <span class="font-weight-bold">{{ t('episode.info.pubAt') }}</span>
+              </template>
+              <span class="ml-2">
+                {{ Date.parse(series.pubAt!) ? new Date(series.pubAt!).toLocaleString(locale) : t('app.unknown') }}
+              </span>
+            </v-list-item>
+            <v-list-item class="px-0 text-subtitle-2" density="compact">
+              <template #prepend>
+                <span class="font-weight-bold">{{ t('episode.info.finished') }}</span>
+              </template>
+              <span class="ml-2">
+                {{ series.finished != undefined ? t(series.finished ? 'app.yes' : 'app.no') : t('app.unknown') }}
+              </span>
+            </v-list-item>
+            <v-list-item class="px-0 text-subtitle-2" density="compact">
+              <template #prepend>
+                <span class="font-weight-bold">{{ t('episode.info.tags') }}</span>
+              </template>
+              <expandable-text
+                v-if="series.tags && series.tags.length > 0"
+                :content="(series.tags ?? []).join('  ')"
+                class="ml-2"
+              ></expandable-text>
+              <span v-else class="ml-2">{{ t('app.none') }}</span>
+            </v-list-item>
+          </v-list>
         </v-col>
         <v-col class="d-none d-sm-block" cols="3">
           <zoom-img
@@ -100,6 +168,7 @@
                     <v-btn
                       variant="text"
                       v-bind="props"
+                      @click="switchEpisode(episode)"
                       :disabled="!episode.playUrl"
                       density="comfortable"
                       color="primary"
@@ -113,6 +182,8 @@
                     <v-btn
                       variant="text"
                       v-bind="props"
+                      :loading="downloadTaskCreating"
+                      @click="episode.downloadUrl && createDownloadTask(episode.downloadUrl, episode.title)"
                       :disabled="!episode.downloadUrl"
                       density="comfortable"
                       color="secondary"
@@ -131,13 +202,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ComputedRef, inject, ref } from 'vue';
-import { MinaPlayParserMetadata, PluginControl } from '@/api/interfaces/plugin.interface';
+import { computed, ComputedRef, inject, nextTick, ref } from 'vue';
+import { MinaPlayParserMetadata, MinaPlayPluginSourceEpisode, PluginControl } from '@/api/interfaces/plugin.interface';
 import { useRoute, useRouter } from 'vue-router';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useApiStore } from '@/store/api';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
-import { mdiAnimationPlayOutline, mdiCheck, mdiChevronLeft, mdiDownload, mdiPlay, mdiRss, mdiViewComfy } from '@mdi/js';
+import {
+  mdiAnimationPlayOutline,
+  mdiArrowLeft,
+  mdiArrowRight,
+  mdiCheck,
+  mdiChevronLeft,
+  mdiDownload,
+  mdiPlay,
+  mdiRss,
+  mdiViewComfy,
+} from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import SeriesPosterFallback from '@/assets/banner-portrait.jpeg';
 import ExpandableText from '@/components/app/ExpandableText.vue';
@@ -145,8 +226,9 @@ import ZoomImg from '@/components/app/ZoomImg.vue';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { useAxiosPageLoader } from '@/composables/use-axios-page-loader';
 import { useToastStore } from '@/store/toast';
+import VideoPlayer from '@/components/app/VideoPlayer.vue';
 
-const { t } = useI18n();
+const { t, locale } = useI18n();
 const api = useApiStore();
 const route = useRoute();
 const router = useRouter();
@@ -179,6 +261,7 @@ onSeriesLoadFailed(async () => {
 });
 
 const {
+  data: subscribe,
   request: getSubscribe,
   pending: subscribeFetching,
   onResolved: onSubscribeFetched,
@@ -207,9 +290,10 @@ const {
     route.params.seriesId as string,
   )();
 });
-onSubscribeCreated(() => {
+onSubscribeCreated((data) => {
   subscribeCreated.value = true;
   seriesCreated.value = true;
+  subscribe.value = data;
 });
 onSubscribeCreateFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
@@ -246,6 +330,44 @@ const episodesLoader = useAxiosPageLoader(
   { page: 0, size: 60 },
 );
 const { items: episodes } = episodesLoader;
+
+const playingEpisode = ref<MinaPlayPluginSourceEpisode>();
+const hasEpisode = (offset: number) => {
+  const currentIndex = episodes.value.findIndex((value) => value === playingEpisode.value);
+  return currentIndex === -1 ? false : currentIndex + offset in episodes.value;
+};
+const toEpisode = async (offset: number) => {
+  const currentIndex = episodes.value.findIndex((value) => value === playingEpisode.value);
+  if (currentIndex + offset in episodes.value) {
+    playingEpisode.value = episodes.value[currentIndex + offset];
+  }
+};
+const toTop = inject<Function>('toTop');
+const switchEpisode = (episode: MinaPlayPluginSourceEpisode) => {
+  playingEpisode.value = episode;
+  nextTick(() => {
+    toTop?.();
+  });
+};
+
+const {
+  request: createDownloadTask,
+  pending: downloadTaskCreating,
+  onResolved: onDownloadTaskCreated,
+  onRejected: onDownloadTaskCreateFailed,
+} = useAxiosRequest(async (url: string, name?: string) => {
+  return await api.Download.create({
+    url,
+    name,
+    ...(subscribe.value?.source ? { sourceId: subscribe.value.source.id } : {}),
+  });
+});
+onDownloadTaskCreated(() => {
+  toast.toastSuccess(t('source.raw.downloadCreated'));
+});
+onDownloadTaskCreateFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
 </script>
 
 <style scoped lang="sass"></style>

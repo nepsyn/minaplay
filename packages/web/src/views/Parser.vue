@@ -53,18 +53,28 @@ import PluginOverview from '@/components/plugin/PluginOverview.vue';
 import { mdiInformationVariantCircleOutline } from '@mdi/js';
 import ToTopContainer from '@/components/app/ToTopContainer.vue';
 import AuthedRouterView from '@/components/app/AuthedRouterView.vue';
+import { useRouter } from 'vue-router';
 
 const { t } = useI18n();
 const api = useApiStore();
+const router = useRouter();
 
 const pluginsLoader = useAxiosPageLoader(async () => {
   return await api.Plugin.getAll();
 });
-const { items: plugins } = pluginsLoader;
+const { items: plugins, onResolved: onPluginLoaded } = pluginsLoader;
+onPluginLoaded(() => {
+  if (parsers.value.length > 0) {
+    const parser = parsers.value[0];
+    router.push({ path: `/parser/${parser.plugin.id}/${parser.name}` });
+  }
+});
 const parsers = computed(() => {
   return plugins.value
     .map((plugin) => {
-      return plugin.parsers.map((parser) => ({ ...parser, plugin }));
+      return plugin.parsers
+        .filter((parser) => parser.features.searchSeries || parser.features.getCalendar)
+        .map((parser) => ({ ...parser, plugin }));
     })
     .flat();
 });

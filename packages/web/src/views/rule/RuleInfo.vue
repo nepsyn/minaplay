@@ -246,7 +246,7 @@ onRuleDeleteFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
-const editorRef = ref<typeof MonacoEditor | undefined>(undefined);
+const editorRef = ref<typeof MonacoEditor>();
 const reset = () => {
   edit.value = { ...rule.value!, sourceIds: rule.value?.sources.map(({ id }) => id) ?? [] };
   editorRef.value?.getEditor()?.setValue(edit.value.code);

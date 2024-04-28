@@ -35,6 +35,7 @@ import { User } from '../user/user.entity.js';
 import { SeriesTagService } from '../media/series/series-tag.service.js';
 import { FileService } from '../file/file.service.js';
 import path from 'node:path';
+import { generateMD5 } from '../../utils/generate-md5.util.js';
 
 @Controller('plugins')
 @UseGuards(AuthorizationGuard)
@@ -50,6 +51,15 @@ export class PluginController {
     private seriesTagService: SeriesTagService,
     private fileService: FileService,
   ) {}
+
+  async buildSeriesSourceMeta(pluginId: string, parserName: string, url: string) {
+    const hash = await generateMD5(url);
+    return `${pluginId}-${parserName}-${hash}`;
+  }
+
+  buildSeriesRuleMeta(pluginId: string, parserName: string, seriesId: string | number) {
+    return `${pluginId}-${parserName}-${seriesId}`;
+  }
 
   async invokeParser<T extends keyof PluginSourceParser>(
     pluginId: string,
@@ -134,10 +144,14 @@ export class PluginController {
     let source = undefined;
     try {
       const parserSource = await this.invokeParser(pluginId, name, 'buildSourceOfSeries', parserSeries);
-      source = await this.sourceService.findOneBy({ url: parserSource.url });
+      source = await this.sourceService.findOneBy({
+        parserMeta: await this.buildSeriesSourceMeta(pluginId, name, parserSource.url),
+      });
     } catch {}
 
-    const rule = await this.ruleService.findOneBy({ remark: `${pluginId}-${name}-${seriesId}` });
+    const rule = await this.ruleService.findOneBy({
+      parserMeta: this.buildSeriesRuleMeta(pluginId, name, seriesId),
+    });
 
     return { series, source, rule };
   }
@@ -184,22 +198,26 @@ export class PluginController {
     }
 
     const parserSource = await this.invokeParser(pluginId, name, 'buildSourceOfSeries', parserSeries);
-    let source = await this.sourceService.findOneBy({ url: parserSource.url });
+    const sourceMeta = await this.buildSeriesSourceMeta(pluginId, name, parserSource.url);
+    let source = await this.sourceService.findOneBy({ parserMeta: sourceMeta });
     if (!source) {
       source = await this.sourceService.save({
         title: parserSource.name,
         url: parserSource.url,
         remark: parserSource.site,
+        parserMeta: sourceMeta,
         user: { id: user.id },
       });
     }
 
     const parserCode = await this.invokeParser(pluginId, name, 'buildRuleCodeOfSeries', parserSeries);
-    let rule = await this.ruleService.findOneBy({ remark: `${pluginId}-${name}-${seriesId}` });
+    const ruleMeta = this.buildSeriesRuleMeta(pluginId, name, seriesId);
+    let rule = await this.ruleService.findOneBy({ parserMeta: ruleMeta });
     if (!rule) {
       const file = await this.ruleService.createCodeFile(parserCode, user);
       rule = await this.ruleService.save({
-        remark: `${pluginId}-${name}-${seriesId}`,
+        remark: `${parserSeries.name}${parserSeries.season ? ' ' + parserSeries.season : ''}`,
+        parserMeta: ruleMeta,
         sources: [{ id: source.id }],
         file: { id: file.id },
       });

@@ -23,6 +23,13 @@ export class Rule {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
+  /** Parser Meta */
+  @Exclude()
+  @Column({
+    nullable: true,
+  })
+  parserMeta?: string;
+
   /** 备注 */
   @Column({
     nullable: true,
@@ -32,9 +39,11 @@ export class Rule {
   /** 规则代码文件 */
   @Exclude()
   @ManyToOne(() => File, {
+    onDelete: 'SET NULL',
+    nullable: true,
     eager: true,
   })
-  file: Relation<File>;
+  file?: Relation<File>;
 
   /** 下载内容 */
   @Exclude()

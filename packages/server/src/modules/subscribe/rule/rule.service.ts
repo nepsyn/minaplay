@@ -109,14 +109,13 @@ export class RuleService {
 
   async delete(where: FindOptionsWhere<Rule>) {
     const rules = await this.ruleRepository.find({ where });
-    const result = await this.ruleRepository.delete(where);
-
     for (const rule of rules) {
       if (rule.file) {
         await this.fileService.delete({ id: rule.file.id });
       }
     }
 
+    const result = await this.ruleRepository.delete(where);
     return result.affected > 0;
   }
 }

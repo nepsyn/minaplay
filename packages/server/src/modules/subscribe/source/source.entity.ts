@@ -28,6 +28,13 @@ export class Source {
   })
   url: string;
 
+  /** Parser Meta */
+  @Exclude()
+  @Column({
+    nullable: true,
+  })
+  parserMeta?: string;
+
   /** 备注 */
   @Column({
     nullable: true,

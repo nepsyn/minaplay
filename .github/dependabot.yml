@@ -8,8 +8,8 @@ updates:
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/packages/server" # Location of package manifests
     schedule:
-      interval: "daily"
+      interval: "weekly"
   - package-ecosystem: "npm" # See documentation for possible values
     directory: "/packages/web" # Location of package manifests
     schedule:
-      interval: "daily"
+      interval: "weekly"

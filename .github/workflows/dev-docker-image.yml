@@ -30,4 +30,5 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           push: true
+          platforms: linux/amd64,linux/arm64
           tags: nepsyn/minaplay:dev-latest

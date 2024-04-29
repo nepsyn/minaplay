@@ -1,8 +1,26 @@
 # ChangeLog
 
+## v0.2.0 [2024-04-29]
+
+### feature
+
+- [server] Add `ServerChan` notification service
+- [server] Add `Telegram` notification service
+- [server&web] Add plugin parser for 3rd-party RSS sources
+
+### change
+
+- [web] Change layout of left-side navigation bar
+
+### fix
+
+- [web] Service worker is not working properly
+- [server&web] Minor bugs fix
+
+
 ## v0.1.1 [2024-04-12]
 
-### features
+### feature
 
 - [server] Add PluginParser for sources parsing in MinaPlay plugins
 - [server&web] Add `MarkdownText` message type
@@ -10,12 +28,12 @@
 - [server] Add `Network` & `Local` file sources
 - [server] Add version update check
 
-### changes
+### change
 
 - [server&web] Remove `ConsumableFeedback` message type
 - [server] Remove enum types in db models
 - [web] Redesign colors in dark mode
 
-### fixes
+### fix
 
-- [server&web] minor bug fixes
+- [server&web] Minor bugs fix

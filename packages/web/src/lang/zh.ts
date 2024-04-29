@@ -160,6 +160,7 @@ const zh: MessageSchema = {
     name: '任务名称（可选）',
   },
   parser: {
+    title: '解析器',
     available: '可用解析器',
     calendar: '更新日期表',
     weekdays: {

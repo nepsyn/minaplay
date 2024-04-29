@@ -1,30 +1,38 @@
 <template>
   <v-container>
-    <slot name="loading" v-if="loader.pending.value && !hideLoading">
-      <v-container class="d-flex flex-column justify-center align-center text-body-2">
-        <v-progress-circular color="primary" indeterminate></v-progress-circular>
-        <span class="mt-2 text-medium-emphasis">{{ t('app.loader.loading') }}</span>
-      </v-container>
-    </slot>
-    <slot name="error" v-else-if="loader.error.value && !hideError">
-      <v-container class="d-flex flex-row justify-center align-center text-body-2">
-        <v-icon :icon="mdiEmoticonDeadOutline"></v-icon>
-        <span class="mx-2">{{ t('app.loader.error') }}</span>
-        <a class="text-decoration-none text-primary cursor-pointer" @click="loader.request()">
-          {{ t('app.loader.retryBtn') }}
-        </a>
-      </v-container>
-    </slot>
-    <slot name="load" v-else-if="!loader.data.value">
-      <v-container class="d-flex flex-row justify-center align-center text-body-2">
-        <v-icon :icon="mdiHelpCircleOutline"></v-icon>
-        <span class="mx-2">{{ t('app.loader.notLoaded') }}</span>
-        <a class="text-decoration-none text-primary cursor-pointer" @click="loader.request()">
-          {{ t('app.loader.loadBtn') }}
-        </a>
-      </v-container>
-    </slot>
-    <slot v-else-if="loader.data.value"></slot>
+    <template v-if="pending">
+      <slot name="loading" v-if="!hideLoading">
+        <v-container class="d-flex flex-column justify-center align-center text-body-2">
+          <v-progress-circular color="primary" indeterminate></v-progress-circular>
+          <span class="mt-2 text-medium-emphasis">{{ t('app.loader.loading') }}</span>
+        </v-container>
+      </slot>
+    </template>
+    <template v-else-if="error">
+      <slot name="error" v-if="!hideError">
+        <v-container class="d-flex flex-row justify-center align-center text-body-2">
+          <v-icon :icon="mdiEmoticonDeadOutline"></v-icon>
+          <span class="mx-2">{{ t('app.loader.error') }}</span>
+          <a class="text-decoration-none text-primary cursor-pointer" @click="request()">
+            {{ t('app.loader.retryBtn') }}
+          </a>
+        </v-container>
+      </slot>
+    </template>
+    <template v-else-if="!data">
+      <slot name="load">
+        <v-container class="d-flex flex-row justify-center align-center text-body-2">
+          <v-icon :icon="mdiHelpCircleOutline"></v-icon>
+          <span class="mx-2">{{ t('app.loader.notLoaded') }}</span>
+          <a class="text-decoration-none text-primary cursor-pointer" @click="request()">
+            {{ t('app.loader.loadBtn') }}
+          </a>
+        </v-container>
+      </slot>
+    </template>
+    <template v-else-if="data">
+      <slot></slot>
+    </template>
   </v-container>
 </template>
 
@@ -56,15 +64,17 @@ const props = withDefaults(
   },
 );
 
+const { pending, error, data, request, onRejected } = props.loader;
+
 onMounted(async () => {
-  props.loader.onRejected(async (error: any) => {
+  onRejected(async (error: any) => {
     if (error.response?.data?.code === ErrorCodeEnum.NOT_FOUND) {
       await router.replace({ path: '/404' });
     }
   });
 
   if (!props.lazy) {
-    await props.loader.request();
+    await request();
   }
 });
 </script>

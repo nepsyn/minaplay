@@ -51,7 +51,7 @@
         </v-col>
         <v-spacer></v-spacer>
         <v-col cols="auto">
-          <v-btn-toggle class="border" color="primary" density="compact" mandatory v-model="weekday">
+          <v-btn-toggle class="border overflow-x-auto" color="primary" density="compact" mandatory v-model="weekday">
             <v-btn size="small" v-for="i in 7" :value="i - 1">
               {{ t(`parser.weekdays.${i - 1}`) }}
               <template v-if="new Date().getDay() === i - 1"> ({{ t('parser.weekdays.today') }}) </template>

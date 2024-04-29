@@ -159,6 +159,7 @@ export default {
     name: 'Task Name(Optional)',
   },
   parser: {
+    title: 'Parser',
     available: 'Available Parsers',
     calendar: 'Update Calendar',
     weekdays: {

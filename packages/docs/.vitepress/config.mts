@@ -8,6 +8,18 @@ export default defineConfig({
   lastUpdated: true,
   base: '/minaplay/',
   srcExclude: ['README.md'],
+  head: [
+    ['script', {
+      defer: true,
+      src: 'https://us.umami.is/script.js',
+      'data-website-id': '6de8215f-84d9-4fc9-a6ca-f6850d2ebb2b',
+    }],
+  ],
+  markdown: {
+    image: {
+      lazyLoading: true,
+    },
+  },
   locales: {
     root: {
       label: '简体中文',

@@ -1,6 +1,11 @@
+<script setup>
+import {useData, withBase} from 'vitepress';
+const data = useData();
+</script>
+
 # 快速开始
 
-## 部署
+## 部署 MinaPlay
 
 推荐使用 [Docker](https://docs.docker.com/get-docker/) 一键安装 MinaPlay。
 
@@ -24,6 +29,8 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=minaplay
     restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql
 
   minaplay-redis:
     image: "redis:latest"
@@ -51,6 +58,9 @@ services:
       - minaplay-redis
     restart: unless-stopped
 
+volumes:
+  mysql-data:
+
 networks:
   minaplay-network:
 ```
@@ -74,6 +84,31 @@ $ docker compose up -d
 ```
 
 启动成功后，在浏览器中访问 `http://127.0.0.1:3000` 即可跳转到 MinaPlay 的登录页面。
+
+## 添加 RSS 订阅源
+
+在 MinaPlay 中的 Web 应用程序界面中，通过左侧导航抽屉切换到 **RSS 订阅源** 页面，点击 **新建** 按钮添加 MinaPlay 中的第一个
+RSS 订阅源。
+这里以追番网站 [蜜柑计划](https://mikanani.me/) 为例，在新建 RSS 订阅源的信息窗口填入蜜柑计划的 RSS 订阅信息，然后 **保存
+** 。
+
+<img :src="data.isDark.value ? withBase('/new-rss-source-dark.png') : withBase('/new-rss-source.png')" alt="new RSS source" data-zoomable>
+
+- **标题** - RSS 订阅源的标题，用户可自行填写。
+- **链接** - RSS 订阅源的更新链接，请保证链接可访问并且为正确的 RSS 格式。
+- **CRON 表达式** - RSS 订阅源的解析周期，MinaPlay 会按照指定的周期解析 RSS 订阅源内容并下载媒体资源。
+- **备注** - RSS 订阅源的备注。
+
+## 添加下载规则
+
+添加 RSS 订阅源后，在左侧菜单切换到 **订阅规则** 页面，点击 **新建** 按钮添加 RSS 订阅源中的一条订阅规则。
+这里使用 MinaPlay 提供的 **内容过滤器模板** 订阅包含 “1080P” 、 “HEVC” 文本的 RSS 项目。
+
+<img :src="data.isDark.value ? withBase('/new-rule-dark.png') : withBase('/new-rule.png')" alt="new rule" data-zoomable>
+
+- **备注** - 订阅规则的备注。
+- **RSS 订阅源** - 订阅规则所属的 RSS 订阅源，可同时选择多个。
+- **代码** - 描述具体订阅行为的 JavaScript/TypeScript 代码，编写方式可参考 [订阅规则](/guide/rule) 章节。
 
 ## 下一步
 

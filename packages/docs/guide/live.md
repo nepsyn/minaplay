@@ -10,7 +10,7 @@ const data = useData();
 MinaPlay 提供了同步观影放映室的相关服务，包含了同步观影、在线聊天和多人语音聊天的服务支持。
 MinaPlay 可以直接选择媒体库中的媒体文件作为实时放映的内容，只需要分享放映室链接，MinaPlay 中的其他用户即可加入放映室同步观影。
 
-<img :src="data.isDark.value ? withBase('/live-dark.png') : withBase('/live.png')" alt="live">
+<img :src="data.isDark.value ? withBase('/live-dark.png') : withBase('/live.png')" alt="live" data-zoomable>
 
 ## 直播流
 

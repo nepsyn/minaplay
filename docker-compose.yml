@@ -11,6 +11,8 @@ services:
       - MYSQL_ALLOW_EMPTY_PASSWORD=yes
       - MYSQL_DATABASE=minaplay
     restart: always
+    volumes:
+      - mysql-data:/var/lib/mysql
 
   minaplay-redis:
     image: "redis:latest"
@@ -37,6 +39,9 @@ services:
       - minaplay-mysql
       - minaplay-redis
     restart: unless-stopped
+
+volumes:
+  mysql-data:
 
 networks:
   minaplay-network:

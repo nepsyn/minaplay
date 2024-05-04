@@ -12,45 +12,50 @@
 version: '3.8'
 
 services:
-  minaplay-mysql:
-    image: "mysql:8"
-    container_name: minaplay-mysql
-    networks:
-      - minaplay-network
-    environment:
-      - TZ=Asia/Shanghai
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-      - MYSQL_DATABASE=minaplay
-    restart: always
+   minaplay-mysql:
+      image: "mysql:8"
+      container_name: minaplay-mysql
+      networks:
+         - minaplay-network
+      environment:
+         - TZ=Asia/Shanghai
+         - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+         - MYSQL_DATABASE=minaplay
+      restart: always
+      volumes:
+         - mysql-data:/var/lib/mysql
 
-  minaplay-redis:
-    image: "redis:latest"
-    container_name: minaplay-redis
-    networks:
-      - minaplay-network
-    restart: always
+   minaplay-redis:
+      image: "redis:latest"
+      container_name: minaplay-redis
+      networks:
+         - minaplay-network
+      restart: always
 
-  minaplay:
-    image: "nepsyn/minaplay:latest"
-    container_name: minaplay
-    networks:
-      - minaplay-network
-    volumes:
-      - ./data:/app/data
-    environment:
-      - DB_HOST=minaplay-mysql
-      - REDIS_HOST=minaplay-redis
-      - MS_ANNOUNCED_IP=127.0.0.1  # 在需要放映室语音通话服务的情况下改为宿主机外部访问 IP
-    ports:
-      - "3000:3000"
-      - "12000-12999:12000-12999"
-    depends_on:
-      - minaplay-mysql
-      - minaplay-redis
-    restart: unless-stopped
+   minaplay:
+      image: "nepsyn/minaplay:latest"
+      container_name: minaplay
+      networks:
+         - minaplay-network
+      volumes:
+         - ./data:/app/data
+      environment:
+         - DB_HOST=minaplay-mysql
+         - REDIS_HOST=minaplay-redis
+         - MS_ANNOUNCED_IP=127.0.0.1  # 在需要放映室语音通话服务的情况下改为宿主机外部访问 IP
+      ports:
+         - "3000:3000"
+         - "12000-12999:12000-12999"
+      depends_on:
+         - minaplay-mysql
+         - minaplay-redis
+      restart: unless-stopped
+
+volumes:
+   mysql-data:
 
 networks:
-  minaplay-network:
+   minaplay-network:
 ```
 
 使用命令运行 MinaPlay 服务。
@@ -65,6 +70,9 @@ $ docker compose up -d
 复制以下命令并修改相关配置。
 
 ```shell
+# 创建 volume
+$ docker volume create mysql-data
+
 # 创建网络
 $ docker network create minaplay-network 
 
@@ -73,6 +81,7 @@ $ docker run -d \
   --name minaplay-mysql \
   --network minaplay-network \
   --restart always \
+  -v mysql-data:/var/lib/mysql \
   -e TZ=Asia/Shanghai \
   -e MYSQL_ALLOW_EMPTY_PASSWORD=yes \
   -e MYSQL_DATABASE=minaplay \

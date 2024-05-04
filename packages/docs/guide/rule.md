@@ -6,8 +6,8 @@ const data = useData();
 # 订阅规则
 
 :::tip 提示
-本章节对于没有接触过 JavaScript 编程语言的用户来说可能会有些难以理解，
-推荐用户先简单了解 [JavaScript 编程语言](https://developer.mozilla.org/zh-CN/docs/Learn/JavaScript/First_steps)。
+本章节内容使用到了 TypeScript 编程语言的语法，
+推荐用户先简单了解 [TypeScript 编程语言](https://www.typescriptlang.org/)。
 
 对于个性化需求不高的普通用户，可以直接参阅 [常用订阅规则](/guide/common-rules) 章节，复制或简单更改代码。
 :::
@@ -104,17 +104,16 @@ RSS 资源站点中用户在发布更新时，新的订阅项目中一般会包�
 
 作为一个订阅项目标题，其包含了资源的一些基础属性，不同的发布组习惯于不同的标题命名规范，但一般都包含了下面所示的信息：
 
-
-| 内容                | 说明                                             | 常见值                |
-| ------------------- | ------------------------------------------------ | --------------------- |
-| __[Un-Sub]__        | 发布组名称。Un-Sub 只是一个假设的发布组名称。    | `xxx-sub` `xxx字幕组` |
-| __NO GAME NO LIVE__ | 资源对应的媒体文件名称（电影 / 剧集名称）。      |                       |
-| __02__              | 资源对应的剧集集号。                             |                       |
-| __[1080P]__         | 资源对应媒体文件的视频质量。                     | `1080P` `4K` `720P`   |
-| __[BDRip]__         | 资源的具体来源，通常有蓝光光碟、网络下载等来源。 | `BDRip` `WEB-DL`      |
-| __[AAC AVC]__       | 资源对应媒体文件的音频格式。                     | `AAC` `AVC` `FLAC`    |
-| __[HEVC]__          | 资源对应媒体文件的视频格式。                     | `MP4` `HEVC` `H265`   |
-| __[CHS]__           | 资源对应媒体文件携带的字幕语言。                 | `CHS` `CHT` `JP`      |
+| 内容                  | 说明                         | 常见值                 |
+|---------------------|----------------------------|---------------------|
+| __[Un-Sub]__        | 发布组名称。Un-Sub 只是一个假设的发布组名称。 | `xxx-sub` `xxx字幕组`  |
+| __NO GAME NO LIVE__ | 资源对应的媒体文件名称（电影 / 剧集名称）。    |                     |
+| __02__              | 资源对应的剧集集号。                 |                     |
+| __[1080P]__         | 资源对应媒体文件的视频质量。             | `1080P` `4K` `720P` |
+| __[BDRip]__         | 资源的具体来源，通常有蓝光光碟、网络下载等来源。   | `BDRip` `WEB-DL`    |
+| __[AAC AVC]__       | 资源对应媒体文件的音频格式。             | `AAC` `AVC` `FLAC`  |
+| __[HEVC]__          | 资源对应媒体文件的视频格式。             | `MP4` `HEVC` `H265` |
+| __[CHS]__           | 资源对应媒体文件携带的字幕语言。           | `CHS` `CHT` `JP`    |
 
 在此基础之上，我们可以个性化自己的订阅规则，例如下面的订阅规则代码：
 
@@ -122,7 +121,7 @@ RSS 资源站点中用户在发布更新时，新的订阅项目中一般会包�
 const hooks: RuleHooks = {
   validate(entry) {
     // 我想要看 1080P 的 《NO GAME NO LIVE》 番剧！但是不要 Un-Sub 发布的版本。
-    return entry.title.includes('NO GAME NO LIVE') 
+    return entry.title.includes('NO GAME NO LIVE')
       && entry.title.includes('1080P')
       && !entry.title.includes('Un-Sub');
   },
@@ -139,7 +138,8 @@ export default hooks;
 ## 进阶使用
 
 :::tip 提示
-建议读者在阅读本章节前先了解 [正则表达式](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_Expressions) 的基础用法。
+建议读者在阅读本章节前先了解 [正则表达式](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Guide/Regular_Expressions)
+的基础用法。
 :::
 
 很多时候用户需要深度定制订阅规则，并同时让 MinaPlay 担任下载后媒体文件的整理工作。
@@ -200,7 +200,7 @@ export default hooks;
 要在 MinaPlay 中添加订阅规则，只需要在管理页面中新建订阅规则即可。
 之后填入订阅规则的基本参数，选择绑定 RSS 订阅源，并修改订阅规则代码。
 
-<img :src="data.isDark.value ? withBase('/new-rule-dark.png') : withBase('/new-rule.png')" alt="new rule">
+<img :src="data.isDark.value ? withBase('/new-rule-dark.png') : withBase('/new-rule.png')" alt="new rule" data-zoomable>
 
 - __备注__ - 订阅规则的备注，通常可以填写规则对应的剧集名称。
 - __RSS 订阅源__ - 选择订阅规则的作用范围，此订阅规则只会在选定的 RSS 订阅源被 MinaPlay 解析时生效。

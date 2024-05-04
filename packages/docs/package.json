@@ -8,6 +8,9 @@
     "docs:preview": "vitepress preview --port 8080"
   },
   "devDependencies": {
-    "vitepress": "^1.0.0-rc.45"
+    "vitepress": "^1.1.4"
+  },
+  "dependencies": {
+    "medium-zoom": "^1.1.0"
   }
 }

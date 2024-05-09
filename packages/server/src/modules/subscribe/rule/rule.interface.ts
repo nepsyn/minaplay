@@ -45,6 +45,8 @@ export interface RuleFileDescriptor {
 
   /** Indicates whether to overwrite the original episode when episode of the same 'title' & 'no' exists in MinaPlay */
   overwriteEpisode?: boolean;
+  /** Save path of media file ( from `data/index` dir ) */
+  savePath?: string;
 }
 
 export interface RuleFileDescriber {

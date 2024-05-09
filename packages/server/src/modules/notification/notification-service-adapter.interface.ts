@@ -1,9 +1,11 @@
 import { NotificationEventMap } from './notification-event.interface.js';
 import { NotificationEventEnum, NotificationServiceEnum } from '../../enums/index.js';
 import { Type } from '@nestjs/common';
+import { User } from '../user/user.entity.js';
 
 export interface NotificationServiceAdapter<Config extends object = object> {
   adapterServiceType: NotificationServiceEnum;
+  adapterConfigType: Type<Config>;
 
   isEnabled(): boolean;
 
@@ -11,5 +13,5 @@ export interface NotificationServiceAdapter<Config extends object = object> {
 
   notify<T extends NotificationEventEnum>(event: T, data: NotificationEventMap[T], userId: number, config: Config): any;
 
-  adapterConfigType(): Type<Config>;
+  test(user: User, config: Config): any;
 }

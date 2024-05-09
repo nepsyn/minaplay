@@ -13,6 +13,8 @@ import { TEMPLATE_DIR } from '../../../../constants.js';
 import { isDefined } from 'class-validator';
 import fetch from 'node-fetch';
 import { HttpsProxyAgent } from 'https-proxy-agent';
+import { EmailConfig } from '../email/email.config.js';
+import { User } from '../../../user/user.entity.js';
 
 export class ServerChanAdapter implements NotificationServiceAdapter<ServerChanConfig> {
   private logger = new ApplicationLogger(ServerChanAdapter.name);
@@ -21,9 +23,7 @@ export class ServerChanAdapter implements NotificationServiceAdapter<ServerChanC
 
   adapterServiceType = NotificationServiceEnum.SERVER_CHAN;
 
-  adapterConfigType() {
-    return ServerChanConfig;
-  }
+  adapterConfigType = ServerChanConfig;
 
   isEnabled() {
     return this.options.serverChanEnabled;
@@ -59,6 +59,23 @@ export class ServerChanAdapter implements NotificationServiceAdapter<ServerChanC
       body: JSON.stringify({
         title: 'MinaPlay ServerChan Notification',
         desp: templateFn(data),
+        noip: true,
+      }),
+    });
+
+    return response.ok;
+  }
+
+  async test(user: User, config: ServerChanConfig) {
+    const response = await fetch(`https://sctapi.ftqq.com/${config.token}.send`, {
+      method: 'POST',
+      agent: this.options.httpProxy && new HttpsProxyAgent(this.options.httpProxy),
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        title: 'MinaPlay ServerChan Notification',
+        desp: `Hello ${user.username}, this is a message from MinaPlay notification service!`,
         noip: true,
       }),
     });

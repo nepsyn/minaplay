@@ -1,9 +1,5 @@
 <template>
-  <v-list-item
-    slim
-    lines="three"
-    v-if="item.event === NotificationEventEnum.NEW_MEDIA || item.event === NotificationEventEnum.NEW_EPISODE"
-  >
+  <v-list-item slim lines="three">
     <template #prepend>
       <div class="px-3 text-h6">📣</div>
     </template>
@@ -13,35 +9,42 @@
     <div class="text-caption font-weight-bold text-medium-emphasis">
       {{ new Date(item.data.time).toLocaleString(locale) }}
     </div>
-    <div class="text-disabled text-caption my-2">
-      {{
-        t(
-          `notification.descriptions.${item.event}`,
-          item.event === NotificationEventEnum.NEW_MEDIA
-            ? { name: item.data.media.name }
-            : { series: item.data.episode.series.name, no: item.data.episode.no || item.data.episode.title },
-        )
-      }}
-    </div>
-    <v-chip
-      label
-      link
-      border
-      size="small"
-      variant="text"
-      @click="
-        goto(
-          item.event === NotificationEventEnum.NEW_MEDIA
-            ? `/media/${item.data.media.id}`
-            : `/episode/${item.data.episode.id}`,
-        )
-      "
-    >
-      <span>{{ t('app.actions.view') }}</span>
-      <template #append>
-        <v-icon class="ml-1" :icon="mdiOpenInNew" size="12"></v-icon>
-      </template>
-    </v-chip>
+    <template v-if="(item.event as any) === 'test'">
+      <div class="text-disabled text-caption my-2">
+        {{ (item.data as any).message }}
+      </div>
+    </template>
+    <template v-if="[NotificationEventEnum.NEW_MEDIA, NotificationEventEnum.NEW_EPISODE].includes(item.event)">
+      <div class="text-disabled text-caption my-2">
+        {{
+          t(
+            `notification.descriptions.${item.event}`,
+            item.event === NotificationEventEnum.NEW_MEDIA
+              ? { name: item.data.media.name }
+              : { series: item.data.episode.series.name, no: item.data.episode.no || item.data.episode.title },
+          )
+        }}
+      </div>
+      <v-chip
+        label
+        link
+        border
+        size="small"
+        variant="text"
+        @click="
+          goto(
+            item.event === NotificationEventEnum.NEW_MEDIA
+              ? `/media/${item.data.media.id}`
+              : `/episode/${item.data.episode.id}`,
+          )
+        "
+      >
+        <span>{{ t('app.actions.view') }}</span>
+        <template #append>
+          <v-icon class="ml-1" :icon="mdiOpenInNew" size="12"></v-icon>
+        </template>
+      </v-chip>
+    </template>
     <template #append>
       <v-tooltip location="bottom">
         {{ item.read ? t('notification.markAsUnread') : t('notification.markAsRead') }}

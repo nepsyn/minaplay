@@ -130,7 +130,7 @@ const zh: MessageSchema = {
     upload: {
       title: '文件上传',
       drop: '将文件拖动到此处上传',
-      closePageHint: '关闭此页面会终止所有上传任务！',
+      closePageHint: '关闭 MinaPlay 应用会终止所有上传任务！',
       cancelTitle: '取消确认',
       cancelConfirm: '确定要取消上传此文件吗？',
       status: {
@@ -606,10 +606,6 @@ const zh: MessageSchema = {
       },
       email: {
         address: '邮箱地址',
-        sendCode: '发送验证码',
-        resend: '{timeout}秒后重新发送',
-        verifyCode: '邮箱验证码',
-        verify: '验证',
       },
       serverChan: {
         token: 'Token',
@@ -640,7 +636,10 @@ const zh: MessageSchema = {
   notification: {
     markAsRead: '标记为已读',
     markAsUnread: '标记为未读',
+    test: '测试',
+    testSent: '已发送测试通知消息',
     titles: {
+      test: '测试通知',
       [NotificationEventEnum.NEW_MEDIA]: '媒体文件更新',
       [NotificationEventEnum.NEW_EPISODE]: '剧集更新',
     },

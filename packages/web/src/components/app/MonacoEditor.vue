@@ -53,6 +53,7 @@ onMounted(() => {
     scrollBeyondLastLine: false,
     tabSize: 2,
     tabCompletion: 'on',
+    fixedOverflowWidgets: true,
   });
   editor.onDidChangeModelContent(() => {
     emits('update:value', editor?.getValue() ?? '');

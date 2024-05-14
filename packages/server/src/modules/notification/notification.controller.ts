@@ -48,6 +48,7 @@ export class NotificationController {
     const errors = await validate(config, {
       whitelist: true,
       forbidNonWhitelisted: true,
+      forbidUnknownValues: false,
     });
     if (errors.length > 0) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);

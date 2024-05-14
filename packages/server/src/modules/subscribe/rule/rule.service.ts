@@ -13,16 +13,22 @@ import fs from 'fs-extra';
 import { generateMD5 } from '../../../utils/generate-md5.util.js';
 import { FileSourceEnum } from '../../../enums/index.js';
 import { User } from '../../user/user.entity.js';
+import { PluginService } from '../../plugin/plugin.service.js';
+import { PluginSourceParser } from '../../plugin/plugin.interface.js';
 
 @Injectable()
 export class RuleService {
-  constructor(@InjectRepository(Rule) private ruleRepository: Repository<Rule>, private fileService: FileService) {}
+  constructor(
+    @InjectRepository(Rule) private ruleRepository: Repository<Rule>,
+    private fileService: FileService,
+    private pluginService: PluginService,
+  ) {}
 
   private isolate = new IsolatedVM.Isolate();
 
-  async buildRuleHook<T extends keyof RuleHooks>(hook: IsolatedVM.Reference) {
+  async buildRuleHook<T extends keyof RuleHooks>(type: T, hook: IsolatedVM.Reference) {
     if (hook.typeof === 'function') {
-      return (...args: Parameters<RuleHooks[T]>) =>
+      return (...args: any[]) =>
         hook.applySync(null, args, {
           arguments: {
             copy: true,
@@ -31,7 +37,36 @@ export class RuleService {
             promise: true,
             copy: true,
           },
-        }) as ReturnType<RuleHooks[T]>;
+        });
+    } else if (hook.typeof === 'string') {
+      const delegate: string = await hook.copy();
+      const [pluginId, parserName] = delegate.split(':');
+      const control = this.pluginService.getControlById(pluginId);
+      const parser = control?.parserMap.get(parserName);
+      if (!parser) {
+        return () => {
+          throw new Error(`Cannot find parser '${delegate}'`);
+        };
+      }
+
+      let handlerName: keyof PluginSourceParser = undefined;
+      switch (type) {
+        case 'validate':
+          handlerName = 'validateFeedEntry';
+          break;
+        case 'describe':
+          handlerName = 'describeDownloadItem';
+          break;
+      }
+      const handler = parser.service[handlerName];
+
+      if (!parser.features[handlerName]) {
+        return () => {
+          throw new Error(`Parser '${delegate}' has no hook handler for '${type}'`);
+        };
+      }
+
+      return async (...args: any[]) => await handler.apply(parser.service, args);
     } else {
       return undefined;
     }
@@ -47,6 +82,7 @@ export class RuleService {
       }).outputText,
     );
     const context = await this.isolate.createContext();
+
     await module.instantiate(context, () => undefined);
     await module.evaluate({ timeout: 1000, reference: true });
     const exports = await module.namespace.get('default', { reference: true });
@@ -54,8 +90,8 @@ export class RuleService {
     const validateHook = await exports.get('validate', { reference: true });
     const describeHook = await exports.get('describe', { reference: true });
     const hooks = {
-      validate: await this.buildRuleHook<'validate'>(validateHook),
-      describe: await this.buildRuleHook<'describe'>(describeHook),
+      validate: await this.buildRuleHook('validate', validateHook),
+      describe: await this.buildRuleHook('describe', describeHook),
     };
 
     const release = () => {

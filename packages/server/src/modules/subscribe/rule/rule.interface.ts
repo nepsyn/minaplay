@@ -59,14 +59,18 @@ export interface RuleFileDescriber {
   (entry: FeedEntry, file: File, files: File[]): RuleFileDescriptor | Promise<RuleFileDescriptor>;
 }
 
+type RuleHookDelegate = `${string}:${string}`;
+
 export interface RuleHooks {
-  validate: RuleEntryValidator;
-  describe?: RuleFileDescriber;
+  validate: RuleEntryValidator | RuleHookDelegate;
+  describe?: RuleFileDescriber | RuleHookDelegate;
 }
+
+type CallableRuleHooks = { [P in keyof RuleHooks]: Exclude<RuleHooks[P], RuleHookDelegate> };
 
 export interface RuleVm {
   context: Context;
   module: Module;
-  hooks: Partial<RuleHooks>;
+  hooks: Partial<CallableRuleHooks>;
   release: () => void;
 }

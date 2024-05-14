@@ -1,5 +1,22 @@
 # ChangeLog
 
+## v0.2.1 [2024-05-14]
+
+### feature
+
+- [server] Add `savePath` in `RuleFileDescriptor` for custom media save path
+- [server] Add rule hook delegates for plugin parsers
+
+### change
+
+- [server] Do not exit program on unhandled rejection
+- [server&web] Optimize notification service APIs & Add test APIs
+
+### fix
+
+- [web] Multi-items loader did not work properly
+- [server&web] Minor bugs fix
+
 ## v0.2.0 [2024-04-29]
 
 ### feature

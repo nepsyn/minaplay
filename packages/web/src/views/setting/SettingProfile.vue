@@ -250,7 +250,7 @@
         <v-card-actions class="px-4">
           <v-btn
             variant="text"
-            color="secondary"
+            color="primary"
             :prepend-icon="mdiCheckAll"
             @click="editSubscriptions = subscriptions.concat()"
           >
@@ -258,6 +258,15 @@
           </v-btn>
           <v-btn variant="text" color="warning" :prepend-icon="mdiSelectionRemove" @click="editSubscriptions = []">
             {{ t('app.actions.unselectAll') }}
+          </v-btn>
+          <v-btn
+            variant="text"
+            color="secondary"
+            :loading="testing"
+            :prepend-icon="mdiMessageBadgeOutline"
+            @click="test()"
+          >
+            {{ t('notification.test') }}
           </v-btn>
           <v-spacer></v-spacer>
           <v-btn variant="text" @click="editSubscriptionsSheet = false">
@@ -315,6 +324,7 @@ import {
   mdiEye,
   mdiEyeOff,
   mdiKeyVariant,
+  mdiMessageBadgeOutline,
   mdiPlus,
   mdiSelectionRemove,
   mdiSquareRoundedBadgeOutline,
@@ -537,11 +547,32 @@ const editSubscriptionsSheet = ref(false);
 const editSubscriptions = ref<NotificationEventEnum[]>([]);
 
 const {
+  pending: testing,
+  request: test,
+  onResolved: onTested,
+  onRejected: onTestFailed,
+} = useAxiosRequest(async () => {
+  return await api.Notification.test({
+    service: editItem.value?.service,
+    config: JSON.parse(editItem.value?.config ?? '{}'),
+  });
+});
+onTested(() => {
+  toast.toastSuccess(t('notification.testSent'));
+});
+onTestFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const {
   request: bindWs,
   onResolved: onWsBound,
   onRejected: onWsBindFailed,
 } = useAxiosRequest(async () => {
-  return await api.Notification.bindWs();
+  return await api.Notification.bind({
+    service: NotificationServiceEnum.WS,
+    config: {},
+  });
 });
 onWsBound((meta) => {
   if (api.user?.metas) {

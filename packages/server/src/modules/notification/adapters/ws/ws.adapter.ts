@@ -8,6 +8,7 @@ import { NotificationGateway } from './notification.gateway.js';
 import { instanceToPlain } from 'class-transformer';
 import { NOTIFICATION_MODULE_OPTIONS_TOKEN } from '../../notification.module-definition.js';
 import { NotificationModuleOptions } from '../../notification.module.interface.js';
+import { User } from '../../../user/user.entity.js';
 
 @Injectable()
 export class WsAdapter implements NotificationServiceAdapter<WsConfig> {
@@ -20,9 +21,7 @@ export class WsAdapter implements NotificationServiceAdapter<WsConfig> {
 
   adapterServiceType = NotificationServiceEnum.WS;
 
-  adapterConfigType() {
-    return WsConfig;
-  }
+  adapterConfigType = WsConfig;
 
   isEnabled() {
     return this.options.wsEnabled;
@@ -34,5 +33,11 @@ export class WsAdapter implements NotificationServiceAdapter<WsConfig> {
 
   notify<T extends NotificationEventEnum>(event: T, data: NotificationEventMap[T], userId: number, _config: WsConfig) {
     this.notificationGateway.server.to(userId.toString()).emit(event, instanceToPlain(data));
+  }
+
+  async test(user: User, _config: WsConfig) {
+    this.notificationGateway.server
+      .to(user.id.toString())
+      .emit('test', { message: `Hello ${user.username}, this is a message from MinaPlay notification service!` });
   }
 }

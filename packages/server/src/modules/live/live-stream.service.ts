@@ -5,13 +5,13 @@ import NodeMediaServer from 'node-media-server';
 import { LIVE_STREAM_DIR } from '../../constants.js';
 import { generateMD5 } from '../../utils/generate-md5.util.js';
 import { ApplicationLogger } from '../../common/application.logger.service.js';
-import type { ExecaChildProcess } from 'execa';
+import type { Subprocess } from 'execa';
 import { execa } from 'execa';
 
 @Injectable()
 export class LiveStreamService implements OnModuleInit {
   private server: NodeMediaServer;
-  private streams: Map<string, ExecaChildProcess> = new Map();
+  private streams: Map<string, Subprocess> = new Map();
 
   private logger = new ApplicationLogger(LiveStreamService.name);
 

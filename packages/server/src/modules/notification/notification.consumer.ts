@@ -46,7 +46,7 @@ export class NotificationConsumer {
         continue;
       }
 
-      const config = meta.getConfig(adapter?.adapterConfigType());
+      const config = meta.getConfig(adapter?.adapterConfigType);
       if (!config) {
         continue;
       }

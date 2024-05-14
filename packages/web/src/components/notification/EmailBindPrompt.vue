@@ -26,46 +26,34 @@
             density="compact"
             type="email"
             maxlength="40"
-            v-model="edit.address"
-            @keydown.enter="sendCode()"
+            v-model.trim="edit.address"
+            @keydown.enter="bind()"
             autofocus
           >
           </v-text-field>
           <v-btn
             class="mt-2"
             variant="tonal"
-            color="primary"
+            color="secondary"
             block
-            :prepend-icon="mdiEmailArrowRightOutline"
-            :loading="codeSending"
-            @click="sendCode()"
-            :disabled="timeout > 0"
+            :loading="testing"
+            :prepend-icon="mdiMessageBadgeOutline"
+            :disabled="edit.address?.length <= 0"
+            @click="test()"
           >
-            <template v-if="timeout > 0">
-              {{ t('settings.profile.email.resend', { timeout }) }}
-            </template>
-            <template v-else>
-              {{ t('settings.profile.email.sendCode') }}
-            </template>
+            {{ t('notification.test') }}
           </v-btn>
-        </v-container>
-        <v-container class="mt-4 mb-2 pa-0">
-          <span class="text-body-1 font-weight-bold">{{ t('settings.profile.email.verifyCode') }}</span>
-          <v-otp-input
-            base-color="primary"
-            density="compact"
-            v-model="edit.verifyCode"
-            @keydown.enter="verifyCode()"
-          ></v-otp-input>
           <v-btn
+            class="mt-2"
             variant="tonal"
             color="warning"
             block
-            :prepend-icon="mdiKeyVariant"
-            :loading="codeVerifying"
-            @click="verifyCode()"
+            :prepend-icon="mdiCheck"
+            :loading="binding"
+            @click="bind()"
+            :disabled="edit.address?.length <= 0"
           >
-            {{ t('settings.profile.email.verify') }}
+            {{ t('app.ok') }}
           </v-btn>
         </v-container>
       </v-card-text>
@@ -75,7 +63,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { mdiClose, mdiEmailArrowRightOutline, mdiKeyVariant } from '@mdi/js';
+import { mdiCheck, mdiClose, mdiMessageBadgeOutline } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { useToastStore } from '@/store/toast';
@@ -114,61 +102,48 @@ const emits = defineEmits<{
 
 const edit = ref({
   address: '',
-  verifyCode: '',
-  key: '',
 });
 
-let interval: ReturnType<typeof setInterval> | undefined = undefined;
-const timeout = ref(0);
 const {
-  pending: codeSending,
-  request: sendCode,
-  onResolved: onCodeSent,
-  onRejected: onCodeSendFailed,
+  pending: testing,
+  request: test,
+  onResolved: onTested,
+  onRejected: onTestFailed,
 } = useAxiosRequest(async () => {
-  return await api.Notification.bindEmail({
-    email: edit.value.address,
+  return await api.Notification.test({
+    service: NotificationServiceEnum.EMAIL,
+    config: edit.value,
   });
 });
-onCodeSent((data) => {
-  edit.value.key = data.key;
-  clearInterval(interval);
-  timeout.value = 60;
-  interval = setInterval(() => {
-    timeout.value--;
-    if (timeout.value <= 0) {
-      clearInterval(interval);
-    }
-  }, 1000);
+onTested(() => {
+  toast.toastSuccess(t('notification.testSent'));
 });
-onCodeSendFailed((error: any) => {
+onTestFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 
 const {
-  pending: codeVerifying,
-  request: verifyCode,
-  onResolved: onCodeVerified,
-  onRejected: onCodeVerifyFailed,
+  pending: binding,
+  request: bind,
+  onResolved: onBound,
+  onRejected: onBindFailed,
 } = useAxiosRequest(async () => {
-  return await api.Notification.verifyEmail({
-    key: edit.value.key,
-    code: edit.value.verifyCode,
+  return await api.Notification.bind({
+    service: NotificationServiceEnum.EMAIL,
+    config: edit.value,
   });
 });
-onCodeVerified((data) => {
+onBound((data) => {
   if (api.user?.metas) {
     api.user.metas.push(data);
   }
   edit.value = {
     address: '',
-    verifyCode: '',
-    key: '',
   };
   emits('success', data);
   dialog.value = false;
 });
-onCodeVerifyFailed((error: any) => {
+onBindFailed((error: any) => {
   toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
 });
 </script>

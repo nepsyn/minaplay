@@ -4,6 +4,9 @@ import { Observable } from 'rxjs';
 import { MinaPlayMessage } from '../../common/application.message.js';
 import { PluginListenerContext } from './plugin-listener-context.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
+import { FeedEntry } from '@extractus/feed-extractor';
+import { File } from '../file/file.entity.js';
+import { RuleFileDescriptor } from '../subscribe/rule/rule.interface.js';
 
 export interface MinaPlayPluginMetadata extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   /** Plugin unique ID */
@@ -189,4 +192,18 @@ export interface PluginSourceParser {
     page?: number,
     size?: number,
   ): MaybePromise<ApiPaginationResultDto<MinaPlayPluginSourceEpisode>>;
+
+  /**
+   * Validate feed entry to download
+   * @param entry feed entry
+   */
+  validateFeedEntry?(entry: FeedEntry): MaybePromise<boolean>;
+
+  /**
+   * Describe a download item
+   * @param entry feed entry
+   * @param file current file entity
+   * @param files all file entities in a same download task
+   */
+  describeDownloadItem?(entry: FeedEntry, file: File, files: File[]): MaybePromise<RuleFileDescriptor>;
 }

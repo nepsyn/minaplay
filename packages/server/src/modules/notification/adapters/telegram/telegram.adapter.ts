@@ -13,6 +13,7 @@ import { TelegramConfig } from './telegram.config.js';
 import path from 'node:path';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import fetch from 'node-fetch';
+import { User } from '../../../user/user.entity.js';
 
 export class TelegramAdapter implements NotificationServiceAdapter<TelegramConfig> {
   private logger = new ApplicationLogger(TelegramAdapter.name);
@@ -21,9 +22,7 @@ export class TelegramAdapter implements NotificationServiceAdapter<TelegramConfi
 
   adapterServiceType = NotificationServiceEnum.TELEGRAM;
 
-  adapterConfigType() {
-    return TelegramConfig;
-  }
+  adapterConfigType = TelegramConfig;
 
   isEnabled() {
     return this.options.telegramEnabled;
@@ -51,6 +50,25 @@ export class TelegramAdapter implements NotificationServiceAdapter<TelegramConfi
     }
 
     const text = templateFn(data);
+    const response = await fetch(`https://api.telegram.org/bot${config.token}/sendMessage`, {
+      method: 'POST',
+      agent: this.options.httpProxy && new HttpsProxyAgent(this.options.httpProxy),
+      headers: {
+        'Content-type': 'application/json',
+      },
+      body: JSON.stringify({
+        chat_id: config.chatId,
+        text,
+        caption: text,
+        disable_notification: true,
+      }),
+    });
+
+    return response.ok;
+  }
+
+  async test(user: User, config: TelegramConfig) {
+    const text = `Hello ${user.username}, this is a message from MinaPlay notification service!`;
     const response = await fetch(`https://api.telegram.org/bot${config.token}/sendMessage`, {
       method: 'POST',
       agent: this.options.httpProxy && new HttpsProxyAgent(this.options.httpProxy),

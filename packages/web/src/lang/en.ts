@@ -129,7 +129,7 @@ export default {
     upload: {
       title: 'Upload Files',
       drop: 'Drop files here to upload',
-      closePageHint: 'Closing this page will cancel all upload tasks.',
+      closePageHint: 'Closing MinaPlay application will cancel all upload tasks.',
       cancelTitle: 'Cancel Confirm',
       cancelConfirm: 'Are your sure to cancel this upload?',
       status: {
@@ -606,10 +606,6 @@ export default {
       },
       email: {
         address: 'Email Address',
-        sendCode: 'Send Verification Code',
-        resend: 'Resend in {timeout} seconds',
-        verifyCode: 'Email Verification Code',
-        verify: 'Verify',
       },
       serverChan: {
         token: 'Token',
@@ -640,7 +636,10 @@ export default {
   notification: {
     markAsRead: 'Mark as Read',
     markAsUnread: 'Mark as Unread',
+    test: 'Test',
+    testSent: 'Test notification message sent',
     titles: {
+      test: 'Test Notification',
       [NotificationEventEnum.NEW_MEDIA]: 'New Media Updated',
       [NotificationEventEnum.NEW_EPISODE]: 'New Episode Updated',
     },

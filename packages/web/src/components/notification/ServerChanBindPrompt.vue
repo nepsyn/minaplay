@@ -25,11 +25,23 @@
             color="primary"
             density="compact"
             maxlength="256"
-            v-model="edit.token"
-            @keydown.enter="edit.token.trim().length > 0 && bindServerChan()"
+            v-model.trim="edit.token"
+            @keydown.enter="edit.token?.length > 0 && bindServerChan()"
             autofocus
           >
           </v-text-field>
+          <v-btn
+            class="mt-2"
+            variant="tonal"
+            color="secondary"
+            block
+            :loading="testing"
+            :prepend-icon="mdiMessageBadgeOutline"
+            :disabled="edit.token?.length <= 0"
+            @click="test()"
+          >
+            {{ t('notification.test') }}
+          </v-btn>
           <v-btn
             class="mt-2"
             variant="tonal"
@@ -37,7 +49,7 @@
             block
             :loading="binding"
             :prepend-icon="mdiCheck"
-            :disabled="edit.token.trim().length <= 0"
+            :disabled="edit.token?.length <= 0"
             @click="bindServerChan()"
           >
             {{ t('app.ok') }}
@@ -49,7 +61,7 @@
 </template>
 
 <script setup lang="ts">
-import { mdiCheck, mdiClose } from '@mdi/js';
+import { mdiCheck, mdiClose, mdiMessageBadgeOutline } from '@mdi/js';
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
@@ -92,13 +104,32 @@ const edit = ref({
 });
 
 const {
+  pending: testing,
+  request: test,
+  onResolved: onTested,
+  onRejected: onTestFailed,
+} = useAxiosRequest(async () => {
+  return await api.Notification.test({
+    service: NotificationServiceEnum.SERVER_CHAN,
+    config: edit.value,
+  });
+});
+onTested(() => {
+  toast.toastSuccess(t('notification.testSent'));
+});
+onTestFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const {
   pending: binding,
   request: bindServerChan,
   onResolved: onServerChanBound,
   onRejected: onServerChanBandFailed,
 } = useAxiosRequest(async () => {
-  return await api.Notification.bindServerChan({
-    token: edit.value.token,
+  return await api.Notification.bind({
+    service: NotificationServiceEnum.SERVER_CHAN,
+    config: edit.value,
   });
 });
 onServerChanBound((data) => {

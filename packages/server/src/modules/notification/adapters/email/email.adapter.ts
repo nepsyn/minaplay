@@ -11,9 +11,6 @@ import { NotificationServiceAdapter } from '../../notification-service-adapter.i
 import { NotificationEventEnum, NotificationServiceEnum } from '../../../../enums/index.js';
 import { User } from '../../../user/user.entity.js';
 import { EmailConfig } from './email.config.js';
-import { generateMD5 } from '../../../../utils/generate-md5.util.js';
-import { EmailVerifyCache } from './email-verify-cache.interface.js';
-import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
 import { compileTemplate } from '../../../../utils/compile-template.util.js';
 import { TEMPLATE_DIR } from '../../../../constants.js';
 
@@ -23,16 +20,11 @@ export class EmailAdapter implements NotificationServiceAdapter<EmailConfig> {
 
   private logger = new ApplicationLogger(EmailAdapter.name);
 
-  constructor(
-    @Inject(NOTIFICATION_MODULE_OPTIONS_TOKEN) private options: NotificationModuleOptions,
-    @Inject(CACHE_MANAGER) private cacheStore: CacheStore,
-  ) {}
+  constructor(@Inject(NOTIFICATION_MODULE_OPTIONS_TOKEN) private options: NotificationModuleOptions) {}
 
   adapterServiceType = NotificationServiceEnum.EMAIL;
 
-  adapterConfigType() {
-    return EmailConfig;
-  }
+  adapterConfigType = EmailConfig;
 
   isEnabled() {
     return this.options.emailEnabled;
@@ -83,57 +75,6 @@ export class EmailAdapter implements NotificationServiceAdapter<EmailConfig> {
     });
   }
 
-  async sendVerifyEmail(address: string, user: User) {
-    const key = await generateMD5(address);
-    const token = `email:${key}`;
-    if (await this.cacheStore.get(token)) {
-      const cache = await this.cacheStore.get<EmailVerifyCache>(token);
-      if (Date.now() - cache.lastSendTimestamp < 60 * 1000) {
-        return key;
-      }
-    }
-
-    const code = Math.round(Math.random() * (999999 - 100000) + 100000).toString();
-    await this.notify('verify-code', { code }, user.id, { address });
-    await this.cacheStore.set<EmailVerifyCache>(
-      token,
-      {
-        userId: user.id,
-        email: address,
-        code,
-        lastSendTimestamp: Date.now(),
-        secureTimes: 5,
-      },
-      30 * 60 * 1000,
-    );
-
-    return key;
-  }
-
-  async verifyEmail(key: string, predicate: (cache: EmailVerifyCache) => boolean | Promise<boolean>) {
-    const token = `email:${key}`;
-    const cache = await this.cacheStore.get<EmailVerifyCache>(token);
-
-    if (!cache) {
-      return undefined;
-    }
-
-    const valid = await predicate(cache);
-    if (!valid) {
-      cache.secureTimes--;
-      if (cache.secureTimes > 0) {
-        await this.cacheStore.set(token, cache, 30 * 60 * 1000);
-      } else {
-        await this.cacheStore.del(token);
-      }
-
-      return undefined;
-    }
-
-    return cache;
-  }
-
-  async notify(event: 'verify-code', data: { code: string }, userId: number, config: EmailConfig): Promise<any>;
   async notify<T extends NotificationEventEnum>(
     event: T,
     data: NotificationEventMap[T],
@@ -154,6 +95,13 @@ export class EmailAdapter implements NotificationServiceAdapter<EmailConfig> {
 
     return await this.sendMail({
       html: templateFn(data),
+      to: config.address,
+    });
+  }
+
+  async test(user: User, config: EmailConfig) {
+    return await this.sendMail({
+      html: `Hello ${user.username}, this is a message from MinaPlay notification service!`,
       to: config.address,
     });
   }

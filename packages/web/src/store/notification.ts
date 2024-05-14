@@ -41,6 +41,13 @@ export const useNotificationStore = defineStore('notification', () => {
       });
     });
   });
+  socket.on('test', (data) => {
+    notifications.value.unshift({
+      event: 'test',
+      data: { ...data, time: new Date() },
+      read: false,
+    } as any);
+  });
 
   return {
     connected,

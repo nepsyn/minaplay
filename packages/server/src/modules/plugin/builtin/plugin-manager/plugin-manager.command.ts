@@ -104,7 +104,7 @@ export class PluginManagerCommand {
   ) {
     const atIndex = id.lastIndexOf('@');
     const name = atIndex >= 0 ? id.slice(0, atIndex) : id;
-    const version = atIndex >= 0 ? id.slice(atIndex + 1, id.length) : 'latest';
+    let version = atIndex >= 0 ? id.slice(atIndex + 1, id.length) : 'latest';
     const packageId = ignorePrefix ? name : `minaplay-plugin-${name}`;
 
     const plugin = this.pluginService.getControlById(name);
@@ -122,6 +122,7 @@ export class PluginManagerCommand {
         return new Text(`Plugin package '${packageId}@${version}' not found in registry`, Text.Colors.ERROR);
       }
       const data = await metadataResponse.json();
+      version = data['version'];
 
       if (!yes) {
         await chat.send([

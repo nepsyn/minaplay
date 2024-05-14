@@ -74,10 +74,10 @@
         <template v-for="log in logs" :key="log.id">
           <v-timeline-item v-if="log.props" :dot-color="log.props.color" size="small" width="100%">
             <v-alert density="comfortable" variant="tonal" :color="log.props.color" :icon="log.props.icon">
-              <v-container class="pa-0 d-flex flex-row align-center">
+              <v-container class="pa-0 d-flex flex-row align-start">
                 <span class="text-subtitle-1 font-weight-bold" v-text="log.props.text"></span>
                 <v-spacer></v-spacer>
-                <v-chip variant="tonal">
+                <v-chip class="flex-shrink-0" variant="tonal">
                   <span class="text-subtitle-1" v-text="new Date(log.createAt).toLocaleString(locale)"></span>
                 </v-chip>
               </v-container>

@@ -25,27 +25,23 @@ export interface NotificationMetaDto {
   subscribes?: NotificationEventEnum[];
 }
 
-export interface EmailConfigDto {
-  address: string;
-}
+export type NotificationTypeMap = {
+  [NotificationServiceEnum.WS]: {};
+  [NotificationServiceEnum.EMAIL]: {
+    email: string;
+  };
+  [NotificationServiceEnum.SERVER_CHAN]: {
+    token: string;
+  };
+  [NotificationServiceEnum.TELEGRAM]: {
+    token: string;
+    chatId: string;
+  };
+};
 
-export interface EmailBindData {
-  email: string;
-  key: string;
-}
-
-export interface EmailVerifyDto {
-  key: string;
-  code: string;
-}
-
-export interface ServerChanConfigDto {
-  token: string;
-}
-
-export interface TelegramConfigDto {
-  token: string;
-  chatId: string;
+export interface NotificationBindDto<T extends NotificationServiceEnum = any> {
+  service: T;
+  config: NotificationTypeMap[T];
 }
 
 export type NotificationEventMap = {

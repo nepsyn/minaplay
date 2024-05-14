@@ -14,7 +14,21 @@
           @update:model-value="logsLoader.reload()"
         ></v-select>
       </v-col>
-      <v-col class="flex-grow-1 text-end">
+      <v-spacer></v-spacer>
+      <v-col sm="auto">
+        <v-btn
+          variant="flat"
+          block
+          color="info"
+          height="40"
+          :prepend-icon="mdiRefresh"
+          :loading="logsLoader.pending.value"
+          @click="logsLoader.reload()"
+        >
+          {{ t('app.actions.refresh') }}
+        </v-btn>
+      </v-col>
+      <v-col cols="auto">
         <v-menu location="bottom">
           <v-card>
             <v-card-title>{{ t('rule.logs.clearLogsTitle') }}</v-card-title>
@@ -46,9 +60,9 @@
         <v-timeline-item v-for="log in logs" :key="log.id" dot-color="error" size="small" width="100%">
           <v-alert density="comfortable" variant="tonal" color="error" :icon="mdiAlertCircle">
             <v-container class="pa-0 d-flex flex-row align-center">
-              <pre class="text-body-2 overflow-x-auto" v-text="log.error"></pre>
+              <pre class="text-body-2 overflow-x-auto text-pre-wrap" v-text="log.error"></pre>
               <v-spacer></v-spacer>
-              <v-chip variant="tonal">
+              <v-chip class="flex-shrink-0" variant="tonal">
                 <span class="text-subtitle-1" v-text="new Date(log.createAt).toLocaleString(locale)"></span>
               </v-chip>
             </v-container>
@@ -61,7 +75,7 @@
 
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n';
-import { mdiAlertCircle, mdiDelete } from '@mdi/js';
+import { mdiAlertCircle, mdiDelete, mdiRefresh } from '@mdi/js';
 import MultiItemsLoader from '@/components/app/MultiItemsLoader.vue';
 import { useApiStore } from '@/store/api';
 import { useRoute } from 'vue-router';

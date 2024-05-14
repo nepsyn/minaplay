@@ -20,16 +20,13 @@ import { User } from '../user/user.entity.js';
 import { NotificationMetaService } from './notification-meta.service.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { buildException } from '../../utils/build-exception.util.js';
-import { ErrorCodeEnum, NotificationServiceEnum } from '../../enums/index.js';
+import { ErrorCodeEnum } from '../../enums/index.js';
 import { NotificationService } from './notification.service.js';
 import { NotificationMetaDto } from './notification-meta.dto.js';
-import { EmailBindDto } from './adapters/email/email-bind.dto.js';
-import { EmailVerifyDto } from './adapters/email/email-verify.dto.js';
-import { EmailAdapter } from './adapters/email/email.adapter.js';
-import { AdapterEnabledGuard } from './adapter-enabled.guard.js';
-import { RequireAdapter } from './require-adapter.decorator.js';
-import { ServerChanConfig } from './adapters/server-chan/server-chan.config.js';
-import { TelegramConfig } from './adapters/telegram/telegram.config.js';
+import { NotificationDto } from './notification.dto.js';
+import { validate } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
+import { NotificationServiceAdapter } from './notification-service-adapter.interface.js';
 
 @Controller('notification')
 @ApiTags('notification')
@@ -39,8 +36,26 @@ export class NotificationController {
   constructor(
     private notificationService: NotificationService,
     private notificationMetaService: NotificationMetaService,
-    private emailAdapter: EmailAdapter,
   ) {}
+
+  private async validateNotificationData(data: NotificationDto): Promise<[NotificationServiceAdapter, object]> {
+    const adapter = this.notificationService.getAdapter(data.service);
+    if (!adapter || !adapter?.isEnabled()) {
+      throw buildException(NotImplementedException, ErrorCodeEnum.NOT_IMPLEMENTED);
+    }
+
+    const config = plainToInstance(adapter.adapterConfigType, data.config);
+    const errors = await validate(config, {
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      forbidUnknownValues: false,
+    });
+    if (errors.length > 0) {
+      throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
+    }
+
+    return [adapter, config];
+  }
 
   @Get('adapters')
   @ApiOperation({
@@ -106,17 +121,28 @@ export class NotificationController {
     return {};
   }
 
-  @Post('ws/bind')
+  @Post('test')
   @ApiOperation({
-    description: '添加ws通知',
+    description: '测试通知服务',
   })
-  @RequireAdapter(NotificationServiceEnum.WS)
-  @UseGuards(AdapterEnabledGuard)
   @HttpCode(200)
-  async bindWs(@RequestUser() user: User) {
+  async testService(@RequestUser() user: User, @Body() data: NotificationDto) {
+    const [adapter, config] = await this.validateNotificationData(data);
+    await adapter.test(user, config);
+    return {};
+  }
+
+  @Post('bind')
+  @ApiOperation({
+    description: '添加通知服务',
+  })
+  @HttpCode(200)
+  async bindService(@RequestUser() user: User, @Body() data: NotificationDto) {
+    const [, config] = await this.validateNotificationData(data);
+
     const meta = await this.notificationMetaService.findOneBy({
       user: { id: user.id },
-      service: NotificationServiceEnum.WS,
+      service: data.service,
     });
     if (meta) {
       throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATED_NOTIFICATION_SERVICE);
@@ -124,105 +150,9 @@ export class NotificationController {
 
     const { id } = await this.notificationMetaService.save({
       user: { id: user.id },
-      service: NotificationServiceEnum.WS,
+      service: data.service,
       enabled: true,
-    });
-    return await this.notificationMetaService.findOneBy({ id });
-  }
-
-  @Post('email/bind')
-  @ApiOperation({
-    description: '添加邮箱通知发送验证邮件',
-  })
-  @RequireAdapter(NotificationServiceEnum.EMAIL)
-  @UseGuards(AdapterEnabledGuard)
-  @HttpCode(200)
-  async bindEmail(@Body() data: EmailBindDto, @RequestUser() user: User) {
-    const meta = await this.notificationMetaService.findOneBy({
-      user: { id: user.id },
-      service: NotificationServiceEnum.EMAIL,
-    });
-    if (meta) {
-      throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATED_NOTIFICATION_SERVICE);
-    }
-
-    const key = await this.emailAdapter.sendVerifyEmail(data.email, user);
-    return {
-      email: data.email,
-      key,
-    };
-  }
-
-  @Post('email/verify')
-  @ApiOperation({
-    description: '验证邮箱地址',
-  })
-  @RequireAdapter(NotificationServiceEnum.EMAIL)
-  @UseGuards(AdapterEnabledGuard)
-  @HttpCode(200)
-  async verifyEmail(@Body() data: EmailVerifyDto, @RequestUser() user: User) {
-    const cache = await this.emailAdapter.verifyEmail(data.key, (cache) => {
-      return cache.userId === user.id && cache.code === data.code;
-    });
-    if (!cache) {
-      throw buildException(BadRequestException, ErrorCodeEnum.WRONG_EMAIL_VERIFY_CODE);
-    }
-
-    const { id } = await this.notificationMetaService.save({
-      user: { id: cache.userId },
-      service: NotificationServiceEnum.EMAIL,
-      enabled: true,
-      config: JSON.stringify({ address: cache.email }),
-    });
-    return await this.notificationMetaService.findOneBy({ id });
-  }
-
-  @Post('serverChan/bind')
-  @ApiOperation({
-    description: '添加 ServerChan 通知',
-  })
-  @RequireAdapter(NotificationServiceEnum.SERVER_CHAN)
-  @UseGuards(AdapterEnabledGuard)
-  @HttpCode(200)
-  async bindServerChan(@RequestUser() user: User, @Body() data: ServerChanConfig) {
-    const meta = await this.notificationMetaService.findOneBy({
-      user: { id: user.id },
-      service: NotificationServiceEnum.SERVER_CHAN,
-    });
-    if (meta) {
-      throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATED_NOTIFICATION_SERVICE);
-    }
-
-    const { id } = await this.notificationMetaService.save({
-      user: { id: user.id },
-      service: NotificationServiceEnum.SERVER_CHAN,
-      enabled: true,
-      config: JSON.stringify({ token: data.token }),
-    });
-    return await this.notificationMetaService.findOneBy({ id });
-  }
-
-  @Post('telegram/bind')
-  @ApiOperation({
-    description: '添加 Telegram 通知',
-  })
-  @RequireAdapter(NotificationServiceEnum.TELEGRAM)
-  @UseGuards(AdapterEnabledGuard)
-  @HttpCode(200)
-  async bindTelegram(@RequestUser() user: User, @Body() data: TelegramConfig) {
-    const meta = await this.notificationMetaService.findOneBy({
-      user: { id: user.id },
-      service: NotificationServiceEnum.TELEGRAM,
-    });
-    if (meta) {
-      throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATED_NOTIFICATION_SERVICE);
-    }
-
-    const { id } = await this.notificationMetaService.save({
-      user: { id: user.id },
-      service: NotificationServiceEnum.TELEGRAM,
-      enabled: true,
-      config: JSON.stringify({ token: data.token, chatId: data.chatId }),
+      config: JSON.stringify(config),
     });
     return await this.notificationMetaService.findOneBy({ id });
   }

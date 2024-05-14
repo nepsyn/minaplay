@@ -1,7 +1,7 @@
 <template>
   <v-container>
+    <slot v-if="items.length > 0"></slot>
     <template v-if="loaded">
-      <slot></slot>
       <template v-if="error">
         <slot name="error" v-if="!hideError">
           <v-container class="d-flex flex-row justify-center align-center text-body-2">

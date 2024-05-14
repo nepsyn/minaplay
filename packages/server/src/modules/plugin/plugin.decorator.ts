@@ -62,6 +62,8 @@ export function MinaPlayPluginParser(options?: Partial<Pick<MinaPlayParserMetada
       'buildSourceOfSeries',
       'buildRuleCodeOfSeries',
       'getEpisodesBySeriesId',
+      'validateFeedEntry',
+      'describeDownloadItem',
     ];
     const metadata: MinaPlayParserMetadata = {
       name: options?.name ?? target.name,

@@ -10,7 +10,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, In, Repository } from 'typeorm';
 import { DownloadItem } from './download-item.entity.js';
 import path from 'node:path';
-import { DOWNLOAD_DIR, VALID_VIDEO_MIME } from '../../../constants.js';
+import { DOWNLOAD_DIR, INDEX_DIR, VALID_VIDEO_MIME } from '../../../constants.js';
 import { randomUUID } from 'node:crypto';
 import { FileSourceEnum, StatusEnum } from '../../../enums/index.js';
 import { generateMD5 } from '../../../utils/generate-md5.util.js';
@@ -306,6 +306,19 @@ export class DownloadService implements OnModuleInit {
         });
         const media = await this.mediaService.findOneBy({ id: mediaId });
         await this.mediaFileService.generateMediaFiles(media);
+
+        // move media files
+        if (descriptor.savePath) {
+          const localPath = path.join(INDEX_DIR, descriptor.savePath);
+          const localDir = path.dirname(localPath);
+          if (localPath.startsWith(INDEX_DIR)) {
+            await fs.ensureDir(localDir);
+            await fs.createLink(media.file.path, localPath);
+            for (const attachment of attachments) {
+              await fs.createLink(attachment.path, path.join(localDir, attachment.filename));
+            }
+          }
+        }
 
         // save series
         if (descriptor.series?.name) {

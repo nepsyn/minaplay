@@ -25,7 +25,7 @@
             color="primary"
             density="compact"
             maxlength="256"
-            v-model="edit.token"
+            v-model.trim="edit.token"
             autofocus
           >
           </v-text-field>
@@ -37,10 +37,22 @@
             color="primary"
             density="compact"
             maxlength="256"
-            v-model="edit.chatId"
-            @keydown.enter="edit.token.trim().length > 0 && edit.chatId.trim().length > 0 && bindTelegram()"
+            v-model.trim="edit.chatId"
+            @keydown.enter="edit.token?.length > 0 && edit.chatId?.length > 0 && bindTelegram()"
           >
           </v-text-field>
+          <v-btn
+            class="mt-2"
+            variant="tonal"
+            color="secondary"
+            block
+            :loading="testing"
+            :prepend-icon="mdiMessageBadgeOutline"
+            :disabled="edit.token?.length <= 0 || edit.chatId?.length <= 0"
+            @click="test()"
+          >
+            {{ t('notification.test') }}
+          </v-btn>
           <v-btn
             class="mt-2"
             variant="tonal"
@@ -48,7 +60,7 @@
             block
             :loading="binding"
             :prepend-icon="mdiCheck"
-            :disabled="edit.token.trim().length <= 0 || edit.chatId.trim().length <= 0"
+            :disabled="edit.token?.length <= 0 || edit.chatId?.length <= 0"
             @click="bindTelegram()"
           >
             {{ t('app.ok') }}
@@ -60,7 +72,7 @@
 </template>
 
 <script setup lang="ts">
-import { mdiCheck, mdiClose } from '@mdi/js';
+import { mdiCheck, mdiClose, mdiMessageBadgeOutline } from '@mdi/js';
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
 import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
@@ -104,14 +116,32 @@ const edit = ref({
 });
 
 const {
+  pending: testing,
+  request: test,
+  onResolved: onTested,
+  onRejected: onTestFailed,
+} = useAxiosRequest(async () => {
+  return await api.Notification.test({
+    service: NotificationServiceEnum.TELEGRAM,
+    config: edit.value,
+  });
+});
+onTested(() => {
+  toast.toastSuccess(t('notification.testSent'));
+});
+onTestFailed((error: any) => {
+  toast.toastError(t(`error.${error.response?.data?.code ?? 'other'}`));
+});
+
+const {
   pending: binding,
   request: bindTelegram,
   onResolved: onTelegramBound,
   onRejected: onTelegramBindFailed,
 } = useAxiosRequest(async () => {
-  return await api.Notification.bindTelegram({
-    token: edit.value.token,
-    chatId: edit.value.chatId,
+  return await api.Notification.bind({
+    service: NotificationServiceEnum.TELEGRAM,
+    config: edit.value,
   });
 });
 onTelegramBound((data) => {

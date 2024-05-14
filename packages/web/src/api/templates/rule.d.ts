@@ -57,6 +57,8 @@ declare interface RuleFileDescriptor {
 
   /** Indicates whether to overwrite the original episode when episode of the same 'title' & 'no' exists in MinaPlay */
   overwriteEpisode?: boolean;
+  /** Save path of media file ( from `data/index` dir ) */
+  savePath?: string;
 }
 
 /**
@@ -71,7 +73,9 @@ declare type RuleFileDescriber = (
   files: FileEntity[],
 ) => RuleFileDescriptor | Promise<RuleFileDescriptor>;
 
+declare type RuleHookDelegate = `${string}:${string}`;
+
 declare interface RuleHooks {
-  validate: RuleEntryValidator;
-  describe?: RuleFileDescriber;
+  validate: RuleEntryValidator | RuleHookDelegate;
+  describe?: RuleFileDescriber | RuleHookDelegate;
 }

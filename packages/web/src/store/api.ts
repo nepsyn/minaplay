@@ -63,12 +63,9 @@ import {
 } from '@/api/interfaces/plugin.interface';
 import { NotificationServiceEnum } from '@/api/enums/notification-service.enum';
 import {
-  EmailBindData,
-  EmailVerifyDto,
+  NotificationBindDto,
   NotificationMetaDto,
   NotificationMetaEntity,
-  ServerChanConfigDto,
-  TelegramConfigDto,
 } from '@/api/interfaces/notification.interface';
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
 
@@ -309,11 +306,8 @@ export const useApiStore = defineStore('api', () => {
     getAll: apiGet<ApiQueryResult<NotificationMetaEntity>>('/api/v1/notification'),
     update: (id: number) => apiPut<NotificationMetaEntity, NotificationMetaDto>(`/api/v1/notification/${id}`),
     delete: (id: number) => apiDelete(`/api/v1/notification/${id}`),
-    bindWs: apiPost<NotificationMetaEntity>('/api/v1/notification/ws/bind'),
-    bindEmail: apiPost<EmailBindData, Pick<EmailBindData, 'email'>>('/api/v1/notification/email/bind'),
-    verifyEmail: apiPost<NotificationMetaEntity, EmailVerifyDto>('/api/v1/notification/email/verify'),
-    bindServerChan: apiPost<NotificationMetaEntity, ServerChanConfigDto>('/api/v1/notification/serverChan/bind'),
-    bindTelegram: apiPost<NotificationMetaEntity, TelegramConfigDto>('/api/v1/notification/telegram/bind'),
+    bind: apiPost<NotificationMetaEntity, NotificationBindDto>('/api/v1/notification/bind'),
+    test: apiPost<{}, NotificationBindDto>('/api/v1/notification/test'),
   };
 
   return {

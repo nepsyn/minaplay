@@ -1,7 +1,7 @@
 <template>
   <v-navigation-drawer
     order="0"
-    :class="display.smAndUp.value ? 'w-25' : 'w-75'"
+    :width="display.width.value * (display.smAndUp.value ? 0.25 : 0.75)"
     location="right"
     temporary
     v-model="layout.uploadDrawer"

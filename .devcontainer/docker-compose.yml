@@ -1,0 +1,60 @@
+services:
+  app:
+    image: mcr.microsoft.com/vscode/devcontainers/typescript-node:20-bookworm
+    container_name: basic_env
+    environment:
+      - DB_HOST=mysql
+      - REDIS_HOST=redis
+      - MS_ANNOUNCED_IP=127.0.0.1
+    networks:
+      - minaplay-network
+    ports:
+      - "5173:5173"
+      - "3000:3000"
+      - "3001:3001"
+      - "1935:1935"
+    volumes:
+      - ../..:/workspaces:cached
+    depends_on:
+      - mysql
+      - redis
+      - aria2
+    command: sleep infinity
+
+  mysql:
+    image: mysql:8
+    container_name: mysql
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
+      - MYSQL_DATABASE=minaplay
+    networks:
+      - minaplay-network
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    networks:
+      - minaplay-network
+    ports:
+      - "6379:6379"
+
+  aria2:
+    image: p3terx/aria2-pro:latest
+    container_name: aria2
+    networks:
+      - minaplay-network
+    ports:
+      - "6800:6800"
+    environment:
+      - RPC_SECRET=dev
+
+volumes:
+  mysql-data:
+
+networks:
+  minaplay-network:

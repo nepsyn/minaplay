@@ -7,7 +7,7 @@
   "scripts": {
     "build": "vue-tsc --noEmit && vite build",
     "lint": "eslint . --fix --ignore-path .gitignore",
-    "dev": "vite",
+    "dev": "vite --host",
     "preview": "vite preview",
     "generate-pwa-assets": "pwa-assets-generator --preset minimal src/assets/logo.svg"
   },

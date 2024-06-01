@@ -18,7 +18,6 @@ services:
     depends_on:
       - mysql
       - redis
-      - aria2
     command: sleep infinity
 
   mysql:

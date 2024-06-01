@@ -23,7 +23,7 @@ export const useSettingsStore = defineStore('settings', () => {
     Object.assign(
       {
         theme: 'auto',
-        locale: Object.keys(LANGUAGES).find((value) => value === navigator.language),
+        locale: Object.keys(LANGUAGES).find((value) => value === navigator?.language) ?? LANGUAGES['zh-CN'],
         showSubtitle: true,
         showDanmaku: true,
         autoJoinVoice: false,

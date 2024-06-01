@@ -43,16 +43,6 @@ services:
     ports:
       - "6379:6379"
 
-  aria2:
-    image: p3terx/aria2-pro:latest
-    container_name: aria2
-    networks:
-      - minaplay-network
-    ports:
-      - "6800:6800"
-    environment:
-      - RPC_SECRET=dev
-
 volumes:
   mysql-data:
 

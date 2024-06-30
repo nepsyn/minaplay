@@ -1,21 +1,20 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ApplicationLogger } from '../../../common/application.logger.service.js';
 import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
-import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
+import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { FileService } from '../../file/file.service.js';
 import { CronJob } from 'cron';
 import fetch from 'node-fetch';
+import WebTorrent from 'webtorrent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, In, Repository } from 'typeorm';
 import { DownloadItem } from './download-item.entity.js';
 import path from 'node:path';
 import { DOWNLOAD_DIR, INDEX_DIR, VALID_VIDEO_MIME } from '../../../constants.js';
-import { randomUUID } from 'node:crypto';
 import { FileSourceEnum, StatusEnum } from '../../../enums/index.js';
 import { generateMD5 } from '../../../utils/generate-md5.util.js';
-import { aria2, Aria2ClientNotification, Conn as Aria2Connection, open } from 'maria2';
-import { DownloadTask } from './download-task.js';
+import { DownloadTask } from './download-task.interface.js';
 import { File } from '../../file/file.entity.js';
 import fs from 'fs-extra';
 import { fileTypeFromFile } from 'file-type';
@@ -32,12 +31,12 @@ import { EpisodeService } from '../../media/episode/episode.service.js';
 import { MediaFileService } from '../../media/media-file.service.js';
 import { SUBSCRIBE_MODULE_OPTIONS_TOKEN } from '../subscribe.module-definition.js';
 import { SubscribeModuleOptions } from '../subscribe.module.interface.js';
-import WebSocket from 'ws';
 import { RuleService } from '../rule/rule.service.js';
+import { TypedEventEmitter } from '../../../utils/typed-event-emitter.js';
 
 @Injectable()
 export class DownloadService implements OnModuleInit {
-  private conn: Aria2Connection;
+  private client = new WebTorrent();
   private tasks = new Map<string, DownloadTask>();
 
   private static TRACKER_CACHE_KEY = 'download:trackers';
@@ -57,108 +56,7 @@ export class DownloadService implements OnModuleInit {
     private mediaFileService: MediaFileService,
   ) {}
 
-  private async onDownloadComplete({ gid }: Aria2ClientNotification) {
-    const status = await aria2.tellStatus(this.conn, gid);
-    const task = this.tasks.get(status.following ?? gid);
-    const localFiles = status.files.filter(({ path }) => fs.existsSync(path));
-    if (task) {
-      const files: File[] = [];
-      for (const file of localFiles) {
-        const fileStat = await fs.stat(file.path);
-        const fileType = await fileTypeFromFile(file.path);
-        const filename = path.basename(file.path);
-        const record = await this.fileService.save({
-          size: fileStat.size,
-          filename: filename,
-          name: filename,
-          md5: await generateMD5(fs.createReadStream(file.path)),
-          mimetype: fileType && fileType.mime,
-          source: FileSourceEnum.DOWNLOAD,
-          path: file.path,
-        });
-        files.push(record);
-      }
-
-      if (status.following || !status.followedBy) {
-        await this.save({ id: task.itemId, status: StatusEnum.SUCCESS });
-        task.emit('complete', files, status);
-        task.removeAllListeners();
-        this.tasks.delete(task.taskId);
-      }
-    }
-  }
-
-  private async onDownloadError({ gid }: Aria2ClientNotification) {
-    const status = await aria2.tellStatus(this.conn, gid);
-    const task = this.tasks.get(status.following ?? gid);
-    if (task) {
-      await this.save({ id: task.itemId, status: StatusEnum.FAILED, error: status.errorMessage });
-      task.emit('failed', status);
-      task.removeAllListeners();
-      this.tasks.delete(task.taskId);
-    }
-  }
-
-  private async onDownloadPause({ gid }: Aria2ClientNotification) {
-    const status = await aria2.tellStatus(this.conn, gid);
-    const task = this.tasks.get(status.following ?? gid);
-    if (task) {
-      await this.save({ id: task.itemId, status: StatusEnum.PAUSED });
-      task.emit('pause', status);
-    }
-  }
-
-  private async onDownloadStart({ gid }: Aria2ClientNotification) {
-    const status = await aria2.tellStatus(this.conn, gid);
-    const task = this.tasks.get(status.following ?? gid);
-    if (task) {
-      await this.save({ id: task.itemId, status: StatusEnum.PENDING });
-      task.emit('start', status);
-    }
-  }
-
-  private async onDownloadStop({ gid }: Aria2ClientNotification) {
-    const status = await aria2.tellStatus(this.conn, gid);
-    const task = this.tasks.get(status.following ?? gid);
-    if (task) {
-      await this.save({ id: task.itemId, status: StatusEnum.FAILED, error: 'Canceled' });
-      task.emit('stop', status);
-      task.removeAllListeners();
-      this.tasks.delete(task.taskId);
-    }
-  }
-
-  private async initClient() {
-    try {
-      this.conn = await open(
-        new WebSocket(`ws://${this.options.rpcHost}:${this.options.rpcPort}${this.options.rpcPath}`),
-        {
-          secret: this.options.rpcSecret,
-        },
-      );
-      this.conn.getSocket().addEventListener('close', () => {
-        this.logger.error('Aria2 WS connection closed, reconnect in 5 seconds');
-        setTimeout(() => this.initClient(), 5000);
-      });
-
-      aria2.onBtDownloadComplete(this.conn, this.onDownloadComplete.bind(this));
-      aria2.onDownloadComplete(this.conn, this.onDownloadComplete.bind(this));
-      aria2.onDownloadError(this.conn, this.onDownloadError.bind(this));
-      aria2.onDownloadPause(this.conn, this.onDownloadPause.bind(this));
-      aria2.onDownloadStart(this.conn, this.onDownloadStart.bind(this));
-      aria2.onDownloadStop(this.conn, this.onDownloadStop.bind(this));
-
-      const { version } = await aria2.getVersion(this.conn);
-      this.logger.log(`Download service is running, Aria2 version=${version}`);
-    } catch (error) {
-      this.logger.error('Aria2 WS connect failed, reconnect in 5 seconds', error.stack, DownloadService.name);
-      setTimeout(() => this.initClient(), 5000);
-    }
-  }
-
   async onModuleInit() {
-    await this.initClient();
-
     await this.downloadItemRepository.update(
       {
         status: In([StatusEnum.PENDING, StatusEnum.PAUSED]),
@@ -189,47 +87,22 @@ export class DownloadService implements OnModuleInit {
       const rawText = await response.text();
       const tracker = rawText.replace(/\s+/g, ',');
       await this.cacheStore.set(DownloadService.TRACKER_CACHE_KEY, tracker);
-      this.logger.log('Aria2 trackers updated');
+      this.logger.log('Downloader trackers updated');
     } catch (error) {
-      this.logger.error('Aria2 update trackers failed', error.stack, DownloadService.name);
+      this.logger.error('Downloader update trackers failed', error.stack, DownloadService.name);
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
-  async autoClean() {
-    try {
-      await aria2.purgeDownloadResult(this.conn);
-    } catch (error) {
-      this.logger.error(`Purge download result failed`, error.stack, DownloadService.name);
-    }
-  }
-
-  private async getState(taskId: string): Promise<DownloadItemState> {
-    try {
-      let status = await aria2.tellStatus(this.conn, taskId);
-      if (status.followedBy && status.followedBy.length > 0) {
-        status = await aria2.tellStatus(this.conn, status.followedBy[0]);
-      }
-
-      return {
-        totalLength: status.totalLength,
-        completedLength: status.completedLength,
-        downloadSpeed: status.downloadSpeed,
-      };
-    } catch {
-      return undefined;
-    }
+  private async getState(task: DownloadTask): Promise<DownloadItemState> {
+    return {
+      totalLength: task.torrent.length,
+      completedLength: task.torrent.downloaded,
+      downloadSpeed: task.torrent.downloadSpeed,
+      progress: task.torrent.progress,
+    };
   }
 
   async createTask(url: string, props?: DeepPartial<DownloadItem>) {
-    const trackers = await this.cacheStore.get<string>(DownloadService.TRACKER_CACHE_KEY);
-    const gid = await aria2.addUri(this.conn, [url], {
-      'http-proxy': this.options.httpProxy,
-      'seed-time': '0',
-      'bt-tracker': trackers ?? '',
-      dir: path.join(DOWNLOAD_DIR, randomUUID().replace(/-/g, '')),
-    });
-
     const hash = await generateMD5(url);
     const item = await this.save({
       ...props,
@@ -238,9 +111,78 @@ export class DownloadService implements OnModuleInit {
       status: StatusEnum.PENDING,
     });
 
-    const task = new DownloadTask(gid, item.id, this.conn);
-    this.tasks.set(gid, task);
+    const trackers = await this.cacheStore.get<string>(DownloadService.TRACKER_CACHE_KEY);
+    const dir = path.join(DOWNLOAD_DIR, item.id.replace(/-/g, ''));
+    const torrent = this.client.add(url, {
+      path: dir,
+      announce: trackers.split(/\s+/g),
+    });
+    this.logger.debug(`Download task #${item.id} created`);
 
+    const task: DownloadTask = Object.assign(new TypedEventEmitter(), {
+      id: item.id,
+      torrent,
+      pause: async () => {
+        if (!torrent.paused) {
+          torrent.pause();
+          await this.save({ id: item.id, status: StatusEnum.PAUSED });
+          this.logger.debug(`Download task #${item.id} paused`);
+          task.emit('pause');
+        }
+      },
+      unpause: async () => {
+        if (torrent.paused) {
+          torrent.resume();
+          await this.save({ id: item.id, status: StatusEnum.PENDING });
+          this.logger.debug(`Download task #${item.id} unpaused`);
+          task.emit('start');
+        }
+      },
+      remove: async () => {
+        torrent.destroy();
+        await this.save({ id: item.id, status: StatusEnum.FAILED, error: 'Canceled' });
+        this.logger.debug(`Download task #${item.id} removed`);
+        task.emit('remove');
+        task.removeAllListeners();
+        this.tasks.delete(item.id);
+      },
+    });
+
+    // register torrent event listeners
+    torrent.on('error', async (error) => {
+      await this.save({ id: item.id, status: StatusEnum.FAILED, error: String(error) });
+      this.logger.debug(`Download task #${item.id} error: ${String(error)}`);
+      task.emit('failed', error);
+      task.removeAllListeners();
+      this.tasks.delete(item.id);
+    });
+    torrent.on('done', async () => {
+      const localFiles = torrent.files.filter((file) => fs.existsSync(path.join(dir, file.path)));
+      const files: File[] = [];
+      for (const file of localFiles) {
+        const filePath = path.join(dir, file.path);
+        const fileStat = await fs.stat(filePath);
+        const fileType = await fileTypeFromFile(filePath);
+        const record = await this.fileService.save({
+          size: fileStat.size,
+          filename: file.name,
+          name: file.name,
+          md5: await generateMD5(fs.createReadStream(filePath)),
+          mimetype: fileType && fileType.mime,
+          source: FileSourceEnum.DOWNLOAD,
+          path: filePath,
+        });
+        files.push(record);
+      }
+
+      await this.save({ id: item.id, status: StatusEnum.SUCCESS });
+      this.logger.debug(`Download task #${item.id} done, total files count: ${torrent.files.length}`);
+      task.emit('done', files);
+      task.removeAllListeners();
+      this.tasks.delete(item.id);
+    });
+
+    this.tasks.set(item.id, task);
     return task;
   }
 
@@ -265,7 +207,7 @@ export class DownloadService implements OnModuleInit {
       error: null,
     });
 
-    task.once('complete', async (files) => {
+    task.once('done', async (files) => {
       // media files
       const mediaFiles = files.filter((file) => VALID_VIDEO_MIME.includes(file.mimetype));
       for (const mediaFile of mediaFiles) {
@@ -300,7 +242,7 @@ export class DownloadService implements OnModuleInit {
           name: mediaFile.name,
           isPublic: true,
           ...descriptor.media,
-          download: { id: task.itemId },
+          download: { id: task.id },
           file: { id: mediaFile.id },
           attachments: attachments.map(({ id }) => ({ id })),
         });
@@ -366,8 +308,8 @@ export class DownloadService implements OnModuleInit {
     return task;
   }
 
-  async getTaskByItemId(id: string) {
-    return [...this.tasks.values()].find(({ itemId }) => itemId === id);
+  async getTask(id: string) {
+    return this.tasks.get(id);
   }
 
   async save(item: DeepPartial<DownloadItem>) {
@@ -377,8 +319,8 @@ export class DownloadService implements OnModuleInit {
   async findOneBy(where: FindOptionsWhere<DownloadItem>) {
     const item = await this.downloadItemRepository.findOneBy(where);
     if (item) {
-      const task = await this.getTaskByItemId(item.id);
-      item.state = task && (await this.getState(task.taskId));
+      const task = await this.getTask(item.id);
+      item.state = task && (await this.getState(task));
     }
     return item;
   }
@@ -386,8 +328,8 @@ export class DownloadService implements OnModuleInit {
   async findAndCount(options?: FindManyOptions<DownloadItem>) {
     const [result, total] = await this.downloadItemRepository.findAndCount(options);
     for (const item of result) {
-      const task = await this.getTaskByItemId(item.id);
-      item.state = task && (await this.getState(task.taskId));
+      const task = await this.getTask(item.id);
+      item.state = task && (await this.getState(task));
     }
     return [result, total] as const;
   }
@@ -395,7 +337,7 @@ export class DownloadService implements OnModuleInit {
   async delete(where: FindOptionsWhere<DownloadItem>) {
     const items = await this.downloadItemRepository.find({ where });
     for (const item of items) {
-      const task = await this.getTaskByItemId(item.id);
+      const task = await this.getTask(item.id);
       await task?.remove();
       await this.downloadItemRepository.delete({ id: item.id });
     }

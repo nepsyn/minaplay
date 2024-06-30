@@ -1,5 +1,6 @@
 export interface DownloadItemState {
-  totalLength: string;
-  completedLength: string;
-  downloadSpeed: string;
+  totalLength: number;
+  completedLength: number;
+  downloadSpeed: number;
+  progress: number;
 }

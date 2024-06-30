@@ -14,10 +14,8 @@ import {
 import { AuthorizationGuard } from '../../authorization/authorization.guard.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from '../../authorization/require-permissions.decorator.js';
-import { PermissionEnum } from '../../../enums/permission.enum.js';
+import { ErrorCodeEnum, PermissionEnum, StatusEnum } from '../../../enums/index.js';
 import { buildException } from '../../../utils/build-exception.util.js';
-import { ErrorCodeEnum } from '../../../enums/error-code.enum.js';
-import { StatusEnum } from '../../../enums/status.enum.js';
 import { DownloadItemQueryDto } from './download-item-query.dto.js';
 import { buildQueryOptions } from '../../../utils/build-query-options.util.js';
 import { DownloadItem } from './download-item.entity.js';
@@ -48,7 +46,7 @@ export class DownloadItemController {
       throw buildException(BadRequestException, ErrorCodeEnum.DUPLICATED_DOWNLOAD_ITEM);
     }
 
-    const { itemId } = await this.downloadService.createAutoDownloadTask(
+    const { id } = await this.downloadService.createAutoDownloadTask(
       {
         id: data.name,
         title: data.name ?? data.url,
@@ -61,7 +59,7 @@ export class DownloadItemController {
       },
     );
 
-    return await this.downloadService.findOneBy({ id: itemId });
+    return await this.downloadService.findOneBy({ id });
   }
 
   @Get(':id')
@@ -101,7 +99,7 @@ export class DownloadItemController {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
 
-    const { itemId } = await this.downloadService.createAutoDownloadTask(JSON.parse(item.entry), {
+    const { id: itemId } = await this.downloadService.createAutoDownloadTask(JSON.parse(item.entry), {
       item,
       rule: item.rule,
       source: item.source,
@@ -130,7 +128,7 @@ export class DownloadItemController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    const task = await this.downloadService.getTaskByItemId(item.id);
+    const task = await this.downloadService.getTask(item.id);
     if (task) {
       await task.pause();
       return await this.downloadService.findOneBy({ id: item.id });
@@ -159,7 +157,7 @@ export class DownloadItemController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    const task = await this.downloadService.getTaskByItemId(item.id);
+    const task = await this.downloadService.getTask(item.id);
     if (task) {
       await task.unpause();
       return await this.downloadService.findOneBy({ id: item.id });
@@ -188,7 +186,7 @@ export class DownloadItemController {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
     }
 
-    const task = await this.downloadService.getTaskByItemId(item.id);
+    const task = await this.downloadService.getTask(item.id);
     if (task) {
       await task.remove();
       return await this.downloadService.findOneBy({ id: item.id });

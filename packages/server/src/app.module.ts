@@ -105,13 +105,8 @@ import process from 'node:process';
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
-        rpcHost: configService.get('ARIA2_RPC_HOST', '127.0.0.1'),
-        rpcPort: Number(configService.get('ARIA2_RPC_PORT', 6800)),
-        rpcPath: configService.get('ARIA2_RPC_PATH', '/jsonrpc'),
-        rpcSecret: configService.get('ARIA2_RPC_SECRET'),
-        trackerAutoUpdate: Number(configService.get('ARIA2_AUTO_UPDATE_TRACKER', 0)) === 1,
-        trackerUpdateUrl: configService.get('ARIA2_TRACKER_LIST_URL'),
-        httpProxy: process.env.HTTP_PROXY ?? configService.get('APP_HTTP_PROXY'),
+        trackerAutoUpdate: Number(configService.get('DOWNLOAD_AUTO_UPDATE_TRACKER', 0)) === 1,
+        trackerUpdateUrl: configService.get('DOWNLOAD_TRACKER_LIST_URL'),
       }),
     }),
     NotificationModule.registerAsync({

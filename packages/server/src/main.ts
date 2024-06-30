@@ -12,8 +12,8 @@ async function bootstrap() {
   const logger = new ApplicationLogger();
 
   process.title = `MinaPlay v${MINAPLAY_VERSION}`;
-  process.on('unhandledRejection', (reason) => {
-    logger.error(`Uncaught rejection: ${reason}`, (reason as Error)?.stack, 'MinaPlay');
+  process.on('unhandledRejection', (reason: Error) => {
+    logger.error(`Uncaught rejection: ${JSON.stringify(reason)}`, reason?.stack, 'MinaPlay');
   });
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule, { logger });

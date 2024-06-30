@@ -51,7 +51,7 @@ export * from './subscribe/download/download.service.js';
 export * from './subscribe/parse-log/parse-log.service.js';
 export * from './subscribe/rule/rule.interface.js';
 export * from './subscribe/download/download-item-state.interface.js';
-export * from './subscribe/download/download-task.js';
+export * from './subscribe/download/download-task.interface.js';
 
 export * from './system/system.service.js';
 

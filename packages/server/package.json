@@ -40,6 +40,7 @@
     "class-validator": "^0.14.1",
     "commander": "^12.1.0",
     "compressing": "^1.10.1",
+    "cron": "^3.1.7",
     "diskusage": "^1.2.0",
     "execa": "^9.3.0",
     "fast-folder-size": "^2.2.0",
@@ -62,12 +63,14 @@
     "rxjs": "^7.8.1",
     "semver": "^7.6.2",
     "sharp": "^0.33.4",
+    "socket.io": "^4.7.5",
     "swagger-ui-express": "^5.0.1",
     "typeorm": "^0.3.20",
     "typescript": "^5.5.2",
     "ws": "^8.17.1"
   },
   "devDependencies": {
+    "@nestjs/cli": "^10.3.2",
     "@nestjs/schematics": "^10.1.1",
     "@nestjs/testing": "^10.3.9",
     "@types/bcrypt": "^5.0.2",

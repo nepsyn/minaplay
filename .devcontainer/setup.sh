@@ -14,7 +14,7 @@ nohup aria2c --enable-rpc --rpc-allow-origin-all > aria2.log 2>&1 &
 # Navigate to the web directory
 cd ./packages/web
 # setup
-yarn install
+pnpm install
 cp ../../.devcontainer/.env.dev.web .env
 
 ########################
@@ -23,6 +23,5 @@ cp ../../.devcontainer/.env.dev.web .env
 # Navigate to the server directory
 cd ../server
 # setup
-yarn global add @nestjs/cli
-yarn install --ignore-engines
+pnpm install
 cp ../../.devcontainer/.env.dev.server .env

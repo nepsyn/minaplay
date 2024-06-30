@@ -1,9 +1,7 @@
 <template>
   <v-app>
-    <v-layout>
-      <upload-drawer></upload-drawer>
-      <home-view />
-    </v-layout>
+    <upload-drawer></upload-drawer>
+    <home-view />
   </v-app>
 </template>
 

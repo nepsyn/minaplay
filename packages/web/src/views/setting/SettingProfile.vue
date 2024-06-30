@@ -248,38 +248,44 @@
           </v-chip-group>
         </v-card-text>
         <v-card-actions class="px-4">
-          <v-btn
-            variant="text"
-            color="primary"
-            :prepend-icon="mdiCheckAll"
-            @click="editSubscriptions = subscriptions.concat()"
-          >
-            {{ t('app.actions.selectAll') }}
-          </v-btn>
-          <v-btn variant="text" color="warning" :prepend-icon="mdiSelectionRemove" @click="editSubscriptions = []">
-            {{ t('app.actions.unselectAll') }}
-          </v-btn>
-          <v-btn
-            variant="text"
-            color="secondary"
-            :loading="testing"
-            :prepend-icon="mdiMessageBadgeOutline"
-            @click="test()"
-          >
-            {{ t('notification.test') }}
-          </v-btn>
-          <v-spacer></v-spacer>
-          <v-btn variant="text" @click="editSubscriptionsSheet = false">
-            {{ t('app.cancel') }}
-          </v-btn>
-          <v-btn
-            variant="text"
-            color="primary"
-            :loading="metaUpdating"
-            @click="updateMeta({ subscribes: editSubscriptions })"
-          >
-            {{ t('app.ok') }}
-          </v-btn>
+          <v-row dense>
+            <v-col cols="auto">
+              <v-btn
+                variant="text"
+                color="primary"
+                :prepend-icon="mdiCheckAll"
+                @click="editSubscriptions = subscriptions.concat()"
+              >
+                {{ t('app.actions.selectAll') }}
+              </v-btn>
+              <v-btn variant="text" color="warning" :prepend-icon="mdiSelectionRemove" @click="editSubscriptions = []">
+                {{ t('app.actions.unselectAll') }}
+              </v-btn>
+              <v-btn
+                variant="text"
+                color="secondary"
+                :loading="testing"
+                :prepend-icon="mdiMessageBadgeOutline"
+                @click="test()"
+              >
+                {{ t('notification.test') }}
+              </v-btn>
+            </v-col>
+            <v-spacer></v-spacer>
+            <v-col cols="auto">
+              <v-btn variant="text" @click="editSubscriptionsSheet = false">
+                {{ t('app.cancel') }}
+              </v-btn>
+              <v-btn
+                variant="text"
+                color="primary"
+                :loading="metaUpdating"
+                @click="updateMeta({ subscribes: editSubscriptions })"
+              >
+                {{ t('app.ok') }}
+              </v-btn>
+            </v-col>
+          </v-row>
         </v-card-actions>
       </v-card>
     </v-bottom-sheet>

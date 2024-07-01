@@ -26,7 +26,7 @@
     "js-md5": "^0.8.3",
     "markdown-it": "^14.1.0",
     "mediasoup-client": "^3.7.8",
-    "monaco-editor": "^0.49.0",
+    "monaco-editor": "^0.50.0",
     "mpegts.js": "^1.7.3",
     "pinia": "^2.1.7",
     "plyr": "^3.7.8",

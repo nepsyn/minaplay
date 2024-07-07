@@ -85,7 +85,7 @@ export class DownloadService implements OnModuleInit {
         agent: this.options.httpProxy && new HttpsProxyAgent(this.options.httpProxy),
       });
       const rawText = await response.text();
-      const tracker = rawText.replace(/\s+/g, ',');
+      const tracker = rawText.trim().split(/\s+/g);
       await this.cacheStore.set(DownloadService.TRACKER_CACHE_KEY, tracker);
       this.logger.log('Downloader trackers updated');
     } catch (error) {
@@ -111,11 +111,11 @@ export class DownloadService implements OnModuleInit {
       status: StatusEnum.PENDING,
     });
 
-    const trackers = await this.cacheStore.get<string>(DownloadService.TRACKER_CACHE_KEY);
+    const tracker = await this.cacheStore.get<string[]>(DownloadService.TRACKER_CACHE_KEY);
     const dir = path.join(DOWNLOAD_DIR, item.id.replace(/-/g, ''));
     const torrent = this.client.add(url, {
       path: dir,
-      announce: trackers.split(/\s+/g),
+      announce: tracker,
     });
     this.logger.debug(`Download task #${item.id} created`);
 

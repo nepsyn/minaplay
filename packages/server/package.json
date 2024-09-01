@@ -33,7 +33,7 @@
     "@nestjs/websockets": "^10.3.8",
     "@types/nodemailer": "^6.4.15",
     "bcrypt": "^5.1.1",
-    "bull": "^4.12.9",
+    "bull": "^4.16.1",
     "cache-manager": "^5.5.3",
     "cache-manager-redis-yet": "^5.0.1",
     "class-transformer": "^0.5.1",

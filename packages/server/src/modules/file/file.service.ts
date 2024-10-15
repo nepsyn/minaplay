@@ -38,8 +38,8 @@ export class FileService implements OnModuleInit {
     });
   }
 
-  async save(file: DeepPartial<File>) {
-    if (isDefined(file.size) && isDefined(file.md5)) {
+  async save(file: DeepPartial<File>, ignoreDuplicated = false) {
+    if (!ignoreDuplicated && isDefined(file.size) && isDefined(file.md5)) {
       const localFile = await this.fileRepository.findOneBy({ md5: file.md5, size: file.size });
       if (localFile) {
         file = {

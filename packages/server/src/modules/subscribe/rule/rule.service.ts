@@ -120,15 +120,18 @@ export class RuleService {
     await fs.ensureDir(RULE_CODE_DIR);
     await fs.writeFile(filepath, code);
     const fileStat = await fs.stat(filepath);
-    return await this.fileService.save({
-      user: user && { id: user.id },
-      filename: filename,
-      name: filename,
-      size: fileStat.size,
-      md5: await generateMD5(code),
-      source: FileSourceEnum.USER_UPLOAD,
-      path: filepath,
-    });
+    return await this.fileService.save(
+      {
+        user: user && { id: user.id },
+        filename: filename,
+        name: filename,
+        size: fileStat.size,
+        md5: await generateMD5(code),
+        source: FileSourceEnum.USER_UPLOAD,
+        path: filepath,
+      },
+      true,
+    );
   }
 
   async save(rule: DeepPartial<Rule>) {

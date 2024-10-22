@@ -1,6 +1,5 @@
 import { TypedEventEmitter } from '../../../utils/typed-event-emitter.js';
 import { File } from '../../file/file.entity.js';
-import { Torrent } from 'webtorrent';
 
 export type DownloadTaskEventMap = {
   done: (files: File[]) => any;
@@ -10,9 +9,9 @@ export type DownloadTaskEventMap = {
   start: () => any;
 };
 
-export interface DownloadTask extends TypedEventEmitter<DownloadTaskEventMap> {
+export interface DownloadTask<T = any> extends TypedEventEmitter<DownloadTaskEventMap> {
   id: string;
-  torrent: Torrent;
+  controller: T;
   pause: () => Promise<void>;
   unpause: () => Promise<void>;
   remove: () => Promise<void>;

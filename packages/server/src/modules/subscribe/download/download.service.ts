@@ -5,19 +5,16 @@ import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { FileService } from '../../file/file.service.js';
 import { CronJob } from 'cron';
 import fetch from 'node-fetch';
-import WebTorrent from 'webtorrent';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, In, Repository } from 'typeorm';
 import { DownloadItem } from './download-item.entity.js';
 import path from 'node:path';
 import { DOWNLOAD_DIR, INDEX_DIR, VALID_VIDEO_MIME } from '../../../constants.js';
-import { FileSourceEnum, StatusEnum } from '../../../enums/index.js';
+import { StatusEnum } from '../../../enums/index.js';
 import { generateMD5 } from '../../../utils/generate-md5.util.js';
 import { DownloadTask } from './download-task.interface.js';
-import { File } from '../../file/file.entity.js';
 import fs from 'fs-extra';
-import { fileTypeFromFile } from 'file-type';
 import { DownloadItemState } from './download-item-state.interface.js';
 import { FeedEntry } from '@extractus/feed-extractor';
 import { RuleFileDescriptor } from '../rule/rule.interface.js';
@@ -32,12 +29,13 @@ import { MediaFileService } from '../../media/media-file.service.js';
 import { SUBSCRIBE_MODULE_OPTIONS_TOKEN } from '../subscribe.module-definition.js';
 import { SubscribeModuleOptions } from '../subscribe.module.interface.js';
 import { RuleService } from '../rule/rule.service.js';
-import { TypedEventEmitter } from '../../../utils/typed-event-emitter.js';
+import { DownloaderAdapter } from './downloader-adapter.interface.js';
+import { DOWNLOADER_ADAPTERS } from './adapters/downloader-adapters.js';
 
 @Injectable()
 export class DownloadService implements OnModuleInit {
-  private client = new WebTorrent();
-  private tasks = new Map<string, DownloadTask>();
+  tasks = new Map<string, DownloadTask>();
+  private adapter: DownloaderAdapter;
 
   private static TRACKER_CACHE_KEY = 'download:trackers';
   private logger = new ApplicationLogger(DownloadService.name);
@@ -55,6 +53,14 @@ export class DownloadService implements OnModuleInit {
     private episodeService: EpisodeService,
     private mediaFileService: MediaFileService,
   ) {}
+
+  getOptions() {
+    return this.options;
+  }
+
+  getFileService() {
+    return this.fileService;
+  }
 
   async onModuleInit() {
     await this.downloadItemRepository.update(
@@ -77,6 +83,24 @@ export class DownloadService implements OnModuleInit {
       });
       this.scheduleRegistry.addCronJob('auto-update-trackers', job);
     }
+
+    let adapterType = this.options.downloader;
+    if (!adapterType || !DOWNLOADER_ADAPTERS[adapterType]) {
+      this.logger.error(`Download adapter '${adapterType}' not found, use fallback adapter: webtorrent`);
+      adapterType = 'webtorrent';
+    }
+
+    try {
+      this.adapter = new DOWNLOADER_ADAPTERS[adapterType](this);
+      await this.adapter.initialize?.();
+      this.logger.log(`Download service is running, adapter: ${adapterType}`);
+    } catch (error) {
+      this.logger.error(
+        `Downloader adapter '${this.options.downloader}' initialize failed`,
+        error.stack,
+        DownloadService.name,
+      );
+    }
   }
 
   private async updateBtTrackers() {
@@ -94,12 +118,7 @@ export class DownloadService implements OnModuleInit {
   }
 
   private async getState(task: DownloadTask): Promise<DownloadItemState> {
-    return {
-      totalLength: task.torrent.length,
-      completedLength: task.torrent.downloaded,
-      downloadSpeed: task.torrent.downloadSpeed,
-      progress: task.torrent.progress,
-    };
+    return await this.adapter.getState(task);
   }
 
   async createTask(url: string, props?: DeepPartial<DownloadItem>) {
@@ -111,77 +130,9 @@ export class DownloadService implements OnModuleInit {
       status: StatusEnum.PENDING,
     });
 
-    const tracker = await this.cacheStore.get<string[]>(DownloadService.TRACKER_CACHE_KEY);
+    const trackers = await this.cacheStore.get<string[]>(DownloadService.TRACKER_CACHE_KEY);
     const dir = path.join(DOWNLOAD_DIR, item.id.replace(/-/g, ''));
-    const torrent = this.client.add(url, {
-      path: dir,
-      announce: tracker,
-    });
-    this.logger.debug(`Download task #${item.id} created`);
-
-    const task: DownloadTask = Object.assign(new TypedEventEmitter(), {
-      id: item.id,
-      torrent,
-      pause: async () => {
-        if (!torrent.paused) {
-          torrent.pause();
-          await this.save({ id: item.id, status: StatusEnum.PAUSED });
-          this.logger.debug(`Download task #${item.id} paused`);
-          task.emit('pause');
-        }
-      },
-      unpause: async () => {
-        if (torrent.paused) {
-          torrent.resume();
-          await this.save({ id: item.id, status: StatusEnum.PENDING });
-          this.logger.debug(`Download task #${item.id} unpaused`);
-          task.emit('start');
-        }
-      },
-      remove: async () => {
-        torrent.destroy();
-        await this.save({ id: item.id, status: StatusEnum.FAILED, error: 'Canceled' });
-        this.logger.debug(`Download task #${item.id} removed`);
-        task.emit('remove');
-        task.removeAllListeners();
-        this.tasks.delete(item.id);
-      },
-    });
-
-    // register torrent event listeners
-    torrent.on('error', async (error) => {
-      await this.save({ id: item.id, status: StatusEnum.FAILED, error: String(error) });
-      this.logger.debug(`Download task #${item.id} error: ${String(error)}`);
-      task.emit('failed', error);
-      task.removeAllListeners();
-      this.tasks.delete(item.id);
-    });
-    torrent.on('done', async () => {
-      const localFiles = torrent.files.filter((file) => fs.existsSync(path.join(dir, file.path)));
-      const files: File[] = [];
-      for (const file of localFiles) {
-        const filePath = path.join(dir, file.path);
-        const fileStat = await fs.stat(filePath);
-        const fileType = await fileTypeFromFile(filePath);
-        const record = await this.fileService.save({
-          size: fileStat.size,
-          filename: file.name,
-          name: file.name,
-          md5: await generateMD5(fs.createReadStream(filePath)),
-          mimetype: fileType && fileType.mime,
-          source: FileSourceEnum.DOWNLOAD,
-          path: filePath,
-        });
-        files.push(record);
-      }
-
-      await this.save({ id: item.id, status: StatusEnum.SUCCESS });
-      this.logger.debug(`Download task #${item.id} done, total files count: ${torrent.files.length}`);
-      task.emit('done', files);
-      task.removeAllListeners();
-      this.tasks.delete(item.id);
-    });
-
+    const task = await this.adapter.createTask(item.id, url, dir, trackers);
     this.tasks.set(item.id, task);
     return task;
   }

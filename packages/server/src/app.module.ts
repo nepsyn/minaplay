@@ -105,8 +105,14 @@ import process from 'node:process';
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
+        downloader: configService.get('DOWNLOAD_ADAPTER') ?? 'webtorrent',
         trackerAutoUpdate: Number(configService.get('DOWNLOAD_AUTO_UPDATE_TRACKER', 0)) === 1,
         trackerUpdateUrl: configService.get('DOWNLOAD_TRACKER_LIST_URL'),
+        httpProxy: process.env.HTTP_PROXY ?? configService.get('APP_HTTP_PROXY'),
+        aria2RpcHost: configService.get('ARIA2_RPC_HOST', '127.0.0.1'),
+        aria2RpcPort: Number(configService.get('ARIA2_RPC_PORT', 6800)),
+        aria2RpcPath: configService.get('ARIA2_RPC_PATH', '/jsonrpc'),
+        aria2RpcSecret: configService.get('ARIA2_RPC_SECRET'),
       }),
     }),
     NotificationModule.registerAsync({

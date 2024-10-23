@@ -1,5 +1,5 @@
 export interface LiveModuleOptions {
-  mediasoupAnnouncedIp: string;
+  mediasoupAnnouncedAddress: string;
   mediasoupRtcMinPort: number;
   mediasoupRtcMaxPort: number;
   mediasoupWorkerNum: number;

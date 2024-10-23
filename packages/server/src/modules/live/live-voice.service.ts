@@ -18,7 +18,7 @@ interface VoiceGroup {
 
 @Injectable()
 export class LiveVoiceService implements OnModuleInit {
-  private readonly workers: MediasoupTypes.Worker[] = [];
+  private workers: MediasoupTypes.Worker[] = [];
   private nextWorkerIndex = -1;
   private readonly groups = new Map<string, VoiceGroup>();
 
@@ -27,19 +27,25 @@ export class LiveVoiceService implements OnModuleInit {
   constructor(@Inject(LIVE_MODULE_OPTIONS_TOKEN) private options: LiveModuleOptions) {}
 
   async onModuleInit() {
-    for (let i = 0; i < this.options.mediasoupWorkerNum; i++) {
-      const worker = await createWorker({
-        rtcMinPort: this.options.mediasoupRtcMinPort,
-        rtcMaxPort: this.options.mediasoupRtcMaxPort,
-        logLevel: 'none',
-      });
-      worker.on('died', (error: Error) => {
-        this.logger.error(`Mediasoup worker(${i}) died`, error.stack, LiveVoiceService.name);
-      });
-      this.workers.push(worker);
+    try {
+      for (let i = 0; i < this.options.mediasoupWorkerNum; i++) {
+        const worker = await createWorker({
+          logLevel: 'none',
+        });
+        worker.on('died', (error: Error) => {
+          this.workers = this.workers.filter((value) => value !== worker);
+          this.logger.error(`Mediasoup worker(${i}) died`, error.stack, LiveVoiceService.name);
+        });
+        this.workers.push(worker);
+      }
+      this.logger.log(`LiveVoice service is running, mediasoup version=${MEDIASOUP_VERSION}`);
+    } catch (error) {
+      this.logger.error(
+        `LiveVoice service init failed, mediasoup version=${MEDIASOUP_VERSION}`,
+        error?.stack,
+        LiveVoiceService.name,
+      );
     }
-
-    this.logger.log(`LiveVoice service is running, mediasoup version=${MEDIASOUP_VERSION}`);
   }
 
   @Interval('mediasoup-workers-status', /* 1 day */ 24 * 60 * 60 * 1000)
@@ -63,10 +69,12 @@ export class LiveVoiceService implements OnModuleInit {
   }
 
   private async createRouter() {
-    if (this.workers.length === 0) return undefined;
+    if (this.workers.length === 0) {
+      throw new Error('Mediasoup service not available');
+    }
+
     this.nextWorkerIndex = (this.nextWorkerIndex + 1) % this.workers.length;
     const worker = this.workers[this.nextWorkerIndex];
-
     return await worker.createRouter({
       mediaCodecs: [
         {
@@ -82,10 +90,15 @@ export class LiveVoiceService implements OnModuleInit {
   async createWebRtcTransport(groupId: string, peerId: number) {
     const group = await this.getVoiceGroup(groupId);
     const transport = await group.router.createWebRtcTransport({
-      listenIps: [
+      listenInfos: [
         {
+          protocol: 'udp',
           ip: '0.0.0.0',
-          announcedIp: this.options.mediasoupAnnouncedIp,
+          announcedAddress: this.options.mediasoupAnnouncedAddress,
+          portRange: {
+            min: this.options.mediasoupRtcMinPort,
+            max: this.options.mediasoupRtcMaxPort,
+          },
         },
       ],
       enableUdp: true,

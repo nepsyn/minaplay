@@ -69,7 +69,7 @@ services:
     environment:
       - DB_HOST=minaplay-mysql
       - REDIS_HOST=minaplay-redis
-      - MS_ANNOUNCED_IP=127.0.0.1  # 在需要放映室语音通话服务的情况下改为宿主机外部访问 IP
+      - MS_ANNOUNCED_ADDRESS=127.0.0.1  # 在需要放映室语音通话服务的情况下改为宿主机外部访问地址
     ports:
       - "3000:3000"
       - "12000-12999:12000-12999"

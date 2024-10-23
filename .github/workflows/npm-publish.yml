@@ -20,10 +20,9 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
-      - run: yarn install
+      - run: pnpm install
         working-directory: packages/server
-      - run: yarn global add @nestjs/cli
-      - run: yarn run build
+      - run: pnpm run build
         working-directory: packages/server
       - run: npm publish --access public
         working-directory: packages/server

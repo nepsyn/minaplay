@@ -20,6 +20,8 @@ jobs:
         with:
           node-version: 20
           registry-url: https://registry.npmjs.org/
+      - run: npm install pnpm --global
+        working-directory: packages/server
       - run: pnpm install
         working-directory: packages/server
       - run: pnpm run build

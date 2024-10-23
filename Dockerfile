@@ -9,6 +9,7 @@ COPY packages/web/. /web/
 
 RUN set -ex \
     && apk add --no-cache bash tini openssl ffmpeg aria2 python3 py3-pip g++ make linux-headers \
+    && npm install pnpm --global \
     && pnpm install \
     && pnpm run build \
     && cd /web \

@@ -10,4 +10,4 @@ if [ -z "$APP_SECRET_KEY" ]; then
 fi
 
 nohup aria2c --enable-rpc --rpc-allow-origin-all > aria2.log 2>&1 &
-node dist/main
+exec node dist/main

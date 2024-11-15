@@ -49,7 +49,7 @@ services:
     environment:
       - DB_HOST=minaplay-mysql
       - REDIS_HOST=minaplay-redis
-      - MS_ANNOUNCED_IP=127.0.0.1  # 在需要放映室语音通话服务的情况下改为宿主机外部访问 IP
+      - MS_ANNOUNCED_ADDRESS=127.0.0.1  # 在需要放映室语音通话服务的情况下改为宿主机外部访问地址
     ports:
       - "3000:3000"
       - "12000-12999:12000-12999"
@@ -108,12 +108,11 @@ RSS 订阅源。
 
 - **备注** - 订阅规则的备注。
 - **RSS 订阅源** - 订阅规则所属的 RSS 订阅源，可同时选择多个。
-- **代码** - 描述具体订阅行为的 JavaScript/TypeScript 代码，编写方式可参考 [订阅规则](/guide/rule) 章节。
+- **代码** - 描述具体订阅行为的 JavaScript/TypeScript 代码，编写方式可参考 [RSS 订阅](/guide/subscribe) 章节。
 
 ## 下一步
 
 - 完整的应用程序启动配置，请参阅 [启动参数](/guide/env) 章节。
-- 要了解如何配置 RSS 订阅源，请参阅 [RSS 订阅源](/guide/rss-source) 章节。
-- 要探索如何编写订阅规则，请参阅 [订阅规则](/guide/rule) 章节。
+- 要了解如何配置 RSS 订阅源，请参阅 [RSS 订阅](/guide/subscribe) 章节。
 - 如果想要创建同步观影放映室，请参阅 [放映室](/guide/live) 章节。
 - 如果要掌握使用 MinaPlay 插件的技巧，请参阅 [插件](/guide/plugin) 章节。

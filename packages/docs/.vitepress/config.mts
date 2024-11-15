@@ -5,12 +5,15 @@ import { zh } from './zh.mjs';
 export default defineConfig({
   title: 'MinaPlay',
   description: 'MinaPlay official document',
+  rewrites: {
+    'zh/:rest*': ':rest*'
+  },
   lastUpdated: true,
   base: '/minaplay/',
   srcExclude: ['README.md'],
   head: [
     ['script', {
-      defer: true,
+      defer: '',
       src: 'https://us.umami.is/script.js',
       'data-website-id': '6de8215f-84d9-4fc9-a6ca-f6850d2ebb2b',
     }],

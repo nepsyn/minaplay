@@ -23,7 +23,7 @@ MinaPlay docs 是 MinaPlay 使用 [VitePress](https://vitepress.dev/zh/) 构建�
 
 ### 项目依赖
 
-- [Node.js](https://nodejs.org/en) (版本 >= 18) & npm
+- [Node.js](https://nodejs.org/en) (版本 >= 18) & pnpm
 
 ### 开始
 
@@ -36,17 +36,17 @@ MinaPlay docs 是 MinaPlay 使用 [VitePress](https://vitepress.dev/zh/) 构建�
 2. 使用包管理器安装依赖。
 
     ```shell
-    npm install
+    pnpm install
     ```
 
 3. 在本地开发环境启动 MinaPlay 文档。
 
     ```shell
-    npm run docs:dev
+    pnpm run docs:dev
     ```
 
 4. 编译 MinaPlay 文档
 
     ```shell
-    npm run docs:build
+    pnpm run docs:build
     ```

@@ -1,6 +1,6 @@
 # 部署
 
-## Docker Compose 部署（推荐）
+## Docker Compose 部署
 
 :::tip 提示
 如果还没有安装 Docker，请移步 [Get Docker](https://docs.docker.com/get-docker/) 先在部署环境中安装 Docker 服务。
@@ -42,7 +42,7 @@ services:
       environment:
          - DB_HOST=minaplay-mysql
          - REDIS_HOST=minaplay-redis
-         - MS_ANNOUNCED_IP=127.0.0.1  # 在需要放映室语音通话服务的情况下改为宿主机外部访问 IP
+         - MS_ANNOUNCED_ADDRESS=127.0.0.1  # 在需要放映室语音通话服务的情况下改为宿主机外部访问地址
       ports:
          - "3000:3000"
          - "12000-12999:12000-12999"
@@ -95,7 +95,7 @@ $ docker run -d \
   redis:latest
 
 # 启动 MinaPlay
-# 在需要放映室语音通话服务的情况下，将命令中 `-e MS_ANNOUNCED_IP=127.0.0.1` 更改为宿主机的外部访问 IP 地址
+# 在需要放映室语音通话服务的情况下，将命令中 `-e MS_ANNOUNCED_ADDRESS=127.0.0.1` 更改为宿主机的外部访问地址
 $ docker run -d \
   --name minaplay \
   --network minaplay-network \
@@ -105,25 +105,25 @@ $ docker run -d \
   -p 12000-12999:12000-12999 \
   -e DB_HOST=minaplay-mysql \
   -e REDIS_HOST=minaplay-redis \
-  -e MS_ANNOUNCED_IP=127.0.0.1 \
+  -e MS_ANNOUNCED_ADDRESS=127.0.0.1 \
   nepsyn/minaplay:latest
 ```
 
-## 本地部署（不推荐）
+## 本地部署
 
 ### 准备工作
 
 在宿主机环境下安装以下服务。
 
-- [Node.js](https://nodejs.org/en) (版本 >= 18) & [yarn](https://yarnpkg.com/)
-- [Aria2](https://github.com/aria2/aria2) (版本 >= 1.36.0)
+- [Node.js](https://nodejs.org/en) (版本 >= 18) & [pnpm](https://pnpm.io/zh/installation)
+- [Aria2](https://github.com/aria2/aria2) (可选，版本 >= 1.36.0)
 - [ffmpeg](https://ffmpeg.org/) & [ffprobe](https://ffmpeg.org/)
 - [MySQL](https://www.mysql.com/) (版本 >= 8.0)
 - [Redis](https://redis.io/) (版本 >= 6.0)
 
 #### 启动服务
 
-- 启动 Aria2 服务并启用 RPC 功能。
+- 启动 Aria2 服务并启用 RPC 功能（可选）。
 - 启动 MySQL 服务并创建 `minaplay` 数据库。
 - 启动 Redis 服务。
 
@@ -141,9 +141,7 @@ $ git clone https://github.com/nepsyn/minaplay
 
     ```shell
     $ cd minaplay/packages/server
-    $ yarn
-    $ yarn add sharp --ignore-engines
-    $ yarn global add @nestjs/cli
+    $ pnpm install
     ```
 
     :::warning 注意
@@ -152,7 +150,7 @@ $ git clone https://github.com/nepsyn/minaplay
     - 重新执行安装。
 
         ```shell
-        $ MEDIASOUP_WORKER_BIN=1 yarn install
+        $ MEDIASOUP_WORKER_BIN=1 pnpm install
         ```
 
     - 访问 [Mediasoup 源码仓库发布页](https://github.com/versatica/mediasoup/releases/) 。
@@ -161,7 +159,6 @@ $ git clone https://github.com/nepsyn/minaplay
     - 解压压缩包中的可执行文件到 `node_modules/mediasoup/worker/out/Release` 目录下。
     - 为可执行文件添加执行权限。
     :::
-
 
 2. 复制并修改配置文件。
 
@@ -173,7 +170,7 @@ $ git clone https://github.com/nepsyn/minaplay
 3. 编译 MinaPlay 服务端应用程序。
 
     ```shell
-    $ yarn run build
+    $ pnpm run build
     ```
 
 #### 编译网页端
@@ -182,13 +179,13 @@ $ git clone https://github.com/nepsyn/minaplay
 
     ```shell
     $ cd ../web
-    $ yarn
+    $ pnpm install
     ```
 
 2. 编译 MinaPlay 网页应用程序。
 
     ```shell
-    $ yarn run build
+    $ pnpm run build
     ```
 
 3. 移动编译后文件到后端静态资源文件夹。

@@ -56,7 +56,7 @@ MinaPlay 使用 [mediasoup](https://mediasoup.org/) 基于 [WebRTC](https://deve
 默认设置下，用户需要在进入放映室后手动加入放映室语音房间。
 
 :::warning 注意
-要使用放映室语音服务，需要在环境变量中使用 `MS_ANNOUNCED_IP` 指明服务器的外部访问IP，具体配置方法请参与 [启动参数](/guide/env) 章节。
+要使用放映室语音服务，需要在环境变量中使用 `MS_ANNOUNCED_ADDRESS` 指明服务器的外部访问地址，具体配置方法请参与 [启动参数](/guide/env) 章节。
 :::
 
 

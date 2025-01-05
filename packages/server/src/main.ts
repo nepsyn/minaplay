@@ -36,7 +36,7 @@ async function bootstrap() {
 
   // global proxy setting
   const proxy = process.env.HTTP_PROXY ?? configService.get('APP_HTTP_PROXY');
-  if (proxy) {
+  if (proxy && configService.get('APP_GLOBAL_PROXY')) {
     globalProxyBootstrap();
     global.GLOBAL_AGENT.HTTP_PROXY = proxy;
   }

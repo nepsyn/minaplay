@@ -6,6 +6,7 @@ import { SocketIOAdapter } from './common/socket-io.adapter.js';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { MINAPLAY_VERSION } from './constants.js';
 import { ApplicationLogger } from './common/application.logger.service.js';
+import { bootstrap as globalProxyBootstrap } from 'global-agent';
 import process from 'node:process';
 
 async function bootstrap() {
@@ -32,6 +33,13 @@ async function bootstrap() {
 
   // use custom socket-io adapter
   app.useWebSocketAdapter(new SocketIOAdapter(app, configService));
+
+  // global proxy setting
+  const proxy = process.env.HTTP_PROXY ?? configService.get('APP_HTTP_PROXY');
+  if (proxy) {
+    globalProxyBootstrap();
+    global.GLOBAL_AGENT.HTTP_PROXY = proxy;
+  }
 
   // swagger settings
   if (configService.get('APP_ENV') === 'dev') {

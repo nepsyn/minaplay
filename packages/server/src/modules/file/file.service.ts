@@ -29,7 +29,7 @@ export class FileService implements OnModuleInit {
       },
       runOnInit: true,
     });
-    this.scheduleRegistry.addCronJob('auto-clean-files', job);
+    this.scheduleRegistry.addCronJob('auto-clean-files', job as any);
   }
 
   private async cleanExpiredFiles() {

@@ -85,7 +85,7 @@ export class DownloadService implements OnModuleInit {
         },
         runOnInit: true,
       });
-      this.scheduleRegistry.addCronJob('auto-update-trackers', job);
+      this.scheduleRegistry.addCronJob('auto-update-trackers', job as any);
     }
 
     let adapterType = this.options.downloader;

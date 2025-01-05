@@ -95,7 +95,7 @@ export class SourceService implements OnModuleInit {
         await this.fetchSubscribeSourceQueue.add(source, { attempts: 3 });
       },
     });
-    this.scheduleRegistry.addCronJob(name, job);
+    this.scheduleRegistry.addCronJob(name, job as any);
     job.start();
   }
 

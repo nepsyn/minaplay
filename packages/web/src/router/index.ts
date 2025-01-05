@@ -23,7 +23,6 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '/resource',
-        name: 'resource',
         children: [
           {
             path: '/resource',

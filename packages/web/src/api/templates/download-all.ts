@@ -1,5 +1,5 @@
 const hooks: RuleHooks = {
-  validate: (entry) => {
+  validate: () => {
     return true;
   },
 };

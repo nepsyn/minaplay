@@ -1,3 +1,23 @@
+declare interface SourceEntity {
+  id: number;
+  url: string;
+  remark?: string;
+  title?: string;
+  cron: string;
+  enabled: boolean;
+  createAt: Date;
+  updateAt: Date;
+}
+
+declare interface RuleEntity {
+  id: number;
+  remark?: string;
+  sources: SourceEntity[];
+  code: string;
+  createAt: Date;
+  updateAt: Date;
+}
+
 declare interface FileEntity {
   id: string;
   name: string;
@@ -16,11 +36,19 @@ declare interface FeedEntry {
   published?: Date;
 }
 
+declare interface RuleEntryValidatorContext {
+  /** Source download item from */
+  source: SourceEntity;
+  /** Rule download item form */
+  rule: RuleEntity;
+}
+
 /**
  * Validate an RSS feed entry, Returns whether MinaPlay should download this entry
  * @param entry Original RSS feed entry
+ * @param ctx Validate item context
  */
-declare type RuleEntryValidator = (entry: FeedEntry) => boolean | Promise<boolean>;
+declare type RuleEntryValidator = (entry: FeedEntry, ctx: RuleEntryValidatorContext) => boolean | Promise<boolean>;
 
 declare interface RuleMediaDescriptor {
   /** Name of this media */
@@ -61,16 +89,27 @@ declare interface RuleFileDescriptor {
   savePath?: string;
 }
 
+declare interface RuleFileDescriberContext {
+  /** Source download item from */
+  source?: SourceEntity;
+  /** Rule download item form */
+  rule?: RuleEntity;
+  /** Original download entry */
+  entry: FeedEntry;
+  /** Media files in the same download task */
+  files: FileEntity[];
+}
+
 /**
  * Describe a downloaded media file
  * @param entry Original RSS feed entry
  * @param file Media file
- * @param files Media files in the same download task
+ * @param ctx Describe item context
  */
 declare type RuleFileDescriber = (
   entry: FeedEntry,
   file: FileEntity,
-  files: FileEntity[],
+  ctx: RuleFileDescriberContext,
 ) => RuleFileDescriptor | Promise<RuleFileDescriptor>;
 
 declare type RuleHookDelegate = `${string}:${string}`;

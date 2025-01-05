@@ -12,6 +12,8 @@ import { ApplicationLogger } from '../../common/application.logger.service.js';
 import { DownloadService } from './download/download.service.js';
 import { generateMD5 } from '../../utils/generate-md5.util.js';
 import { RuleVm } from './rule/rule.interface.js';
+import { instanceToPlain } from 'class-transformer';
+import { Rule } from './rule/rule.entity.js';
 
 @Injectable()
 @Processor('parse-source')
@@ -104,7 +106,10 @@ export class ParseSourceConsumer {
         }
 
         try {
-          const valid = await vm.hooks.validate?.(entry);
+          const valid = await vm.hooks.validate?.(entry, {
+            source: { ...instanceToPlain(source), parserMeta: source.parserMeta } as Source,
+            rule: { ...instanceToPlain(rule), parserMeta: rule.parserMeta } as Rule,
+          });
           if (!valid) {
             continue;
           }

@@ -6,7 +6,11 @@ import { PluginListenerContext } from './plugin-listener-context.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { FeedEntry } from '@extractus/feed-extractor';
 import { File } from '../file/file.entity.js';
-import { RuleFileDescriptor } from '../subscribe/rule/rule.interface.js';
+import {
+  RuleEntryValidatorContext,
+  RuleFileDescriberContext,
+  RuleFileDescriptor,
+} from '../subscribe/rule/rule.interface.js';
 
 export interface MinaPlayPluginMetadata extends Pick<ModuleMetadata, 'imports' | 'providers'> {
   /** Plugin unique ID */
@@ -196,14 +200,15 @@ export interface PluginSourceParser {
   /**
    * Validate feed entry to download
    * @param entry feed entry
+   * @param ctx validate item context
    */
-  validateFeedEntry?(entry: FeedEntry): MaybePromise<boolean>;
+  validateFeedEntry?(entry: FeedEntry, ctx: RuleEntryValidatorContext): MaybePromise<boolean>;
 
   /**
    * Describe a download item
    * @param entry feed entry
    * @param file current file entity
-   * @param files all file entities in a same download task
+   * @param ctx describe item context
    */
-  describeDownloadItem?(entry: FeedEntry, file: File, files: File[]): MaybePromise<RuleFileDescriptor>;
+  describeDownloadItem?(entry: FeedEntry, file: File, ctx: RuleFileDescriberContext): MaybePromise<RuleFileDescriptor>;
 }

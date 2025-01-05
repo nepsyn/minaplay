@@ -1,13 +1,23 @@
 import { FeedEntry } from '@extractus/feed-extractor';
 import { File } from '../../file/file.entity.js';
 import { Context, Module } from 'isolated-vm';
+import { Source } from '../source/source.entity.js';
+import { Rule } from './rule.entity.js';
+
+export interface RuleEntryValidatorContext {
+  /** Source download item from */
+  source: Source;
+  /** Rule download item form */
+  rule: Rule;
+}
 
 export interface RuleEntryValidator {
   /**
    * Validate an RSS feed entry, Returns whether MinaPlay should download this entry
    * @param entry Original RSS feed entry
+   * @param ctx Validate item context
    */
-  (entry: FeedEntry): boolean | Promise<boolean>;
+  (entry: FeedEntry, ctx: RuleEntryValidatorContext): boolean | Promise<boolean>;
 }
 
 export interface RuleMediaDescriptor {
@@ -49,14 +59,25 @@ export interface RuleFileDescriptor {
   savePath?: string;
 }
 
+export interface RuleFileDescriberContext {
+  /** Source download item from */
+  source?: Source;
+  /** Rule download item form */
+  rule?: Rule;
+  /** Original download entry */
+  entry: FeedEntry;
+  /** Media files in the same download task */
+  files: File[];
+}
+
 export interface RuleFileDescriber {
   /**
    * Describe a downloaded media file
    * @param entry Original RSS feed entry
    * @param file Media file
-   * @param files Media files in the same download task
+   * @param ctx Describe item context
    */
-  (entry: FeedEntry, file: File, files: File[]): RuleFileDescriptor | Promise<RuleFileDescriptor>;
+  (entry: FeedEntry, file: File, ctx: RuleFileDescriberContext): RuleFileDescriptor | Promise<RuleFileDescriptor>;
 }
 
 type RuleHookDelegate = `${string}:${string}`;

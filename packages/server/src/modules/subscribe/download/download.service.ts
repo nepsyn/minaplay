@@ -31,6 +31,9 @@ import { SubscribeModuleOptions } from '../subscribe.module.interface.js';
 import { RuleService } from '../rule/rule.service.js';
 import { DownloaderAdapter } from './downloader-adapter.interface.js';
 import { DOWNLOADER_ADAPTERS } from './adapters/downloader-adapters.js';
+import { SourceService } from '../source/source.service.js';
+import { instanceToPlain } from 'class-transformer';
+import { File } from '../../file/file.entity.js';
 
 @Injectable()
 export class DownloadService implements OnModuleInit {
@@ -46,6 +49,7 @@ export class DownloadService implements OnModuleInit {
     @Inject(CACHE_MANAGER) private cacheStore: CacheStore,
     private scheduleRegistry: SchedulerRegistry,
     private fileService: FileService,
+    private sourceService: SourceService,
     private ruleService: RuleService,
     private ruleErrorLogService: RuleErrorLogService,
     private mediaService: MediaService,
@@ -159,6 +163,7 @@ export class DownloadService implements OnModuleInit {
     });
 
     task.once('done', async (files) => {
+      const source = props.source && (await this.sourceService.findOneBy({ id: props.source.id }));
       // media files
       const mediaFiles = files.filter((file) => VALID_VIDEO_MIME.includes(file.mimetype));
       for (const mediaFile of mediaFiles) {
@@ -169,7 +174,12 @@ export class DownloadService implements OnModuleInit {
             const rule = await this.ruleService.findOneBy({ id: props.rule.id });
             if (rule?.file?.isExist) {
               const { hooks, release } = await this.ruleService.createRuleVm(rule.code);
-              descriptor = await hooks?.describe?.(entry, mediaFile, mediaFiles);
+              descriptor = await hooks?.describe?.(entry, instanceToPlain(mediaFile) as File, {
+                source: source && ({ ...instanceToPlain(source), parserMeta: source.parserMeta } as Source),
+                rule: { ...instanceToPlain(rule), parserMeta: rule.parserMeta } as Rule,
+                entry,
+                files: instanceToPlain(mediaFiles) as File[],
+              });
               release?.();
             }
           } catch (error) {

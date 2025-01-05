@@ -223,6 +223,9 @@ export class PluginController {
       });
     }
 
+    await this.sourceService.deleteFetchSubscribeDataJob(source.id);
+    await this.sourceService.addFetchSubscribeDataJob(source);
+
     return { series, source, rule };
   }
 

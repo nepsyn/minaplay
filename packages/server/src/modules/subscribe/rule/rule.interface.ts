@@ -9,6 +9,8 @@ export interface RuleEntryValidatorContext {
   source: Source;
   /** Rule download item form */
   rule: Rule;
+  /** Meta info from rule code */
+  meta: object;
 }
 
 export interface RuleEntryValidator {
@@ -68,6 +70,8 @@ export interface RuleFileDescriberContext {
   entry: FeedEntry;
   /** Media files in the same download task */
   files: File[];
+  /** Meta info from rule code */
+  meta: object;
 }
 
 export interface RuleFileDescriber {
@@ -93,5 +97,6 @@ export interface RuleVm {
   context: Context;
   module: Module;
   hooks: Partial<CallableRuleHooks>;
+  meta: object;
   release: () => void;
 }

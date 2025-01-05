@@ -89,6 +89,7 @@ export class RuleService {
 
     const validateHook = await exports.get('validate', { reference: true });
     const describeHook = await exports.get('describe', { reference: true });
+    const meta = await exports.get('meta', { reference: true });
     const hooks = {
       validate: await this.buildRuleHook('validate', validateHook),
       describe: await this.buildRuleHook('describe', describeHook),
@@ -110,6 +111,7 @@ export class RuleService {
       context,
       module,
       hooks,
+      meta: (await meta.copy()) ?? {},
       release,
     };
   }

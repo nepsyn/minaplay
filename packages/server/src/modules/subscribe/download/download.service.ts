@@ -173,12 +173,13 @@ export class DownloadService implements OnModuleInit {
           try {
             const rule = await this.ruleService.findOneBy({ id: props.rule.id });
             if (rule?.file?.isExist) {
-              const { hooks, release } = await this.ruleService.createRuleVm(rule.code);
+              const { hooks, meta, release } = await this.ruleService.createRuleVm(rule.code);
               descriptor = await hooks?.describe?.(entry, instanceToPlain(mediaFile) as File, {
                 source: source && ({ ...instanceToPlain(source), parserMeta: source.parserMeta } as Source),
                 rule: { ...instanceToPlain(rule), parserMeta: rule.parserMeta } as Rule,
                 entry,
                 files: instanceToPlain(mediaFiles) as File[],
+                meta,
               });
               release?.();
             }

@@ -109,6 +109,7 @@ export class ParseSourceConsumer {
           const valid = await vm.hooks.validate?.(entry, {
             source: { ...instanceToPlain(source), parserMeta: source.parserMeta } as Source,
             rule: { ...instanceToPlain(rule), parserMeta: rule.parserMeta } as Rule,
+            meta: vm.meta,
           });
           if (!valid) {
             continue;

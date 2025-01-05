@@ -41,6 +41,8 @@ declare interface RuleEntryValidatorContext {
   source: SourceEntity;
   /** Rule download item form */
   rule: RuleEntity;
+  /** Meta info from rule code */
+  meta: object;
 }
 
 /**
@@ -98,6 +100,8 @@ declare interface RuleFileDescriberContext {
   entry: FeedEntry;
   /** Media files in the same download task */
   files: FileEntity[];
+  /** Meta info from rule code */
+  meta: object;
 }
 
 /**

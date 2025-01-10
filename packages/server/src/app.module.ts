@@ -9,7 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
 import { BullModule } from '@nestjs/bull';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AuthorizationModule } from './modules/authorization/authorization.module.js';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { FileModule } from './modules/file/file.module.js';
@@ -30,6 +30,7 @@ import { ApplicationTimeoutInterceptor } from './common/application.timeout.inte
 import { ApplicationLogger } from './common/application.logger.service.js';
 import { MINAPLAY_VERSION } from './constants.js';
 import process from 'node:process';
+import fs from 'fs-extra';
 
 @Module({
   imports: [
@@ -61,19 +62,30 @@ import process from 'node:process';
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: (configService: ConfigService) => ({
-        type: 'mysql',
-        host: configService.get('DB_HOST', '127.0.0.1'),
-        port: Number(configService.get('DB_PORT', 3306)),
-        username: configService.get('DB_USERNAME', 'root'),
-        password: configService.get('DB_PASSWORD'),
-        database: configService.get('DB_DATABASE', 'minaplay'),
-        entities: ['dist/**/*.entity{.ts,.js}'],
-        migrations: ['dist/migrations/*{.ts,.js}'],
-        migrationsTableName: 'migrations_minaplay',
-        synchronize: configService.get('APP_ENV') === 'dev',
-        migrationsRun: configService.get('APP_ENV') !== 'dev',
-      }),
+      useFactory: (configService: ConfigService) => {
+        const caPath = configService.get<string>('DB_SSL_CA') || undefined;
+        let ca: Buffer = undefined;
+        if (caPath?.toLowerCase() !== 'none' && fs.pathExistsSync(caPath)) {
+          ca = fs.readFileSync(caPath);
+        }
+        return {
+          type: 'mysql',
+          host: configService.get('DB_HOST', '127.0.0.1'),
+          port: Number(configService.get('DB_PORT', 3306)),
+          username: configService.get('DB_USERNAME', 'root'),
+          password: configService.get('DB_PASSWORD'),
+          database: configService.get('DB_DATABASE', 'minaplay'),
+          entities: ['dist/**/*.entity{.ts,.js}'],
+          migrations: ['dist/migrations/*{.ts,.js}'],
+          migrationsTableName: 'migrations_minaplay',
+          synchronize: configService.get('APP_ENV') === 'dev',
+          migrationsRun: configService.get('APP_ENV') !== 'dev',
+          ssl: caPath && {
+            ca,
+            rejectUnauthorized: caPath?.toLowerCase() !== 'none',
+          },
+        } as TypeOrmModuleOptions;
+      },
     }),
     LiveModule.registerAsync({
       inject: [ConfigService],

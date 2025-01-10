@@ -36,12 +36,14 @@ import { SeriesTagService } from '../media/series/series-tag.service.js';
 import { FileService } from '../file/file.service.js';
 import path from 'node:path';
 import { generateMD5 } from '../../utils/generate-md5.util.js';
+import { RequestTimeout } from '../../common/request.timeout.decorator.js';
 
 @Controller('plugins')
 @UseGuards(AuthorizationGuard)
 @ApiTags('plugins')
 @ApiBearerAuth()
 @RequirePermissions(PermissionEnum.ROOT_OP)
+@RequestTimeout(30 * 1000)
 export class PluginController {
   constructor(
     private pluginService: PluginService,

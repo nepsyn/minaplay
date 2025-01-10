@@ -35,14 +35,14 @@ export class PluginService implements OnModuleInit {
     const files = fs
       .readdirSync(dir, { withFileTypes: true })
       .flatMap((file) =>
-        file.isDirectory() ? fs.readdirSync(path.join(file.path, file.name), { withFileTypes: true }) : file,
+        file.isDirectory() ? fs.readdirSync(path.join(file.parentPath, file.name), { withFileTypes: true }) : file,
       )
       .filter((file) => file.isFile() && (file.name.endsWith('.plugin.js') || file.name.endsWith('.plugin.mjs')));
 
     const plugins: [Type, fs.Dirent][] = [];
     for (const file of files) {
       try {
-        const module: object = await import(pathToFileURL(path.join(file.path, file.name)).href);
+        const module: object = await import(pathToFileURL(path.join(file.parentPath, file.name)).href);
         for (const attr of Object.values(module)) {
           if (isDefined(getMinaPlayPluginMetadata(attr)?.id)) {
             plugins.push([attr, file]);

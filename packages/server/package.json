@@ -1,6 +1,6 @@
 {
   "name": "@minaplay/server",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "author": "Nepsyn",
   "license": "AGPL-3.0",
   "type": "module",

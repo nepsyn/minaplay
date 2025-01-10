@@ -186,12 +186,15 @@ export class AppModule implements OnApplicationBootstrap {
   private logger = new ApplicationLogger('MinaPlay');
 
   onApplicationBootstrap() {
-    this.logger.log(`Welcome to MinaPlay v${MINAPLAY_VERSION} ${banner}`);
+    let banner = MINAPLAY_BANNER;
+    if (fs.pathExistsSync('banner.txt')) {
+      banner = fs.readFileSync('banner.txt').toString();
+    }
+    this.logger.log(`Welcome to MinaPlay v${MINAPLAY_VERSION}\n${banner}`);
   }
 }
 
-const banner = `
-
+const MINAPLAY_BANNER = `
     __  ____             ____  __           
    /  |/  (_)___  ____ _/ __ \\/ /___ ___  __
   / /|_/ / / __ \\/ __ \`/ /_/ / / __ \`/ / / /

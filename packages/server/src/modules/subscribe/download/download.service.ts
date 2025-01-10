@@ -134,7 +134,7 @@ export class DownloadService implements OnModuleInit {
       status: StatusEnum.PENDING,
     });
 
-    const trackers = await this.cacheStore.get<string[]>(DownloadService.TRACKER_CACHE_KEY);
+    const trackers = (await this.cacheStore.get<string[]>(DownloadService.TRACKER_CACHE_KEY)) ?? [];
     const dir = path.join(DOWNLOAD_DIR, item.id.replace(/-/g, ''));
     const task = await this.adapter.createTask(item.id, url, dir, trackers);
     this.tasks.set(item.id, task);

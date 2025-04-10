@@ -155,7 +155,7 @@ import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
 import { useI18n } from 'vue-i18n';
 import { computed, ref } from 'vue';
 import { mdiCheck, mdiClockOutline, mdiClose, mdiPencilLock } from '@mdi/js';
-import { parseExpression } from 'cron-parser';
+import { CronExpressionParser } from 'cron-parser';
 import { useToastStore } from '@/store/toast';
 
 const api = useApiStore();
@@ -270,7 +270,7 @@ const reset = () => {
 
 const nextTriggerTimes = computed(() => {
   try {
-    const interval = parseExpression(edit.value!.cron);
+    const interval = CronExpressionParser.parse(edit.value!.cron);
     return (
       `${t('source.nextTriggerTimes')}\n` +
       Array.from({ length: 3 })

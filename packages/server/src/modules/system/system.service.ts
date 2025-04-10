@@ -16,7 +16,7 @@ import semver from 'semver';
 export class SystemService implements OnModuleInit, OnApplicationBootstrap {
   public startAt: Date;
 
-  static getFolderSize = promisify(fastFolderSize);
+  static getFolderSize = promisify(fastFolderSize as unknown as Function);
 
   constructor(private configService: ConfigService) {}
 

@@ -60,7 +60,7 @@ import { useI18n } from 'vue-i18n';
 import BlankFavicon from '@/assets/blank-favicon.png';
 import { mdiClock, mdiPause, mdiProgressCheck } from '@mdi/js';
 import { computed, ref } from 'vue';
-import { parseExpression } from 'cron-parser';
+import { CronExpressionParser } from 'cron-parser';
 import { useRouter } from 'vue-router';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useApiStore } from '@/store/api';
@@ -108,7 +108,7 @@ const getFaviconUrl = (url: string) => {
 
 const nextTriggerTimes = computed(() => {
   try {
-    const interval = parseExpression(props.source.cron);
+    const interval = CronExpressionParser.parse(props.source.cron);
     return (
       `${t('source.nextTriggerTimes')}\n` +
       Array.from({ length: 3 })

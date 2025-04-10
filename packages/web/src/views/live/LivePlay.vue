@@ -584,7 +584,7 @@ import { useI18n } from 'vue-i18n';
 import { useApiStore } from '@/store/api';
 import { useRoute, useRouter } from 'vue-router';
 import VideoPlayer from '@/components/app/VideoPlayer.vue';
-import { ComponentPublicInstance, computed, nextTick, onUnmounted, ref, shallowRef } from 'vue';
+import { computed, nextTick, onUnmounted, ref, shallowRef } from 'vue';
 import {
   mdiAccountMultiple,
   mdiAnimationPlayOutline,
@@ -623,8 +623,8 @@ import { useAsyncTask } from '@/composables/use-async-task';
 import { UserEntity } from '@/api/interfaces/user.interface';
 import axios from 'axios';
 import { Device } from 'mediasoup-client';
-import { Transport } from 'mediasoup-client/lib/Transport';
-import { Producer } from 'mediasoup-client/lib/Producer';
+import { Transport } from 'mediasoup-client/lib/Transport.js';
+import { Producer } from 'mediasoup-client/lib/Producer.js';
 import { getFullUrl, selectFile } from '@/utils/utils';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { MediaEntity } from '@/api/interfaces/media.interface';

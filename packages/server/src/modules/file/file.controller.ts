@@ -34,7 +34,7 @@ import { buildQueryOptions } from '../../utils/build-query-options.util.js';
 import { File } from './file.entity.js';
 import { Between } from 'typeorm';
 import { Response } from 'express';
-import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { ApiFile } from '../../common/api.file.decorator.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
@@ -45,7 +45,7 @@ import { RequestTimeout } from '../../common/request.timeout.decorator.js';
 @RequestTimeout(0)
 @ApiBearerAuth()
 export class FileController {
-  constructor(private fileService: FileService, @Inject(CACHE_MANAGER) private cacheStore: CacheStore) {}
+  constructor(private fileService: FileService, @Inject(CACHE_MANAGER) private cache: Cache) {}
 
   @Post('image')
   @HttpCode(200)
@@ -155,13 +155,13 @@ export class FileController {
 
   async getFileCacheById(id: string) {
     const key = `file:${id}`;
-    let file = await this.cacheStore.get<File>(key);
+    let file = await this.cache.get<File>(key);
     if (!file) {
       file = await this.fileService.findOneBy({ id });
       if (!file || !file.isExist) {
         throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
       }
-      await this.cacheStore.set(key, file, 24 * 60 * 60 * 1000);
+      await this.cache.set(key, file, 24 * 60 * 60 * 1000);
     }
 
     return file;

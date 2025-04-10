@@ -4,13 +4,13 @@ import { Live } from './live.entity.js';
 import { DeepPartial, FindManyOptions, FindOptionsWhere, Repository } from 'typeorm';
 import { LiveState } from './live-state.insterface.js';
 import { instanceToPlain } from 'class-transformer';
-import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 
 @Injectable()
 export class LiveService implements OnModuleInit {
   constructor(
     @InjectRepository(Live) private liveRepository: Repository<Live>,
-    @Inject(CACHE_MANAGER) private cacheStore: CacheStore,
+    @Inject(CACHE_MANAGER) private cache: Cache,
   ) {}
 
   async onModuleInit() {
@@ -40,7 +40,7 @@ export class LiveService implements OnModuleInit {
   async createOrGetLiveState(id: string): Promise<LiveState | undefined> {
     const cacheKey = `live:${id}`;
 
-    const state: LiveState = await this.cacheStore.get(cacheKey);
+    const state: LiveState = await this.cache.get(cacheKey);
     if (state) {
       return state;
     }
@@ -57,7 +57,7 @@ export class LiveService implements OnModuleInit {
         stream: undefined,
         updateAt: new Date(),
       };
-      await this.cacheStore.set(cacheKey, state, 0);
+      await this.cache.set(cacheKey, state, 0);
       return state;
     }
 
@@ -65,10 +65,10 @@ export class LiveService implements OnModuleInit {
   }
 
   async updateLiveState(state: LiveState) {
-    await this.cacheStore.set(`live:${state.live.id}`, state, 0);
+    await this.cache.set(`live:${state.live.id}`, state, 0);
   }
 
   async deleteLiveState(id: string) {
-    await this.cacheStore.del(`live:${id}`);
+    await this.cache.del(`live:${id}`);
   }
 }

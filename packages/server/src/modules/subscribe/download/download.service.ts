@@ -1,6 +1,6 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ApplicationLogger } from '../../../common/application.logger.service.js';
-import { CACHE_MANAGER, CacheStore } from '@nestjs/cache-manager';
+import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
 import { CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { FileService } from '../../file/file.service.js';
 import { CronJob } from 'cron';
@@ -46,7 +46,7 @@ export class DownloadService implements OnModuleInit {
   constructor(
     @InjectRepository(DownloadItem) private downloadItemRepository: Repository<DownloadItem>,
     @Inject(SUBSCRIBE_MODULE_OPTIONS_TOKEN) private options: SubscribeModuleOptions,
-    @Inject(CACHE_MANAGER) private cacheStore: CacheStore,
+    @Inject(CACHE_MANAGER) private cache: Cache,
     private scheduleRegistry: SchedulerRegistry,
     private fileService: FileService,
     private sourceService: SourceService,
@@ -114,7 +114,7 @@ export class DownloadService implements OnModuleInit {
       });
       const rawText = await response.text();
       const tracker = rawText.trim().split(/\s+/g);
-      await this.cacheStore.set(DownloadService.TRACKER_CACHE_KEY, tracker);
+      await this.cache.set(DownloadService.TRACKER_CACHE_KEY, tracker);
       this.logger.log('Downloader trackers updated');
     } catch (error) {
       this.logger.error('Downloader update trackers failed', error.stack, DownloadService.name);
@@ -134,7 +134,7 @@ export class DownloadService implements OnModuleInit {
       status: StatusEnum.PENDING,
     });
 
-    const trackers = (await this.cacheStore.get<string[]>(DownloadService.TRACKER_CACHE_KEY)) ?? [];
+    const trackers = (await this.cache.get<string[]>(DownloadService.TRACKER_CACHE_KEY)) ?? [];
     const dir = path.join(DOWNLOAD_DIR, item.id.replace(/-/g, ''));
     const task = await this.adapter.createTask(item.id, url, dir, trackers);
     this.tasks.set(item.id, task);

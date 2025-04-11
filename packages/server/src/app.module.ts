@@ -13,8 +13,6 @@ import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { AuthorizationModule } from './modules/authorization/authorization.module.js';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { FileModule } from './modules/file/file.module.js';
-import { RedisClientOptions } from 'redis';
-import { redisStore } from 'cache-manager-redis-yet';
 import { buildException } from './utils/build-exception.util.js';
 import { ErrorCodeEnum } from './enums/index.js';
 import { LiveModule } from './modules/live/live.module.js';
@@ -31,6 +29,7 @@ import { ApplicationLogger } from './common/application.logger.service.js';
 import { MINAPLAY_VERSION } from './constants.js';
 import process from 'node:process';
 import fs from 'fs-extra';
+import KeyvRedis from '@keyv/redis';
 
 @Module({
   imports: [
@@ -39,14 +38,17 @@ import fs from 'fs-extra';
       expandVariables: true,
     }),
     ScheduleModule.forRoot(),
-    CacheModule.registerAsync<RedisClientOptions>({
+    CacheModule.registerAsync({
       inject: [ConfigService],
       isGlobal: true,
       useFactory: (configService: ConfigService) => ({
-        store: redisStore,
-        url: `redis://${configService.get('REDIS_HOST', '127.0.0.1')}:${configService.get('REDIS_PORT', 6379)}`,
-        database: Number(configService.get('REDIS_DB', 0)),
-        password: configService.get('REDIS_PASSWORD'),
+        stores: [
+          new KeyvRedis({
+            url: `redis://${configService.get('REDIS_HOST', '127.0.0.1')}:${configService.get('REDIS_PORT', 6379)}`,
+            database: Number(configService.get('REDIS_DB', 0)),
+            password: configService.get('REDIS_PASSWORD'),
+          }),
+        ],
         ttl: 24 * 60 * 60 * 1000,
       }),
     }),

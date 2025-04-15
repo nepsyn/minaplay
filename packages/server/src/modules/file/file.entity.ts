@@ -32,6 +32,8 @@ export class File {
 
   /** 文件大小(字节) */
   @Column({
+    type: 'bigint',
+    unsigned: true,
     nullable: true,
   })
   size: number;

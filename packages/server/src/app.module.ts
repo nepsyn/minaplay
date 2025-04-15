@@ -9,7 +9,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CacheModule } from '@nestjs/cache-manager';
 import { BullModule } from '@nestjs/bull';
-import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthorizationModule } from './modules/authorization/authorization.module.js';
 import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { FileModule } from './modules/file/file.module.js';
@@ -86,7 +86,7 @@ import KeyvRedis from '@keyv/redis';
             ca,
             rejectUnauthorized: caPath?.toLowerCase() !== 'none',
           },
-        } as TypeOrmModuleOptions;
+        };
       },
     }),
     LiveModule.registerAsync({

@@ -23,11 +23,14 @@ export class File {
   @Exclude()
   @Column({
     nullable: true,
+    length: 512,
   })
   filename: string;
 
   /** 文件名 */
-  @Column()
+  @Column({
+    length: 512,
+  })
   name: string;
 
   /** 文件大小(字节) */
@@ -57,7 +60,7 @@ export class File {
   /** 文件路径 */
   @Exclude()
   @Column({
-    length: 1024,
+    length: 4096,
   })
   path: string;
 

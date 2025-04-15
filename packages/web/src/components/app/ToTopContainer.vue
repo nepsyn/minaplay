@@ -30,17 +30,26 @@ const props = withDefaults(
   defineProps<{
     threshold?: string | number;
     size?: string | number;
+    alwaysShow?: boolean;
   }>(),
   {
     threshold: 120,
     size: 'small',
+    alwaysShow: false,
   },
 );
 
 const showToTop = ref(false);
+let timeout: ReturnType<typeof setTimeout> | undefined = undefined;
 
 const onScroll = (e: any) => {
   showToTop.value = e.target.scrollTop >= Number(props.threshold);
+  if (!props.alwaysShow && showToTop.value) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => {
+      showToTop.value = false;
+    }, 2000);
+  }
 };
 
 const containerRef = ref<HTMLElement>();

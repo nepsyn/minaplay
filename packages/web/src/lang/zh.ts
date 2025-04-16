@@ -181,6 +181,7 @@ const zh: MessageSchema = {
     seriesAdded: '剧集已添加',
     play: '播放',
     download: '下载',
+    defaultResource: '默认资源',
   },
   resource: {
     seriesUpdates: '最新剧集',

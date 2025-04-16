@@ -124,8 +124,8 @@ export interface MinaPlayPluginSourceEpisode {
   no: string;
   pubAt?: Date;
   posterUrl?: string;
-  downloadUrl?: string;
-  playUrl?: string;
+  downloadUrl?: string | { title: string; url: string }[];
+  playUrl?: string | { title: string; url: string }[];
 }
 
 export interface MinaPlayPluginSourceSeries {

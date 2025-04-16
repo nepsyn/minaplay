@@ -9,33 +9,9 @@
   <v-expand-transition>
     <v-sheet v-if="playingEpisode?.playUrl" class="d-flex flex-column pa-4">
       <v-responsive class="rounded-lg" :aspect-ratio="16 / 9" max-height="520">
-        <video-player :src="playingEpisode.playUrl ?? ''" :poster="playingEpisode.posterUrl"></video-player>
+        <video-player :src="playingUrl ?? ''" :poster="playingEpisode.posterUrl"></video-player>
       </v-responsive>
-      <div class="text-h6 mt-2 d-flex justify-space-between align-center">
-        <v-btn
-          variant="flat"
-          size="small"
-          color="info"
-          :prepend-icon="mdiArrowLeft"
-          @click="toEpisode(-1)"
-          :disabled="!hasEpisode(-1)"
-        >
-          {{ t('resource.episode.previous') }}
-        </v-btn>
-        <span class="text-h6 px-2 text-truncate">
-          {{ playingEpisode.no }}
-        </span>
-        <v-btn
-          variant="flat"
-          size="small"
-          color="info"
-          :append-icon="mdiArrowRight"
-          @click="toEpisode(1)"
-          :disabled="!hasEpisode(1)"
-        >
-          {{ t('resource.episode.next') }}
-        </v-btn>
-      </div>
+      <span class="text-h6 mt-2 d-flex text-truncate">{{ playingEpisode.no }} {{ playingEpisode.title ?? '' }}</span>
       <v-divider class="mt-3"></v-divider>
     </v-sheet>
   </v-expand-transition>
@@ -162,35 +138,59 @@
                 {{ episode.title ?? '' }}
               </v-list-item-title>
               <template #append>
-                <v-tooltip location="bottom">
-                  {{ t('parser.play') }}
-                  <template #activator="{ props }">
-                    <v-btn
-                      variant="text"
-                      v-bind="props"
-                      @click="switchEpisode(episode)"
-                      :disabled="!episode.playUrl"
-                      density="comfortable"
-                      color="primary"
-                      :icon="mdiPlay"
-                    ></v-btn>
+                <v-menu close-on-content-click>
+                  <v-list density="compact" class="py-0">
+                    <v-list-item
+                      v-for="(item, index) in episode.playUrl ?? []"
+                      :key="index"
+                      :title="item.title ?? episode.title"
+                      @click="switchEpisode(episode, item.url)"
+                      :append-icon="mdiPlay"
+                    ></v-list-item>
+                  </v-list>
+                  <template #activator="{ props: menuProps }">
+                    <v-tooltip location="bottom">
+                      {{ t('parser.play') }}
+                      <template #activator="{ props: tooltipProps }">
+                        <v-btn
+                          variant="text"
+                          v-bind="mergeProps(menuProps, tooltipProps)"
+                          :disabled="!episode.playUrl || episode.playUrl.length === 0"
+                          density="comfortable"
+                          color="primary"
+                          :icon="mdiPlay"
+                        ></v-btn>
+                      </template>
+                    </v-tooltip>
                   </template>
-                </v-tooltip>
-                <v-tooltip location="bottom">
-                  {{ t('parser.download') }}
-                  <template #activator="{ props }">
-                    <v-btn
-                      variant="text"
-                      v-bind="props"
-                      :loading="downloadTaskCreating"
-                      @click="episode.downloadUrl && createDownloadTask(episode.downloadUrl, episode.title)"
-                      :disabled="!episode.downloadUrl"
-                      density="comfortable"
-                      color="secondary"
-                      :icon="mdiDownload"
-                    ></v-btn>
+                </v-menu>
+                <v-menu close-on-content-click>
+                  <v-list density="compact" class="py-0">
+                    <v-list-item
+                      v-for="(item, index) in episode.downloadUrl ?? []"
+                      :key="index"
+                      :title="item.title ?? episode.title"
+                      @click="createDownloadTask(item.url, episode.title)"
+                      :append-icon="mdiDownload"
+                    ></v-list-item>
+                  </v-list>
+                  <template #activator="{ props: menuProps }">
+                    <v-tooltip location="bottom">
+                      {{ t('parser.download') }}
+                      <template #activator="{ props: tooltipProps }">
+                        <v-btn
+                          variant="text"
+                          v-bind="mergeProps(menuProps, tooltipProps)"
+                          :loading="downloadTaskCreating"
+                          :disabled="!episode.downloadUrl || episode.downloadUrl.length === 0"
+                          density="comfortable"
+                          color="secondary"
+                          :icon="mdiDownload"
+                        ></v-btn>
+                      </template>
+                    </v-tooltip>
                   </template>
-                </v-tooltip>
+                </v-menu>
               </template>
             </v-list-item>
             <v-divider v-if="index < episodes.length - 1"></v-divider>
@@ -202,23 +202,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ComputedRef, inject, nextTick, ref } from 'vue';
+import { computed, ComputedRef, inject, mergeProps, nextTick, ref } from 'vue';
 import { MinaPlayParserMetadata, MinaPlayPluginSourceEpisode, PluginControl } from '@/api/interfaces/plugin.interface';
 import { useRoute, useRouter } from 'vue-router';
 import { useAxiosRequest } from '@/composables/use-axios-request';
 import { useApiStore } from '@/store/api';
 import SingleItemLoader from '@/components/app/SingleItemLoader.vue';
-import {
-  mdiAnimationPlayOutline,
-  mdiArrowLeft,
-  mdiArrowRight,
-  mdiCheck,
-  mdiChevronLeft,
-  mdiDownload,
-  mdiPlay,
-  mdiRss,
-  mdiViewComfy,
-} from '@mdi/js';
+import { mdiAnimationPlayOutline, mdiCheck, mdiChevronLeft, mdiDownload, mdiPlay, mdiRss, mdiViewComfy } from '@mdi/js';
 import { useI18n } from 'vue-i18n';
 import SeriesPosterFallback from '@/assets/banner-portrait.jpeg';
 import ExpandableText from '@/components/app/ExpandableText.vue';
@@ -329,22 +319,24 @@ const episodesLoader = useAxiosPageLoader(
   },
   { page: 0, size: 60 },
 );
-const { items: episodes } = episodesLoader;
+const { items: rawEpisodes } = episodesLoader;
+const episodes = computed(() =>
+  (rawEpisodes.value ?? []).map((raw) => ({
+    ...raw,
+    downloadUrl:
+      typeof raw.downloadUrl === 'string'
+        ? [{ title: t('parser.defaultResource'), url: raw.downloadUrl }]
+        : raw.downloadUrl,
+    playUrl: typeof raw.playUrl === 'string' ? [{ title: t('parser.defaultResource'), url: raw.playUrl }] : raw.playUrl,
+  })),
+);
 
 const playingEpisode = ref<MinaPlayPluginSourceEpisode>();
-const hasEpisode = (offset: number) => {
-  const currentIndex = episodes.value.findIndex((value) => value === playingEpisode.value);
-  return currentIndex === -1 ? false : currentIndex + offset in episodes.value;
-};
-const toEpisode = async (offset: number) => {
-  const currentIndex = episodes.value.findIndex((value) => value === playingEpisode.value);
-  if (currentIndex + offset in episodes.value) {
-    playingEpisode.value = episodes.value[currentIndex + offset];
-  }
-};
+const playingUrl = ref('');
 const toTop = inject<Function>('toTop');
-const switchEpisode = (episode: MinaPlayPluginSourceEpisode) => {
+const switchEpisode = (episode: MinaPlayPluginSourceEpisode, url: string) => {
   playingEpisode.value = episode;
+  playingUrl.value = url;
   nextTick(() => {
     toTop?.();
   });

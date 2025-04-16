@@ -180,6 +180,7 @@ export default {
     seriesAdded: 'Series Added',
     play: 'Play',
     download: 'Download',
+    defaultResource: 'Default Resource',
   },
   resource: {
     seriesUpdates: 'Series Updates',

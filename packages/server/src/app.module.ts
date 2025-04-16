@@ -185,7 +185,7 @@ import KeyvRedis from '@keyv/redis';
   ],
 })
 export class AppModule implements OnApplicationBootstrap {
-  private logger = new ApplicationLogger('MinaPlay');
+  private logger = new ApplicationLogger();
 
   onApplicationBootstrap() {
     let banner = MINAPLAY_BANNER;

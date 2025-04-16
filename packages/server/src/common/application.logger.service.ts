@@ -1,7 +1,15 @@
 import { ConsoleLogger, LogLevel } from '@nestjs/common';
+import { ConsoleLoggerOptions } from '@nestjs/common/services/console-logger.service.js';
 
 export class ApplicationLogger extends ConsoleLogger {
   private static messages: string[] = [];
+
+  constructor(context: string = 'APP', options?: ConsoleLoggerOptions) {
+    super(context, {
+      ...options,
+      prefix: 'MinaPlay',
+    });
+  }
 
   public static addHistoryMessage(message: string) {
     if (this.messages.length > 512) {

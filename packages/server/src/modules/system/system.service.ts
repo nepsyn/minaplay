@@ -21,7 +21,7 @@ export class SystemService implements OnModuleInit, OnApplicationBootstrap {
   constructor(private configService: ConfigService) {}
 
   onApplicationBootstrap() {
-    const logger = new ApplicationLogger('MinaPlay');
+    const logger = new ApplicationLogger();
     this.checkUpdate()
       .then(({ current, latest }) => {
         if (semver.gt(latest, current)) {

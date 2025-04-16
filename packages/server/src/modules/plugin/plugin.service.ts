@@ -174,7 +174,9 @@ export class PluginService implements OnModuleInit {
 
     // register plugins in data dir
     for (const [type, file] of await this.findPlugins(PLUGIN_DIR)) {
-      const pluginPath = isEmpty(path.relative(PLUGIN_DIR, file.path)) ? path.join(file.path, file.name) : file.path;
+      const pluginPath = isEmpty(path.relative(PLUGIN_DIR, file.parentPath))
+        ? path.join(file.parentPath, file.name)
+        : file.parentPath;
       await this.registerPlugin(type, pluginPath);
     }
 
@@ -187,7 +189,7 @@ export class PluginService implements OnModuleInit {
     ...args: Parameters<MinaPlayPluginHooks[T]>
   ) {
     try {
-      for (const service of control.services) {
+      for (const service of control.services ?? []) {
         await service[hook]?.apply(service, args);
       }
     } catch (error) {
@@ -278,7 +280,9 @@ export class PluginService implements OnModuleInit {
           );
         });
         await context.handleMessage(message, locale);
-        context.control.contexts.delete(socket.data.user.id);
+        if (!context.isBlocking()) {
+          context.control.contexts.delete(socket.data.user.id);
+        }
       }),
     );
   }

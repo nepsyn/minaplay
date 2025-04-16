@@ -33,6 +33,10 @@ export class PluginListenerContext extends TypedEventEmitter<PluginListenerConte
     super();
   }
 
+  isBlocking() {
+    return this.blocking;
+  }
+
   private async createListenerRuntimeParams(
     metadata: MinaPlayMessageListenerMetadata,
     container: Map<InjectionToken, any>,

@@ -35,6 +35,7 @@ services:
     ports:
       - "3000:3000"
       - "12000-12100:12000-12100"
+      - "12000-12100:12000-12100/udp"
     depends_on:
       - minaplay-mysql
       - minaplay-redis

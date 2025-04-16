@@ -38,6 +38,9 @@ export class PluginControl {
   repo?: string;
 
   @Expose()
+  package?: string;
+
+  @Expose()
   license?: string;
 
   @Expose()

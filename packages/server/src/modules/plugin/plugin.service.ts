@@ -72,6 +72,7 @@ export class PluginService implements OnModuleInit {
         description: metadata.description,
         author: metadata.author,
         repo: metadata.repo,
+        package: metadata.package,
         license: metadata.license,
         enabled: true,
         type: plugin,
@@ -293,5 +294,9 @@ export class PluginService implements OnModuleInit {
 
   getControlById(id: string) {
     return this.controls.find((control) => control.id === id);
+  }
+
+  getControlByPackageId(packageId: string) {
+    return this.controls.find((control) => control.package && packageId === control.package);
   }
 }

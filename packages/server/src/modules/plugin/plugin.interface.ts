@@ -27,6 +27,8 @@ export interface MinaPlayPluginMetadata extends Pick<ModuleMetadata, 'imports' |
   author?: string;
   /** Plugin Git repository */
   repo?: string;
+  /** Plugin package name */
+  package?: string;
   /** Plugin license */
   license?: string;
 }

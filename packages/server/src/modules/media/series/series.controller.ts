@@ -6,7 +6,6 @@ import {
   Get,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -47,7 +46,7 @@ export class SeriesController {
     description: '查看剧集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
-  async getSeriesById(@Param('id', ParseIntPipe) id: number) {
+  async getSeriesById(@Param('id') id: number) {
     const series = await this.seriesService.findOneBy({ id });
     if (!series) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -100,7 +99,7 @@ export class SeriesController {
       }),
       skip: query.page * query.size,
       take: query.size,
-      order: { [query.sort]: query.order },
+      order: query.sortBy,
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
@@ -111,7 +110,7 @@ export class SeriesController {
     description: '修改剧集信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
-  async updateSeries(@Param('id', ParseIntPipe) id: number, @Body() data: SeriesDto) {
+  async updateSeries(@Param('id') id: number, @Body() data: SeriesDto) {
     const series = await this.seriesService.findOneBy({ id });
     if (!series) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -137,7 +136,7 @@ export class SeriesController {
     description: '删除剧集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
-  async deleteSeries(@Param('id', ParseIntPipe) id: number) {
+  async deleteSeries(@Param('id') id: number) {
     await this.seriesService.delete({ id });
     return {};
   }
@@ -147,7 +146,7 @@ export class SeriesController {
     description: '获取订阅信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
-  async getSubscribeInfoBySeriesId(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
+  async getSubscribeInfoBySeriesId(@RequestUser() user: User, @Param('id') id: number) {
     return (await this.seriesSubscribeService.findOneBy({ seriesId: id, userId: user.id })) ?? {};
   }
 
@@ -156,11 +155,7 @@ export class SeriesController {
     description: '订阅剧集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
-  async subscribeSeries(
-    @RequestUser() user: User,
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: SeriesSubscribeDto,
-  ) {
+  async subscribeSeries(@RequestUser() user: User, @Param('id') id: number, @Body() data: SeriesSubscribeDto) {
     const series = await this.seriesService.findOneBy({ id });
     if (!series) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -178,7 +173,7 @@ export class SeriesController {
     description: '取消订阅剧集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
-  async unsubscribeSeries(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
+  async unsubscribeSeries(@RequestUser() user: User, @Param('id') id: number) {
     const series = await this.seriesService.findOneBy({ id });
     if (!series) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);

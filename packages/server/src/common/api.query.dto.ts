@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsIn, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsInt, IsOptional, IsString } from 'class-validator';
+import { FindOptionsOrder } from 'typeorm';
 
 export class ApiQueryDto<T extends { createAt: Date }> {
   @ApiProperty({
@@ -30,19 +31,15 @@ export class ApiQueryDto<T extends { createAt: Date }> {
 
   @ApiProperty({
     description: '排序字段',
-    type: String,
+    type: [String],
     required: false,
-    default: 'createAt',
+    default: ['createAt:ASC'],
   })
-  @IsString()
-  sort: keyof T = 'createAt';
+  @IsString({ each: true })
+  @Transform(({ value }) => (typeof value === 'string' ? [value] : value))
+  sort: `${keyof T & string}:${'ASC' | 'DESC'}`[] = ['createAt:ASC'];
 
-  @ApiProperty({
-    description: '排序方式',
-    type: String,
-    required: false,
-    default: 'ASC',
-  })
-  @IsIn(['ASC', 'DESC'])
-  order: 'ASC' | 'DESC' = 'ASC';
+  get sortBy(): FindOptionsOrder<T> {
+    return Object.fromEntries(this.sort.map((sort) => sort.split(':')));
+  }
 }

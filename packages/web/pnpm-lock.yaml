@@ -62,6 +62,9 @@ importers:
       plyr:
         specifier: ^3.7.8
         version: 3.7.8
+      qs:
+        specifier: ^6.14.0
+        version: 6.14.0
       roboto-fontface:
         specifier: ^0.10.0
         version: 0.10.0
@@ -102,6 +105,9 @@ importers:
       '@types/node':
         specifier: ^22.14.0
         version: 22.14.0
+      '@types/qs':
+        specifier: ^6.9.18
+        version: 6.9.18
       '@vitejs/plugin-vue':
         specifier: ^5.2.3
         version: 5.2.3(vite@6.2.5(@types/node@22.14.0)(sass@1.86.3)(terser@5.37.0))(vue@3.5.13(typescript@5.8.3))
@@ -1171,6 +1177,9 @@ packages:
 
   '@types/node@22.14.0':
     resolution: {integrity: sha512-Kmpl+z84ILoG+3T/zQFyAJsU6EPTmOCj8/2+83fSN6djd6I4o7uOuGIH6vq3PrjY5BGitSbFuMN18j3iknubbA==}
+
+  '@types/qs@6.9.18':
+    resolution: {integrity: sha512-kK7dgTYDyGqS+e2Q4aK9X3D7q234CIZ1Bv0q/7Z5IwRDoADNU81xXJK/YVyLbLTZCoIwUoDoffFeF+p/eIklAA==}
 
   '@types/resolve@1.20.2':
     resolution: {integrity: sha512-60BCwRFOZCQhDncwQdxxeOEEkbc5dIMccYLwbxsS4TUNeVECQ/pBJ0j09mrHOl/JJvpRPGwO9SvE4nR2Nb/a4Q==}
@@ -2442,6 +2451,10 @@ packages:
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
+
+  qs@6.14.0:
+    resolution: {integrity: sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==}
+    engines: {node: '>=0.6'}
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -4041,7 +4054,7 @@ snapshots:
 
   '@rollup/pluginutils@5.1.4(rollup@2.79.2)':
     dependencies:
-      '@types/estree': 1.0.6
+      '@types/estree': 1.0.7
       estree-walker: 2.0.2
       picomatch: 4.0.2
     optionalDependencies:
@@ -4140,6 +4153,8 @@ snapshots:
   '@types/node@22.14.0':
     dependencies:
       undici-types: 6.21.0
+
+  '@types/qs@6.9.18': {}
 
   '@types/resolve@1.20.2': {}
 
@@ -5552,6 +5567,10 @@ snapshots:
   punycode.js@2.3.1: {}
 
   punycode@2.3.1: {}
+
+  qs@6.14.0:
+    dependencies:
+      side-channel: 1.1.0
 
   queue-microtask@1.2.3: {}
 

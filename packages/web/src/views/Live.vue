@@ -22,7 +22,7 @@
             variant="outlined"
             :label="t('app.input.order')"
             density="compact"
-            v-model="filters.order"
+            v-model="filters.sort"
             :items="orders"
             hide-details
             clearable
@@ -93,11 +93,11 @@ const toast = useToastStore();
 const orders = [
   {
     title: t('app.input.desc'),
-    value: 'DESC',
+    value: 'createAt:DESC',
   },
   {
     title: t('app.input.asc'),
-    value: 'ASC',
+    value: 'createAt:ASC',
   },
 ];
 
@@ -105,7 +105,7 @@ const livesLoader = useAxiosPageLoader(
   async (query: LiveQueryDto = {}) => {
     return await api.Live.query({
       ...query,
-      order: filters.value.order,
+      sort: filters.value.sort,
       keyword: filters.value.keyword,
     });
   },
@@ -115,7 +115,7 @@ const { items: lives, pending: loading, reload: request } = livesLoader;
 
 const filters = ref<Partial<LiveQueryDto>>({
   keyword: '',
-  order: 'DESC',
+  sort: 'createAt:DESC',
 });
 const useQuery = debounce(livesLoader.reload, 1000);
 

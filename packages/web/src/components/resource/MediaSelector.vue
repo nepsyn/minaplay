@@ -92,8 +92,7 @@ const select = (item: MediaEntity) => {
 
 const filters: Ref<MediaQueryDto> = ref({
   keyword: '',
-  sort: 'createAt',
-  order: 'DESC',
+  sort: 'createAt:DESC',
 });
 const mediasLoader = useAxiosPageLoader(
   async (query?: MediaQueryDto) => {

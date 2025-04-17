@@ -8,7 +8,6 @@ import {
   NotFoundException,
   NotImplementedException,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   UseGuards,
@@ -82,11 +81,7 @@ export class NotificationController {
   @ApiOperation({
     description: '修改通知服务',
   })
-  async updateMetaSubscribes(
-    @RequestUser() user: User,
-    @Param('id', ParseIntPipe) id: number,
-    @Body() data: NotificationMetaDto,
-  ) {
+  async updateMetaSubscribes(@RequestUser() user: User, @Param('id') id: number, @Body() data: NotificationMetaDto) {
     const meta = await this.notificationMetaService.findOneBy({
       id,
       user: { id: user.id },
@@ -113,7 +108,7 @@ export class NotificationController {
   @ApiOperation({
     description: '删除通知服务配置',
   })
-  async deleteMetaById(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
+  async deleteMetaById(@RequestUser() user: User, @Param('id') id: number) {
     await this.notificationMetaService.delete({
       id,
       user: { id: user.id },

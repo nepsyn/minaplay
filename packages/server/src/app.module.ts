@@ -164,6 +164,7 @@ import KeyvRedis from '@keyv/redis';
       provide: APP_PIPE,
       useFactory: () =>
         new ValidationPipe({
+          transform: true,
           whitelist: true,
           forbidNonWhitelisted: true,
           errorHttpStatusCode: 400,

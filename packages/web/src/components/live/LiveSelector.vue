@@ -95,8 +95,7 @@ const select = (item: LiveEntity) => {
 const filters: Ref<LiveQueryDto> = ref({
   userId: props.owner ? api.user?.id : undefined,
   keyword: '',
-  sort: 'createAt',
-  order: 'DESC',
+  sort: 'createAt:DESC',
 });
 const livesLoader = useAxiosPageLoader(
   async (query?: LiveQueryDto) => {

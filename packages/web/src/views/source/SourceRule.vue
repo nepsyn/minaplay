@@ -63,7 +63,7 @@ const rulesLoader = useAxiosPageLoader(
     return await api.Rule.query({
       ...query,
       sourceId: Number(route.params.id),
-      order: 'DESC',
+      sort: 'createAt:DESC',
     });
   },
   { page: 0, size: 20 },

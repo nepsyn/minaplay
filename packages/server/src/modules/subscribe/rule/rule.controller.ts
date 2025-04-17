@@ -6,7 +6,6 @@ import {
   Get,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -69,7 +68,7 @@ export class RuleController {
     description: '获取规则信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP, PermissionEnum.SUBSCRIBE_VIEW)
-  async getSubscribeRuleById(@Param('id', ParseIntPipe) id: number) {
+  async getSubscribeRuleById(@Param('id') id: number) {
     const rule = await this.ruleService.findOneBy({ id });
     if (!rule) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -96,7 +95,7 @@ export class RuleController {
       }),
       skip: query.page * query.size,
       take: query.size,
-      order: { [query.sort]: query.order },
+      order: query.sortBy,
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
@@ -107,7 +106,7 @@ export class RuleController {
     description: '修改订阅源规则',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async updateSubscribeRule(@Param('id', ParseIntPipe) id: number, @Body() data: RuleDto) {
+  async updateSubscribeRule(@Param('id') id: number, @Body() data: RuleDto) {
     const rule = await this.ruleService.findOneBy({ id });
     if (!rule) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -139,7 +138,7 @@ export class RuleController {
     description: '删除订阅规则',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async deleteSubscribeRule(@Param('id', ParseIntPipe) id: number) {
+  async deleteSubscribeRule(@Param('id') id: number) {
     await this.ruleService.delete({ id });
     return {};
   }
@@ -149,7 +148,7 @@ export class RuleController {
     description: '查询订阅规则错误日志',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async getErrorLogsByRuleId(@Param('id', ParseIntPipe) id: number, @Query() query: ApiQueryDto<RuleErrorLog>) {
+  async getErrorLogsByRuleId(@Param('id') id: number, @Query() query: ApiQueryDto<RuleErrorLog>) {
     const rule = await this.ruleService.findOneBy({ id });
     if (!rule) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -161,7 +160,7 @@ export class RuleController {
       }),
       skip: query.page * query.size,
       take: query.size,
-      order: { [query.sort]: query.order },
+      order: query.sortBy,
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
@@ -172,7 +171,7 @@ export class RuleController {
     description: '删除所有订阅规则错误日志',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async deleteErrorLogsByRuleId(@Param('id', ParseIntPipe) id: number) {
+  async deleteErrorLogsByRuleId(@Param('id') id: number) {
     const rule = await this.ruleService.findOneBy({ id });
     if (!rule) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);

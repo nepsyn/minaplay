@@ -34,7 +34,7 @@
             variant="outlined"
             :label="t('app.input.order')"
             density="compact"
-            v-model="filters.order"
+            v-model="filters.sort"
             :items="orders"
             hide-details
             clearable
@@ -166,11 +166,11 @@ const props = defineProps<{
 const orders = [
   {
     title: t('app.input.desc'),
-    value: 'DESC',
+    value: 'createAt:DESC',
   },
   {
     title: t('app.input.asc'),
-    value: 'ASC',
+    value: 'createAt:ASC',
   },
 ];
 
@@ -184,7 +184,7 @@ const downloadsLoader = useAxiosPageLoader(
       ...option,
       keyword: filters.value.keyword,
       status: filters.value.status,
-      order: filters.value.order,
+      sort: filters.value.sort,
     });
   },
   { page: 0, size: 20 },
@@ -194,8 +194,7 @@ const { items: downloads } = downloadsLoader;
 const filters = ref<Partial<DownloadItemQueryDto>>({
   keyword: '',
   status: undefined,
-  sort: undefined,
-  order: 'DESC',
+  sort: 'createAt:DESC',
 });
 const useQuery = debounce(downloadsLoader.reload, 1000);
 

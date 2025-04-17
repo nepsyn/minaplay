@@ -53,6 +53,7 @@
         v-model:items-per-page="size"
         v-model:page="page"
         v-model:sort-by="sortBy"
+        multi-sort
         :headers="headers"
         :items-length="total"
         :items="rules?.items ?? []"
@@ -171,8 +172,7 @@ const {
     ),
     page: page.value - 1,
     size: size.value,
-    sort: sortBy.value?.[0]?.key,
-    order: sortBy.value[0]?.order?.toUpperCase(),
+    sort: (sortBy.value ?? []).map(({ key, order }) => `${key}:${order.toUpperCase()}`) as any,
   });
 });
 onRulesLoaded((data) => {
@@ -198,8 +198,7 @@ const useSourceQuery = debounce(
     resetSources();
     await loadSources({
       keyword: sourceKeyword.value,
-      sort: 'createAt',
-      order: 'DESC',
+      sort: 'createAt:DESC',
     });
   },
   500,

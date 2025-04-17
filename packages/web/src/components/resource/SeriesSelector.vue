@@ -92,8 +92,7 @@ const select = (item: SeriesEntity) => {
 
 const filters: Ref<SeriesQueryDto> = ref({
   keyword: '',
-  sort: 'createAt',
-  order: 'DESC',
+  sort: 'createAt:DESC',
 });
 const seriesLoader = useAxiosPageLoader(
   async (query?: SeriesQueryDto) => {

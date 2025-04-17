@@ -6,8 +6,7 @@ export interface ApiError {
 export interface ApiQueryDto<T = any> {
   page?: number;
   size?: number;
-  sort?: keyof T;
-  order?: 'ASC' | 'DESC';
+  sort?: `${keyof T & string}:${'ASC' | 'DESC'}` | `${keyof T & string}:${'ASC' | 'DESC'}`[];
 }
 
 export interface ApiQueryResult<T = any> {

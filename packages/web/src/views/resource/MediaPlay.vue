@@ -357,8 +357,7 @@ const recommendsLoader = useAxiosPageLoader(
   async (query = {}) => {
     return await api.Media.query({
       ...query,
-      sort: 'createAt',
-      order: 'DESC',
+      sort: 'createAt:DESC',
     });
   },
   { page: 0, size: 12 },
@@ -372,8 +371,7 @@ const episodesLoader = useAxiosPageLoader(
     return await api.Episode.query({
       ...query,
       seriesId: currentEpisode.value?.series.id,
-      sort: 'pubAt',
-      order: 'ASC',
+      sort: 'pubAt:ASC',
     });
   },
   { page: 0, size: 24 },

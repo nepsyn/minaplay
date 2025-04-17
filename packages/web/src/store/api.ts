@@ -68,6 +68,7 @@ import {
   NotificationMetaEntity,
 } from '@/api/interfaces/notification.interface';
 import { FileSourceEnum } from '@/api/enums/file-source.enum';
+import qs from 'qs';
 
 export const useApiStore = defineStore('api', () => {
   const user = ref<UserEntity>();
@@ -101,7 +102,14 @@ export const useApiStore = defineStore('api', () => {
   const baseUrl = import.meta.env.VITE_API_HOST ?? '';
 
   function apiGet<T = any, Params = any>(url: string, config: AxiosRequestConfig = {}) {
-    return (params?: Params) => axios.get<T>(baseUrl + url, { params, ...config });
+    return (params?: Params) =>
+      axios.get<T>(baseUrl + url, {
+        params,
+        paramsSerializer: (params) => {
+          return qs.stringify(params, { arrayFormat: 'repeat' });
+        },
+        ...config,
+      });
   }
 
   function apiPost<T = any, Data = any>(url: string, config: AxiosRequestConfig = {}) {

@@ -4,7 +4,6 @@ import {
   Get,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Put,
   Query,
   SerializeOptions,
@@ -37,7 +36,7 @@ export class UserController {
     description: '查看用户信息',
   })
   @SerializeOptions({ groups: ['profile'] })
-  async getUserProfileById(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number) {
+  async getUserProfileById(@RequestUser() user: User, @Param('id') id: number) {
     const valid = user.isRoot || user.id === id;
     if (!valid) {
       throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
@@ -56,7 +55,7 @@ export class UserController {
     description: '修改用户信息',
   })
   @SerializeOptions({ groups: ['profile'] })
-  async updateUserProfile(@RequestUser() user: User, @Param('id', ParseIntPipe) id: number, @Body() data: UserDto) {
+  async updateUserProfile(@RequestUser() user: User, @Param('id') id: number, @Body() data: UserDto) {
     const valid = user.isRoot || user.id === id;
     if (!valid) {
       throw buildException(ForbiddenException, ErrorCodeEnum.NO_PERMISSION);
@@ -95,7 +94,7 @@ export class UserController {
       }),
       skip: query.page * query.size,
       take: query.size,
-      order: { [query.sort]: query.order },
+      order: query.sortBy,
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);

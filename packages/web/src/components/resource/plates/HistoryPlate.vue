@@ -5,15 +5,15 @@
       <span class="text-h5 ml-3">{{ t('resource.histories') }}</span>
       <v-spacer></v-spacer>
       <v-tooltip location="left">
-        {{ t(`app.input.${filters.order!.toLowerCase()}`) }}
+        {{ t(`app.input.${filters.sort === 'updateAt:ASC' ? 'asc' : 'desc'}`) }}
         <template #activator="{ props }">
           <v-btn
             v-bind="props"
             variant="text"
             :disabled="historiesLoader.pending.value"
-            :icon="filters.order === 'ASC' ? mdiSortClockDescendingOutline : mdiSortClockAscendingOutline"
+            :icon="filters.sort === 'updateAt:ASC' ? mdiSortClockDescendingOutline : mdiSortClockAscendingOutline"
             @click="
-              filters.order = filters.order === 'ASC' ? 'DESC' : 'ASC';
+              filters.sort = filters.sort === 'updateAt:ASC' ? 'updateAt:DESC' : 'updateAt:ASC';
               historiesLoader.reload();
             "
           ></v-btn>
@@ -83,8 +83,7 @@ const router = useRouter();
 const display = useDisplay();
 
 const filters = ref<ApiQueryDto>({
-  sort: 'updateAt',
-  order: 'DESC',
+  sort: 'updateAt:DESC',
 });
 const historiesLoader = useAxiosPageLoader(
   async (query = {}) => {

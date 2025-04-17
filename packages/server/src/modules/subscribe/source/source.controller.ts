@@ -6,7 +6,6 @@ import {
   Get,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -81,7 +80,7 @@ export class SourceController {
     description: '获取订阅源信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP, PermissionEnum.SUBSCRIBE_VIEW)
-  async getSourceById(@Param('id', ParseIntPipe) id: number) {
+  async getSourceById(@Param('id') id: number) {
     const source = await this.sourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -108,7 +107,7 @@ export class SourceController {
       }),
       skip: query.page * query.size,
       take: query.size,
-      order: { [query.sort]: query.order },
+      order: query.sortBy,
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
@@ -119,7 +118,7 @@ export class SourceController {
     description: '修改订阅源信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async updateSource(@Param('id', ParseIntPipe) id: number, @Body() data: SourceDto) {
+  async updateSource(@Param('id') id: number, @Body() data: SourceDto) {
     if (data.cron) {
       try {
         new CronTime(data.cron);
@@ -152,7 +151,7 @@ export class SourceController {
     description: '删除订阅源',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async deleteSource(@Param('id', ParseIntPipe) id: number) {
+  async deleteSource(@Param('id') id: number) {
     await this.sourceService.deleteFetchSubscribeDataJob(id);
     await this.sourceService.delete({ id });
     return {};
@@ -163,7 +162,7 @@ export class SourceController {
     description: '获取订阅源原始数据',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async fetchRawDataBySourceId(@Param('id', ParseIntPipe) id: number) {
+  async fetchRawDataBySourceId(@Param('id') id: number) {
     const source = await this.sourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -181,7 +180,7 @@ export class SourceController {
     description: '立即执行更新订阅源操作',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async invokeFetchJobBySourceId(@Param('id', ParseIntPipe) id: number) {
+  async invokeFetchJobBySourceId(@Param('id') id: number) {
     const source = await this.sourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -196,7 +195,7 @@ export class SourceController {
     description: '获取订阅源解析日志',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async getParseLogsBySourceId(@Param('id', ParseIntPipe) id: number, @Query() query: ParseLogQueryDto) {
+  async getParseLogsBySourceId(@Param('id') id: number, @Query() query: ParseLogQueryDto) {
     const source = await this.sourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -213,7 +212,7 @@ export class SourceController {
       }),
       skip: query.page * query.size,
       take: query.size,
-      order: { [query.sort]: query.order },
+      order: query.sortBy,
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
@@ -224,7 +223,7 @@ export class SourceController {
     description: '删除所有订阅源解析日志',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async deleteParseLogsBySourceId(@Param('id', ParseIntPipe) id: number) {
+  async deleteParseLogsBySourceId(@Param('id') id: number) {
     const source = await this.sourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -241,7 +240,7 @@ export class SourceController {
     description: '获取订阅源下载项目',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.SUBSCRIBE_OP)
-  async getDownloadItemsBySourceId(@Param('id', ParseIntPipe) id: number, @Query() query: DownloadItemQueryDto) {
+  async getDownloadItemsBySourceId(@Param('id') id: number, @Query() query: DownloadItemQueryDto) {
     const source = await this.sourceService.findOneBy({ id });
     if (!source) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -263,7 +262,7 @@ export class SourceController {
       }),
       skip: query.page * query.size,
       take: query.size,
-      order: { [query.sort]: query.order },
+      order: query.sortBy,
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);

@@ -21,7 +21,7 @@
           variant="outlined"
           :label="t('app.input.order')"
           density="compact"
-          v-model="filters.order"
+          v-model="filters.sort"
           :items="orders"
           hide-details
           clearable
@@ -111,11 +111,11 @@ const toast = useToastStore();
 const orders = [
   {
     title: t('app.input.desc'),
-    value: 'DESC',
+    value: 'createAt:DESC',
   },
   {
     title: t('app.input.asc'),
-    value: 'ASC',
+    value: 'createAt:ASC',
   },
 ];
 
@@ -124,7 +124,7 @@ const logsLoader = useAxiosPageLoader(
     return await api.Source.getParseLogsById(Number(route.params.id))({
       ...query,
       status: filters.value.status,
-      order: filters.value.order,
+      sort: filters.value.sort,
     });
   },
   { page: 0, size: 20 },
@@ -164,7 +164,7 @@ const logs = computed(() =>
 
 const filters = ref<Partial<ParseLogQueryDto>>({
   status: undefined,
-  order: 'DESC',
+  sort: 'createAt:DESC',
 });
 
 const statusOptions = [

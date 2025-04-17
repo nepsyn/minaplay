@@ -1,16 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  NotFoundException,
-  Param,
-  ParseIntPipe,
-  Post,
-  Put,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, Query, UseGuards } from '@nestjs/common';
 import { EpisodeService } from './episode.service.js';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { RequirePermissions } from '../../authorization/require-permissions.decorator.js';
@@ -51,7 +39,7 @@ export class EpisodeController {
       }),
       skip: query.page * query.size,
       take: query.size,
-      order: { [query.sort]: query.order },
+      order: query.sortBy,
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);
@@ -73,7 +61,7 @@ export class EpisodeController {
     description: '查看单集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP, PermissionEnum.MEDIA_VIEW)
-  async getEpisodeById(@Param('id', ParseIntPipe) id: number) {
+  async getEpisodeById(@Param('id') id: number) {
     const episode = await this.episodeService.findOneBy({ id });
     if (!episode) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -95,7 +83,7 @@ export class EpisodeController {
 
     const { id } = await this.episodeService.save({
       ...data,
-      pubAt: data.pubAt ? new Date(data.pubAt) : new Date(),
+      pubAt: data.pubAt ? new Date(data.pubAt) : null,
       series: { id: data.seriesId },
       media: { id: data.mediaId },
     });
@@ -108,7 +96,7 @@ export class EpisodeController {
     description: '修改单集信息',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
-  async updateEpisode(@Param('id', ParseIntPipe) id: number, @Body() data: EpisodeDto) {
+  async updateEpisode(@Param('id') id: number, @Body() data: EpisodeDto) {
     const episode = await this.episodeService.findOneBy({ id });
     if (!episode) {
       throw buildException(NotFoundException, ErrorCodeEnum.NOT_FOUND);
@@ -130,7 +118,7 @@ export class EpisodeController {
     description: '删除单集',
   })
   @RequirePermissions(PermissionEnum.ROOT_OP, PermissionEnum.MEDIA_OP)
-  async deleteEpisode(@Param('id', ParseIntPipe) id: number) {
+  async deleteEpisode(@Param('id') id: number) {
     await this.episodeService.delete({ id });
     return {};
   }

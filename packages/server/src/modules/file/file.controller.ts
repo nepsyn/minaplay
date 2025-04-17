@@ -34,7 +34,7 @@ import { buildQueryOptions } from '../../utils/build-query-options.util.js';
 import { File } from './file.entity.js';
 import { Between } from 'typeorm';
 import { Response } from 'express';
-import { CACHE_MANAGER, Cache } from '@nestjs/cache-manager';
+import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ApiFile } from '../../common/api.file.decorator.js';
 import { ApiPaginationResultDto } from '../../common/api.pagination.result.dto.js';
 import { isDefined } from 'class-validator';
@@ -235,7 +235,7 @@ export class FileController {
       }),
       skip: query.page * query.size,
       take: query.size,
-      order: { [query.sort]: query.order },
+      order: query.sortBy,
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);

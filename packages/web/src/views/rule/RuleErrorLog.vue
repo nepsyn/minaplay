@@ -7,7 +7,7 @@
           variant="outlined"
           :label="t('app.input.order')"
           density="compact"
-          v-model="filters.order"
+          v-model="filters.sort"
           :items="orders"
           hide-details
           clearable
@@ -94,11 +94,11 @@ const toast = useToastStore();
 const orders = [
   {
     title: t('app.input.desc'),
-    value: 'DESC',
+    value: 'createAt:DESC',
   },
   {
     title: t('app.input.asc'),
-    value: 'ASC',
+    value: 'createAt:ASC',
   },
 ];
 
@@ -114,7 +114,7 @@ const logsLoader = useAxiosPageLoader(
 const { items: logs } = logsLoader;
 
 const filters = ref<ApiQueryDto<RuleErrorLogEntity>>({
-  order: 'DESC',
+  sort: 'createAt:DESC',
 });
 
 const {

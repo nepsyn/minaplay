@@ -10,8 +10,6 @@ import {
   NotFoundException,
   NotImplementedException,
   Param,
-  ParseBoolPipe,
-  ParseIntPipe,
   Post,
   Query,
   UseGuards,
@@ -167,7 +165,7 @@ export class PluginController {
     @Param('pluginId') pluginId: string,
     @Param('parser') name: string,
     @Param('seriesId') seriesId: string,
-    @Body('seriesOnly', new DefaultValuePipe(false), ParseBoolPipe) seriesOnly: boolean,
+    @Body('seriesOnly', new DefaultValuePipe(false)) seriesOnly: boolean,
   ) {
     const parserSeries = await this.invokeParser(pluginId, name, 'getSeriesById', seriesId);
     let series = await this.seriesService.findOneBy({ name: parserSeries.name, season: parserSeries.season });
@@ -247,8 +245,8 @@ export class PluginController {
     @Param('pluginId') pluginId: string,
     @Param('parser') name: string,
     @Query('keyword') keyword: string,
-    @Query('page', new DefaultValuePipe(0), ParseIntPipe) page: number,
-    @Query('size', new DefaultValuePipe(120), ParseIntPipe) size: number,
+    @Query('page', new DefaultValuePipe(0)) page: number,
+    @Query('size', new DefaultValuePipe(120)) size: number,
   ) {
     if (!isString(keyword) || isEmpty(keyword)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
@@ -273,8 +271,8 @@ export class PluginController {
     @Param('pluginId') pluginId: string,
     @Param('parser') name: string,
     @Param('seriesId') seriesId: string,
-    @Query('page', new DefaultValuePipe(0), ParseIntPipe) page: number,
-    @Query('size', new DefaultValuePipe(120), ParseIntPipe) size: number,
+    @Query('page', new DefaultValuePipe(0)) page: number,
+    @Query('size', new DefaultValuePipe(120)) size: number,
   ) {
     if (!isDefined(seriesId)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);

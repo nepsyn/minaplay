@@ -5,15 +5,15 @@
       <span class="text-h5 ml-3">{{ t('resource.mediaUpdates') }}</span>
       <v-spacer></v-spacer>
       <v-tooltip location="left">
-        {{ t(`app.input.${filters.order!.toLowerCase()}`) }}
+        {{ t(`app.input.${filters.sort === 'createAt:ASC' ? 'asc' : 'desc'}`) }}
         <template #activator="{ props }">
           <v-btn
             v-bind="props"
             variant="text"
             :disabled="mediasLoader.pending.value"
-            :icon="filters.order === 'ASC' ? mdiSortClockDescendingOutline : mdiSortClockAscendingOutline"
+            :icon="filters.sort === 'createAt:ASC' ? mdiSortClockDescendingOutline : mdiSortClockAscendingOutline"
             @click="
-              filters.order = filters.order === 'ASC' ? 'DESC' : 'ASC';
+              filters.sort = filters.sort === 'createAt:ASC' ? 'createAt:DESC' : 'createAt:ASC';
               mediasLoader.reload();
             "
           ></v-btn>
@@ -62,8 +62,7 @@ const router = useRouter();
 const display = useDisplay();
 
 const filters = ref<MediaQueryDto>({
-  sort: 'createAt',
-  order: 'DESC',
+  sort: 'createAt:DESC',
 });
 const mediasLoader = useAxiosPageLoader(
   async (query: MediaQueryDto = {}) => {

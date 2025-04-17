@@ -22,7 +22,7 @@
             variant="outlined"
             :label="t('app.input.order')"
             density="compact"
-            v-model="filters.order"
+            v-model="filters.sort"
             :items="orders"
             hide-details
             clearable
@@ -92,11 +92,11 @@ const toast = useToastStore();
 const orders = [
   {
     title: t('app.input.desc'),
-    value: 'DESC',
+    value: 'createAt:DESC',
   },
   {
     title: t('app.input.asc'),
-    value: 'ASC',
+    value: 'createAt:ASC',
   },
 ];
 
@@ -104,7 +104,7 @@ const rulesLoader = useAxiosPageLoader(
   async (query: RuleQueryDto = {}) => {
     return await api.Rule.query({
       ...query,
-      order: filters.value.order,
+      sort: filters.value.sort,
       keyword: filters.value.keyword,
     });
   },
@@ -114,7 +114,7 @@ const { items: rules, pending: loading, reload: request } = rulesLoader;
 
 const filters = ref<Partial<RuleQueryDto>>({
   keyword: '',
-  order: 'DESC',
+  sort: 'createAt:DESC',
 });
 const useQuery = debounce(rulesLoader.reload, 1000);
 

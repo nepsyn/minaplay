@@ -7,7 +7,6 @@ import {
   HttpCode,
   NotFoundException,
   Param,
-  ParseIntPipe,
   Post,
   Put,
   Query,
@@ -179,11 +178,7 @@ export class AuthorizationController {
   @HttpCode(200)
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP)
-  async logoutUser(
-    @RequestUser() operator: User,
-    @Param('userId', ParseIntPipe) userId: number,
-    @RequestIp() ip: string,
-  ) {
+  async logoutUser(@RequestUser() operator: User, @Param('userId') userId: number, @RequestIp() ip: string) {
     if (!isInt(userId)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
@@ -217,7 +212,7 @@ export class AuthorizationController {
   @RequirePermissions(PermissionEnum.ROOT_OP)
   async changeUserPassword(
     @RequestUser() operator: User,
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('userId') userId: number,
     @RequestIp() ip: string,
     @Body() data: ChangePasswordDto,
   ) {
@@ -261,7 +256,7 @@ export class AuthorizationController {
   @SerializeOptions({ groups: ['profile'] })
   async grantPermissions(
     @RequestUser() operator: User,
-    @Param('userId', ParseIntPipe) userId: number,
+    @Param('userId') userId: number,
     @Body() data: PermissionDto,
     @RequestIp() ip: string,
   ) {
@@ -301,7 +296,7 @@ export class AuthorizationController {
   @ApiBearerAuth()
   @UseGuards(AuthorizationGuard)
   @RequirePermissions(PermissionEnum.ROOT_OP)
-  async deleteUser(@Param('userId', ParseIntPipe) userId: number) {
+  async deleteUser(@Param('userId') userId: number) {
     if (!isInt(userId)) {
       throw buildException(BadRequestException, ErrorCodeEnum.BAD_REQUEST);
     }
@@ -350,7 +345,7 @@ export class AuthorizationController {
       }),
       skip: query.page * query.size,
       take: query.size,
-      order: { [query.sort]: query.order },
+      order: query.sortBy,
     });
 
     return new ApiPaginationResultDto(result, total, query.page, query.size);

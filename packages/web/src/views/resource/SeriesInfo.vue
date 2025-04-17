@@ -198,8 +198,7 @@ const episodesLoader = useAxiosPageLoader(
     return await api.Episode.query({
       ...query,
       seriesId: series.value?.id,
-      sort: 'pubAt',
-      order: 'ASC',
+      sort: 'pubAt:ASC',
     });
   },
   { page: 0, size: 24 },

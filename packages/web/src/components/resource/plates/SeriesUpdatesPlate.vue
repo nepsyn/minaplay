@@ -52,7 +52,7 @@ const router = useRouter();
 const display = useDisplay();
 
 const getEpisodeNote = (episode: EpisodeEntity) => {
-  if (episode.series.count && episode.series.count === Number(episode.no)) {
+  if ((episode.series.count && Number(episode.no) >= episode.series.count) || episode.series.finished) {
     return `${episode.no} ${t('resource.fin')}`;
   } else {
     return episode.no;

@@ -29,8 +29,7 @@ export default defineConfig({
         families: [
           {
             name: 'Maple',
-            local: 'Maple',
-            src: './src/assets/MapleMono-Regular.woff2',
+            src: './src/assets/fonts/*',
           },
         ],
         preload: true,

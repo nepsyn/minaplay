@@ -48,7 +48,7 @@ export class PluginManagerCommand {
     })
     id: string,
   ) {
-    const plugin = this.pluginService.getControlById(id);
+    const plugin = this.pluginService.getControlById(id) ?? this.pluginService.getControlByPackageId(id);
     if (!plugin) {
       return new Text(`Plugin '${id}' not found in MinaPlay`, Text.Colors.ERROR);
     }
@@ -68,13 +68,45 @@ export class PluginManagerCommand {
     })
     id: string,
   ) {
-    const plugin = this.pluginService.getControlById(id);
+    const plugin = this.pluginService.getControlById(id) ?? this.pluginService.getControlByPackageId(id);
     if (!plugin) {
       return new Text(`Plugin '${id}' not found in MinaPlay`, Text.Colors.ERROR);
     }
 
     await this.pluginService.toggleEnabled(plugin, false);
     return new Text(`Plugin '${id}' disabled`, Text.Colors.SUCCESS);
+  }
+
+  @MinaPlayCommand('dump', {
+    aliases: ['du'],
+    description: 'dump info of a MinaPlay plugin',
+    parent: () => PluginManagerCommand.prototype.handlePm,
+  })
+  async handleDump(
+    @MinaPlayCommandArgument('<id>', {
+      description: 'plugin ID',
+    })
+    id: string,
+  ) {
+    const plugin = this.pluginService.getControlById(id) ?? this.pluginService.getControlByPackageId(id);
+    if (!plugin) {
+      return new Text(`Plugin '${id}' not found in MinaPlay`, Text.Colors.ERROR);
+    }
+
+    const result = [new Text(`Dump info of plugin ${plugin.id}`, Text.Colors.INFO)];
+    for (const key of Object.keys(plugin.metadata)) {
+      if (plugin.metadata[key]) {
+        const field = key
+          .replace(/([A-Z])/g, ' $1')
+          .toUpperCase()
+          .padEnd(20, ' ');
+        result.push(new Text(`${field} : ${plugin.metadata[key]}`));
+      }
+    }
+    if (plugin.path) {
+      result.push(new Text(`${'INSTALL PATH'.padEnd(20, ' ')} : ${plugin.path}`));
+    }
+    return result;
   }
 
   @MinaPlayCommand('install', {
@@ -285,7 +317,7 @@ export class PluginManagerCommand {
     yes: boolean,
     @MinaPlayListenerInject() chat: PluginChat,
   ) {
-    const plugin = this.pluginService.getControlById(id);
+    const plugin = this.pluginService.getControlById(id) ?? this.pluginService.getControlByPackageId(id);
     if (!plugin) {
       return new Text(`Plugin '${id}' not found in MinaPlay`, Text.Colors.ERROR);
     }

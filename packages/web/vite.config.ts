@@ -21,8 +21,20 @@ export default defineConfig({
           {
             name: 'Roboto',
             styles: 'wght@100;300;400;500;700;900',
+            defer: true,
           },
         ],
+      },
+      custom: {
+        families: [
+          {
+            name: 'Maple',
+            local: 'Maple',
+            src: './src/assets/MapleMono-Regular.woff2',
+          },
+        ],
+        preload: true,
+        injectTo: 'head-prepend',
       },
     }),
     VitePWA({

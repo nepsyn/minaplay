@@ -22,7 +22,6 @@ export class PluginRef {
   }
 
   get metadata() {
-    const { id, version, description, author, repo, license } = this.control;
-    return { id, version, description, author, repo, license };
+    return this.control.metadata;
   }
 }

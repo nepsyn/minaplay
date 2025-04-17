@@ -64,16 +64,9 @@ export class PluginService implements OnModuleInit {
     }
 
     try {
+      const { imports, providers, ...info } = metadata;
       const control = new PluginControl({
-        id: metadata.id,
-        icon: metadata.icon,
-        version: metadata.version,
-        supportVersion: metadata.supportVersion,
-        description: metadata.description,
-        author: metadata.author,
-        repo: metadata.repo,
-        package: metadata.package,
-        license: metadata.license,
+        ...info,
         enabled: true,
         type: plugin,
         path,

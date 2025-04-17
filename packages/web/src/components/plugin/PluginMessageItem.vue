@@ -1,6 +1,10 @@
 <template>
   <template v-if="message.type === 'Text'">
-    <pre class="text-subtitle-2 text-pre-wrap" :style="{ color: message.color }">{{ message.content }}</pre>
+    <pre
+      class="text-subtitle-2 text-pre-wrap message-container"
+      :style="{ color: message.color }"
+      v-text="message.content"
+    ></pre>
   </template>
   <template v-else-if="message.type === 'NetworkImage'">
     <zoom-img class="rounded" :src="message.url" max-width="240">
@@ -65,7 +69,7 @@
     </v-row>
   </template>
   <template v-else-if="message.type === 'MarkdownText'">
-    <div class="text-subtitle-2 text-wrap" v-html="markdown.render(message.content)"></div>
+    <div class="text-subtitle-2 text-wrap message-container" v-html="markdown.render(message.content)"></div>
   </template>
   <template v-else>
     <slot></slot>
@@ -129,4 +133,7 @@ onUnmounted(() => {
 const sendAction = inject<Function>('send-action');
 </script>
 
-<style scoped lang="sass"></style>
+<style scoped lang="sass">
+.message-container
+  font-family: 'Maple', monospace
+</style>

@@ -3,6 +3,7 @@ import {
   MinaPlayMessageListenerMetadata,
   MinaPlayParserMetadata,
   MinaPlayPluginHooks,
+  MinaPlayPluginMetadata,
   PluginSourceParser,
 } from './plugin.interface.js';
 import { Type } from '@nestjs/common';
@@ -42,6 +43,19 @@ export class PluginControl {
 
   @Expose()
   license?: string;
+
+  @Exclude()
+  get metadata(): Omit<MinaPlayPluginMetadata, 'imports' | 'providers'> {
+    return {
+      id: this.id,
+      icon: this.id,
+      version: this.version,
+      supportVersion: this.supportVersion,
+      description: this.description,
+      author: this.author,
+      repo: this.repo,
+    };
+  }
 
   @Expose()
   enabled: boolean;

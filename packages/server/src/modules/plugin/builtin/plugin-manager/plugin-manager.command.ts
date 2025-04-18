@@ -266,7 +266,7 @@ export class PluginManagerCommand {
       return new Text(`Plugin '${id}' not found in MinaPlay`, Text.Colors.ERROR);
     }
     if (!plugin.package) {
-      return new Text(`Plugin '${id}' has no 'package' field is undefined`, Text.Colors.ERROR);
+      return new Text(`Plugin '${id}' has no 'package' field`, Text.Colors.ERROR);
     }
 
     const groupId = Date.now().toString();

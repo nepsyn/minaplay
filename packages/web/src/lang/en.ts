@@ -535,8 +535,9 @@ export default {
     startTime: 'Start Time',
     workedTime: 'Worked for',
     version: 'Version',
-    currentVersion: 'Current Version',
-    latestVersion: 'LatestVersion',
+    serverVersion: 'Current Server Version',
+    latestServerVersion: 'Latest Server Version',
+    webVersion: 'Web Client Version',
     updateAvailable: 'Update Available',
     about: {
       title: 'About',

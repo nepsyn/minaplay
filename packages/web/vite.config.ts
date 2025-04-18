@@ -4,6 +4,7 @@ import ViteFonts from 'unplugin-fonts/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vite';
 import { fileURLToPath, URL } from 'node:url';
+import { version } from './package.json';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -71,7 +72,11 @@ export default defineConfig({
       },
     }),
   ],
-  define: { 'process.env': {} },
+  define: {
+    'process.env': {},
+    __VERSION: JSON.stringify(version),
+    __BUILD_TIME: JSON.stringify(new Date().toISOString()),
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

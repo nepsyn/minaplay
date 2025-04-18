@@ -535,8 +535,9 @@ const zh: MessageSchema = {
     startTime: '启动时间',
     workedTime: '已持续运行',
     version: '版本',
-    currentVersion: '当前版本',
-    latestVersion: '最新版本',
+    serverVersion: '当前 Server 版本',
+    latestServerVersion: '最新 Server 版本',
+    webVersion: '当前 Web 版本',
     updateAvailable: '可更新',
     about: {
       title: '关于',

@@ -47,11 +47,14 @@
             <span class="ml-4 text-h5">{{ t('system.version') }}</span>
           </div>
           <v-sheet class="border rounded-lg pa-4 my-4">
-            <v-card-subtitle class="px-0">{{ t('system.currentVersion') }}</v-card-subtitle>
+            <v-card-subtitle class="px-0">{{ t('system.webVersion') }}</v-card-subtitle>
+            <span class="text-h6">{{ WEB_VERSION }}</span>
+            <span class="text-caption font-italic ps-2">{{ BUILD_TIME }}</span>
+            <v-card-subtitle class="px-0 mt-2">{{ t('system.serverVersion') }}</v-card-subtitle>
             <span class="text-h6">{{ status!.version }}</span>
             <single-item-loader class="pa-0 mt-2" :loader="versionUpdateLoader">
               <v-card-subtitle class="px-0">
-                {{ t('system.latestVersion') }}
+                {{ t('system.latestServerVersion') }}
                 <v-chip
                   v-if="versionUpdate?.current !== versionUpdate?.latest"
                   class="ml-2 text-caption"
@@ -119,6 +122,9 @@ import { Pie } from 'vue-chartjs';
 import { computed, onMounted, onUnmounted, ref } from 'vue';
 import { ArcElement, Chart as ChartJS, Legend, Title, Tooltip, TooltipItem } from 'chart.js';
 import { useLayoutStore } from '@/store/layout';
+
+const WEB_VERSION = __VERSION;
+const BUILD_TIME = __BUILD_TIME;
 
 ChartJS.register(Title, Tooltip, Legend, ArcElement);
 

@@ -18,7 +18,7 @@
                   <use xlink:href="#plyr-restart"></use>
                 </svg>
               </button>
-              <span v-if="live" class="plyr__controls__item ml-2"> LIVE </span>
+              <span v-if="live" class="plyr__controls__item ms-2"> LIVE </span>
             </div>
             <div v-if="!live" class="plyr__controls__item plyr__progress__container">
               <div class="plyr__progress">

@@ -2,7 +2,7 @@
   <div class="mb-6">
     <div class="d-flex flex-row align-center">
       <v-icon :icon="mdiAnimationPlayOutline" size="x-large"></v-icon>
-      <span class="text-h5 ml-3">{{ t('resource.allSeries') }}</span>
+      <span class="text-h5 ms-3">{{ t('resource.allSeries') }}</span>
       <v-spacer></v-spacer>
       <v-tooltip location="left">
         {{ t(`app.input.${filters.sort === 'createAt:ASC' ? 'asc' : 'desc'}`) }}
@@ -20,7 +20,7 @@
         </template>
       </v-tooltip>
       <v-btn
-        class="ml-1"
+        class="ms-1"
         variant="text"
         :icon="mdiRefresh"
         :loading="seriesLoader.pending.value"

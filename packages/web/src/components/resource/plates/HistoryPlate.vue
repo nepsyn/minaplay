@@ -2,7 +2,7 @@
   <div class="mb-6">
     <div class="d-flex flex-row align-center">
       <v-icon :icon="mdiHistory" size="x-large"></v-icon>
-      <span class="text-h5 ml-3">{{ t('resource.histories') }}</span>
+      <span class="text-h5 ms-3">{{ t('resource.histories') }}</span>
       <v-spacer></v-spacer>
       <v-tooltip location="left">
         {{ t(`app.input.${filters.sort === 'updateAt:ASC' ? 'asc' : 'desc'}`) }}
@@ -20,7 +20,7 @@
         </template>
       </v-tooltip>
       <v-btn
-        class="ml-1"
+        class="ms-1"
         variant="text"
         :icon="mdiRefresh"
         :loading="historiesLoader.pending.value"
@@ -39,7 +39,7 @@
             :history-duration="history.progress"
           >
             <template #append>
-              <div class="ml-2 px-1 text-caption">
+              <div class="ms-2 px-1 text-caption">
                 <time-ago :time="history.updateAt" :label="t('resource.watched')"></time-ago>
               </div>
             </template>

@@ -8,7 +8,7 @@
           </template>
         </v-img>
       </v-icon>
-      <span class="ml-2 text-wrap text-break cursor-pointer" @click="router.push({ path: `/source/${source.id}` })">
+      <span class="ms-2 text-wrap text-break cursor-pointer" @click="router.push({ path: `/source/${source.id}` })">
         {{ source.title || t('source.unnamed') }}
       </span>
       <v-spacer></v-spacer>
@@ -20,7 +20,7 @@
               v-bind="props"
               v-model="editEnabled"
               :loading="enabledChanging"
-              class="ml-2"
+              class="ms-2"
               :false-icon="mdiPause"
               :true-icon="mdiProgressCheck"
               density="comfortable"

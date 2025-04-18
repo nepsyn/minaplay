@@ -83,7 +83,7 @@
           >
             {{ t('app.actions.save') }}
           </v-btn>
-          <v-btn @click="reset()" color="warning" variant="tonal" class="flex-grow-0 ml-2" :prepend-icon="mdiClose">
+          <v-btn @click="reset()" color="warning" variant="tonal" class="flex-grow-0 ms-2" :prepend-icon="mdiClose">
             {{ t('app.actions.reset') }}
           </v-btn>
         </div>
@@ -94,18 +94,18 @@
               <p class="text-subtitle-1">{{ t('source.info.update') }}</p>
               <p class="text-caption">{{ t('source.info.updateDescription') }}</p>
             </v-container>
-            <v-btn class="ml-4" variant="tonal" color="primary" :loading="updateRequesting" @click="requestUpdate()">
+            <v-btn class="ms-4" variant="tonal" color="primary" :loading="updateRequesting" @click="requestUpdate()">
               {{ t('source.info.updateBtn') }}
             </v-btn>
           </v-container>
-          <v-divider class="ml-4"></v-divider>
+          <v-divider class="ms-4"></v-divider>
           <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
             <v-container class="pa-0">
               <p class="text-subtitle-1">{{ t('source.info.enabled') }}</p>
               <p class="text-caption">{{ t('source.info.enabledDescription') }}</p>
             </v-container>
             <v-switch
-              class="ml-4"
+              class="ms-4"
               v-model="edit!.enabled"
               @change="toggleEnabled"
               :loading="enabledTogging"
@@ -114,7 +114,7 @@
               density="compact"
             ></v-switch>
           </v-container>
-          <v-divider class="ml-4"></v-divider>
+          <v-divider class="ms-4"></v-divider>
           <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
             <v-container class="pa-0">
               <p class="text-subtitle-1">{{ t('source.info.delete') }}</p>
@@ -135,7 +135,7 @@
                 </v-card-actions>
               </v-card>
               <template #activator="{ props }">
-                <v-btn v-bind="props" class="ml-4" variant="tonal" color="error" :loading="sourceDeleting">
+                <v-btn v-bind="props" class="ms-4" variant="tonal" color="error" :loading="sourceDeleting">
                   {{ t('app.actions.delete') }}
                 </v-btn>
               </template>

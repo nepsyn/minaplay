@@ -6,7 +6,7 @@
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
         <v-container class="pa-0 d-flex flex-row align-center">
           <v-icon :icon="mdiTranslate"></v-icon>
-          <v-container class="pa-0 ml-3">
+          <v-container class="pa-0 ms-3">
             <p class="text-subtitle-1">{{ t('settings.app.language') }}</p>
             <p class="text-caption">{{ t('settings.app.languageDescription') }}</p>
           </v-container>
@@ -23,11 +23,11 @@
           </v-select>
         </v-container>
       </v-container>
-      <v-divider class="ml-4"></v-divider>
+      <v-divider class="ms-4"></v-divider>
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
         <v-container class="pa-0 d-flex flex-row align-center">
           <v-icon :icon="mdiThemeLightDark"></v-icon>
-          <v-container class="pa-0 ml-3">
+          <v-container class="pa-0 ms-3">
             <p class="text-subtitle-1">{{ t('settings.app.theme') }}</p>
             <p class="text-caption">{{ t('settings.app.themeDescription') }}</p>
           </v-container>
@@ -50,14 +50,14 @@
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
         <v-container class="pa-0 d-flex flex-row align-center">
           <v-icon :icon="mdiSubtitles"></v-icon>
-          <v-container class="pa-0 ml-3">
+          <v-container class="pa-0 ms-3">
             <p class="text-subtitle-1">{{ t('settings.app.subtitle') }}</p>
             <p class="text-caption">{{ t('settings.app.subtitleDescription') }}</p>
           </v-container>
         </v-container>
         <v-switch v-model="settings.showSubtitle" hide-details density="compact" color="primary"> </v-switch>
       </v-container>
-      <v-divider class="ml-4"></v-divider>
+      <v-divider class="ms-4"></v-divider>
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
         <v-container class="pa-0 d-flex flex-row align-center">
           <v-icon>
@@ -73,29 +73,29 @@
               ></path>
             </svg>
           </v-icon>
-          <v-container class="pa-0 ml-3">
+          <v-container class="pa-0 ms-3">
             <p class="text-subtitle-1">{{ t('settings.app.danmaku') }}</p>
             <p class="text-caption">{{ t('settings.app.danmakuDescription') }}</p>
           </v-container>
         </v-container>
         <v-switch v-model="settings.showDanmaku" hide-details density="compact" color="primary"></v-switch>
       </v-container>
-      <v-divider class="ml-4"></v-divider>
+      <v-divider class="ms-4"></v-divider>
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
         <v-container class="pa-0 d-flex flex-row align-center">
           <v-icon :icon="mdiMicrophonePlus"></v-icon>
-          <v-container class="pa-0 ml-3">
+          <v-container class="pa-0 ms-3">
             <p class="text-subtitle-1">{{ t('settings.app.joinVoice') }}</p>
             <p class="text-caption">{{ t('settings.app.joinVoiceDescription') }}</p>
           </v-container>
         </v-container>
         <v-switch v-model="settings.autoJoinVoice" hide-details density="compact" color="primary"> </v-switch>
       </v-container>
-      <v-divider class="ml-4"></v-divider>
+      <v-divider class="ms-4"></v-divider>
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
         <v-container class="pa-0 d-flex flex-row align-center">
           <v-icon :icon="mdiPlayCircle"></v-icon>
-          <v-container class="pa-0 ml-3">
+          <v-container class="pa-0 ms-3">
             <p class="text-subtitle-1">{{ t('settings.app.autoContinue') }}</p>
             <p class="text-caption">{{ t('settings.app.autoContinueDescription') }}</p>
           </v-container>

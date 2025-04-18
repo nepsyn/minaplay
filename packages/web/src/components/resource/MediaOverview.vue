@@ -27,7 +27,7 @@
 
       <div
         v-if="media.duration != null"
-        class="position-absolute text-caption font-weight-bold duration-container mb-3 mr-3 px-2 rounded"
+        class="position-absolute text-caption font-weight-bold duration-container mb-3 me-3 px-2 rounded"
       >
         <slot name="duration">
           <template v-if="historyDuration != null">

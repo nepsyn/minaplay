@@ -29,7 +29,7 @@
 
           <div
             v-if="media.duration != null"
-            class="position-absolute text-caption font-weight-bold duration-container mb-2 mr-2 px-2 rounded"
+            class="position-absolute text-caption font-weight-bold duration-container mb-2 me-2 px-2 rounded"
           >
             <slot name="duration">
               <template v-if="historyDuration != null">
@@ -44,7 +44,7 @@
       <v-col cols="8">
         <v-container class="pa-0 d-flex flex-column h-100">
           <slot name="title">
-            <span class="ml-2 px-1 media-title font-weight-bold" :title="media.name">
+            <span class="ms-2 px-1 media-title font-weight-bold" :title="media.name">
               {{ media.name || media.file?.name }}
             </span>
           </slot>
@@ -52,7 +52,7 @@
           <v-spacer></v-spacer>
 
           <slot name="append">
-            <div class="ml-2 px-1 text-caption d-flex flex-column">
+            <div class="ms-2 px-1 text-caption d-flex flex-column">
               <span>{{ t(`file.source.${media.file?.source ?? 'other'}`) }}</span>
               <span>
                 {{ new Date(media.createAt).toLocaleString(locale) }}

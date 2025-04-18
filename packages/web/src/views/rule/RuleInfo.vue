@@ -92,7 +92,7 @@
           >
             {{ t('app.actions.save') }}
           </v-btn>
-          <v-btn @click="reset()" color="warning" variant="tonal" class="flex-grow-0 ml-2" :prepend-icon="mdiClose">
+          <v-btn @click="reset()" color="warning" variant="tonal" class="flex-grow-0 ms-2" :prepend-icon="mdiClose">
             {{ t('app.actions.reset') }}
           </v-btn>
         </div>
@@ -103,11 +103,11 @@
               <p class="text-subtitle-1">{{ t('rule.info.duplicate') }}</p>
               <p class="text-caption">{{ t('rule.info.duplicateDescription') }}</p>
             </v-container>
-            <v-btn class="ml-4" variant="tonal" color="primary" :loading="ruleDuplicating" @click="duplicateRule">
+            <v-btn class="ms-4" variant="tonal" color="primary" :loading="ruleDuplicating" @click="duplicateRule">
               {{ t('rule.info.duplicateBtn') }}
             </v-btn>
           </v-container>
-          <v-divider class="ml-4"></v-divider>
+          <v-divider class="ms-4"></v-divider>
           <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
             <v-container class="pa-0">
               <p class="text-subtitle-1">{{ t('rule.info.delete') }}</p>
@@ -128,7 +128,7 @@
                 </v-card-actions>
               </v-card>
               <template #activator="{ props }">
-                <v-btn v-bind="props" class="ml-4" variant="tonal" color="error" :loading="ruleDeleting">
+                <v-btn v-bind="props" class="ms-4" variant="tonal" color="error" :loading="ruleDeleting">
                   {{ t('app.actions.delete') }}
                 </v-btn>
               </template>

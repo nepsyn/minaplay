@@ -51,7 +51,7 @@
           <br />
           {{ source.url }}
           <template #activator="{ props }">
-            <v-icon class="mr-1" v-bind="props">
+            <v-icon class="me-1" v-bind="props">
               <v-img cover :src="getFaviconUrl(source.url)" aspect-ratio="1">
                 <template #placeholder>
                   <v-img :src="BlankFavicon" aspect-ratio="1"></v-img>

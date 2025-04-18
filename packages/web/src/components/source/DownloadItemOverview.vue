@@ -28,7 +28,7 @@
     <div class="mt-2 d-flex flex-row align-center">
       <template v-for="(action, index) in actions" :key="index">
         <v-chip
-          class="mr-2"
+          class="me-2"
           density="comfortable"
           :prepend-icon="action.icon"
           v-if="action.show"

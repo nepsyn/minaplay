@@ -22,7 +22,7 @@
             <v-container class="py-0 d-flex flex-column justify-space-around">
               <div class="d-flex align-center">
                 <span class="text-h6">{{ live.title ?? t('live.unnamed') }}</span>
-                <v-icon class="ml-2 text-medium-emphasis" v-if="live.hasPassword" :icon="mdiLock" size="small"></v-icon>
+                <v-icon class="ms-2 text-medium-emphasis" v-if="live.hasPassword" :icon="mdiLock" size="small"></v-icon>
               </div>
               <div v-if="state?.stream?.title" class="text-subtitle-2 text-medium-emphasis">
                 <span>
@@ -33,9 +33,9 @@
             </v-container>
           </template>
           <v-skeleton-loader v-else type="list-item-avatar-two-line" min-width="360px"></v-skeleton-loader>
-          <div v-if="state" class="d-flex flex-row align-center flex-grow-0 ml-2">
+          <div v-if="state" class="d-flex flex-row align-center flex-grow-0 ms-2">
             <v-icon :icon="mdiAccountMultiple"></v-icon>
-            <span class="ml-2">{{ state.users.length }}</span>
+            <span class="ms-2">{{ state.users.length }}</span>
           </div>
         </v-container>
         <v-divider class="py-0 d-flex d-md-none"></v-divider>
@@ -67,7 +67,7 @@
                     <div class="d-flex flex-row align-center">
                       <span>{{ t('live.play.validateHint') }}</span>
                       <v-spacer></v-spacer>
-                      <v-btn @click="validateDialog = true" class="ml-2" color="info" variant="outlined">
+                      <v-btn @click="validateDialog = true" class="ms-2" color="info" variant="outlined">
                         {{ t('live.play.validate') }}
                       </v-btn>
                     </div>
@@ -174,7 +174,7 @@
                     <template #activator="{ props }">
                       <v-btn
                         variant="flat"
-                        class="ml-2 text-medium-emphasis"
+                        class="ms-2 text-medium-emphasis"
                         density="comfortable"
                         :icon="producer.paused ? mdiMicrophoneOff : mdiMicrophone"
                         v-bind="props"
@@ -244,7 +244,7 @@
                       <span>{{ t('live.entity.title') }}</span>
                     </template>
                     <template #append>
-                      <span class="text-medium-emphasis text-break text-wrap ml-4">
+                      <span class="text-medium-emphasis text-break text-wrap ms-4">
                         {{ live?.title ?? t('live.unnamed') }}
                       </span>
                     </template>
@@ -374,7 +374,7 @@
                         </v-col>
                         <v-col cols="auto">
                           <v-btn
-                            class="ml-2"
+                            class="ms-2"
                             variant="tonal"
                             color="primary"
                             :disabled="episodesLoading"
@@ -474,7 +474,7 @@
                       <span>{{ t('live.entity.stream') }}</span>
                     </template>
                     <template #append>
-                      <span class="text-medium-emphasis text-break text-wrap ml-4">
+                      <span class="text-medium-emphasis text-break text-wrap ms-4">
                         {{ t(state?.stream ? `live.play.stream.${state.stream.type}` : 'live.play.noStream') }}
                       </span>
                     </template>

@@ -7,7 +7,7 @@
   >
     <v-layout>
       <v-system-bar>
-        <v-icon :icon="mdiConsole" class="mr-2"></v-icon>
+        <v-icon :icon="mdiConsole" class="me-2"></v-icon>
         <span>{{ t('plugin.console') }}</span>
         <v-spacer></v-spacer>
         <v-btn
@@ -22,7 +22,7 @@
           size="small"
           density="compact"
           variant="text"
-          class="ml-2"
+          class="ms-2"
           @click="layout.pluginConsoleFullscreen = !layout.pluginConsoleFullscreen"
         ></v-btn>
         <v-btn
@@ -30,7 +30,7 @@
           size="small"
           density="compact"
           variant="text"
-          class="ml-2"
+          class="ms-2"
           @click="layout.pluginConsoleSheet = false"
         ></v-btn>
       </v-system-bar>
@@ -41,11 +41,11 @@
               <v-container fluid class="h-100 d-flex align-center justify-center">
                 <template v-if="connectError">
                   <v-icon :icon="mdiCloseCircle"></v-icon>
-                  <span class="text-subtitle-1 font-weight-bold ml-2">{{ t('plugin.connectFailed') }}</span>
+                  <span class="text-subtitle-1 font-weight-bold ms-2">{{ t('plugin.connectFailed') }}</span>
                   <v-btn
                     variant="text"
                     color="primary"
-                    class="text-subtitle-1 font-weight-bold ml-2"
+                    class="text-subtitle-1 font-weight-bold ms-2"
                     @click="socket.connect()"
                   >
                     {{ t('app.actions.retry') }}
@@ -53,7 +53,7 @@
                 </template>
                 <template v-else>
                   <v-progress-circular indeterminate color="primary"></v-progress-circular>
-                  <span class="text-subtitle-1 font-weight-bold ml-2">{{ t('plugin.initializing') }}</span>
+                  <span class="text-subtitle-1 font-weight-bold ms-2">{{ t('plugin.initializing') }}</span>
                 </template>
               </v-container>
             </template>

@@ -3,7 +3,7 @@
     <single-item-loader class="pa-0" :loader="statusLoader">
       <div class="d-flex align-center">
         <v-icon :icon="mdiChartDonut" size="large"></v-icon>
-        <span class="ml-4 text-h5">{{ t('system.usage') }}</span>
+        <span class="ms-4 text-h5">{{ t('system.usage') }}</span>
       </div>
       <v-sheet class="border rounded-lg pa-4 my-4">
         <v-row class="pa-0">
@@ -32,7 +32,7 @@
         <v-col cols="12" sm="6">
           <div class="d-flex align-center">
             <v-icon :icon="mdiTimerOutline" size="large"></v-icon>
-            <span class="ml-4 text-h5">{{ t('system.workingTime') }}</span>
+            <span class="ms-4 text-h5">{{ t('system.workingTime') }}</span>
           </div>
           <v-sheet class="border rounded-lg pa-4 my-4">
             <v-card-subtitle class="px-0">{{ t('system.startTime') }}</v-card-subtitle>
@@ -44,7 +44,7 @@
         <v-col cols="12" sm="6">
           <div class="d-flex align-center">
             <v-icon :icon="mdiTagOutline" size="large"></v-icon>
-            <span class="ml-4 text-h5">{{ t('system.version') }}</span>
+            <span class="ms-4 text-h5">{{ t('system.version') }}</span>
           </div>
           <v-sheet class="border rounded-lg pa-4 my-4">
             <v-card-subtitle class="px-0">{{ t('system.webVersion') }}</v-card-subtitle>
@@ -57,7 +57,7 @@
                 {{ t('system.latestServerVersion') }}
                 <v-chip
                   v-if="versionUpdate?.current !== versionUpdate?.latest"
-                  class="ml-2 text-caption"
+                  class="ms-2 text-caption"
                   color="error"
                   density="compact"
                 >
@@ -76,7 +76,7 @@
       </v-row>
       <div class="d-flex align-center">
         <v-icon :icon="mdiInformationOutline" size="large"></v-icon>
-        <span class="ml-4 text-h5">{{ t('system.about.title') }}</span>
+        <span class="ms-4 text-h5">{{ t('system.about.title') }}</span>
       </div>
       <v-sheet class="border rounded-lg pa-4 my-4 d-flex flex-column">
         <span class="text-body-1">{{ t('system.about.description') }}</span>

@@ -4,7 +4,7 @@
       <v-row dense class="pa-0 mb-3">
         <v-col cols="auto" class="d-flex flex-row align-center">
           <v-icon :icon="mdiMagnify" size="x-large"></v-icon>
-          <span class="text-h5 ml-3">{{ t('parser.search') }}</span>
+          <span class="text-h5 ms-3">{{ t('parser.search') }}</span>
         </v-col>
       </v-row>
 
@@ -47,7 +47,7 @@
       <v-row dense class="pa-0 mb-3">
         <v-col cols="auto" class="d-flex flex-row align-center">
           <v-icon :icon="mdiCalendarMonthOutline" size="x-large"></v-icon>
-          <span class="text-h5 ml-3">{{ t('parser.calendar') }}</span>
+          <span class="text-h5 ms-3">{{ t('parser.calendar') }}</span>
         </v-col>
         <v-spacer></v-spacer>
         <v-col cols="auto">

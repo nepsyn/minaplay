@@ -17,14 +17,14 @@
           </template>
         </v-menu>
 
-        <span class="ml-4 text-subtitle-1 font-weight-bold">{{ message.control.id }}</span>
+        <span class="ms-4 text-subtitle-1 font-weight-bold">{{ message.control.id }}</span>
       </template>
       <template v-else-if="message.from === 'user' && api.user">
         <user-avatar :src="api.user.avatar && api.File.buildRawPath(api.user.avatar)" size="small"></user-avatar>
-        <span class="ml-4 text-subtitle-1 font-weight-bold">{{ api.user.username }}</span>
+        <span class="ms-4 text-subtitle-1 font-weight-bold">{{ api.user.username }}</span>
       </template>
     </div>
-    <div class="ml-12 mb-1" v-for="item in message.messages">
+    <div class="ms-12 mb-1" v-for="item in message.messages">
       <plugin-message-item v-if="canRender(item)" :message="item"></plugin-message-item>
     </div>
   </div>

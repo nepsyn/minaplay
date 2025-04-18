@@ -41,7 +41,7 @@
       >
         <span>{{ t('app.actions.view') }}</span>
         <template #append>
-          <v-icon class="ml-1" :icon="mdiOpenInNew" size="12"></v-icon>
+          <v-icon class="ms-1" :icon="mdiOpenInNew" size="12"></v-icon>
         </template>
       </v-chip>
     </template>

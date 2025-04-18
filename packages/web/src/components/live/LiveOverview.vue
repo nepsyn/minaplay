@@ -23,10 +23,10 @@
 
     <div class="d-flex flex-row mt-1 align-center">
       <user-avatar size="40" :src="live?.user?.avatar && api.File.buildRawPath(live.user.avatar)"></user-avatar>
-      <div class="d-flex flex-column px-1 ml-2 justify-space-around">
+      <div class="d-flex flex-column px-1 ms-2 justify-space-around">
         <div class="mt-2 d-flex flex-row align-center font-weight-bold live-title">
           <span class="live-title">{{ live.title || t('live.unnamed') }}</span>
-          <v-icon class="ml-1 text-medium-emphasis" v-if="live.hasPassword" :icon="mdiLock" size="x-small"></v-icon>
+          <v-icon class="ms-1 text-medium-emphasis" v-if="live.hasPassword" :icon="mdiLock" size="x-small"></v-icon>
         </div>
         <span class="text-caption text-medium-emphasis">{{ live.user?.username || t('user.deleted') }}</span>
       </div>

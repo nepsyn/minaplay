@@ -1,7 +1,7 @@
 <template>
   <v-card flat border class="d-flex flex-column">
     <v-card-title class="d-flex align-center">
-      <v-avatar size="small" v-if="plugin.icon" class="mr-2">
+      <v-avatar size="small" v-if="plugin.icon" class="me-2">
         <v-img height="24" :src="plugin.icon"></v-img>
       </v-avatar>
       <span>{{ plugin.id }}</span>
@@ -48,7 +48,7 @@
           <v-tooltip location="bottom">
             {{ t('plugin.entity.version') }}
             <template #activator="{ props }">
-              <v-icon v-bind="props" size="small" :icon="mdiTagOutline" class="mr-2"></v-icon>
+              <v-icon v-bind="props" size="small" :icon="mdiTagOutline" class="me-2"></v-icon>
             </template>
           </v-tooltip>
           {{ plugin.version }}
@@ -57,7 +57,7 @@
           <v-tooltip location="bottom">
             {{ t('plugin.entity.license') }}
             <template #activator="{ props }">
-              <v-icon v-bind="props" size="small" :icon="mdiScaleBalance" class="mr-2"></v-icon>
+              <v-icon v-bind="props" size="small" :icon="mdiScaleBalance" class="me-2"></v-icon>
             </template>
           </v-tooltip>
           {{ plugin.license }}
@@ -66,7 +66,7 @@
           <v-tooltip location="bottom">
             {{ t('plugin.entity.author') }}
             <template #activator="{ props }">
-              <v-icon v-bind="props" size="small" :icon="mdiAccountOutline" class="mr-2"></v-icon>
+              <v-icon v-bind="props" size="small" :icon="mdiAccountOutline" class="me-2"></v-icon>
             </template>
           </v-tooltip>
           {{ plugin.author }}
@@ -98,7 +98,7 @@
               v-if="!plugin.isBuiltin"
               v-bind="props"
               density="comfortable"
-              class="mr-1"
+              class="me-1"
               variant="plain"
               :loading="uninstalling"
               color="error"

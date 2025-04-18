@@ -8,15 +8,15 @@
           ·
           <time-ago :time="chat.data.createAt" interval="60000"></time-ago>
         </div>
-        <v-container fluid class="pa-0 ml-1 d-flex align-center">
+        <v-container fluid class="pa-0 ms-1 d-flex align-center">
           <slot name="actions"></slot>
         </v-container>
       </v-container>
       <template v-if="message.type === 'Text'">
-        <span class="plain-text ml-5 mr-2">{{ message.content }}</span>
+        <span class="plain-text ms-5 me-2">{{ message.content }}</span>
       </template>
       <template v-else-if="message.type === 'NetworkImage'">
-        <zoom-img class="ml-5 rounded" :src="message.url" max-width="200px" @load="emits('load')"></zoom-img>
+        <zoom-img class="ms-5 rounded" :src="message.url" max-width="200px" @load="emits('load')"></zoom-img>
       </template>
       <template v-else>
         <span class="plain-text">{{ t('live.play.unknownChatType') }}</span>

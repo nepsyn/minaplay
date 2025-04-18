@@ -77,7 +77,7 @@
               <template v-for="(item, index) in items" :key="index">
                 <v-list-item class="px-0 py-2">
                   <template #append>
-                    <div class="ml-2">
+                    <div class="ms-2">
                       <div class="d-none d-sm-flex flex-row">
                         <template v-for="(action, index) in actions" :key="index">
                           <div v-if="action.show(item.raw)">

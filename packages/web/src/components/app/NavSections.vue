@@ -1,7 +1,7 @@
 <template>
   <div>
     <span class="text-h5">{{ t('layout.sections') }}</span>
-    <v-tabs class="mt-4 ml-1 border-s-sm" direction="vertical" density="comfortable" color="primary">
+    <v-tabs class="mt-4 ms-1 border-s-sm" direction="vertical" density="comfortable" color="primary">
       <v-tab
         density="comfortable"
         v-for="(tab, index) in tabs"

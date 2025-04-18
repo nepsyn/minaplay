@@ -138,7 +138,7 @@
           <div class="pb-2" v-if="isMedia">
             <div class="d-flex align-center">
               <v-icon :icon="mdiMultimedia" size="large"></v-icon>
-              <span class="text-h6 ml-3">{{ t('resource.recommendMedias') }}</span>
+              <span class="text-h6 ms-3">{{ t('resource.recommendMedias') }}</span>
             </div>
             <multi-items-loader class="px-0 py-3" :loader="recommendsLoader" :hide-empty="recommends.length > 0" auto>
               <template #empty>
@@ -159,7 +159,7 @@
             <div class="pb-2" v-if="!isMedia">
               <div class="d-flex align-center">
                 <v-icon :icon="mdiViewComfy" size="large"></v-icon>
-                <span class="text-h6 ml-3">{{ t('resource.episodes') }}</span>
+                <span class="text-h6 ms-3">{{ t('resource.episodes') }}</span>
               </div>
               <multi-items-loader class="px-0 py-3" :loader="episodesLoader" :hide-empty="episodes.length > 0" lazy>
                 <v-row dense>
@@ -180,7 +180,7 @@
             <div class="pb-2" v-if="!isMedia">
               <div class="d-flex align-center">
                 <v-icon :icon="mdiInformationVariantCircleOutline" size="large"></v-icon>
-                <span class="text-h6 ml-3">{{ t('resource.information') }}</span>
+                <span class="text-h6 ms-3">{{ t('resource.information') }}</span>
               </div>
               <single-item-loader class="px-0 py-3" :loader="currentEpisodeLoader">
                 <v-row>
@@ -226,7 +226,7 @@
           <div class="pb-2" v-if="!isMedia">
             <div class="d-flex align-center">
               <v-icon :icon="mdiMultimedia" size="large"></v-icon>
-              <span class="text-h6 ml-3">{{ t('resource.recommendSeries') }}</span>
+              <span class="text-h6 ms-3">{{ t('resource.recommendSeries') }}</span>
             </div>
             <multi-items-loader class="px-0 py-3" :loader="seriesLoader" :hide-empty="series.length > 0">
               <template #empty>

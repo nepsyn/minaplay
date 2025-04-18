@@ -115,7 +115,7 @@
           <user-avatar
             v-bind="props"
             v-if="api.user"
-            class="cursor-pointer mr-4"
+            class="cursor-pointer me-4"
             :src="api.user.avatar && api.File.buildRawPath(api.user?.avatar)"
             size="40"
           >
@@ -136,7 +136,7 @@
             <v-list-subheader v-if="subNav.isHeader" class="font-weight-black text-high-emphasis">
               {{ subNav.name }}
             </v-list-subheader>
-            <v-divider class="my-3 ml-10" v-else-if="subNav.isDivider"></v-divider>
+            <v-divider class="my-3 ms-10" v-else-if="subNav.isDivider"></v-divider>
             <v-list-item
               v-else
               :to="subNav.route"

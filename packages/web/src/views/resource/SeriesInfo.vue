@@ -18,7 +18,7 @@
               <div class="d-flex flex-row align-center justify-space-between">
                 <div>
                   <span class="text-h5 text-break">{{ series.name }}</span>
-                  <span v-if="series.season" class="text-body-2 text-medium-emphasis text-break ml-2">
+                  <span v-if="series.season" class="text-body-2 text-medium-emphasis text-break ms-2">
                     {{ +series.season ? t('series.seasonLabel', { season: series.season }) : series.season }}
                   </span>
                 </div>
@@ -46,13 +46,13 @@
                   <template #prepend>
                     <span class="font-weight-bold">{{ t('episode.info.count') }}</span>
                   </template>
-                  <span class="ml-2">{{ series.count ?? t('app.unknown') }}</span>
+                  <span class="ms-2">{{ series.count ?? t('app.unknown') }}</span>
                 </v-list-item>
                 <v-list-item class="px-0 text-subtitle-2" density="compact">
                   <template #prepend>
                     <span class="font-weight-bold">{{ t('episode.info.pubAt') }}</span>
                   </template>
-                  <span class="ml-2">
+                  <span class="ms-2">
                     {{ Date.parse(series.pubAt!) ? new Date(series.pubAt!).toLocaleString(locale) : t('app.unknown') }}
                   </span>
                 </v-list-item>
@@ -60,7 +60,7 @@
                   <template #prepend>
                     <span class="font-weight-bold">{{ t('episode.info.finished') }}</span>
                   </template>
-                  <span class="ml-2">
+                  <span class="ms-2">
                     {{ series.finished != undefined ? t(series.finished ? 'app.yes' : 'app.no') : t('app.unknown') }}
                   </span>
                 </v-list-item>
@@ -71,9 +71,9 @@
                   <expandable-text
                     v-if="series.tags && series.tags.length > 0"
                     :content="(series.tags ?? []).map(({ name }) => name).join('  ')"
-                    class="ml-2"
+                    class="ms-2"
                   ></expandable-text>
-                  <span v-else class="ml-2">{{ t('app.none') }}</span>
+                  <span v-else class="ms-2">{{ t('app.none') }}</span>
                 </v-list-item>
               </v-list>
             </v-col>
@@ -147,7 +147,7 @@
         <v-sheet border class="pa-6 my-4 rounded">
           <div class="d-flex align-center">
             <v-icon :icon="mdiViewComfy" size="large"></v-icon>
-            <span class="text-h6 ml-3">{{ t('resource.episodes') }}</span>
+            <span class="text-h6 ms-3">{{ t('resource.episodes') }}</span>
           </div>
           <multi-items-loader class="px-0 py-3" :loader="episodesLoader" :hide-empty="episodes.length > 0">
             <v-row dense>

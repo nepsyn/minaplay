@@ -9,7 +9,7 @@
         </v-container>
         <span class="text-h6">{{ api.user?.username }}</span>
       </v-container>
-      <v-divider class="ml-4"></v-divider>
+      <v-divider class="ms-4"></v-divider>
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
         <p class="text-subtitle-1">{{ t('settings.profile.avatar') }}</p>
         <div class="d-flex flex-column align-end">
@@ -27,7 +27,7 @@
           </v-btn>
         </div>
       </v-container>
-      <v-divider class="ml-4"></v-divider>
+      <v-divider class="ms-4"></v-divider>
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
         <v-container class="pa-0">
           <p class="text-subtitle-1">{{ t('settings.profile.globalNotification') }}</p>
@@ -41,7 +41,7 @@
           @update:model-value="updateNotify({ notify: api.user?.notify })"
         ></v-switch>
       </v-container>
-      <v-divider class="ml-4"></v-divider>
+      <v-divider class="ms-4"></v-divider>
       <v-container class="pa-4 d-flex flex-row align-center justify-space-between">
         <v-container class="pa-0">
           <p class="text-subtitle-1">{{ t('settings.profile.password') }}</p>
@@ -144,7 +144,7 @@
               ></v-btn>
             </template>
           </v-list-item>
-          <v-divider v-if="index < api.user!.metas.length - 1" class="ml-4"></v-divider>
+          <v-divider v-if="index < api.user!.metas.length - 1" class="ms-4"></v-divider>
         </template>
       </single-item-loader>
     </v-sheet>

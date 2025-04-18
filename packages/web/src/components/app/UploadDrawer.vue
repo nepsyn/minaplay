@@ -13,7 +13,7 @@
             {{ t('layout.upload.title') }}
           </v-toolbar-title>
           <v-spacer></v-spacer>
-          <v-btn class="mr-4" variant="text" color="primary" :icon="mdiPlus" @click="selectAndUploadMedia()"></v-btn>
+          <v-btn class="me-4" variant="text" color="primary" :icon="mdiPlus" @click="selectAndUploadMedia()"></v-btn>
         </v-toolbar>
         <v-alert class="mx-4 mb-2" variant="tonal" type="warning" density="compact" :icon="mdiInformationOutline">
           {{ t('layout.upload.closePageHint') }}

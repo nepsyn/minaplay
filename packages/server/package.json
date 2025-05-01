@@ -54,7 +54,7 @@
     "maria2": "^0.3.4",
     "mediasoup": "^3.15.7",
     "multer": "1.4.5-lts.2",
-    "mysql2": "^3.14.0",
+    "mysql2": "^3.14.1",
     "node-fetch": "^3.3.2",
     "node-media-server": "^2.7.4",
     "nodemailer": "^6.10.0",

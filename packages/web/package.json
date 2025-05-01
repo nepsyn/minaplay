@@ -58,7 +58,7 @@
     "vite-plugin-pwa": "^1.0.0",
     "vite-plugin-vuetify": "^2.1.1",
     "vue-cli-plugin-vue-i18n": "~1.0.1",
-    "vue-tsc": "^2.2.8",
+    "vue-tsc": "^2.2.10",
     "workbox-window": "^7.3.0"
   }
 }

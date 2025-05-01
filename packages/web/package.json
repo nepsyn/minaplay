@@ -44,7 +44,7 @@
     "vuetify": "^3.8.1"
   },
   "devDependencies": {
-    "@babel/types": "^7.27.0",
+    "@babel/types": "^7.27.1",
     "@types/node": "^22.14.0",
     "@types/qs": "^6.9.18",
     "@vitejs/plugin-vue": "^5.2.3",
